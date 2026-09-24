@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <!-- Subtle geometric background facets -->
+  <defs>
+    <linearGradient id="bgGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+  </defs>
+  
+  <rect width="500" height="500" fill="url(#bgGlow)"/>
+  
+  <!-- Subtle angled architectural background patterns -->
+  <polygon points="0,0 250,0 120,200 0,100" fill="#f1f5f9" opacity="0.6"/>
+  <polygon points="500,0 280,0 400,200 500,120" fill="#f1f5f9" opacity="0.6"/>
+  <polygon points="0,500 200,500 100,380 0,420" fill="#f1f5f9" opacity="0.5"/>
+  <polygon points="500,500 320,500 420,360 500,400" fill="#f1f5f9" opacity="0.5"/>
+
+  <g transform="translate(0, 5)">
+    <!-- Roof 1 (Top Orange Gable) -->
+    <path d="M 250,55 L 285,100 L 285,245 L 273,245 L 273,110 L 250,80 L 227,110 L 227,245 L 215,245 L 215,100 Z" fill="#F58220"/>
+    
+    <!-- Roof 2 (Middle Green Gable) -->
+    <path d="M 250,115 L 320,195 L 320,245 L 308,245 L 308,202 L 250,135 L 192,202 L 192,245 L 180,245 L 180,195 Z" fill="#22A33D"/>
+    
+    <!-- Roof 3 (Lower Orange Outer Gable Spreading Down) -->
+    <path d="M 250,165 L 355,275 L 355,245 L 250,140 L 145,245 L 145,275 Z" fill="#F58220"/>
+    <rect x="145" y="200" width="12" height="45" fill="#F58220"/>
+    <rect x="343" y="200" width="12" height="45" fill="#F58220"/>
+
+    <!-- 4-Pane Green Window -->
+    <rect x="238" y="172" width="10" height="10" rx="1" fill="#22A33D"/>
+    <rect x="252" y="172" width="10" height="10" rx="1" fill="#22A33D"/>
+    <rect x="238" y="186" width="10" height="10" rx="1" fill="#22A33D"/>
+    <rect x="252" y="186" width="10" height="10" rx="1" fill="#22A33D"/>
+
+    <!-- MGM Typographic Block -->
+    <!-- Left M (Green) -->
+    <path d="M 85,255 L 138,255 L 175,325 L 212,255 L 220,255 L 220,385 L 180,385 L 180,312 L 150,370 L 128,370 L 125,312 L 125,385 L 85,385 Z" fill="#22A33D"/>
+    
+    <!-- Center G (Warm Orange/Gold) -->
+    <path d="M 250,253 C 285,253 312,277 312,320 C 312,363 285,387 250,387 C 215,387 195,360 195,320 C 195,280 216,253 250,253 Z M 250,285 C 235,285 227,298 227,320 C 227,342 235,355 250,355 C 263,355 272,344 274,332 L 246,332 L 246,308 L 305,308 C 306,312 306,316 306,320 C 306,355 285,380 250,380 C 218,380 200,355 200,320 C 200,285 218,260 250,260 Z" fill="#F58220"/>
+    
+    <!-- Right M (Green) -->
+    <path d="M 280,255 L 288,255 L 325,325 L 362,255 L 415,255 L 415,385 L 375,385 L 375,312 L 372,370 L 350,370 L 320,312 L 320,385 L 280,385 Z" fill="#22A33D"/>
+
+    <!-- Subtitle: SOCIEDAD CIVIL MGM INMOBILIARIA -->
+    <text x="250" y="418" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="20" letter-spacing="1.5" fill="#18181B">
+      SOCIEDAD CIVIL MGM INMOBILIARIA
+    </text>
+  </g>
+</svg>

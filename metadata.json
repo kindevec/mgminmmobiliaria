@@ -1,0 +1,6 @@
+{
+  "name": "MGM Inmobiliaria | Lotes y Proyectos Residenciales en Ecuador",
+  "description": "Sociedad Civil MGM Inmobiliaria. Venta de lotes urbanizados de alta plusvalía y proyectos residenciales exclusivos como Ciudadela Miravalle en Ecuador.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
