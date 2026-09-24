@@ -12,23 +12,19 @@ import {
   Star,
   ChevronRight,
   ChevronLeft,
-  Handshake,
-  FileCheck2,
   KeyRound,
   Trees,
   Sparkles,
   CalendarCheck2,
-  Info,
   Layers,
   MapPin,
+  Search,
   CheckCircle2,
-  Compass,
 } from 'lucide-react';
 import type { PageView } from '../Header';
 import {
   AMENITIES_MIRAVALLE,
   TESTIMONIALS_DATA,
-  getMiravalleWhatsAppUrl,
   getGeneralWhatsAppUrl,
   type LotProperty,
 } from '@/src/data/lots';
@@ -38,8 +34,6 @@ import { WhatsAppIcon } from '../SocialIcons';
 import {
   WaveDarkToCream,
   WaveCreamToDark,
-  WaveDarkToCreamSkyline,
-  WaveCreamToDarkSkyline,
   TopographicContours,
 } from '../WaveDividers';
 
@@ -50,36 +44,36 @@ interface HomeViewProps {
   onFilterSearch?: (location: string, type: string, maxPrice: number) => void;
 }
 
-// Data for "Nosotros" summary carousel
+// 4 Pilares Fundacionales
 const ABOUT_PILLARS = [
   {
     title: 'Certeza Jurídica & Notarial',
     subtitle: 'Escrituras Individuales Inmediatas',
-    desc: 'Cada predio cuenta con aprobación municipal definitiva, levantamiento topográfico georreferenciado y protocolización ante Notaría Pública, libre de hipotecas.',
+    desc: 'Cada lote cuenta con aprobación municipal definitiva, levantamiento topográfico georreferenciado y protocolización solemne ante Notaría Pública, libre de gravámenes o prohibiciones.',
     icon: ShieldCheck,
     tag: '100% Legalizado',
     image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
   },
   {
     title: 'Obras Civiles Concluidas',
-    subtitle: 'Urbanismo Real, No Promesas',
-    desc: 'Calzadas adoquinadas de 10 a 12 metros, aceras con franjas peatonales, bordillos de hormigón y alcantarillado pluvial y sanitario en pleno funcionamiento.',
+    subtitle: 'Urbanismo Real y Palpable',
+    desc: 'Calzadas adoquinadas de 10 a 12 metros, aceras con franjas peatonales, bordillos de hormigón y redes de alcantarillado pluvial y sanitario en pleno funcionamiento in situ.',
     icon: Building,
     tag: 'Obras Entregadas',
     image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80',
   },
   {
-    title: 'Financiamiento Directo hasta 48 Meses',
+    title: 'Crédito Directo hasta 48 Meses',
     subtitle: 'Sin Bancos ni Buró de Crédito',
-    desc: 'Crédito directo otorgado por la urbanizadora. Cuotas mensuales fijas, mínimos requisitos (solo cédula) y aprobación sin trabas burocráticas.',
+    desc: 'Financiamiento directo otorgado por la urbanizadora. Cuotas mensuales fijas en dólares, mínimos requisitos (solo tu cédula) y aprobación sin trabas burocráticas para ecuatorianos y residentes en el exterior.',
     icon: CreditCard,
     tag: 'Crédito Propio',
     image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
   },
   {
     title: 'Redes Eléctricas Soterradas',
-    subtitle: 'Estética y Seguridad Subterránea',
-    desc: 'Cableado eléctrico y acometidas de fibra óptica totalmente bajo tierra, garantizando un horizonte limpio sin cables aéreos y máxima estabilidad.',
+    subtitle: 'Estética y Vanguardia Subterránea',
+    desc: 'Acometidas eléctricas y ductería de telecomunicaciones bajo tierra, garantizando un horizonte despejado sin cables aéreos, mayor seguridad y plusvalía inmediata.',
     icon: KeyRound,
     tag: 'Tecnología Soterrada',
     image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80',
@@ -90,20 +84,25 @@ export function HomeView({
   onNavigate,
   onOpenVisitModal,
   onSelectLot,
+  onFilterSearch,
 }: HomeViewProps) {
   const { properties } = useProperties();
 
-  // Carousel 1: "Nosotros" Pillars
+  // Search Bar inside Hero
+  const [heroType, setHeroType] = useState('Todos');
+  const [heroPrice, setHeroPrice] = useState('Todos');
+
+  // Carousel 1: Pillars
   const [aboutIndex, setAboutIndex] = useState(0);
 
-  // Carousel 2: "Lotes / Catálogo" Filter & Carousel
+  // Carousel 2: Catalog
   const [catalogTab, setCatalogTab] = useState<'Todos' | 'Lote de Terreno' | 'Vivienda'>('Todos');
   const [catalogIndex, setCatalogIndex] = useState(0);
 
-  // Carousel 3: "Miravalle" Amenities Carousel
+  // Carousel 3: Miravalle
   const [miravalleIndex, setMiravalleIndex] = useState(0);
 
-  // Carousel 4: "Testimonios / Confianza"
+  // Carousel 4: Testimonials
   const [testimonialIndex, setTestimonialIndex] = useState(0);
 
   // Filtered properties for Catalog Summary Carousel
@@ -112,7 +111,6 @@ export function HomeView({
     return item.type === catalogTab;
   });
 
-  // Items per page in Catalog Carousel
   const itemsPerPage = 3;
   const totalCatalogPages = Math.ceil(filteredCatalog.length / itemsPerPage);
   const visibleCatalog = filteredCatalog.slice(
@@ -148,17 +146,29 @@ export function HomeView({
     setTestimonialIndex((prev) => (prev - 1 < 0 ? TESTIMONIALS_DATA.length - 1 : prev - 1));
   };
 
+  const handleHeroSearch = () => {
+    let parsedPrice = 120000;
+    if (heroPrice === '25k') parsedPrice = 25000;
+    if (heroPrice === '35k') parsedPrice = 35000;
+    if (heroPrice === '50k') parsedPrice = 50000;
+
+    if (onFilterSearch) {
+      onFilterSearch('Todas', heroType, parsedPrice);
+    }
+    onNavigate('properties');
+  };
+
   return (
     <div className="w-full overflow-hidden bg-slate-950 text-white">
       {/* =========================================================================
-          1. CINEMATIC FULLSCREEN HERO (Resumen General & Bienvenida)
+          1. CINEMATIC HERO — Inversión Inmobiliaria & Búsqueda Predictiva
           ========================================================================= */}
-      <section className="relative w-full min-h-[620px] md:min-h-[720px] lg:min-h-[780px] flex flex-col justify-between overflow-hidden bg-slate-950 text-white">
-        {/* Cinematic Background with Slow Ken Burns Zoom Effect */}
+      <section className="relative w-full min-h-[660px] md:min-h-[740px] lg:min-h-[800px] flex flex-col justify-between overflow-hidden bg-slate-950 text-white">
+        {/* Background Photo with subtle zoom */}
         <motion.div
           initial={{ scale: 1 }}
-          animate={{ scale: [1, 1.08, 1] }}
-          transition={{ duration: 24, repeat: Infinity, ease: 'easeInOut' }}
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ duration: 28, repeat: Infinity, ease: 'easeInOut' }}
           className="absolute inset-0 w-full h-full pointer-events-none"
         >
           <Image
@@ -167,146 +177,134 @@ export function HomeView({
             fill
             priority
             sizes="100vw"
-            className="object-cover object-center brightness-[0.88]"
+            className="object-cover object-center brightness-[0.82]"
             referrerPolicy="no-referrer"
           />
         </motion.div>
 
-        {/* Multi-layer Dark Gradient Overlays for Maximum Contrast */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/85 via-slate-950/35 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 bg-black/25 pointer-events-none" />
+        {/* Gradient Contrast Layers */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-slate-950/40 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-black/20 pointer-events-none" />
 
-        {/* Center Content Container */}
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col justify-center pt-28 sm:pt-32 pb-8">
+        {/* Main Hero Container */}
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col justify-center pt-28 sm:pt-32 pb-12">
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
             className="max-w-4xl space-y-6"
           >
-            {/* Informative Portal Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/20 bg-white/10 backdrop-blur-md shadow-lg"
-            >
+            {/* Status Pill */}
+            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-950/40 backdrop-blur-md shadow-lg">
               <Sparkles className="h-4 w-4 text-[#25D366] shrink-0" />
-              <span className="text-xs font-bold uppercase tracking-widest text-[#25D366]">
-                Portal Informativo Oficial · Sociedad Civil MGM Inmobiliaria
+              <span className="text-xs font-bold uppercase tracking-widest text-emerald-300">
+                Lotes Urbanizados con Escrituras al Día · Ecuador
               </span>
-            </motion.div>
+            </div>
 
-            {/* Main Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.06] [text-wrap:balance]"
-            >
+            {/* Editorial Main Headline */}
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.05] [text-wrap:balance]">
               Tierra firme, certeza jurídica y el{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300 font-serif italic font-normal">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-400 font-serif italic font-normal">
                 patrimonio de tu familia.
               </span>
-            </motion.h1>
+            </h1>
 
-            {/* Informative Summary Subtitle */}
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-sm sm:text-base md:text-lg text-slate-200 max-w-2xl leading-relaxed drop-shadow-sm"
-            >
-              Conoce nuestro resumen informativo: proyectos urbanizados con obras concluidas, 
-              escrituras notariales individuales y crédito directo sin bancos en Ecuador.
-            </motion.p>
+            {/* Informative Subtitle */}
+            <p className="text-sm sm:text-base md:text-lg text-slate-200 max-w-2xl leading-relaxed drop-shadow-sm">
+              Sociedad Civil MGM Inmobiliaria desarrolla comunidades residenciales con obras civiles concluidas, servicios básicos garantizados y crédito directo hasta 48 meses.
+            </p>
 
-            {/* Executive Quick Links to Main Pages - Horizontal swipeable rail on mobile */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="pt-2 flex items-center gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap"
-            >
-              <button
-                onClick={() => onNavigate('about')}
-                className="px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-bold backdrop-blur-md border border-white/20 transition-all cursor-pointer flex items-center gap-1.5 shrink-0 active:scale-95"
-              >
-                <Award className="h-3.5 w-3.5 text-amber-300" />
-                <span>1. Sobre Nosotros</span>
-              </button>
+            {/* Quick Filter Search Box (Clean, Architectural, Unboxed) */}
+            <div className="pt-2 max-w-3xl">
+              <div className="p-2 sm:p-2.5 rounded-2xl bg-slate-900/85 backdrop-blur-md border border-white/20 shadow-2xl flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                {/* Type Selector */}
+                <div className="flex-1 px-3 py-2 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-emerald-400 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <label className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
+                      Tipo de Inmueble
+                    </label>
+                    <select
+                      value={heroType}
+                      onChange={(e) => setHeroType(e.target.value)}
+                      className="w-full bg-transparent text-xs sm:text-sm font-semibold text-white focus:outline-none cursor-pointer"
+                    >
+                      <option value="Todos" className="bg-slate-900 text-white">Todos los inmuebles</option>
+                      <option value="Lote de Terreno" className="bg-slate-900 text-white">Lotes de Terreno</option>
+                      <option value="Vivienda" className="bg-slate-900 text-white">Villas & Casas</option>
+                    </select>
+                  </div>
+                </div>
 
-              <button
-                onClick={() => onNavigate('properties')}
-                className="px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-bold backdrop-blur-md border border-white/20 transition-all cursor-pointer flex items-center gap-1.5 shrink-0 active:scale-95"
-              >
-                <Layers className="h-3.5 w-3.5 text-emerald-300" />
-                <span>2. Catálogo de Lotes</span>
-              </button>
+                {/* Price Selector */}
+                <div className="flex-1 px-3 py-2 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+                  <CreditCard className="h-4 w-4 text-amber-400 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <label className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
+                      Presupuesto Máximo
+                    </label>
+                    <select
+                      value={heroPrice}
+                      onChange={(e) => setHeroPrice(e.target.value)}
+                      className="w-full bg-transparent text-xs sm:text-sm font-semibold text-white focus:outline-none cursor-pointer"
+                    >
+                      <option value="Todos" className="bg-slate-900 text-white">Sin límite</option>
+                      <option value="25k" className="bg-slate-900 text-white">Hasta $25,000 USD</option>
+                      <option value="35k" className="bg-slate-900 text-white">Hasta $35,000 USD</option>
+                      <option value="50k" className="bg-slate-900 text-white">Hasta $50,000 USD</option>
+                    </select>
+                  </div>
+                </div>
 
-              <button
-                onClick={() => onNavigate('miravalle')}
-                className="px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-bold backdrop-blur-md border border-white/20 transition-all cursor-pointer flex items-center gap-1.5 shrink-0 active:scale-95"
-              >
-                <Trees className="h-3.5 w-3.5 text-teal-300" />
-                <span>3. Ciudadela Miravalle</span>
-              </button>
+                {/* Search Button */}
+                <button
+                  onClick={handleHeroSearch}
+                  className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-[#25D366] hover:brightness-110 active:scale-95 text-slate-950 font-black text-xs sm:text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
+                >
+                  <Search className="h-4 w-4 stroke-[2.5]" />
+                  <span>Explorar Disponibilidad</span>
+                </button>
+              </div>
+            </div>
 
-              <button
-                onClick={() => onNavigate('contact')}
-                className="px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-bold backdrop-blur-md border border-white/20 transition-all cursor-pointer flex items-center gap-1.5 shrink-0 active:scale-95"
-              >
-                <WhatsAppIcon size={14} className="text-[#25D366]" />
-                <span>4. Contacto & Asesoría</span>
-              </button>
-            </motion.div>
-
-            {/* Primary Action CTAs - Responsive full-width on mobile */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-3"
-            >
-              <button
-                onClick={() => onNavigate('properties')}
-                className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-gradient-to-r from-emerald-500 via-emerald-400 to-[#25D366] text-slate-950 font-black text-xs sm:text-sm hover:brightness-110 active:scale-95 transition-all shadow-xl flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>Ver Catálogo Informativo</span>
-                <ArrowRight className="h-4 w-4 stroke-[2.5]" />
-              </button>
-
+            {/* Quick Actions */}
+            <div className="pt-2 flex flex-wrap items-center gap-3">
               <button
                 onClick={() => onOpenVisitModal('Consulta General MGM')}
-                className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold text-xs sm:text-sm backdrop-blur-md border border-white/25 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="px-6 py-3 rounded-full bg-white/15 hover:bg-white/25 text-white font-bold text-xs sm:text-sm backdrop-blur-md border border-white/20 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
               >
                 <CalendarCheck2 className="h-4 w-4 text-emerald-300" />
-                <span>Agendar Asesoría Notarial</span>
+                <span>Agendar Asesoría Notarial en Sitio</span>
               </button>
-            </motion.div>
+
+              <a
+                href={getGeneralWhatsAppUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-3 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 text-xs sm:text-sm font-bold flex items-center gap-2 transition-all active:scale-95 cursor-pointer"
+              >
+                <WhatsAppIcon size={16} className="text-[#25D366]" />
+                <span>WhatsApp Asesor Directo</span>
+              </a>
+            </div>
           </motion.div>
         </div>
 
-        {/* Dynamic Wave to Cream Section */}
+        {/* Dynamic Transition */}
         <WaveDarkToCream fillColor="#FAF7F2" />
       </section>
 
       {/* =========================================================================
-          2. STATS RIBBON (Solidez en Cifras)
+          2. METRICS & TRUST RIBBON (Solidez en Cifras)
           ========================================================================= */}
       <section className="relative w-full bg-[#FAF7F2] text-slate-900 py-10 sm:py-12 border-b border-amber-900/10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 items-center">
             {/* Stat 1 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0 }}
-              className="flex items-center gap-3.5"
-            >
-              <div className="h-12 w-12 rounded-full border border-amber-800/30 bg-white flex items-center justify-center shrink-0 shadow-sm text-amber-800">
+            <div className="flex items-center gap-3.5">
+              <div className="h-12 w-12 rounded-2xl border border-amber-800/20 bg-white flex items-center justify-center shrink-0 shadow-sm text-amber-800">
                 <Award className="h-6 w-6 stroke-[1.8]" />
               </div>
               <div>
@@ -317,17 +315,11 @@ export function HomeView({
                   Trayectoria Urbanística
                 </span>
               </div>
-            </motion.div>
+            </div>
 
             {/* Stat 2 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="flex items-center gap-3.5"
-            >
-              <div className="h-12 w-12 rounded-full border border-emerald-800/30 bg-white flex items-center justify-center shrink-0 shadow-sm text-emerald-700">
+            <div className="flex items-center gap-3.5">
+              <div className="h-12 w-12 rounded-2xl border border-emerald-800/20 bg-white flex items-center justify-center shrink-0 shadow-sm text-emerald-700">
                 <Building className="h-6 w-6 stroke-[1.8]" />
               </div>
               <div>
@@ -335,20 +327,14 @@ export function HomeView({
                   +350 Lotes
                 </span>
                 <span className="text-[11px] sm:text-xs text-slate-600 uppercase tracking-wider block font-semibold">
-                  Urbanizados & Entregados
+                  Urbanizados con Obras
                 </span>
               </div>
-            </motion.div>
+            </div>
 
             {/* Stat 3 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="flex items-center gap-3.5"
-            >
-              <div className="h-12 w-12 rounded-full border border-teal-800/30 bg-white flex items-center justify-center shrink-0 shadow-sm text-teal-700">
+            <div className="flex items-center gap-3.5">
+              <div className="h-12 w-12 rounded-2xl border border-teal-800/20 bg-white flex items-center justify-center shrink-0 shadow-sm text-teal-700">
                 <ShieldCheck className="h-6 w-6 stroke-[1.8]" />
               </div>
               <div>
@@ -359,17 +345,11 @@ export function HomeView({
                   Escrituras Individuales
                 </span>
               </div>
-            </motion.div>
+            </div>
 
             {/* Stat 4 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="flex items-center gap-3.5"
-            >
-              <div className="h-12 w-12 rounded-full border border-amber-800/30 bg-white flex items-center justify-center shrink-0 shadow-sm text-amber-700">
+            <div className="flex items-center gap-3.5">
+              <div className="h-12 w-12 rounded-2xl border border-amber-800/20 bg-white flex items-center justify-center shrink-0 shadow-sm text-amber-700">
                 <CreditCard className="h-6 w-6 stroke-[1.8]" />
               </div>
               <div>
@@ -380,32 +360,24 @@ export function HomeView({
                   Crédito Directo Propio
                 </span>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* =========================================================================
-          3. RESUMEN PÁGINA 1: "NOSOTROS & SOLIDEZ JURÍDICA" (con Carrusel de Pilares)
+          3. SOLIDEZ JURÍDICA & PILARES URBANÍSTICOS (Carrusel con Flechas Flanqueadas)
           ========================================================================= */}
-      <motion.section
-        initial={{ opacity: 0, y: 35 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-        className="relative w-full bg-[#FAF7F2] text-slate-900 py-16 sm:py-24 overflow-hidden"
-      >
-        <TopographicContours className="text-amber-800/15" />
+      <section className="relative w-full bg-[#FAF7F2] text-slate-900 py-16 sm:py-24 overflow-hidden">
+        <TopographicContours className="text-amber-800/10" />
 
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
-          {/* Header strip with badge and link to full page */}
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
+          {/* Section Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-amber-900/15">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 text-xs font-bold text-amber-800 uppercase tracking-widest">
-                <span className="px-2.5 py-0.5 rounded-full bg-amber-200/80 text-amber-900 font-mono">
-                  RESUMEN 01
-                </span>
-                <span>SOBRE SOCIEDAD CIVIL MGM INMOBILIARIA</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 text-xs font-bold uppercase tracking-wider">
+                <ShieldCheck className="h-4 w-4 text-emerald-700" />
+                <span>Garantía Notarial & Trayectoria</span>
               </div>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.12]">
                 Solidez jurídica y urbanismo de{' '}
@@ -414,8 +386,7 @@ export function HomeView({
                 </span>
               </h2>
               <p className="text-sm sm:text-base text-slate-700 max-w-2xl leading-relaxed">
-                MGM Inmobiliaria transforma terrenos en ciudadelas planificadas con obras concluidas, 
-                garantizando que cada dólar invertido por tu familia esté legalmente blindado.
+                MGM Inmobiliaria transforma terrenos en ciudadelas planificadas con obras concluidas, garantizando que cada dólar invertido por tu familia esté legalmente blindado.
               </p>
             </div>
 
@@ -423,39 +394,33 @@ export function HomeView({
               onClick={() => onNavigate('about')}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-950 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap shadow-md hover:scale-105 active:scale-95"
             >
-              <span>Ver Más de Nosotros</span>
+              <span>Conoce Nuestra Historia</span>
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
 
-          {/* Carrusel Interactivo de Pilares de "Nosotros" */}
+          {/* Carrusel con Navegación Flanqueada (Regla 2 Kindev) */}
           <div className="relative">
-            {/* Controles de navegación del Carrusel */}
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                Pilar {aboutIndex + 1} de {ABOUT_PILLARS.length}: {ABOUT_PILLARS[aboutIndex].tag}
-              </span>
+            {/* Botón Lateral Izquierdo Flanqueado */}
+            <button
+              onClick={prevAbout}
+              aria-label="Pilar anterior"
+              className="absolute -left-2 sm:-left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-600 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
+            >
+              <ChevronLeft className="h-6 w-6 stroke-[2.5]" />
+            </button>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={prevAbout}
-                  className="w-10 h-10 rounded-full border border-slate-300 bg-white hover:bg-slate-100 text-slate-800 flex items-center justify-center transition-all shadow-xs active:scale-90 cursor-pointer"
-                  aria-label="Pilar anterior"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={nextAbout}
-                  className="w-10 h-10 rounded-full border border-slate-300 bg-white hover:bg-slate-100 text-slate-800 flex items-center justify-center transition-all shadow-xs active:scale-90 cursor-pointer"
-                  aria-label="Pilar siguiente"
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
+            {/* Botón Lateral Derecho Flanqueado */}
+            <button
+              onClick={nextAbout}
+              aria-label="Pilar siguiente"
+              className="absolute -right-2 sm:-right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-600 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
+            >
+              <ChevronRight className="h-6 w-6 stroke-[2.5]" />
+            </button>
 
-            {/* Contenedor del Slide Activo con Transición Fluida */}
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+            {/* Contenedor del Slide Activo */}
+            <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xl overflow-hidden">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={aboutIndex}
@@ -463,7 +428,7 @@ export function HomeView({
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.35, ease: 'easeInOut' }}
-                  className="flex flex-col lg:grid lg:grid-cols-12 gap-6 sm:gap-8 items-center p-5 sm:p-10"
+                  className="flex flex-col lg:grid lg:grid-cols-12 gap-6 sm:gap-8 items-center p-6 sm:p-10"
                 >
                   {/* Left Column: Descriptive Content */}
                   <div className="lg:col-span-6 space-y-4 w-full order-last lg:order-first">
@@ -489,13 +454,13 @@ export function HomeView({
                         onClick={() => onNavigate('about')}
                         className="text-xs font-bold text-emerald-700 hover:text-emerald-800 inline-flex items-center gap-1 cursor-pointer"
                       >
-                        <span>Conoce los detalles notariales</span>
+                        <span>Conoce los detalles notariales y el proceso</span>
                         <ArrowRight className="h-3.5 w-3.5" />
                       </button>
                     </div>
                   </div>
 
-                  {/* Right Column: Visual Photo Mask */}
+                  {/* Right Column: Visual Photo */}
                   <div className="lg:col-span-6 w-full order-first lg:order-last">
                     <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full rounded-2xl overflow-hidden shadow-lg border border-slate-200">
                       <Image
@@ -532,29 +497,21 @@ export function HomeView({
           </div>
         </div>
 
-        {/* Dynamic Wave to Midnight Dark Section */}
+        {/* Transition to Catalog */}
         <WaveCreamToDark className="mt-14" fillColor="#080D18" />
-      </motion.section>
+      </section>
 
       {/* =========================================================================
-          4. RESUMEN PÁGINA 2: "CATÁLOGO DE LOTES & VIVIENDAS" (con Carrusel de Inmuebles)
+          4. CATÁLOGO DE LOTES & VIVIENDAS (Grid & Carrusel Flanqueado)
           ========================================================================= */}
-      <motion.section
-        initial={{ opacity: 0, y: 35 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-        className="relative w-full bg-[#080D18] text-white py-16 sm:py-24 overflow-hidden"
-      >
+      <section className="relative w-full bg-[#080D18] text-white py-16 sm:py-24 overflow-hidden">
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
-          {/* Header strip with informative note */}
+          {/* Header strip */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-white/15">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 text-xs font-bold text-emerald-400 uppercase tracking-widest">
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 font-mono">
-                  RESUMEN 02
-                </span>
-                <span>CATÁLOGO INFORMATIVO DE PROPIEDADES</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-xs font-bold uppercase tracking-wider text-emerald-300">
+                <Layers className="h-4 w-4 text-emerald-400" />
+                <span>Catálogo de Inmuebles Destacados</span>
               </div>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-[1.12]">
                 Lotes y viviendas con{' '}
@@ -563,7 +520,7 @@ export function HomeView({
                 </span>
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
-                Este portal es estrictamente informativo. No realizamos cobros en línea: agenda tu visita guiada en terreno y consulta disponibilidad en tiempo real con un asesor.
+                Revisa disponibilidad en tiempo real, metrajes exactos y facilidades de pago directo. Agenda tu visita técnica presencial en terreno sin intermediarios.
               </p>
             </div>
 
@@ -592,22 +549,22 @@ export function HomeView({
                 onClick={() => onNavigate('properties')}
                 className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-white hover:bg-slate-100 text-slate-950 text-xs font-bold transition-all cursor-pointer whitespace-nowrap shadow-md"
               >
-                <span>Ver Todo ({properties.length})</span>
+                <span>Ver Todo el Inventario ({properties.length})</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </div>
           </div>
 
-          {/* Carrusel de Propiedades Destacadas: Diseño Independiente PC vs Móvil */}
+          {/* Carrusel de Propiedades Destacadas: Flanqueado en PC, Táctil en Móvil */}
           <div className="relative">
-            {/* VISTA DESKTOP / TABLET (>= 768px): Cuadrícula paginada con flechas */}
+            {/* VISTA DESKTOP / TABLET (>= 768px): Cuadrícula paginada con flechas flanqueadas */}
             <div className="hidden md:block">
               {filteredCatalog.length > itemsPerPage && (
                 <>
                   <button
                     onClick={prevCatalog}
                     aria-label="Propiedades anteriores"
-                    className="absolute -left-3 sm:-left-5 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-slate-900/95 hover:bg-emerald-500 text-white hover:text-slate-950 shadow-xl border border-white/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
+                    className="absolute -left-3 sm:-left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-slate-900/95 hover:bg-[#25D366] text-white hover:text-slate-950 shadow-xl border border-white/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
                   >
                     <ChevronLeft className="h-6 w-6 stroke-[2.5]" />
                   </button>
@@ -615,7 +572,7 @@ export function HomeView({
                   <button
                     onClick={nextCatalog}
                     aria-label="Siguientes propiedades"
-                    className="absolute -right-3 sm:-right-5 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-slate-900/95 hover:bg-emerald-500 text-white hover:text-slate-950 shadow-xl border border-white/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
+                    className="absolute -right-3 sm:-right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-slate-900/95 hover:bg-[#25D366] text-white hover:text-slate-950 shadow-xl border border-white/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
                   >
                     <ChevronRight className="h-6 w-6 stroke-[2.5]" />
                   </button>
@@ -679,29 +636,21 @@ export function HomeView({
           </div>
         </div>
 
-        {/* Dynamic Wave to Warm Cream Skyline Section */}
-        <WaveDarkToCreamSkyline className="mt-14" fillColor="#FAF7F2" />
-      </motion.section>
+        {/* Transition to Miravalle Section */}
+        <WaveDarkToCream className="mt-14" fillColor="#FAF7F2" />
+      </section>
 
       {/* =========================================================================
-          5. RESUMEN PÁGINA 3: "CIUDADELA MIRAVALLE" (con Carrusel de Obras & Amenidades)
+          5. PROYECTO INSIGNIA: CIUDADELA MIRAVALLE (Carrusel con Flechas Flanqueadas)
           ========================================================================= */}
-      <motion.section
-        initial={{ opacity: 0, y: 35 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-        className="relative w-full bg-[#FAF7F2] text-slate-900 py-16 sm:py-24 overflow-hidden"
-      >
+      <section className="relative w-full bg-[#FAF7F2] text-slate-900 py-16 sm:py-24 overflow-hidden">
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
-          {/* Header strip with badge and link */}
+          {/* Header strip */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-amber-900/15">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 text-xs font-bold text-emerald-800 uppercase tracking-widest">
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-200 text-emerald-900 font-mono">
-                  RESUMEN 03
-                </span>
-                <span>PROYECTO INSIGNIA · MODELO DE URBANISMO</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 text-xs font-bold uppercase tracking-wider">
+                <Trees className="h-4 w-4 text-emerald-700" />
+                <span>Proyecto Insignia · Modelo de Urbanismo</span>
               </div>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.12]">
                 Ciudadela Miravalle:{' '}
@@ -718,38 +667,33 @@ export function HomeView({
               onClick={() => onNavigate('miravalle')}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-950 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap shadow-md hover:scale-105 active:scale-95"
             >
-              <span>Ver Proyecto Miravalle</span>
+              <span>Ver Masterplan Miravalle</span>
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
 
-          {/* Carrusel de Amenidades y Obras de Miravalle */}
+          {/* Carrusel de Amenidades con Flechas Flanqueadas a los Costados (Regla 2 Kindev) */}
           <div className="relative">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                Amenidad {miravalleIndex + 1} de {AMENITIES_MIRAVALLE.length}: {AMENITIES_MIRAVALLE[miravalleIndex].title}
-              </span>
+            {/* Botón Lateral Izquierdo */}
+            <button
+              onClick={prevMiravalle}
+              aria-label="Amenidad anterior"
+              className="absolute -left-2 sm:-left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-600 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
+            >
+              <ChevronLeft className="h-6 w-6 stroke-[2.5]" />
+            </button>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={prevMiravalle}
-                  className="w-10 h-10 rounded-full border border-slate-300 bg-white hover:bg-slate-100 text-slate-800 flex items-center justify-center transition-all shadow-xs active:scale-90 cursor-pointer"
-                  aria-label="Amenidad anterior"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={nextMiravalle}
-                  className="w-10 h-10 rounded-full border border-slate-300 bg-white hover:bg-slate-100 text-slate-800 flex items-center justify-center transition-all shadow-xs active:scale-90 cursor-pointer"
-                  aria-label="Amenidad siguiente"
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
+            {/* Botón Lateral Derecho */}
+            <button
+              onClick={nextMiravalle}
+              aria-label="Amenidad siguiente"
+              className="absolute -right-2 sm:-right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-600 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
+            >
+              <ChevronRight className="h-6 w-6 stroke-[2.5]" />
+            </button>
 
             {/* Slide de Amenidad Miravalle */}
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+            <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xl overflow-hidden">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={miravalleIndex}
@@ -757,7 +701,7 @@ export function HomeView({
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.35, ease: 'easeInOut' }}
-                  className="flex flex-col lg:grid lg:grid-cols-12 gap-6 sm:gap-8 items-center p-5 sm:p-10"
+                  className="flex flex-col lg:grid lg:grid-cols-12 gap-6 sm:gap-8 items-center p-6 sm:p-10"
                 >
                   {/* Left Column: Image with status badge */}
                   <div className="lg:col-span-7 w-full">
@@ -826,38 +770,30 @@ export function HomeView({
           </div>
         </div>
 
-        {/* Dynamic Wave to Dark Section */}
-        <WaveCreamToDarkSkyline className="mt-14" fillColor="#070B14" />
-      </motion.section>
+        {/* Transition to Testimonials */}
+        <WaveCreamToDark className="mt-14" fillColor="#070B14" />
+      </section>
 
       {/* =========================================================================
-          6. RESUMEN PÁGINA 4: "CONTACTO, ATENCIÓN & TESTIMONIOS" (con Carrusel)
+          6. FAMILIAS PROPIETARIAS & TESTIMONIOS (Carrusel Flanqueado)
           ========================================================================= */}
-      <motion.section
-        initial={{ opacity: 0, y: 35 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-        className="relative w-full bg-[#070B14] text-white py-16 sm:py-24 overflow-hidden"
-      >
+      <section className="relative w-full bg-[#070B14] text-white py-16 sm:py-24 overflow-hidden">
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
           {/* Header strip */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-white/15">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-widest">
-                <span className="px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/30 text-amber-300 font-mono">
-                  RESUMEN 04
-                </span>
-                <span>CONTACTO OFICIAL & TESTIMONIOS</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 border border-amber-400/30 text-amber-300 text-xs font-bold uppercase tracking-wider">
+                <Star className="h-4 w-4 fill-amber-300 text-amber-300" />
+                <span>Familias Propietarias</span>
               </div>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-[1.12]">
-                Atención directa, notarial y{' '}
+                Confianza respaldada por{' '}
                 <span className="font-serif italic font-normal text-amber-300">
-                  sin intermediarios
+                  escrituras entregadas
                 </span>
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
-                Comunícate directamente con nuestro equipo directivo, revisa la documentación jurídica y conoce las experiencias de familias que ya construyen su patrimonio.
+                Comunícate directamente con nuestro equipo directivo, revisa la documentación jurídica en notaría y conoce las experiencias de familias que ya construyen su patrimonio.
               </p>
             </div>
 
@@ -865,35 +801,30 @@ export function HomeView({
               onClick={() => onNavigate('contact')}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap shadow-md hover:scale-105 active:scale-95"
             >
-              <span>Ver Canales de Contacto</span>
+              <span>Canales de Contacto Directo</span>
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
 
-          {/* Carrusel de Testimonios Reales */}
+          {/* Carrusel de Testimonios Reales con Flechas Flanqueadas a los Costados (Regla 2 Kindev) */}
           <div className="relative">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                Testimonio {testimonialIndex + 1} de {TESTIMONIALS_DATA.length}
-              </span>
+            {/* Botón Lateral Izquierdo */}
+            <button
+              onClick={prevTestimonial}
+              aria-label="Testimonio anterior"
+              className="absolute -left-2 sm:-left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-slate-900/90 hover:bg-[#25D366] text-white hover:text-slate-950 shadow-xl border border-white/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
+            >
+              <ChevronLeft className="h-6 w-6 stroke-[2.5]" />
+            </button>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={prevTestimonial}
-                  className="w-10 h-10 rounded-full border border-white/20 bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all shadow-xs active:scale-90 cursor-pointer"
-                  aria-label="Testimonio anterior"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={nextTestimonial}
-                  className="w-10 h-10 rounded-full border border-white/20 bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all shadow-xs active:scale-90 cursor-pointer"
-                  aria-label="Testimonio siguiente"
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
+            {/* Botón Lateral Derecho */}
+            <button
+              onClick={nextTestimonial}
+              aria-label="Testimonio siguiente"
+              className="absolute -right-2 sm:-right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-slate-900/90 hover:bg-[#25D366] text-white hover:text-slate-950 shadow-xl border border-white/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
+            >
+              <ChevronRight className="h-6 w-6 stroke-[2.5]" />
+            </button>
 
             <div className="bg-slate-900/90 rounded-3xl border border-white/15 p-8 sm:p-10 shadow-2xl backdrop-blur-md">
               <AnimatePresence mode="wait">
@@ -964,7 +895,7 @@ export function HomeView({
             </div>
           </div>
         </div>
-      </motion.section>
+      </section>
     </div>
   );
 }

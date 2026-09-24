@@ -25,7 +25,7 @@ import {
 import type { PageView } from '../Header';
 import { AMENITIES_MIRAVALLE, getMiravalleWhatsAppUrl } from '@/src/data/lots';
 import { WhatsAppIcon } from '../SocialIcons';
-
+import { InvestmentCalculator } from '../InvestmentCalculator';
 import { WaveDarkToCream, WaveCreamToDark } from '../WaveDividers';
 
 interface MiravalleViewProps {
@@ -198,7 +198,7 @@ export function MiravalleView({
 
             {/* Right Visual Photo Mask */}
             <div className="lg:col-span-5 relative flex justify-center">
-              <div className="relative aspect-[4/3] w-full max-w-md rounded-[70px_24px_90px_24px] overflow-hidden shadow-2xl bg-slate-900 border-2 border-white/30">
+              <div className="relative aspect-[4/3] w-full max-w-md rounded-3xl overflow-hidden shadow-2xl bg-slate-900 border-4 border-white/20">
                 <Image
                   src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80"
                   alt="Ciudadela Miravalle Urbanismo"
@@ -647,6 +647,11 @@ export function MiravalleView({
           </div>
         </div>
       </motion.section>
+
+      {/* 5.5 SIMULADOR FINANCIERO INTERACTIVO DIRECTO */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <InvestmentCalculator />
+      </section>
 
       {/* 6. VIP RECORRIDO EN VEHÍCULO CORPORATIVO CTA (With Photographic Landscape Background) */}
       <motion.section

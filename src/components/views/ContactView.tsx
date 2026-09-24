@@ -108,7 +108,7 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
 
             <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.08] [text-wrap:balance]">
               Contáctanos y agenda tu{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300 font-serif italic font-normal">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-400 font-serif italic font-normal">
                 asesoría personalizada.
               </span>
             </h1>
