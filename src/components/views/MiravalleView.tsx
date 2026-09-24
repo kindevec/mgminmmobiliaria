@@ -98,7 +98,7 @@ export function MiravalleView({
   const currentRender = GALLERY_RENDERS[activeGallery];
 
   return (
-    <div className="w-full overflow-hidden bg-slate-950">
+    <div className="w-full overflow-hidden bg-white text-slate-900">
       {/* 1. CINEMATIC FULL-WIDTH HERO OF CIUDADELA MIRAVALLE */}
       <section className="relative w-full min-h-[640px] md:min-h-[720px] lg:min-h-[780px] flex flex-col justify-between overflow-hidden bg-slate-950 text-white">
         {/* Cinematic Backdrop Image with Slow Ken Burns Zoom Effect */}
@@ -128,12 +128,7 @@ export function MiravalleView({
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col justify-center pt-28 sm:pt-32 pb-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/20 bg-white/10 backdrop-blur-md shadow-lg">
-                <Trees className="h-4 w-4 text-emerald-400 shrink-0" />
-                <span className="text-xs font-bold uppercase tracking-widest text-emerald-300">
-                  Proyecto Insignia · Urbanización Residencial Modelo
-                </span>
-              </div>
+
 
               <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-[1.08] [text-wrap:balance]">
                 Ciudadela Miravalle:{' '}
@@ -222,7 +217,7 @@ export function MiravalleView({
         </div>
 
         {/* Dynamic Wave to Content */}
-        <WaveDarkToCream fillColor="#080D18" />
+        <WaveDarkToCream fillColor="#FFFFFF" />
       </section>
 
       {/* Main Content Sections with Organic Spacing */}
@@ -234,224 +229,196 @@ export function MiravalleView({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-60px' }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14 rounded-3xl overflow-hidden bg-slate-950 text-white shadow-2xl border border-white/10"
+        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
       >
-        {/* Sports Park High-Res Photo Background */}
-        <div className="absolute inset-0 pointer-events-none">
-          <Image
-            src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1920&q=80"
-            alt="Complejo Deportivo y Áreas Verdes"
-            fill
-            sizes="100vw"
-            className="object-cover opacity-20 brightness-75 scale-105"
-            referrerPolicy="no-referrer"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/90 to-slate-950/80" />
+        <div className="max-w-2xl mb-8 space-y-2">
+          <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 block">
+            Infraestructura & Bienestar
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+            Amenidades y obras diseñadas para perdurar
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-600">
+            En Ciudadela Miravalle no compras solo tierra: adquieres un entorno seguro, ordenado y rodeado de naturaleza.
+          </p>
         </div>
 
-        <div className="relative z-10">
-          <div className="max-w-2xl mb-10 space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 block">
-              Infraestructura & Bienestar
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-              Amenidades y obras diseñadas para perdurar
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-300">
-              En Ciudadela Miravalle no compras solo tierra: adquieres un entorno seguro, ordenado y rodeado de naturaleza.
-            </p>
-          </div>
+        {/* Carousel Visual Box with SIDE-FLANKED controls */}
+        <div className="relative w-full rounded-3xl overflow-hidden bg-white border border-slate-200/90 shadow-xl">
+          {/* Side-Flanked Control: LEFT-4 */}
+          <button
+            onClick={prevSlide}
+            aria-label="Amenidad anterior"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/90 hover:bg-emerald-600 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
+          >
+            <ChevronLeft className="h-6 w-6 stroke-[2.5]" />
+          </button>
 
-          {/* Carousel Visual Box with SIDE-FLANKED controls */}
-          <div className="relative w-full rounded-3xl overflow-hidden bg-white/10 backdrop-blur-md border border-white/15 shadow-xl">
-            {/* Side-Flanked Control: LEFT-4 */}
-            <button
-              onClick={prevSlide}
-              aria-label="Amenidad anterior"
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-slate-900/90 hover:bg-emerald-600 text-white shadow-xl border border-white/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
-            >
-              <ChevronLeft className="h-6 w-6 stroke-[2.5]" />
-            </button>
+          {/* Side-Flanked Control: RIGHT-4 */}
+          <button
+            onClick={nextSlide}
+            aria-label="Siguiente amenidad"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/90 hover:bg-emerald-600 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
+          >
+            <ChevronRight className="h-6 w-6 stroke-[2.5]" />
+          </button>
 
-            {/* Side-Flanked Control: RIGHT-4 */}
-            <button
-              onClick={nextSlide}
-              aria-label="Siguiente amenidad"
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-slate-900/90 hover:bg-emerald-600 text-white shadow-xl border border-white/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
-            >
-              <ChevronRight className="h-6 w-6 stroke-[2.5]" />
-            </button>
+          {/* Slide Content Viewer: Split Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-12 min-h-[420px]">
+            <div className="md:col-span-6 relative aspect-[16/10] md:aspect-auto">
+              <Image
+                src={currentAmenity.image}
+                alt={currentAmenity.title}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
+                referrerPolicy="no-referrer"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-slate-950/70 via-transparent to-transparent pointer-events-none" />
+              <span className="absolute bottom-6 left-6 text-xs font-mono font-bold text-white bg-black/60 px-3 py-1 rounded-md backdrop-blur-md border border-white/15">
+                {currentAmenity.tag}
+              </span>
+            </div>
 
-            {/* Slide Content Viewer: Split Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-12 min-h-[420px]">
-              <div className="md:col-span-6 relative aspect-[16/10] md:aspect-auto">
-                <Image
-                  src={currentAmenity.image}
-                  alt={currentAmenity.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-slate-950/80 via-transparent to-transparent pointer-events-none" />
-                <span className="absolute bottom-6 left-6 text-xs font-mono font-bold text-white bg-black/60 px-3 py-1 rounded-md backdrop-blur-md border border-white/15">
-                  {currentAmenity.tag}
-                </span>
-              </div>
+            <div className="md:col-span-6 p-8 sm:p-14 flex flex-col justify-center space-y-4">
+              <span className="text-xs font-bold font-mono tracking-wider uppercase text-emerald-800">
+                {currentAmenity.tag}
+              </span>
 
-              <div className="md:col-span-6 p-8 sm:p-14 flex flex-col justify-center space-y-4">
-                <span className="text-xs font-bold font-mono tracking-wider uppercase text-emerald-400">
-                  {currentAmenity.tag}
-                </span>
+              <h3 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                {currentAmenity.title}
+              </h3>
 
-                <h3 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-                  {currentAmenity.title}
-                </h3>
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+                {currentAmenity.description}
+              </p>
 
-                <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                  {currentAmenity.description}
-                </p>
-
-                {/* Slide Index Indicators */}
-                <div className="flex items-center gap-2 pt-4">
-                  {AMENITIES_MIRAVALLE.map((_, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveSlide(idx)}
-                      className={`h-2 rounded-full transition-all cursor-pointer ${
-                        activeSlide === idx
-                          ? 'w-8 bg-emerald-400'
-                          : 'w-2 bg-white/20 hover:bg-white/40'
-                      }`}
-                      aria-label={`Ir a amenidad ${idx + 1}`}
-                    />
-                  ))}
-                </div>
+              {/* Slide Index Indicators */}
+              <div className="flex items-center gap-2 pt-4">
+                {AMENITIES_MIRAVALLE.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveSlide(idx)}
+                    className={`h-2 rounded-full transition-all cursor-pointer ${
+                      activeSlide === idx
+                        ? 'w-8 bg-emerald-700'
+                        : 'w-2 bg-slate-300 hover:bg-slate-400'
+                    }`}
+                    aria-label={`Ir a amenidad ${idx + 1}`}
+                  />
+                ))}
               </div>
             </div>
           </div>
         </div>
       </motion.section>
 
-      {/* 3. MASTERPLAN SPECS & URBAN PLANNING (With Cinematic Drone Backdrop) */}
+      {/* 3. MASTERPLAN SPECS & URBAN PLANNING */}
       <motion.section
         initial={{ opacity: 0, y: 35 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-60px' }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14 rounded-3xl overflow-hidden bg-slate-950 text-white shadow-2xl border border-white/10"
+        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
       >
-        {/* Quality Drone Aerial Background of Miravalle */}
-        <div className="absolute inset-0 pointer-events-none">
-          <Image
-            src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1920&q=80"
-            alt="Masterplan y Especificaciones Técnicas"
-            fill
-            sizes="100vw"
-            className="object-cover opacity-20 brightness-75 scale-105"
-            referrerPolicy="no-referrer"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/90 to-slate-950/80" />
-        </div>
-
-        <div className="relative z-10">
+        <div className="rounded-3xl bg-[#FBFBFA] border border-slate-200/90 p-8 sm:p-14 text-slate-900 shadow-xs">
           <div className="max-w-2xl mb-12 space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 block">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 block">
               Diseño Urbanístico Aprobado
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
               Especificaciones técnicas del Master Plan
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300">
+            <p className="text-xs sm:text-sm text-slate-600">
               Construye tu vivienda bajo normativa que protege la armonía arquitectónica y la plusvalía de toda la comunidad.
             </p>
           </div>
 
           {/* Open 3-Column Specifications with Hairline Dividers */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:divide-x md:divide-white/15">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:divide-x md:divide-slate-200">
             <div className="space-y-4 md:pr-6">
-              <div className="flex items-center gap-2 text-white font-bold text-lg">
-                <Zap className="h-6 w-6 text-amber-400 shrink-0" />
+              <div className="flex items-center gap-2 text-slate-900 font-bold text-lg">
+                <Zap className="h-6 w-6 text-amber-600 shrink-0" />
                 <h4>Servicios Básicos</h4>
               </div>
-              <ul className="text-xs sm:text-sm text-slate-300 space-y-3 leading-relaxed">
+              <ul className="text-xs sm:text-sm text-slate-600 space-y-3 leading-relaxed">
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold">•</span>
                   <span>Red eléctrica subterránea con transformadores propios.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold">•</span>
                   <span>Red matriz de agua potable certificada y probada.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold">•</span>
                   <span>Sistema de alcantarillado sanitario y pluvial separado.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold">•</span>
                   <span>Ductería subterránea lista para conexión de fibra óptica.</span>
                 </li>
               </ul>
             </div>
 
             <div className="space-y-4 md:px-6">
-              <div className="flex items-center gap-2 text-white font-bold text-lg">
-                <Car className="h-6 w-6 text-emerald-400 shrink-0" />
+              <div className="flex items-center gap-2 text-slate-900 font-bold text-lg">
+                <Car className="h-6 w-6 text-emerald-700 shrink-0" />
                 <h4>Vías & Movilidad</h4>
               </div>
-              <ul className="text-xs sm:text-sm text-slate-300 space-y-3 leading-relaxed">
+              <ul className="text-xs sm:text-sm text-slate-600 space-y-3 leading-relaxed">
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold">•</span>
                   <span>Avenidas principales de 12 metros con parterre central.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold">•</span>
                   <span>Calles secundarias de 10 metros con adoquín de alto tonelaje.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold">•</span>
                   <span>Aceras peatonales con adoquín podotáctil y arbolado.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold">•</span>
                   <span>Bahías de parqueo para visitantes y retornos amplios.</span>
                 </li>
               </ul>
             </div>
 
             <div className="space-y-4 md:pl-6">
-              <div className="flex items-center gap-2 text-white font-bold text-lg">
-                <ShieldCheck className="h-6 w-6 text-emerald-400 shrink-0" />
+              <div className="flex items-center gap-2 text-slate-900 font-bold text-lg">
+                <ShieldCheck className="h-6 w-6 text-emerald-700 shrink-0" />
                 <h4>Seguridad & Entorno</h4>
               </div>
-              <ul className="text-xs sm:text-sm text-slate-300 space-y-3 leading-relaxed">
+              <ul className="text-xs sm:text-sm text-slate-600 space-y-3 leading-relaxed">
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold">•</span>
                   <span>Garita de control vehicular y peatonal 24 horas.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold">•</span>
                   <span>Cerramiento perimetral de seguridad en todo el predio.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold">•</span>
                   <span>Circuito de cámaras de monitoreo en accesos principales.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold">•</span>
                   <span>Retiro vegetal y sendero ecológico con iluminación LED.</span>
                 </li>
               </ul>
             </div>
           </div>
 
-          <div className="mt-12 pt-8 border-t border-white/15 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <span className="text-xs font-semibold text-slate-300">
+          <div className="mt-12 pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <span className="text-xs font-semibold text-slate-600">
               Etapa 1: 85% Vendida · Etapa 2: Preventa con precios promocionales de inauguración
             </span>
             <button
               onClick={() => onNavigate('properties')}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-[#25D366] text-slate-950 font-black text-xs sm:text-sm hover:brightness-110 shadow-md transition-all cursor-pointer whitespace-nowrap"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-900 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer whitespace-nowrap"
             >
               <span>Ver Lotes Disponibles en Miravalle</span>
               <ArrowRight className="h-4 w-4" />
@@ -481,12 +448,12 @@ export function MiravalleView({
         </div>
 
         {/* Gallery Carousel Box with SIDE-FLANKED controls */}
-        <div className="relative w-full rounded-3xl overflow-hidden bg-slate-950 border border-slate-800 shadow-2xl">
+        <div className="relative w-full rounded-3xl overflow-hidden bg-slate-900 border border-slate-200/90 shadow-xl">
           {/* Side-Flanked Control: LEFT-4 */}
           <button
             onClick={prevGallery}
             aria-label="Fotografía anterior"
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-slate-900/90 hover:bg-emerald-600 text-white shadow-xl border border-white/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/90 hover:bg-emerald-600 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
           >
             <ChevronLeft className="h-6 w-6 stroke-[2.5]" />
           </button>
@@ -495,7 +462,7 @@ export function MiravalleView({
           <button
             onClick={nextGallery}
             aria-label="Siguiente fotografía"
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-slate-900/90 hover:bg-emerald-600 text-white shadow-xl border border-white/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/90 hover:bg-emerald-600 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
           >
             <ChevronRight className="h-6 w-6 stroke-[2.5]" />
           </button>
@@ -544,37 +511,23 @@ export function MiravalleView({
         </div>
       </motion.section>
 
-      {/* 5. FACILIDADES DE ADQUISICIÓN DIRECTA EN MIRAVALLE (Reemplazo del Cotizador con Foto Panorámica) */}
+      {/* 5. FACILIDADES DE ADQUISICIÓN DIRECTA EN MIRAVALLE */}
       <motion.section
         initial={{ opacity: 0, y: 35 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-60px' }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 rounded-3xl overflow-hidden bg-slate-950 text-white shadow-2xl border border-white/15"
+        className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 rounded-3xl overflow-hidden bg-[#FBFBFA] text-slate-900 shadow-sm border border-slate-200/90"
       >
-        {/* Quality Architectural Blueprint / Residential Background */}
-        <div className="absolute inset-0 pointer-events-none">
-          <Image
-            src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1920&q=85"
-            alt="Adquisición Directa en Ciudadela Miravalle"
-            fill
-            sizes="100vw"
-            className="object-cover opacity-25 brightness-75 scale-105"
-            referrerPolicy="no-referrer"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-950/75" />
-          <div className="absolute inset-0 bg-radial from-emerald-500/15 via-transparent to-transparent" />
-        </div>
-
         <div className="relative z-10 max-w-5xl mx-auto space-y-8">
           <div className="text-center space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#25D366] block">
+            <span className="text-xs font-bold uppercase tracking-widest text-emerald-800 block">
               ADQUISICIÓN DIRECTA & CRÉDITO PROPIO
             </span>
-            <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight [text-wrap:balance]">
+            <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight [text-wrap:balance]">
               Planes Flexibles en Ciudadela Miravalle
             </h2>
-            <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
               Elige tu lote desde 180 m² hasta 320 m² con facilidades de pago directo.
               Sin requisitos bancarios y con entrega de minuta notariada desde el primer pago.
             </p>
@@ -583,44 +536,44 @@ export function MiravalleView({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
             <motion.div
               whileHover={{ y: -4 }}
-              className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-2"
+              className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs space-y-2"
             >
-              <div className="text-3xl font-black text-[#25D366] font-mono">0%</div>
-              <h4 className="font-extrabold text-white text-sm">Sin Buró Crediticio</h4>
-              <p className="text-xs text-slate-300">
+              <div className="text-3xl font-black text-emerald-700 font-mono">0%</div>
+              <h4 className="font-extrabold text-slate-900 text-sm">Sin Buró Crediticio</h4>
+              <p className="text-xs text-slate-600">
                 Aprobación directa con MGM Inmobiliaria, sin historiales crediticios ni avalistas externos.
               </p>
             </motion.div>
 
             <motion.div
               whileHover={{ y: -4 }}
-              className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-2"
+              className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs space-y-2"
             >
-              <div className="text-3xl font-black text-amber-400 font-mono">48 Meses</div>
-              <h4 className="font-extrabold text-white text-sm">Pagos Fijos en USD</h4>
-              <p className="text-xs text-slate-300">
+              <div className="text-3xl font-black text-amber-600 font-mono">48 Meses</div>
+              <h4 className="font-extrabold text-slate-900 text-sm">Pagos Fijos en USD</h4>
+              <p className="text-xs text-slate-600">
                 Cuotas pactadas sin variaciones, en dólares americanos, adaptadas a tu flujo de ingresos.
               </p>
             </motion.div>
 
             <motion.div
               whileHover={{ y: -4 }}
-              className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-2"
+              className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs space-y-2"
             >
-              <div className="text-3xl font-black text-teal-400 font-mono">100%</div>
-              <h4 className="font-extrabold text-white text-sm">Entrega Notariada</h4>
-              <p className="text-xs text-slate-300">
+              <div className="text-3xl font-black text-teal-700 font-mono">100%</div>
+              <h4 className="font-extrabold text-slate-900 text-sm">Entrega Notariada</h4>
+              <p className="text-xs text-slate-600">
                 Linderos georreferenciados con coordenadas UTM y entrega de clave catastral oficial.
               </p>
             </motion.div>
 
             <motion.div
               whileHover={{ y: -4 }}
-              className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-2"
+              className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs space-y-2"
             >
-              <div className="text-3xl font-black text-emerald-400 font-mono">10% Off</div>
-              <h4 className="font-extrabold text-white text-sm">Bono Pago de Contado</h4>
-              <p className="text-xs text-slate-300">
+              <div className="text-3xl font-black text-emerald-700 font-mono">10% Off</div>
+              <h4 className="font-extrabold text-slate-900 text-sm">Bono Pago de Contado</h4>
+              <p className="text-xs text-slate-600">
                 Descuento preferencial inmediato y escrituración prioritaria por cancelación al contado.
               </p>
             </motion.div>
@@ -629,7 +582,7 @@ export function MiravalleView({
           <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
             <button
               onClick={() => onOpenVisitModal('Ciudadela Miravalle')}
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-white text-slate-950 font-black text-xs sm:text-sm hover:bg-slate-100 transition-all shadow-lg active:scale-95 cursor-pointer whitespace-nowrap"
+              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-slate-900 text-white font-bold text-xs sm:text-sm hover:bg-emerald-700 transition-all shadow-md active:scale-95 cursor-pointer whitespace-nowrap"
             >
               <CalendarCheck2 className="h-4 w-4" />
               <span>Agendar Asesoría en Obra</span>
@@ -639,7 +592,7 @@ export function MiravalleView({
               href={getMiravalleWhatsAppUrl()}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm transition-all shadow-lg active:scale-95 whitespace-nowrap cursor-pointer"
+              className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm transition-all shadow-md active:scale-95 whitespace-nowrap cursor-pointer"
             >
               <WhatsAppIcon size={18} className="text-slate-950" />
               <span>Consultar Disponibilidad por WhatsApp</span>
@@ -661,7 +614,7 @@ export function MiravalleView({
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-4"
       >
-        <div className="rounded-3xl bg-slate-950 p-8 sm:p-14 text-white shadow-2xl border border-white/15 relative overflow-hidden">
+        <div className="rounded-3xl bg-slate-900 p-8 sm:p-14 text-white shadow-xl border border-slate-800 relative overflow-hidden">
           {/* Panoramic Luxury Transport / Road Backdrop */}
           <div className="absolute inset-0 pointer-events-none">
             <Image

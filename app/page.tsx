@@ -94,16 +94,16 @@ function HomePageContent() {
         onOpenVisitModal={handleOpenVisitModal}
       />
 
-      {/* 2. Main Content Container with Strict Anti-Overflow & Mobile Safe Bottom Padding */}
-      <main className="flex-1 w-full overflow-x-hidden pb-24 md:pb-12 pt-0">
-        <AnimatePresence mode="wait">
+      {/* 2. Main Content Container with Strict Anti-Overflow & Luminous Light Base */}
+      <main className="flex-1 w-full overflow-x-hidden pb-24 md:pb-12 pt-0 bg-white">
+        <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={currentPage}
-            initial={{ opacity: 0, y: 20, filter: 'blur(6px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -16, filter: 'blur(4px)' }}
-            transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-            className="w-full"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="w-full bg-white"
           >
             {currentPage === 'home' && (
               <HomeView

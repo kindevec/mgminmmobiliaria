@@ -134,7 +134,7 @@ export function PropertiesView({
   };
 
   return (
-    <div className="w-full overflow-hidden bg-slate-950">
+    <div className="w-full overflow-hidden bg-white text-slate-900">
       {/* =========================================================================
           1. CINEMATIC FULL-WIDTH HERO BANNER
           ========================================================================= */}
@@ -165,13 +165,7 @@ export function PropertiesView({
         {/* Hero Content */}
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col justify-center pt-28 sm:pt-32 pb-8">
           <div className="max-w-4xl space-y-5">
-            {/* Glassmorphic Badge */}
-            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/20 bg-white/10 backdrop-blur-md shadow-lg">
-              <Sparkles className="h-4 w-4 text-[#25D366] shrink-0" />
-              <span className="text-xs font-bold uppercase tracking-widest text-[#25D366]">
-                Catálogo Oficial · Sociedad Civil MGM Inmobiliaria
-              </span>
-            </div>
+
 
             {/* High-Impact Headline */}
             <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.08] [text-wrap:balance]">
@@ -204,14 +198,14 @@ export function PropertiesView({
           </div>
         </div>
 
-        {/* Dynamic Wave to Cream Section */}
-        <WaveDarkToCream fillColor="#FAF7F2" />
+        {/* Dynamic Wave to White Section */}
+        <WaveDarkToCream fillColor="#FFFFFF" />
       </section>
 
       {/* =========================================================================
-          2. WARM CREAM SECTION: "FILTRO MODERNO & CATÁLOGO DE PROPIEDADES"
+          2. SECCIÓN: "FILTRO MODERNO & CATÁLOGO DE PROPIEDADES (Blanco Puro)"
           ========================================================================= */}
-      <section className="relative w-full bg-[#FAF7F2] text-slate-900 py-10 sm:py-16 overflow-hidden">
+      <section className="relative w-full bg-white text-slate-900 py-10 sm:py-16 overflow-hidden">
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
           
           {/* =====================================================================

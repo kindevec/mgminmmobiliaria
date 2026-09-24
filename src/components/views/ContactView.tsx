@@ -70,7 +70,7 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
   };
 
   return (
-    <div className="w-full overflow-hidden bg-slate-950">
+    <div className="w-full overflow-hidden bg-white text-slate-900">
       {/* 1. CINEMATIC FULL-WIDTH HERO BANNER */}
       <section className="relative w-full min-h-[560px] md:min-h-[640px] lg:min-h-[700px] flex flex-col justify-between overflow-hidden bg-slate-950 text-white">
         {/* Cinematic Backdrop Image with Slow Ken Burns Zoom Effect */}
@@ -99,12 +99,7 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
         {/* Hero Content */}
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col justify-center pt-28 sm:pt-32 pb-8">
           <div className="max-w-4xl space-y-5">
-            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/20 bg-white/10 backdrop-blur-md shadow-lg">
-              <span className="h-2 w-2 rounded-full bg-[#25D366] animate-pulse" />
-              <span className="text-xs font-bold uppercase tracking-widest text-[#25D366]">
-                Atención Inmediata & Canales Oficiales
-              </span>
-            </div>
+
 
             <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.08] [text-wrap:balance]">
               Contáctanos y agenda tu{' '}
@@ -139,12 +134,12 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
           </div>
         </div>
 
-        {/* Dynamic Wave to Cream Section */}
-        <WaveDarkToCream fillColor="#FAF7F2" />
+        {/* Dynamic Wave to White Section */}
+        <WaveDarkToCream fillColor="#FFFFFF" />
       </section>
 
-      {/* Main Content Sections with Organic Background */}
-      <div className="bg-[#FAF7F2] text-slate-900 py-12 sm:py-20 space-y-16 sm:space-y-24">
+      {/* Main Content Sections with Organic Spacing */}
+      <div className="bg-white text-slate-900 py-12 sm:py-20 space-y-16 sm:space-y-24">
 
       {/* Main Grid: Form + Direct Contact Information (Open Layout, ZERO Box-in-Box) */}
       <motion.section
@@ -499,7 +494,7 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
         </div>
       </motion.section>
 
-      {/* 3. GUÍA PRÁCTICA PARA EL DÍA DE LA VISITA with Panoramic Background */}
+      {/* 3. GUÍA PRÁCTICA PARA EL DÍA DE LA VISITA */}
       <motion.section
         initial={{ opacity: 0, y: 35 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -507,65 +502,52 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-4"
       >
-        <div className="rounded-3xl bg-slate-950 p-8 sm:p-12 text-white border border-white/15 shadow-2xl space-y-6 relative overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none">
-            <Image
-              src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1920&q=80"
-              alt="Terrenos y Topografía"
-              fill
-              sizes="100vw"
-              className="object-cover opacity-20 brightness-75 scale-105"
-              referrerPolicy="no-referrer"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-950/70" />
-            <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
-          </div>
-
+        <div className="rounded-3xl bg-[#FBFBFA] p-8 sm:p-12 text-slate-900 border border-slate-200/90 shadow-sm space-y-6 relative overflow-hidden">
           <div className="max-w-2xl space-y-1 relative z-10">
-            <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#25D366] block">
+            <span className="text-xs font-mono font-bold uppercase tracking-widest text-emerald-800 block">
               Recomendaciones para el Cliente
             </span>
-            <h3 className="text-2xl sm:text-3xl font-black text-white">
+            <h3 className="text-2xl sm:text-3xl font-black text-slate-900">
               Guía previa para el día de tu visita a obra
             </h3>
-            <p className="text-xs sm:text-sm text-slate-300">
+            <p className="text-xs sm:text-sm text-slate-600">
               Queremos que tu experiencia técnica en el terreno sea cómoda, transparente y segura.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-2 relative z-10">
-            <div className="space-y-1.5 border-l-2 border-[#25D366] pl-4 bg-white/5 p-4 rounded-r-xl backdrop-blur-sm">
-              <span className="text-xs font-bold text-[#25D366] uppercase tracking-wider block">
+            <div className="space-y-1.5 border-l-2 border-emerald-600 pl-4 bg-white p-5 rounded-r-2xl border-y border-r border-slate-200/80 shadow-xs">
+              <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider block">
                 01 · Calzado Cómodo
               </span>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs text-slate-600 leading-relaxed">
                 Recomendamos zapatos deportivos o botas para caminar sobre el terreno natural y comprobar los linderos.
               </p>
             </div>
 
-            <div className="space-y-1.5 border-l-2 border-amber-400 pl-4 bg-white/5 p-4 rounded-r-xl backdrop-blur-sm">
-              <span className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
+            <div className="space-y-1.5 border-l-2 border-amber-500 pl-4 bg-white p-5 rounded-r-2xl border-y border-r border-slate-200/80 shadow-xs">
+              <span className="text-xs font-bold text-amber-800 uppercase tracking-wider block">
                 02 · Identificación Personal
               </span>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs text-slate-600 leading-relaxed">
                 Trae tu cédula o pasaporte original si deseas congelar la reserva inmediata del lote elegido.
               </p>
             </div>
 
-            <div className="space-y-1.5 border-l-2 border-teal-400 pl-4 bg-white/5 p-4 rounded-r-xl backdrop-blur-sm">
-              <span className="text-xs font-bold text-teal-400 uppercase tracking-wider block">
+            <div className="space-y-1.5 border-l-2 border-teal-600 pl-4 bg-white p-5 rounded-r-2xl border-y border-r border-slate-200/80 shadow-xs">
+              <span className="text-xs font-bold text-teal-800 uppercase tracking-wider block">
                 03 · Transporte Corporativo
               </span>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs text-slate-600 leading-relaxed">
                 Si no dispones de vehículo propio, te recogemos en nuestras oficinas centrales previa coordinación.
               </p>
             </div>
 
-            <div className="space-y-1.5 border-l-2 border-emerald-400 pl-4 bg-white/5 p-4 rounded-r-xl backdrop-blur-sm">
-              <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider block">
+            <div className="space-y-1.5 border-l-2 border-emerald-600 pl-4 bg-white p-5 rounded-r-2xl border-y border-r border-slate-200/80 shadow-xs">
+              <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider block">
                 04 · Asesoría Legal Notarial
               </span>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs text-slate-600 leading-relaxed">
                 Tendrás acceso a planos catastrales, licencias de subdivisión y certificados de gravamen vigentes.
               </p>
             </div>

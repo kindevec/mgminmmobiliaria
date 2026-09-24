@@ -159,7 +159,7 @@ export function HomeView({
   };
 
   return (
-    <div className="w-full overflow-hidden bg-slate-950 text-white">
+    <div className="w-full overflow-hidden bg-white text-slate-900">
       {/* =========================================================================
           1. CINEMATIC HERO — Inversión Inmobiliaria & Búsqueda Predictiva
           ========================================================================= */}
@@ -195,13 +195,7 @@ export function HomeView({
             transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
             className="max-w-4xl space-y-6"
           >
-            {/* Status Pill */}
-            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-950/40 backdrop-blur-md shadow-lg">
-              <Sparkles className="h-4 w-4 text-[#25D366] shrink-0" />
-              <span className="text-xs font-bold uppercase tracking-widest text-emerald-300">
-                Lotes Urbanizados con Escrituras al Día · Ecuador
-              </span>
-            </div>
+
 
             {/* Editorial Main Headline */}
             <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.05] [text-wrap:balance]">
@@ -216,12 +210,12 @@ export function HomeView({
               Sociedad Civil MGM Inmobiliaria desarrolla comunidades residenciales con obras civiles concluidas, servicios básicos garantizados y crédito directo hasta 48 meses.
             </p>
 
-            {/* Quick Filter Search Box (Clean, Architectural, Unboxed) */}
+            {/* Quick Filter Search Bar (Ergonomic, Architectural, Zero Box-in-Box) */}
             <div className="pt-2 max-w-3xl">
-              <div className="p-2 sm:p-2.5 rounded-2xl bg-slate-900/85 backdrop-blur-md border border-white/20 shadow-2xl flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+              <div className="p-2 sm:p-2.5 rounded-2xl bg-slate-900/90 backdrop-blur-xl border border-white/20 shadow-2xl flex flex-col sm:flex-row items-stretch sm:items-center divide-y sm:divide-y-0 sm:divide-x divide-white/10 gap-3 sm:gap-4">
                 {/* Type Selector */}
-                <div className="flex-1 px-3 py-2 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
-                  <Layers className="h-4 w-4 text-emerald-400 shrink-0" />
+                <div className="flex-1 py-1 sm:py-0 px-2 sm:px-3 flex items-center gap-3">
+                  <Layers className="h-5 w-5 text-emerald-400 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <label className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
                       Tipo de Inmueble
@@ -229,7 +223,7 @@ export function HomeView({
                     <select
                       value={heroType}
                       onChange={(e) => setHeroType(e.target.value)}
-                      className="w-full bg-transparent text-xs sm:text-sm font-semibold text-white focus:outline-none cursor-pointer"
+                      className="w-full bg-transparent text-xs sm:text-sm font-semibold text-white focus:outline-none cursor-pointer pt-0.5"
                     >
                       <option value="Todos" className="bg-slate-900 text-white">Todos los inmuebles</option>
                       <option value="Lote de Terreno" className="bg-slate-900 text-white">Lotes de Terreno</option>
@@ -239,8 +233,8 @@ export function HomeView({
                 </div>
 
                 {/* Price Selector */}
-                <div className="flex-1 px-3 py-2 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
-                  <CreditCard className="h-4 w-4 text-amber-400 shrink-0" />
+                <div className="flex-1 pt-2 sm:pt-0 py-1 sm:py-0 px-2 sm:px-3 flex items-center gap-3">
+                  <CreditCard className="h-5 w-5 text-amber-400 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <label className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
                       Presupuesto Máximo
@@ -248,7 +242,7 @@ export function HomeView({
                     <select
                       value={heroPrice}
                       onChange={(e) => setHeroPrice(e.target.value)}
-                      className="w-full bg-transparent text-xs sm:text-sm font-semibold text-white focus:outline-none cursor-pointer"
+                      className="w-full bg-transparent text-xs sm:text-sm font-semibold text-white focus:outline-none cursor-pointer pt-0.5"
                     >
                       <option value="Todos" className="bg-slate-900 text-white">Sin límite</option>
                       <option value="25k" className="bg-slate-900 text-white">Hasta $25,000 USD</option>
@@ -258,14 +252,16 @@ export function HomeView({
                   </div>
                 </div>
 
-                {/* Search Button */}
-                <button
-                  onClick={handleHeroSearch}
-                  className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-[#25D366] hover:brightness-110 active:scale-95 text-slate-950 font-black text-xs sm:text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
-                >
-                  <Search className="h-4 w-4 stroke-[2.5]" />
-                  <span>Explorar Disponibilidad</span>
-                </button>
+                {/* Search Action Button */}
+                <div className="pt-2 sm:pt-0 sm:pl-2 shrink-0">
+                  <button
+                    onClick={handleHeroSearch}
+                    className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-[#25D366] hover:brightness-110 active:scale-95 text-slate-950 font-black text-xs sm:text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
+                  >
+                    <Search className="h-4 w-4 stroke-[2.5]" />
+                    <span>Explorar Disponibilidad</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -292,26 +288,26 @@ export function HomeView({
           </motion.div>
         </div>
 
-        {/* Dynamic Transition */}
-        <WaveDarkToCream fillColor="#FAF7F2" />
+        {/* Dynamic Transition into Pure White */}
+        <WaveDarkToCream fillColor="#FFFFFF" />
       </section>
 
       {/* =========================================================================
           2. METRICS & TRUST RIBBON (Solidez en Cifras)
           ========================================================================= */}
-      <section className="relative w-full bg-[#FAF7F2] text-slate-900 py-10 sm:py-12 border-b border-amber-900/10">
+      <section className="relative w-full bg-white text-slate-900 py-10 sm:py-14 border-b border-slate-100">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 items-center">
             {/* Stat 1 */}
             <div className="flex items-center gap-3.5">
-              <div className="h-12 w-12 rounded-2xl border border-amber-800/20 bg-white flex items-center justify-center shrink-0 shadow-sm text-amber-800">
+              <div className="h-12 w-12 rounded-2xl border border-slate-200/80 bg-slate-50 flex items-center justify-center shrink-0 shadow-xs text-amber-700">
                 <Award className="h-6 w-6 stroke-[1.8]" />
               </div>
               <div>
                 <span className="text-xl sm:text-2xl font-black text-slate-900 font-mono block tracking-tight">
                   10+ Años
                 </span>
-                <span className="text-[11px] sm:text-xs text-slate-600 uppercase tracking-wider block font-semibold">
+                <span className="text-[11px] sm:text-xs text-slate-500 uppercase tracking-wider block font-semibold">
                   Trayectoria Urbanística
                 </span>
               </div>
@@ -319,14 +315,14 @@ export function HomeView({
 
             {/* Stat 2 */}
             <div className="flex items-center gap-3.5">
-              <div className="h-12 w-12 rounded-2xl border border-emerald-800/20 bg-white flex items-center justify-center shrink-0 shadow-sm text-emerald-700">
+              <div className="h-12 w-12 rounded-2xl border border-slate-200/80 bg-slate-50 flex items-center justify-center shrink-0 shadow-xs text-emerald-700">
                 <Building className="h-6 w-6 stroke-[1.8]" />
               </div>
               <div>
                 <span className="text-xl sm:text-2xl font-black text-slate-900 font-mono block tracking-tight">
                   +350 Lotes
                 </span>
-                <span className="text-[11px] sm:text-xs text-slate-600 uppercase tracking-wider block font-semibold">
+                <span className="text-[11px] sm:text-xs text-slate-500 uppercase tracking-wider block font-semibold">
                   Urbanizados con Obras
                 </span>
               </div>
@@ -334,14 +330,14 @@ export function HomeView({
 
             {/* Stat 3 */}
             <div className="flex items-center gap-3.5">
-              <div className="h-12 w-12 rounded-2xl border border-teal-800/20 bg-white flex items-center justify-center shrink-0 shadow-sm text-teal-700">
+              <div className="h-12 w-12 rounded-2xl border border-slate-200/80 bg-slate-50 flex items-center justify-center shrink-0 shadow-xs text-teal-700">
                 <ShieldCheck className="h-6 w-6 stroke-[1.8]" />
               </div>
               <div>
                 <span className="text-xl sm:text-2xl font-black text-emerald-700 font-mono block tracking-tight">
                   100% Notarial
                 </span>
-                <span className="text-[11px] sm:text-xs text-slate-600 uppercase tracking-wider block font-semibold">
+                <span className="text-[11px] sm:text-xs text-slate-500 uppercase tracking-wider block font-semibold">
                   Escrituras Individuales
                 </span>
               </div>
@@ -349,14 +345,14 @@ export function HomeView({
 
             {/* Stat 4 */}
             <div className="flex items-center gap-3.5">
-              <div className="h-12 w-12 rounded-2xl border border-amber-800/20 bg-white flex items-center justify-center shrink-0 shadow-sm text-amber-700">
+              <div className="h-12 w-12 rounded-2xl border border-slate-200/80 bg-slate-50 flex items-center justify-center shrink-0 shadow-xs text-amber-700">
                 <CreditCard className="h-6 w-6 stroke-[1.8]" />
               </div>
               <div>
                 <span className="text-xl sm:text-2xl font-black text-amber-700 font-mono block tracking-tight">
                   Hasta 48 Meses
                 </span>
-                <span className="text-[11px] sm:text-xs text-slate-600 uppercase tracking-wider block font-semibold">
+                <span className="text-[11px] sm:text-xs text-slate-500 uppercase tracking-wider block font-semibold">
                   Crédito Directo Propio
                 </span>
               </div>
@@ -368,31 +364,27 @@ export function HomeView({
       {/* =========================================================================
           3. SOLIDEZ JURÍDICA & PILARES URBANÍSTICOS (Carrusel con Flechas Flanqueadas)
           ========================================================================= */}
-      <section className="relative w-full bg-[#FAF7F2] text-slate-900 py-16 sm:py-24 overflow-hidden">
-        <TopographicContours className="text-amber-800/10" />
+      <section className="relative w-full bg-[#FBFBFA] text-slate-900 py-16 sm:py-24 overflow-hidden border-b border-slate-100">
+        <TopographicContours className="text-slate-900/5" />
 
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
           {/* Section Header */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-amber-900/15">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-slate-200">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 text-xs font-bold uppercase tracking-wider">
-                <ShieldCheck className="h-4 w-4 text-emerald-700" />
-                <span>Garantía Notarial & Trayectoria</span>
-              </div>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.12]">
                 Solidez jurídica y urbanismo de{' '}
-                <span className="font-serif italic font-normal text-amber-900">
+                <span className="font-serif italic font-normal text-emerald-800">
                   alta plusvalía
                 </span>
               </h2>
-              <p className="text-sm sm:text-base text-slate-700 max-w-2xl leading-relaxed">
+              <p className="text-sm sm:text-base text-slate-600 max-w-2xl leading-relaxed">
                 MGM Inmobiliaria transforma terrenos en ciudadelas planificadas con obras concluidas, garantizando que cada dólar invertido por tu familia esté legalmente blindado.
               </p>
             </div>
 
             <button
               onClick={() => onNavigate('about')}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-950 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap shadow-md hover:scale-105 active:scale-95"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-900 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap shadow-md hover:scale-105 active:scale-95"
             >
               <span>Conoce Nuestra Historia</span>
               <ArrowRight className="h-4 w-4" />
@@ -405,7 +397,7 @@ export function HomeView({
             <button
               onClick={prevAbout}
               aria-label="Pilar anterior"
-              className="absolute -left-2 sm:-left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-600 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
+              className="absolute -left-2 sm:-left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-700 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
             >
               <ChevronLeft className="h-6 w-6 stroke-[2.5]" />
             </button>
@@ -414,7 +406,7 @@ export function HomeView({
             <button
               onClick={nextAbout}
               aria-label="Pilar siguiente"
-              className="absolute -right-2 sm:-right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-600 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
+              className="absolute -right-2 sm:-right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-700 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
             >
               <ChevronRight className="h-6 w-6 stroke-[2.5]" />
             </button>
@@ -428,15 +420,10 @@ export function HomeView({
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.35, ease: 'easeInOut' }}
-                  className="flex flex-col lg:grid lg:grid-cols-12 gap-6 sm:gap-8 items-center p-6 sm:p-10"
+                  className="flex flex-col lg:grid lg:grid-cols-12 items-stretch"
                 >
                   {/* Left Column: Descriptive Content */}
-                  <div className="lg:col-span-6 space-y-4 w-full order-last lg:order-first">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                      {React.createElement(ABOUT_PILLARS[aboutIndex].icon, { className: 'h-4 w-4' })}
-                      <span>{ABOUT_PILLARS[aboutIndex].tag}</span>
-                    </div>
-
+                  <div className="lg:col-span-6 p-6 sm:p-10 lg:p-12 space-y-4 flex flex-col justify-center order-last lg:order-first">
                     <h3 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight">
                       {ABOUT_PILLARS[aboutIndex].title}
                     </h3>
@@ -460,73 +447,64 @@ export function HomeView({
                     </div>
                   </div>
 
-                  {/* Right Column: Visual Photo */}
-                  <div className="lg:col-span-6 w-full order-first lg:order-last">
-                    <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full rounded-2xl overflow-hidden shadow-lg border border-slate-200">
-                      <Image
-                        src={ABOUT_PILLARS[aboutIndex].image}
-                        alt={ABOUT_PILLARS[aboutIndex].title}
-                        fill
-                        sizes="(max-width: 1024px) 100vw, 50vw"
-                        className="object-cover"
-                        referrerPolicy="no-referrer"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
-                      <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 text-white text-[11px] sm:text-xs font-medium">
-                        Sociedad Civil MGM Inmobiliaria · Obras y Certeza Notarial
-                      </div>
+                  {/* Right Column: Visual Photo Full-Bleed (top, bottom, right margin) */}
+                  <div className="lg:col-span-6 w-full relative min-h-[260px] sm:min-h-[320px] lg:min-h-[420px] order-first lg:order-last">
+                    <Image
+                      src={ABOUT_PILLARS[aboutIndex].image}
+                      alt={ABOUT_PILLARS[aboutIndex].title}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      className="object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
+                    <div className="absolute bottom-4 left-4 right-4 text-white text-[11px] sm:text-xs font-medium drop-shadow-md">
+                      Sociedad Civil MGM Inmobiliaria · Obras y Certeza Notarial
                     </div>
                   </div>
                 </motion.div>
               </AnimatePresence>
+            </div>
 
-              {/* Dots Indicators */}
-              <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-center gap-2">
-                {ABOUT_PILLARS.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setAboutIndex(i)}
-                    className={`h-2 rounded-full transition-all cursor-pointer ${
-                      aboutIndex === i ? 'w-8 bg-slate-950' : 'w-2 bg-slate-300 hover:bg-slate-400'
-                    }`}
-                    aria-label={`Ir a pilar ${i + 1}`}
-                  />
-                ))}
-              </div>
+            {/* Dots Indicators - Clean Floating Dots */}
+            <div className="flex items-center justify-center gap-2 mt-6">
+              {ABOUT_PILLARS.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setAboutIndex(i)}
+                  className={`h-2 rounded-full transition-all cursor-pointer ${
+                    aboutIndex === i ? 'w-8 bg-emerald-700' : 'w-2 bg-slate-300 hover:bg-slate-400'
+                  }`}
+                  aria-label={`Ir a pilar ${i + 1}`}
+                />
+              ))}
             </div>
           </div>
         </div>
-
-        {/* Transition to Catalog */}
-        <WaveCreamToDark className="mt-14" fillColor="#080D18" />
       </section>
 
       {/* =========================================================================
-          4. CATÁLOGO DE LOTES & VIVIENDAS (Grid & Carrusel Flanqueado)
+          4. CATÁLOGO DE LOTES & VIVIENDAS (Grid & Carrusel Flanqueado - Blanco Puro)
           ========================================================================= */}
-      <section className="relative w-full bg-[#080D18] text-white py-16 sm:py-24 overflow-hidden">
+      <section className="relative w-full bg-white text-slate-900 py-16 sm:py-24 overflow-hidden border-b border-slate-100">
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
           {/* Header strip */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-white/15">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-slate-200">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-xs font-bold uppercase tracking-wider text-emerald-300">
-                <Layers className="h-4 w-4 text-emerald-400" />
-                <span>Catálogo de Inmuebles Destacados</span>
-              </div>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-[1.12]">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.12]">
                 Lotes y viviendas con{' '}
-                <span className="font-serif italic font-normal text-amber-300">
+                <span className="font-serif italic font-normal text-emerald-700">
                   crédito directo
                 </span>
               </h2>
-              <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 max-w-xl leading-relaxed">
                 Revisa disponibilidad en tiempo real, metrajes exactos y facilidades de pago directo. Agenda tu visita técnica presencial en terreno sin intermediarios.
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
               {/* Type Filter Tabs */}
-              <div className="inline-flex p-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-semibold text-slate-200 border border-white/15">
+              <div className="inline-flex p-1 bg-slate-100 rounded-full text-xs font-semibold text-slate-600 border border-slate-200/80">
                 {(['Todos', 'Lote de Terreno', 'Vivienda'] as const).map((tab) => (
                   <button
                     key={tab}
@@ -536,8 +514,8 @@ export function HomeView({
                     }}
                     className={`px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
                       catalogTab === tab
-                        ? 'bg-gradient-to-r from-emerald-500 to-[#25D366] text-slate-950 font-black shadow-md'
-                        : 'hover:text-white hover:bg-white/10'
+                        ? 'bg-emerald-700 text-white font-bold shadow-xs'
+                        : 'hover:text-slate-900 hover:bg-slate-200/60'
                     }`}
                   >
                     {tab === 'Todos' ? 'Todos' : tab === 'Lote de Terreno' ? 'Lotes' : 'Villas'}
@@ -547,7 +525,7 @@ export function HomeView({
 
               <button
                 onClick={() => onNavigate('properties')}
-                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-white hover:bg-slate-100 text-slate-950 text-xs font-bold transition-all cursor-pointer whitespace-nowrap shadow-md"
+                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-slate-900 hover:bg-emerald-800 text-white text-xs font-bold transition-all cursor-pointer whitespace-nowrap shadow-md"
               >
                 <span>Ver Todo el Inventario ({properties.length})</span>
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -564,7 +542,7 @@ export function HomeView({
                   <button
                     onClick={prevCatalog}
                     aria-label="Propiedades anteriores"
-                    className="absolute -left-3 sm:-left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-slate-900/95 hover:bg-[#25D366] text-white hover:text-slate-950 shadow-xl border border-white/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
+                    className="absolute -left-3 sm:-left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-700 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
                   >
                     <ChevronLeft className="h-6 w-6 stroke-[2.5]" />
                   </button>
@@ -572,7 +550,7 @@ export function HomeView({
                   <button
                     onClick={nextCatalog}
                     aria-label="Siguientes propiedades"
-                    className="absolute -right-3 sm:-right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-slate-900/95 hover:bg-[#25D366] text-white hover:text-slate-950 shadow-xl border border-white/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
+                    className="absolute -right-3 sm:-right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-700 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
                   >
                     <ChevronRight className="h-6 w-6 stroke-[2.5]" />
                   </button>
@@ -584,7 +562,7 @@ export function HomeView({
                   <PropertyCard
                     key={lot.id}
                     lot={lot}
-                    dark={true}
+                    dark={false}
                     onSelectLot={onSelectLot}
                     onOpenVisitModal={onOpenVisitModal}
                   />
@@ -599,7 +577,7 @@ export function HomeView({
                       key={idx}
                       onClick={() => setCatalogIndex(idx)}
                       className={`h-2 rounded-full transition-all cursor-pointer ${
-                        catalogIndex === idx ? 'w-8 bg-[#25D366]' : 'w-2 bg-white/30 hover:bg-white/50'
+                        catalogIndex === idx ? 'w-8 bg-emerald-700' : 'w-2 bg-slate-300 hover:bg-slate-400'
                       }`}
                       aria-label={`Ir a página de catálogo ${idx + 1}`}
                     />
@@ -610,12 +588,12 @@ export function HomeView({
 
             {/* VISTA MÓVIL (< 768px): Rail táctil con snap horizontal nativo estilo App */}
             <div className="md:hidden">
-              <div className="flex items-center justify-between mb-3 px-1 text-xs text-slate-300">
-                <span className="font-semibold text-[#25D366] flex items-center gap-1">
+              <div className="flex items-center justify-between mb-3 px-1 text-xs text-slate-600">
+                <span className="font-semibold text-emerald-700 flex items-center gap-1">
                   <span>Desliza para ver más</span>
                   <span>→</span>
                 </span>
-                <span className="text-[11px] font-mono text-slate-400">
+                <span className="text-[11px] font-mono text-slate-500">
                   {filteredCatalog.length} disponibles
                 </span>
               </div>
@@ -625,7 +603,7 @@ export function HomeView({
                   <div key={lot.id} className="w-[84vw] max-w-[325px] shrink-0 snap-center">
                     <PropertyCard
                       lot={lot}
-                      dark={true}
+                      dark={false}
                       onSelectLot={onSelectLot}
                       onOpenVisitModal={onOpenVisitModal}
                     />
@@ -635,23 +613,17 @@ export function HomeView({
             </div>
           </div>
         </div>
-
-        {/* Transition to Miravalle Section */}
-        <WaveDarkToCream className="mt-14" fillColor="#FAF7F2" />
       </section>
 
       {/* =========================================================================
           5. PROYECTO INSIGNIA: CIUDADELA MIRAVALLE (Carrusel con Flechas Flanqueadas)
           ========================================================================= */}
-      <section className="relative w-full bg-[#FAF7F2] text-slate-900 py-16 sm:py-24 overflow-hidden">
+      <section className="relative w-full bg-[#FBFBFA] text-slate-900 py-16 sm:py-24 overflow-hidden border-t border-slate-100">
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
           {/* Header strip */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-amber-900/15">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-slate-200">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 text-xs font-bold uppercase tracking-wider">
-                <Trees className="h-4 w-4 text-emerald-700" />
-                <span>Proyecto Insignia · Modelo de Urbanismo</span>
-              </div>
+
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.12]">
                 Ciudadela Miravalle:{' '}
                 <span className="font-serif italic font-normal text-amber-900">
@@ -701,33 +673,31 @@ export function HomeView({
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.35, ease: 'easeInOut' }}
-                  className="flex flex-col lg:grid lg:grid-cols-12 gap-6 sm:gap-8 items-center p-6 sm:p-10"
+                  className="flex flex-col lg:grid lg:grid-cols-12 items-stretch"
                 >
-                  {/* Left Column: Image with status badge */}
-                  <div className="lg:col-span-7 w-full">
-                    <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden shadow-md border border-slate-200">
-                      <Image
-                        src={AMENITIES_MIRAVALLE[miravalleIndex].image}
-                        alt={AMENITIES_MIRAVALLE[miravalleIndex].title}
-                        fill
-                        sizes="(max-width: 1024px) 100vw, 60vw"
-                        className="object-cover"
-                        referrerPolicy="no-referrer"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
-                      <div className="absolute top-3 sm:top-4 left-3 sm:left-4">
-                        <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#25D366] text-slate-950 shadow-md">
-                          {AMENITIES_MIRAVALLE[miravalleIndex].tag}
-                        </span>
-                      </div>
-                      <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 text-white text-[11px] sm:text-xs font-medium">
-                        Ciudadela Miravalle · Masterplan Urbanístico
-                      </div>
+                  {/* Left Column: Image Full-Bleed (top, bottom, left) */}
+                  <div className="lg:col-span-7 w-full relative min-h-[260px] sm:min-h-[340px] lg:min-h-[420px]">
+                    <Image
+                      src={AMENITIES_MIRAVALLE[miravalleIndex].image}
+                      alt={AMENITIES_MIRAVALLE[miravalleIndex].title}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 60vw"
+                      className="object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
+                    <div className="absolute top-4 left-4">
+                      <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#25D366] text-slate-950 shadow-md">
+                        {AMENITIES_MIRAVALLE[miravalleIndex].tag}
+                      </span>
+                    </div>
+                    <div className="absolute bottom-4 left-4 right-4 text-white text-[11px] sm:text-xs font-medium drop-shadow-md">
+                      Ciudadela Miravalle · Masterplan Urbanístico
                     </div>
                   </div>
 
-                  {/* Right Column: Narrative */}
-                  <div className="lg:col-span-5 space-y-4 w-full">
+                  {/* Right Column: Narrative Content with ergonomic padding */}
+                  <div className="lg:col-span-5 p-6 sm:p-8 lg:p-10 space-y-4 flex flex-col justify-center w-full">
                     <span className="text-xs font-bold uppercase tracking-widest text-emerald-800">
                       INFRAESTRUCTURA DE URBANIZACIÓN
                     </span>
@@ -752,54 +722,49 @@ export function HomeView({
                   </div>
                 </motion.div>
               </AnimatePresence>
+            </div>
 
-              {/* Dots Indicators */}
-              <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-center gap-2">
-                {AMENITIES_MIRAVALLE.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setMiravalleIndex(i)}
-                    className={`h-2 rounded-full transition-all cursor-pointer ${
-                      miravalleIndex === i ? 'w-8 bg-emerald-700' : 'w-2 bg-slate-300 hover:bg-slate-400'
-                    }`}
-                    aria-label={`Ir a amenidad ${i + 1}`}
-                  />
-                ))}
-              </div>
+            {/* Dots Indicators - Clean Floating Dots */}
+            <div className="flex items-center justify-center gap-2 mt-6">
+              {AMENITIES_MIRAVALLE.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setMiravalleIndex(i)}
+                  className={`h-2 rounded-full transition-all cursor-pointer ${
+                    miravalleIndex === i ? 'w-8 bg-emerald-700' : 'w-2 bg-slate-300 hover:bg-slate-400'
+                  }`}
+                  aria-label={`Ir a amenidad ${i + 1}`}
+                />
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Transition to Testimonials */}
-        <WaveCreamToDark className="mt-14" fillColor="#070B14" />
+        {/* Section divider to Testimonials */}
       </section>
 
       {/* =========================================================================
-          6. FAMILIAS PROPIETARIAS & TESTIMONIOS (Carrusel Flanqueado)
+          6. FAMILIAS PROPIETARIAS & TESTIMONIOS (Carrusel Flanqueado - Blanco Puro)
           ========================================================================= */}
-      <section className="relative w-full bg-[#070B14] text-white py-16 sm:py-24 overflow-hidden">
+      <section className="relative w-full bg-white text-slate-900 py-16 sm:py-24 overflow-hidden border-t border-slate-100">
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
           {/* Header strip */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-white/15">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-slate-200">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 border border-amber-400/30 text-amber-300 text-xs font-bold uppercase tracking-wider">
-                <Star className="h-4 w-4 fill-amber-300 text-amber-300" />
-                <span>Familias Propietarias</span>
-              </div>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-[1.12]">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.12]">
                 Confianza respaldada por{' '}
-                <span className="font-serif italic font-normal text-amber-300">
+                <span className="font-serif italic font-normal text-emerald-800">
                   escrituras entregadas
                 </span>
               </h2>
-              <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 max-w-xl leading-relaxed">
                 Comunícate directamente con nuestro equipo directivo, revisa la documentación jurídica en notaría y conoce las experiencias de familias que ya construyen su patrimonio.
               </p>
             </div>
 
             <button
               onClick={() => onNavigate('contact')}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap shadow-md hover:scale-105 active:scale-95"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-900 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap shadow-md hover:scale-105 active:scale-95"
             >
               <span>Canales de Contacto Directo</span>
               <ArrowRight className="h-4 w-4" />
@@ -812,7 +777,7 @@ export function HomeView({
             <button
               onClick={prevTestimonial}
               aria-label="Testimonio anterior"
-              className="absolute -left-2 sm:-left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-slate-900/90 hover:bg-[#25D366] text-white hover:text-slate-950 shadow-xl border border-white/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
+              className="absolute -left-2 sm:-left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-700 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
             >
               <ChevronLeft className="h-6 w-6 stroke-[2.5]" />
             </button>
@@ -821,12 +786,12 @@ export function HomeView({
             <button
               onClick={nextTestimonial}
               aria-label="Testimonio siguiente"
-              className="absolute -right-2 sm:-right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-slate-900/90 hover:bg-[#25D366] text-white hover:text-slate-950 shadow-xl border border-white/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
+              className="absolute -right-2 sm:-right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-700 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
             >
               <ChevronRight className="h-6 w-6 stroke-[2.5]" />
             </button>
 
-            <div className="bg-slate-900/90 rounded-3xl border border-white/15 p-8 sm:p-10 shadow-2xl backdrop-blur-md">
+            <div className="bg-[#FBFBFA] rounded-3xl border border-slate-200/90 p-8 sm:p-10 shadow-lg">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={testimonialIndex}
@@ -842,20 +807,20 @@ export function HomeView({
                     ))}
                   </div>
 
-                  <p className="text-base sm:text-xl text-slate-200 italic leading-relaxed font-serif">
+                  <p className="text-base sm:text-xl text-slate-800 italic leading-relaxed font-serif">
                     &ldquo;{TESTIMONIALS_DATA[testimonialIndex].text}&rdquo;
                   </p>
 
-                  <div className="pt-4 border-t border-white/15 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                      <h4 className="text-base font-bold text-white">
+                      <h4 className="text-base font-bold text-slate-900">
                         {TESTIMONIALS_DATA[testimonialIndex].name}
                       </h4>
-                      <span className="text-xs text-emerald-400 font-medium">
+                      <span className="text-xs text-emerald-700 font-medium">
                         {TESTIMONIALS_DATA[testimonialIndex].role}
                       </span>
                     </div>
-                    <span className="text-xs text-slate-400 font-mono">
+                    <span className="text-xs text-slate-500 font-mono">
                       {TESTIMONIALS_DATA[testimonialIndex].location}
                     </span>
                   </div>
@@ -865,12 +830,12 @@ export function HomeView({
           </div>
 
           {/* Quick Action Capsule to WhatsApp & Office */}
-          <div className="rounded-3xl bg-white/10 border border-white/15 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 backdrop-blur-md">
+          <div className="rounded-3xl bg-gradient-to-r from-emerald-50 via-teal-50/40 to-slate-50 border border-emerald-200/80 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
             <div className="space-y-1 text-center sm:text-left">
-              <h3 className="text-lg sm:text-xl font-bold text-white">
+              <h3 className="text-lg sm:text-xl font-bold text-slate-900">
                 ¿Deseas hablar directamente con un asesor notarial?
               </h3>
-              <p className="text-xs sm:text-sm text-slate-300">
+              <p className="text-xs sm:text-sm text-slate-600">
                 Respondemos consultas en minutos con planimetrías y cotizaciones personalizadas.
               </p>
             </div>
@@ -888,7 +853,7 @@ export function HomeView({
 
               <button
                 onClick={() => onOpenVisitModal('Agendamiento desde Inicio')}
-                className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs sm:text-sm transition-all cursor-pointer shadow-md active:scale-95 text-center"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer shadow-md active:scale-95 text-center"
               >
                 <span>Agendar Cita en Oficina</span>
               </button>
