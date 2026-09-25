@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+@layer utilities {
+  .hero-mask-blend {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.06) 6%, rgba(0, 0, 0, 0.45) 22%, black 48%);
+    mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.06) 6%, rgba(0, 0, 0, 0.45) 22%, black 48%);
+  }
+
+  @media (min-width: 1024px) {
+    .hero-mask-blend {
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.04) 5%, rgba(0, 0, 0, 0.3) 16%, rgba(0, 0, 0, 0.75) 32%, black 52%);
+      mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.04) 5%, rgba(0, 0, 0, 0.3) 16%, rgba(0, 0, 0, 0.75) 32%, black 52%);
+    }
+  }
+}

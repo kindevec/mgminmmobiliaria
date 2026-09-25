@@ -385,23 +385,30 @@ export const TESTIMONIALS_DATA = [
   {
     name: 'Ing. Fabricio Paredes & Familia',
     role: 'Propietario Lote Etapa 1 · Ciudadela Miravalle',
-    text: 'Revisamos minuciosamente las escrituras en la notaría antes de dar el anticipo y todo estuvo perfectamente en regla. El crédito directo de MGM Inmobiliaria nos permitió empezar a construir de inmediato.',
+    text: 'Escrituras individuales listas en notaría. El crédito directo nos permitió iniciar obra sin depender de bancos.',
     stars: 5,
     location: 'Quito, Ecuador',
   },
   {
     name: 'Dra. Marlene Caicedo',
     role: 'Compradora Lote Esquinero Comercial',
-    text: 'Compré para inversión y en menos de 14 meses el valor del metro cuadrado ha subido más de un 20%. La entrega con calles adoquinadas y luz soterrada marca una enorme diferencia.',
+    text: 'Excelente plusvalía en poco tiempo. Las vías adoquinadas y el soterramiento marcan una gran diferencia.',
     stars: 5,
     location: 'Valle de los Chillos',
   },
   {
     name: 'Lcdo. Roberto Zambrano',
     role: 'Propietario Residencia Miravalle',
-    text: 'El acompañamiento del equipo de MGM Inmobiliaria fue impecable. La visita guiada en terreno nos dio la tranquilidad que ninguna otra inmobiliaria nos había brindado.',
+    text: 'Acompañamiento legal impecable. La visita guiada en terreno nos dio total certeza jurídica.',
     stars: 5,
     location: 'Ecuador',
+  },
+  {
+    name: 'Familia Rodríguez',
+    role: 'Propietarios Proyecto Modena',
+    text: 'Aprobación directa inmediata solo con cédula. Ver las obras terminadas fue decisivo para nuestra familia.',
+    stars: 5,
+    location: 'Guayaquil, Ecuador',
   },
 ];
 

@@ -65,7 +65,7 @@ export function LogoMGM({
     <div className={`inline-flex items-center gap-3 select-none ${className}`}>
       <svg
         viewBox="0 0 500 440"
-        className="h-full w-auto max-h-12 aspect-[500/440]"
+        className="h-full w-auto max-h-16 sm:max-h-20 aspect-[500/440]"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         aria-label="MGM Inmobiliaria Logo"
@@ -130,7 +130,7 @@ export function LogoMGM({
       {variant === 'compact' && showSubtitle && (
         <div className="flex flex-col text-left">
           <span
-            className={`font-extrabold text-sm tracking-tight leading-tight transition-colors ${
+            className={`font-black text-base sm:text-lg md:text-xl tracking-tight leading-tight transition-colors ${
               isGhost
                 ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]'
                 : 'text-slate-900'
@@ -139,7 +139,7 @@ export function LogoMGM({
             MGM INMOBILIARIA
           </span>
           <span
-            className={`text-[10px] tracking-wider font-semibold uppercase transition-colors ${
+            className={`text-xs sm:text-[13px] tracking-wider font-bold uppercase transition-colors ${
               isGhost
                 ? 'text-emerald-300 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]'
                 : 'text-slate-500'

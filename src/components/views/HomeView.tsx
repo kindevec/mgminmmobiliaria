@@ -1,25 +1,25 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ArrowRight,
   ShieldCheck,
+  FileCheck,
   CreditCard,
   Building,
+  HardHat,
+  HandCoins,
   Award,
   Star,
   ChevronRight,
   ChevronLeft,
   KeyRound,
-  Trees,
-  Sparkles,
-  CalendarCheck2,
-  Layers,
-  MapPin,
-  Search,
-  CheckCircle2,
+  Headphones,
+  Users,
+  Grid,
+  SlidersHorizontal,
 } from 'lucide-react';
 import type { PageView } from '../Header';
 import {
@@ -30,12 +30,14 @@ import {
 } from '@/src/data/lots';
 import { useProperties } from '@/src/context/PropertyContext';
 import { PropertyCard } from '../PropertyCard';
+import { NatureContainerCard } from '../NatureContainerCard';
 import { WhatsAppIcon } from '../SocialIcons';
+import { TopographicContours } from '../WaveDividers';
 import {
-  WaveDarkToCream,
-  WaveCreamToDark,
-  TopographicContours,
-} from '../WaveDividers';
+  CircularGallery,
+  type GalleryItem,
+  type CircularGalleryHandle,
+} from '@/components/ui/circular-gallery';
 
 interface HomeViewProps {
   onNavigate: (page: PageView) => void;
@@ -43,6 +45,54 @@ interface HomeViewProps {
   onSelectLot: (lot: LotProperty) => void;
   onFilterSearch?: (location: string, type: string, maxPrice: number) => void;
 }
+
+// 4 Pilares del Banner (provenientes de los contenedores: solo ícono y título)
+const HERO_CONTAINER_FEATURES = [
+  {
+    title: 'Certeza Notarial',
+    icon: ShieldCheck,
+  },
+  {
+    title: 'Obras Civiles',
+    icon: Building,
+  },
+  {
+    title: 'Crédito Directo',
+    icon: CreditCard,
+  },
+  {
+    title: 'Asesoría 24/7',
+    icon: Headphones,
+  },
+];
+
+// Imágenes continuas de alta calidad relacionadas al sector inmobiliario para el carrusel
+const HERO_REAL_ESTATE_IMAGES = [
+  {
+    url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1600&q=85',
+    alt: 'Sala Contemporánea y Arquitectura de Vanguardia - Sociedad Civil MGM Inmobiliaria',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1600&q=85',
+    alt: 'Residencia Moderna con Piscina y Áreas Verdes - MGM Inmobiliaria',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85',
+    alt: 'Fachada Residencial Contemporánea con Obras Civiles Concluidas',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1600&q=85',
+    alt: 'Villa Exclusiva con Vistas Panorámicas y Terrazas Iluminadas',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1600&q=85',
+    alt: 'Casas y Terrenos Residenciales con Servicios Básicos Garantizados',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1600&q=85',
+    alt: 'Urbanización Planificada y Vialidad de Primer Orden',
+  },
+];
 
 // 4 Pilares Fundacionales
 const ABOUT_PILLARS = [
@@ -84,26 +134,39 @@ export function HomeView({
   onNavigate,
   onOpenVisitModal,
   onSelectLot,
-  onFilterSearch,
 }: HomeViewProps) {
   const { properties } = useProperties();
-
-  // Search Bar inside Hero
-  const [heroType, setHeroType] = useState('Todos');
-  const [heroPrice, setHeroPrice] = useState('Todos');
 
   // Carousel 1: Pillars
   const [aboutIndex, setAboutIndex] = useState(0);
 
-  // Carousel 2: Catalog
+  // Carousel 2: Catalog (Nature Container Slide & Grid toggle)
   const [catalogTab, setCatalogTab] = useState<'Todos' | 'Lote de Terreno' | 'Vivienda'>('Todos');
   const [catalogIndex, setCatalogIndex] = useState(0);
+  const [catalogViewMode, setCatalogViewMode] = useState<'slide' | 'grid'>('slide');
 
   // Carousel 3: Miravalle
   const [miravalleIndex, setMiravalleIndex] = useState(0);
 
-  // Carousel 4: Testimonials
-  const [testimonialIndex, setTestimonialIndex] = useState(0);
+  // Banner Continuous Real Estate Slideshow
+  const [heroImgIndex, setHeroImgIndex] = useState(0);
+  const [heroHovered, setHeroHovered] = useState(false);
+
+  useEffect(() => {
+    if (heroHovered) return;
+    const interval = setInterval(() => {
+      setHeroImgIndex((prev) => (prev + 1) % HERO_REAL_ESTATE_IMAGES.length);
+    }, 2800);
+    return () => clearInterval(interval);
+  }, [heroHovered]);
+
+  const nextHeroImage = () => {
+    setHeroImgIndex((prev) => (prev + 1) % HERO_REAL_ESTATE_IMAGES.length);
+  };
+
+  const prevHeroImage = () => {
+    setHeroImgIndex((prev) => (prev - 1 < 0 ? HERO_REAL_ESTATE_IMAGES.length - 1 : prev - 1));
+  };
 
   // Filtered properties for Catalog Summary Carousel
   const filteredCatalog = properties.filter((item) => {
@@ -111,18 +174,34 @@ export function HomeView({
     return item.type === catalogTab;
   });
 
-  const itemsPerPage = 3;
-  const totalCatalogPages = Math.ceil(filteredCatalog.length / itemsPerPage);
-  const visibleCatalog = filteredCatalog.slice(
-    catalogIndex * itemsPerPage,
-    catalogIndex * itemsPerPage + itemsPerPage
-  );
+  const circularGalleryRef = useRef<CircularGalleryHandle | null>(null);
+
+  const circularGalleryItems: GalleryItem[] = properties.map((lot) => ({
+    id: lot.id,
+    common: lot.name,
+    binomial: `${lot.areaM2} m² · $${lot.priceUSD.toLocaleString()} USD · Cuota: $${lot.estimatedMonthlyUSD}/mes`,
+    photo: {
+      url: lot.image,
+      text: lot.name,
+      pos: 'center',
+      by: `${lot.project} · ${lot.status}`,
+    },
+    onSelect: () => onSelectLot(lot),
+    onVisit: () => onOpenVisitModal(`Visita: ${lot.name}`),
+    onWhatsApp: () => window.open(getGeneralWhatsAppUrl(), '_blank'),
+    raw: lot,
+  }));
+
+  const currentCatalogItem =
+    filteredCatalog.length > 0
+      ? filteredCatalog[catalogIndex % filteredCatalog.length]
+      : properties[0];
 
   const nextCatalog = () => {
-    setCatalogIndex((prev) => (prev + 1 >= totalCatalogPages ? 0 : prev + 1));
+    setCatalogIndex((prev) => (prev + 1 >= filteredCatalog.length ? 0 : prev + 1));
   };
   const prevCatalog = () => {
-    setCatalogIndex((prev) => (prev - 1 < 0 ? totalCatalogPages - 1 : prev - 1));
+    setCatalogIndex((prev) => (prev - 1 < 0 ? filteredCatalog.length - 1 : prev - 1));
   };
 
   const nextAbout = () => {
@@ -139,343 +218,128 @@ export function HomeView({
     setMiravalleIndex((prev) => (prev - 1 < 0 ? AMENITIES_MIRAVALLE.length - 1 : prev - 1));
   };
 
-  const nextTestimonial = () => {
-    setTestimonialIndex((prev) => (prev + 1 >= TESTIMONIALS_DATA.length ? 0 : prev + 1));
-  };
-  const prevTestimonial = () => {
-    setTestimonialIndex((prev) => (prev - 1 < 0 ? TESTIMONIALS_DATA.length - 1 : prev - 1));
-  };
-
-  const handleHeroSearch = () => {
-    let parsedPrice = 120000;
-    if (heroPrice === '25k') parsedPrice = 25000;
-    if (heroPrice === '35k') parsedPrice = 35000;
-    if (heroPrice === '50k') parsedPrice = 50000;
-
-    if (onFilterSearch) {
-      onFilterSearch('Todas', heroType, parsedPrice);
-    }
-    onNavigate('properties');
-  };
-
   return (
     <div className="w-full overflow-hidden bg-white text-slate-900">
       {/* =========================================================================
-          1. CINEMATIC HERO — Inversión Inmobiliaria & Búsqueda Predictiva
+          1. BANNER CINEMÁTICO — GRAN FORMATO (PALETA CORPORATIVA LOGO MGM)
           ========================================================================= */}
-      <section className="relative w-full min-h-[660px] md:min-h-[740px] lg:min-h-[800px] flex flex-col justify-between overflow-hidden bg-slate-950 text-white">
-        {/* Background Photo with subtle zoom */}
-        <motion.div
-          initial={{ scale: 1 }}
-          animate={{ scale: [1, 1.05, 1] }}
-          transition={{ duration: 28, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute inset-0 w-full h-full pointer-events-none"
-        >
-          <Image
-            src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2160&q=90"
-            alt="Sociedad Civil MGM Inmobiliaria - Urbanismo Planificado en Ecuador"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center brightness-[0.82]"
-            referrerPolicy="no-referrer"
-          />
-        </motion.div>
-
-        {/* Gradient Contrast Layers */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-slate-950/40 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 bg-black/20 pointer-events-none" />
-
-        {/* Main Hero Container */}
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col justify-center pt-28 sm:pt-32 pb-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-            className="max-w-4xl space-y-6"
-          >
-
-
-            {/* Editorial Main Headline */}
-            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.05] [text-wrap:balance]">
-              Tierra firme, certeza jurídica y el{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-400 font-serif italic font-normal">
-                patrimonio de tu familia.
-              </span>
+      <section className="relative w-full bg-[#113d22] text-white overflow-hidden">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-2 min-h-[720px] sm:min-h-[820px] lg:min-h-[900px] xl:min-h-[960px] 2xl:min-h-[1020px]">
+          
+          {/* LADO IZQUIERDO: 50% de la pantalla - Panel Verde MGM (#113d22) con Pilares y Acciones */}
+          <div className="bg-[#113d22] flex flex-col justify-center items-center text-center px-6 sm:px-10 md:px-12 lg:px-14 xl:px-18 pt-36 sm:pt-44 lg:pt-48 xl:pt-52 pb-14 sm:pb-18 lg:pb-22 z-10 space-y-7 sm:space-y-9 max-w-4xl mx-auto">
+            
+            {/* Título Principal con Acento Verde y Naranja MGM */}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl 2xl:text-[5rem] font-black text-white leading-[1.05] tracking-tight [text-wrap:balance] text-center mx-auto">
+              Tierra Firme, Certeza Jurídica
+              <br />
+              <span className="text-[#5be196]">y Patrimonio </span>
+              <span className="text-[#F58220]">de tu Familia</span>
             </h1>
 
-            {/* Informative Subtitle */}
-            <p className="text-sm sm:text-base md:text-lg text-slate-200 max-w-2xl leading-relaxed drop-shadow-sm">
-              Sociedad Civil MGM Inmobiliaria desarrolla comunidades residenciales con obras civiles concluidas, servicios básicos garantizados y crédito directo hasta 48 meses.
+            {/* Párrafo Descriptivo */}
+            <p className="text-base sm:text-lg lg:text-xl xl:text-2xl text-slate-200/90 leading-relaxed font-normal max-w-2xl xl:max-w-3xl text-center mx-auto">
+              Sociedad Civil MGM Inmobiliaria desarrolla comunidades residenciales con obras civiles concluidas, servicios básicos garantizados y crédito directo hasta 48 meses sin bancos ni buró de crédito.
             </p>
 
-            {/* Quick Filter Search Bar (Ergonomic, Architectural, Zero Box-in-Box) */}
-            <div className="pt-2 max-w-3xl">
-              <div className="p-2 sm:p-2.5 rounded-2xl bg-slate-900/90 backdrop-blur-xl border border-white/20 shadow-2xl flex flex-col sm:flex-row items-stretch sm:items-center divide-y sm:divide-y-0 sm:divide-x divide-white/10 gap-3 sm:gap-4">
-                {/* Type Selector */}
-                <div className="flex-1 py-1 sm:py-0 px-2 sm:px-3 flex items-center gap-3">
-                  <Layers className="h-5 w-5 text-emerald-400 shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <label className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
-                      Tipo de Inmueble
-                    </label>
-                    <select
-                      value={heroType}
-                      onChange={(e) => setHeroType(e.target.value)}
-                      className="w-full bg-transparent text-xs sm:text-sm font-semibold text-white focus:outline-none cursor-pointer pt-0.5"
-                    >
-                      <option value="Todos" className="bg-slate-900 text-white">Todos los inmuebles</option>
-                      <option value="Lote de Terreno" className="bg-slate-900 text-white">Lotes de Terreno</option>
-                      <option value="Vivienda" className="bg-slate-900 text-white">Villas & Casas</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Price Selector */}
-                <div className="flex-1 pt-2 sm:pt-0 py-1 sm:py-0 px-2 sm:px-3 flex items-center gap-3">
-                  <CreditCard className="h-5 w-5 text-amber-400 shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <label className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
-                      Presupuesto Máximo
-                    </label>
-                    <select
-                      value={heroPrice}
-                      onChange={(e) => setHeroPrice(e.target.value)}
-                      className="w-full bg-transparent text-xs sm:text-sm font-semibold text-white focus:outline-none cursor-pointer pt-0.5"
-                    >
-                      <option value="Todos" className="bg-slate-900 text-white">Sin límite</option>
-                      <option value="25k" className="bg-slate-900 text-white">Hasta $25,000 USD</option>
-                      <option value="35k" className="bg-slate-900 text-white">Hasta $35,000 USD</option>
-                      <option value="50k" className="bg-slate-900 text-white">Hasta $50,000 USD</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Search Action Button */}
-                <div className="pt-2 sm:pt-0 sm:pl-2 shrink-0">
-                  <button
-                    onClick={handleHeroSearch}
-                    className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-[#25D366] hover:brightness-110 active:scale-95 text-slate-950 font-black text-xs sm:text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
+            {/* 4 Pilares del Banner — Sin contenedores: Íconos y títulos con alternancia verde y naranja */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 w-full max-w-3xl pt-2 sm:pt-4">
+              {HERO_CONTAINER_FEATURES.map((item, idx) => {
+                const Icon = item.icon;
+                const isOrange = idx === 2; // Crédito Directo
+                return (
+                  <div
+                    key={idx}
+                    className="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-2.5 sm:gap-3 text-center sm:text-left transition-transform duration-200 hover:scale-105"
                   >
-                    <Search className="h-4 w-4 stroke-[2.5]" />
-                    <span>Explorar Disponibilidad</span>
-                  </button>
-                </div>
-              </div>
+                    <Icon className={`w-6 h-6 sm:w-7 sm:h-7 shrink-0 stroke-[2.2] ${isOrange ? 'text-[#F58220]' : 'text-[#5be196]'}`} />
+                    <span className="text-xs sm:text-sm lg:text-base font-bold tracking-wide text-white leading-snug">
+                      {item.title}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
 
-            {/* Quick Actions */}
-            <div className="pt-2 flex flex-wrap items-center gap-3">
+            {/* Botones de Acción Inmobiliaria en Verde y Naranja */}
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 pt-1 sm:pt-2">
               <button
-                onClick={() => onOpenVisitModal('Consulta General MGM')}
-                className="px-6 py-3 rounded-full bg-white/15 hover:bg-white/25 text-white font-bold text-xs sm:text-sm backdrop-blur-md border border-white/20 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                onClick={() => onNavigate('properties')}
+                className="inline-flex items-center gap-2 px-6 sm:px-8 py-3.5 rounded-full bg-[#22A33D] hover:bg-[#1a8230] text-white font-bold text-sm sm:text-base tracking-wide transition-all shadow-lg hover:shadow-[#22A33D]/30 hover:scale-105 active:scale-95 cursor-pointer border border-[#5be196]/30"
               >
-                <CalendarCheck2 className="h-4 w-4 text-emerald-300" />
-                <span>Agendar Asesoría Notarial en Sitio</span>
+                <span>Explorar Proyectos</span>
+                <ArrowRight className="h-4 w-4 stroke-[2.5]" />
               </button>
-
-              <a
-                href={getGeneralWhatsAppUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-5 py-3 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 text-xs sm:text-sm font-bold flex items-center gap-2 transition-all active:scale-95 cursor-pointer"
+              <button
+                onClick={() => onOpenVisitModal()}
+                className="inline-flex items-center gap-2 px-6 sm:px-7 py-3.5 rounded-full bg-white/10 hover:bg-[#F58220] hover:border-[#F58220] text-white font-medium text-sm sm:text-base border border-white/25 backdrop-blur-sm transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md"
               >
-                <WhatsAppIcon size={16} className="text-[#25D366]" />
-                <span>WhatsApp Asesor Directo</span>
-              </a>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Dynamic Transition into Pure White */}
-        <WaveDarkToCream fillColor="#FFFFFF" />
-      </section>
-
-      {/* =========================================================================
-          2. METRICS & TRUST RIBBON (Solidez en Cifras)
-          ========================================================================= */}
-      <section className="relative w-full bg-white text-slate-900 py-10 sm:py-14 border-b border-slate-100">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 items-center">
-            {/* Stat 1 */}
-            <div className="flex items-center gap-3.5">
-              <div className="h-12 w-12 rounded-2xl border border-slate-200/80 bg-slate-50 flex items-center justify-center shrink-0 shadow-xs text-amber-700">
-                <Award className="h-6 w-6 stroke-[1.8]" />
-              </div>
-              <div>
-                <span className="text-xl sm:text-2xl font-black text-slate-900 font-mono block tracking-tight">
-                  10+ Años
-                </span>
-                <span className="text-[11px] sm:text-xs text-slate-500 uppercase tracking-wider block font-semibold">
-                  Trayectoria Urbanística
-                </span>
-              </div>
+                <span>Agendar Visita</span>
+              </button>
             </div>
 
-            {/* Stat 2 */}
-            <div className="flex items-center gap-3.5">
-              <div className="h-12 w-12 rounded-2xl border border-slate-200/80 bg-slate-50 flex items-center justify-center shrink-0 shadow-xs text-emerald-700">
-                <Building className="h-6 w-6 stroke-[1.8]" />
-              </div>
-              <div>
-                <span className="text-xl sm:text-2xl font-black text-slate-900 font-mono block tracking-tight">
-                  +350 Lotes
-                </span>
-                <span className="text-[11px] sm:text-xs text-slate-500 uppercase tracking-wider block font-semibold">
-                  Urbanizados con Obras
-                </span>
-              </div>
-            </div>
-
-            {/* Stat 3 */}
-            <div className="flex items-center gap-3.5">
-              <div className="h-12 w-12 rounded-2xl border border-slate-200/80 bg-slate-50 flex items-center justify-center shrink-0 shadow-xs text-teal-700">
-                <ShieldCheck className="h-6 w-6 stroke-[1.8]" />
-              </div>
-              <div>
-                <span className="text-xl sm:text-2xl font-black text-emerald-700 font-mono block tracking-tight">
-                  100% Notarial
-                </span>
-                <span className="text-[11px] sm:text-xs text-slate-500 uppercase tracking-wider block font-semibold">
-                  Escrituras Individuales
-                </span>
-              </div>
-            </div>
-
-            {/* Stat 4 */}
-            <div className="flex items-center gap-3.5">
-              <div className="h-12 w-12 rounded-2xl border border-slate-200/80 bg-slate-50 flex items-center justify-center shrink-0 shadow-xs text-amber-700">
-                <CreditCard className="h-6 w-6 stroke-[1.8]" />
-              </div>
-              <div>
-                <span className="text-xl sm:text-2xl font-black text-amber-700 font-mono block tracking-tight">
-                  Hasta 48 Meses
-                </span>
-                <span className="text-[11px] sm:text-xs text-slate-500 uppercase tracking-wider block font-semibold">
-                  Crédito Directo Propio
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* =========================================================================
-          3. SOLIDEZ JURÍDICA & PILARES URBANÍSTICOS (Carrusel con Flechas Flanqueadas)
-          ========================================================================= */}
-      <section className="relative w-full bg-[#FBFBFA] text-slate-900 py-16 sm:py-24 overflow-hidden border-b border-slate-100">
-        <TopographicContours className="text-slate-900/5" />
-
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
-          {/* Section Header */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-slate-200">
-            <div className="space-y-2">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.12]">
-                Solidez jurídica y urbanismo de{' '}
-                <span className="font-serif italic font-normal text-emerald-800">
-                  alta plusvalía
-                </span>
-              </h2>
-              <p className="text-sm sm:text-base text-slate-600 max-w-2xl leading-relaxed">
-                MGM Inmobiliaria transforma terrenos en ciudadelas planificadas con obras concluidas, garantizando que cada dólar invertido por tu familia esté legalmente blindado.
-              </p>
-            </div>
-
-            <button
-              onClick={() => onNavigate('about')}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-900 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap shadow-md hover:scale-105 active:scale-95"
-            >
-              <span>Conoce Nuestra Historia</span>
-              <ArrowRight className="h-4 w-4" />
-            </button>
           </div>
 
-          {/* Carrusel con Navegación Flanqueada (Regla 2 Kindev) */}
-          <div className="relative">
-            {/* Botón Lateral Izquierdo Flanqueado */}
-            <button
-              onClick={prevAbout}
-              aria-label="Pilar anterior"
-              className="absolute -left-2 sm:-left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-700 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
-            >
-              <ChevronLeft className="h-6 w-6 stroke-[2.5]" />
-            </button>
+          {/* LADO DERECHO: 50% de la pantalla - Carrusel Continuo Inmobiliario con Difuminación de la Imagen */}
+          <div
+            className="relative w-full h-[500px] sm:h-[620px] lg:h-full min-h-[500px] sm:min-h-[620px] lg:min-h-full overflow-hidden group/hero-slider select-none bg-[#113d22]"
+            onMouseEnter={() => setHeroHovered(true)}
+            onMouseLeave={() => setHeroHovered(false)}
+          >
+            {/* Sombra suave inferior para rematar el borde inferior */}
+            <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 z-10 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
 
-            {/* Botón Lateral Derecho Flanqueado */}
-            <button
-              onClick={nextAbout}
-              aria-label="Pilar siguiente"
-              className="absolute -right-2 sm:-right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-700 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
-            >
-              <ChevronRight className="h-6 w-6 stroke-[2.5]" />
-            </button>
-
-            {/* Contenedor del Slide Activo */}
-            <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xl overflow-hidden">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={aboutIndex}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.35, ease: 'easeInOut' }}
-                  className="flex flex-col lg:grid lg:grid-cols-12 items-stretch"
+            {/* Carrusel continuo de imágenes donde es LA IMAGEN la que se difumina (hero-mask-blend) */}
+            <div className="hero-mask-blend absolute inset-0 w-full h-full">
+              {HERO_REAL_ESTATE_IMAGES.map((img, idx) => (
+                <div
+                  key={idx}
+                  className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                    heroImgIndex === idx ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none'
+                  }`}
                 >
-                  {/* Left Column: Descriptive Content */}
-                  <div className="lg:col-span-6 p-6 sm:p-10 lg:p-12 space-y-4 flex flex-col justify-center order-last lg:order-first">
-                    <h3 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                      {ABOUT_PILLARS[aboutIndex].title}
-                    </h3>
-
-                    <h4 className="text-xs sm:text-sm font-bold text-amber-800 uppercase tracking-wide">
-                      {ABOUT_PILLARS[aboutIndex].subtitle}
-                    </h4>
-
-                    <p className="text-xs sm:text-base text-slate-600 leading-relaxed">
-                      {ABOUT_PILLARS[aboutIndex].desc}
-                    </p>
-
-                    <div className="pt-2 flex items-center gap-3">
-                      <button
-                        onClick={() => onNavigate('about')}
-                        className="text-xs font-bold text-emerald-700 hover:text-emerald-800 inline-flex items-center gap-1 cursor-pointer"
-                      >
-                        <span>Conoce los detalles notariales y el proceso</span>
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Right Column: Visual Photo Full-Bleed (top, bottom, right margin) */}
-                  <div className="lg:col-span-6 w-full relative min-h-[260px] sm:min-h-[320px] lg:min-h-[420px] order-first lg:order-last">
-                    <Image
-                      src={ABOUT_PILLARS[aboutIndex].image}
-                      alt={ABOUT_PILLARS[aboutIndex].title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                      className="object-cover"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
-                    <div className="absolute bottom-4 left-4 right-4 text-white text-[11px] sm:text-xs font-medium drop-shadow-md">
-                      Sociedad Civil MGM Inmobiliaria · Obras y Certeza Notarial
-                    </div>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
+                  <Image
+                    src={img.url}
+                    alt={img.alt}
+                    fill
+                    priority={idx === 0}
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover object-center transform transition-transform duration-7000 ease-out hover:scale-105"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+              ))}
             </div>
 
-            {/* Dots Indicators - Clean Floating Dots */}
-            <div className="flex items-center justify-center gap-2 mt-6">
-              {ABOUT_PILLARS.map((_, i) => (
+            {/* Flechas de navegación a los costados: SOLO aparecen ambas simultáneamente al pasar el mouse por la imagen */}
+            <button
+              type="button"
+              onClick={prevHeroImage}
+              aria-label="Imagen anterior"
+              className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/45 hover:bg-[#22A33D] text-white hover:text-white backdrop-blur-md border border-white/20 shadow-2xl flex items-center justify-center opacity-0 group-hover/hero-slider:opacity-100 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer pointer-events-none group-hover/hero-slider:pointer-events-auto"
+            >
+              <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
+            </button>
+
+            <button
+              type="button"
+              onClick={nextHeroImage}
+              aria-label="Imagen siguiente"
+              className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/45 hover:bg-[#22A33D] text-white hover:text-white backdrop-blur-md border border-white/20 shadow-2xl flex items-center justify-center opacity-0 group-hover/hero-slider:opacity-100 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer pointer-events-none group-hover/hero-slider:pointer-events-auto"
+            >
+              <ChevronRight className="w-6 h-6 stroke-[2.5]" />
+            </button>
+
+            {/* Indicadores de diapositiva (visibles al interactuar con el carrusel) */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15 opacity-0 group-hover/hero-slider:opacity-100 transition-opacity duration-300">
+              {HERO_REAL_ESTATE_IMAGES.map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => setAboutIndex(i)}
+                  onClick={() => setHeroImgIndex(i)}
+                  aria-label={`Ver imagen ${i + 1}`}
                   className={`h-2 rounded-full transition-all cursor-pointer ${
-                    aboutIndex === i ? 'w-8 bg-emerald-700' : 'w-2 bg-slate-300 hover:bg-slate-400'
+                    heroImgIndex === i ? 'w-6 bg-[#5be196]' : 'w-2 bg-white/50 hover:bg-white'
                   }`}
-                  aria-label={`Ir a pilar ${i + 1}`}
                 />
               ))}
             </div>
@@ -484,131 +348,149 @@ export function HomeView({
       </section>
 
       {/* =========================================================================
-          4. CATÁLOGO DE LOTES & VIVIENDAS (Grid & Carrusel Flanqueado - Blanco Puro)
+          2. SECCIÓN: PROYECTOS CONCLUIDOS & ARTE DEL URBANISMO (DISEÑO REFERENCIA)
           ========================================================================= */}
-      <section className="relative w-full bg-white text-slate-900 py-16 sm:py-24 overflow-hidden border-b border-slate-100">
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
-          {/* Header strip */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-slate-200">
-            <div className="space-y-2">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.12]">
-                Lotes y viviendas con{' '}
-                <span className="font-serif italic font-normal text-emerald-700">
-                  crédito directo
-                </span>
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-600 max-w-xl leading-relaxed">
-                Revisa disponibilidad en tiempo real, metrajes exactos y facilidades de pago directo. Agenda tu visita técnica presencial en terreno sin intermediarios.
-              </p>
-            </div>
+      <section className="relative w-full bg-[#f2f7f4] text-slate-900 py-20 sm:py-28 lg:py-32 overflow-hidden border-b border-slate-200/60">
+        {/* Topographic Background SVG provided by user */}
+        <svg
+          viewBox="0 0 800 600"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.06] text-[#113d22]"
+        >
+          <path d="M-50,200 C150,150 250,350 450,280 C650,210 750,420 900,380" stroke="currentColor" strokeWidth="1.2" />
+          <path d="M-50,250 C160,200 270,400 470,330 C670,260 760,470 900,430" stroke="currentColor" strokeWidth="1.2" />
+          <path d="M-50,300 C170,250 290,450 490,380 C690,310 770,520 900,480" stroke="currentColor" strokeWidth="1.2" />
+          <path d="M-50,350 C180,300 310,500 510,430 C710,360 780,570 900,530" stroke="currentColor" strokeWidth="1.2" />
+          <ellipse cx="620" cy="280" rx="180" ry="140" stroke="currentColor" strokeWidth="1.2" />
+          <ellipse cx="620" cy="280" rx="220" ry="170" stroke="currentColor" strokeWidth="1.2" />
+          <ellipse cx="620" cy="280" rx="260" ry="200" stroke="currentColor" strokeWidth="1.2" />
+        </svg>
 
-            <div className="flex flex-wrap items-center gap-3">
-              {/* Type Filter Tabs */}
-              <div className="inline-flex p-1 bg-slate-100 rounded-full text-xs font-semibold text-slate-600 border border-slate-200/80">
-                {(['Todos', 'Lote de Terreno', 'Vivienda'] as const).map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => {
-                      setCatalogTab(tab);
-                      setCatalogIndex(0);
-                    }}
-                    className={`px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
-                      catalogTab === tab
-                        ? 'bg-emerald-700 text-white font-bold shadow-xs'
-                        : 'hover:text-slate-900 hover:bg-slate-200/60'
-                    }`}
-                  >
-                    {tab === 'Todos' ? 'Todos' : tab === 'Lote de Terreno' ? 'Lotes' : 'Villas'}
-                  </button>
-                ))}
-              </div>
-
-              <button
-                onClick={() => onNavigate('properties')}
-                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-slate-900 hover:bg-emerald-800 text-white text-xs font-bold transition-all cursor-pointer whitespace-nowrap shadow-md"
-              >
-                <span>Ver Todo el Inventario ({properties.length})</span>
-                <ArrowRight className="h-3.5 w-3.5" />
-              </button>
-            </div>
+        <div className="relative z-10 mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+          {/* Encabezado visible únicamente en móviles (< lg) */}
+          <div className="lg:hidden text-center max-w-2xl mx-auto space-y-3 mb-10">
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-[1.15] [text-wrap:balance]">
+              Descubre la Solidez y <br />
+              <span className="text-[#22A33D]">Urbanismo</span> a Través de Nuestros Proyectos
+            </h2>
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
+              Sociedad Civil MGM Inmobiliaria transforma predios estratégicos en ciudadelas residenciales planificadas con obras concluidas, servicios básicos garantizados y certeza jurídica notarial.
+            </p>
           </div>
 
-          {/* Carrusel de Propiedades Destacadas: Flanqueado en PC, Táctil en Móvil */}
-          <div className="relative">
-            {/* VISTA DESKTOP / TABLET (>= 768px): Cuadrícula paginada con flechas flanqueadas */}
-            <div className="hidden md:block">
-              {filteredCatalog.length > itemsPerPage && (
-                <>
-                  <button
-                    onClick={prevCatalog}
-                    aria-label="Propiedades anteriores"
-                    className="absolute -left-3 sm:-left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-700 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
-                  >
-                    <ChevronLeft className="h-6 w-6 stroke-[2.5]" />
-                  </button>
-
-                  <button
-                    onClick={nextCatalog}
-                    aria-label="Siguientes propiedades"
-                    className="absolute -right-3 sm:-right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-700 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
-                  >
-                    <ChevronRight className="h-6 w-6 stroke-[2.5]" />
-                  </button>
-                </>
-              )}
-
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                {visibleCatalog.map((lot) => (
-                  <PropertyCard
-                    key={lot.id}
-                    lot={lot}
-                    dark={false}
-                    onSelectLot={onSelectLot}
-                    onOpenVisitModal={onOpenVisitModal}
-                  />
-                ))}
-              </div>
-
-              {/* Pagination Dots (Desktop) */}
-              {totalCatalogPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-8">
-                  {Array.from({ length: totalCatalogPages }).map((_, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setCatalogIndex(idx)}
-                      className={`h-2 rounded-full transition-all cursor-pointer ${
-                        catalogIndex === idx ? 'w-8 bg-emerald-700' : 'w-2 bg-slate-300 hover:bg-slate-400'
-                      }`}
-                      aria-label={`Ir a página de catálogo ${idx + 1}`}
-                    />
-                  ))}
+          {/* Grilla Arquitectónica de 3 Columnas: Mismo ancho en todas las tarjetas y boxes redondeados sin cortar la imagen */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
+            {/* Columna Izquierda: 1 Tarjeta Lateral a la altura de la palabra "Urbanismo" (Pilar 0) */}
+            <div className="lg:col-span-3 flex justify-center lg:justify-end lg:mt-14 xl:mt-16">
+              <div
+                onClick={() => onNavigate('properties')}
+                className="group relative w-full max-w-[280px] sm:max-w-[300px] h-[330px] sm:h-[360px] lg:h-[370px] xl:h-[390px] rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer bg-slate-900"
+              >
+                <Image
+                  src={ABOUT_PILLARS[0].image}
+                  alt={ABOUT_PILLARS[0].title}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 300px"
+                  className="object-cover object-center transform transition-transform duration-700 ease-out group-hover:scale-108"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/15 to-transparent pointer-events-none" />
+                {/* Box blanco redondeado con separación lateral ubicado más abajo en vertical con fuente más grande */}
+                <div className="absolute bottom-1.5 sm:bottom-2 left-3 right-3 sm:left-3.5 sm:right-3.5 z-10 bg-white/95 backdrop-blur-md px-4 py-3 sm:py-3.5 rounded-2xl shadow-xl border border-white/80 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-2xl text-center">
+                  <h4 className="text-base sm:text-lg lg:text-xl font-black text-[#22A33D] leading-snug tracking-tight">
+                    {ABOUT_PILLARS[0].title}
+                  </h4>
                 </div>
-              )}
+              </div>
             </div>
 
-            {/* VISTA MÓVIL (< 768px): Rail táctil con snap horizontal nativo estilo App */}
-            <div className="md:hidden">
-              <div className="flex items-center justify-between mb-3 px-1 text-xs text-slate-600">
-                <span className="font-semibold text-emerald-700 flex items-center gap-1">
-                  <span>Desliza para ver más</span>
-                  <span>→</span>
-                </span>
-                <span className="text-[11px] font-mono text-slate-500">
-                  {filteredCatalog.length} disponibles
-                </span>
+            {/* Columna Central: Título y Párrafo Arriba + 2 Tarjetas Abajo */}
+            <div className="md:col-span-2 lg:col-span-6 flex flex-col items-center">
+              {/* Título y Párrafo Centrado (visible en lg+) con Urbanismo alineado */}
+              <div className="hidden lg:flex flex-col items-center text-center space-y-4 px-4 max-w-3xl mx-auto">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] xl:text-[3.25rem] font-black text-slate-900 tracking-tight leading-[1.15] [text-wrap:balance]">
+                  Descubre la Solidez y <br className="hidden lg:block" />
+                  <span className="text-[#22A33D]">Urbanismo</span> a Través de <span className="text-[#F58220]">Nuestros Proyectos</span>
+                </h2>
+                <p className="text-base lg:text-lg text-slate-600 leading-relaxed font-normal max-w-2xl">
+                  Sociedad Civil MGM Inmobiliaria transforma predios estratégicos en ciudadelas residenciales planificadas con obras concluidas, servicios básicos garantizados y certeza jurídica notarial.
+                </p>
               </div>
 
-              <div className="flex gap-4 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory scrollbar-none -mx-4 px-4">
-                {filteredCatalog.map((lot) => (
-                  <div key={lot.id} className="w-[84vw] max-w-[325px] shrink-0 snap-center">
-                    <PropertyCard
-                      lot={lot}
-                      dark={false}
-                      onSelectLot={onSelectLot}
-                      onOpenVisitModal={onOpenVisitModal}
+              {/* Sub-grilla de 2 Tarjetas Abajo del Texto (Con el mismo ancho de las laterales y separación del texto) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 justify-center max-w-2xl mx-auto w-full mt-10 sm:mt-12 lg:mt-16 xl:mt-20">
+                {/* Pilar 1 */}
+                <div className="flex justify-center">
+                  <div
+                    onClick={() => onNavigate('properties')}
+                    className="group relative w-full max-w-[280px] sm:max-w-[300px] h-[280px] sm:h-[300px] lg:h-[310px] xl:h-[330px] rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer bg-slate-900"
+                  >
+                    <Image
+                      src={ABOUT_PILLARS[1].image}
+                      alt={ABOUT_PILLARS[1].title}
+                      fill
+                      sizes="(max-width: 640px) 100vw, 300px"
+                      className="object-cover object-center transform transition-transform duration-700 ease-out group-hover:scale-108"
+                      referrerPolicy="no-referrer"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/15 to-transparent pointer-events-none" />
+                    {/* Box blanco redondeado con separación lateral ubicado más abajo en vertical con fuente más grande */}
+                    <div className="absolute bottom-1.5 sm:bottom-2 left-3 right-3 sm:left-3.5 sm:right-3.5 z-10 bg-white/95 backdrop-blur-md px-4 py-3 sm:py-3.5 rounded-2xl shadow-xl border border-white/80 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-2xl text-center">
+                      <h4 className="text-base sm:text-lg lg:text-xl font-black text-[#22A33D] leading-snug tracking-tight">
+                        {ABOUT_PILLARS[1].title}
+                      </h4>
+                    </div>
                   </div>
-                ))}
+                </div>
+
+                {/* Pilar 2 - Crédito Directo en Naranja MGM */}
+                <div className="flex justify-center">
+                  <div
+                    onClick={() => onNavigate('properties')}
+                    className="group relative w-full max-w-[280px] sm:max-w-[300px] h-[280px] sm:h-[300px] lg:h-[310px] xl:h-[320px] rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer bg-slate-900"
+                  >
+                    <Image
+                      src={ABOUT_PILLARS[2].image}
+                      alt={ABOUT_PILLARS[2].title}
+                      fill
+                      sizes="(max-width: 640px) 100vw, 300px"
+                      className="object-cover object-center transform transition-transform duration-700 ease-out group-hover:scale-108"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/15 to-transparent pointer-events-none" />
+                    {/* Box blanco redondeado con título en naranja corporativo */}
+                    <div className="absolute bottom-1.5 sm:bottom-2 left-3 right-3 sm:left-3.5 sm:right-3.5 z-10 bg-white/95 backdrop-blur-md px-4 py-3 sm:py-3.5 rounded-2xl shadow-xl border border-white/80 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-2xl text-center">
+                      <h4 className="text-base sm:text-lg lg:text-xl font-black text-[#F58220] leading-snug tracking-tight">
+                        {ABOUT_PILLARS[2].title}
+                      </h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Columna Derecha: 1 Tarjeta Lateral a la altura de la palabra "Urbanismo" (Pilar 3) */}
+            <div className="lg:col-span-3 flex justify-center lg:justify-start lg:mt-14 xl:mt-16">
+              <div
+                onClick={() => onNavigate('properties')}
+                className="group relative w-full max-w-[280px] sm:max-w-[300px] h-[330px] sm:h-[360px] lg:h-[370px] xl:h-[390px] rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer bg-slate-900"
+              >
+                <Image
+                  src={ABOUT_PILLARS[3].image}
+                  alt={ABOUT_PILLARS[3].title}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 300px"
+                  className="object-cover object-center transform transition-transform duration-700 ease-out group-hover:scale-108"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/15 to-transparent pointer-events-none" />
+                {/* Box blanco redondeado con separación lateral ubicado más abajo en vertical con fuente más grande */}
+                <div className="absolute bottom-1.5 sm:bottom-2 left-3 right-3 sm:left-3.5 sm:right-3.5 z-10 bg-white/95 backdrop-blur-md px-4 py-3 sm:py-3.5 rounded-2xl shadow-xl border border-white/80 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-2xl text-center">
+                  <h4 className="text-base sm:text-lg lg:text-xl font-black text-[#22A33D] leading-snug tracking-tight">
+                    {ABOUT_PILLARS[3].title}
+                  </h4>
+                </div>
               </div>
             </div>
           </div>
@@ -616,18 +498,76 @@ export function HomeView({
       </section>
 
       {/* =========================================================================
-          5. PROYECTO INSIGNIA: CIUDADELA MIRAVALLE (Carrusel con Flechas Flanqueadas)
+          3. CARRUSEL 2: CATÁLOGO DE LOTES & VIVIENDAS — CARRUSEL CIRCULAR 3D
           ========================================================================= */}
-      <section className="relative w-full bg-[#FBFBFA] text-slate-900 py-16 sm:py-24 overflow-hidden border-t border-slate-100">
+      <section className="relative w-full bg-[#fbfbfa] text-slate-900 py-16 sm:py-24 overflow-hidden border-b border-slate-100">
+        <div className="relative z-10 mx-auto max-w-[1600px] px-2 sm:px-4 lg:px-6 space-y-8 sm:space-y-12">
+          {/* Header de la sección: Limpio, centrado, sin buscadores ni botones superiores */}
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.12]">
+              Lotes y viviendas con{' '}
+              <span className="font-serif italic font-normal text-[#F58220]">
+                crédito directo
+              </span>
+            </h2>
+            <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+              Revisa disponibilidad en tiempo real, metrajes exactos y facilidades de pago directo. Agenda tu visita técnica presencial en terreno sin intermediarios.
+            </p>
+          </div>
+
+          {/* CARRUSEL CIRCULAR 3D INTERACTIVO */}
+          <div className="relative">
+            {/* Botones de navegación prev/next para girar el carrusel 3D */}
+            {properties.length > 1 && (
+              <>
+                <button
+                  onClick={() => circularGalleryRef.current?.prev()}
+                  aria-label="Propiedad anterior"
+                  className="absolute left-2 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-[#F58220] text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
+                >
+                  <ChevronLeft className="h-6 w-6 stroke-[2.5]" />
+                </button>
+
+                <button
+                  onClick={() => circularGalleryRef.current?.next()}
+                  aria-label="Siguiente propiedad"
+                  className="absolute right-2 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-[#F58220] text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
+                >
+                  <ChevronRight className="h-6 w-6 stroke-[2.5]" />
+                </button>
+              </>
+            )}
+
+            {/* Contenedor del Carrusel Circular 3D con altura vertical para tarjetas altas */}
+            <div className="w-full h-[620px] sm:h-[700px] lg:h-[780px] xl:h-[820px] relative flex items-center justify-center overflow-hidden py-2">
+              <CircularGallery
+                ref={circularGalleryRef}
+                items={circularGalleryItems}
+                radius={750}
+                autoRotateSpeed={0.08}
+                onItemSelect={(item) => {
+                  if (item.raw) {
+                    onSelectLot(item.raw);
+                  }
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          4. CARRUSEL 3: PROYECTO INSIGNIA CIUDADELA MIRAVALLE — DISEÑO CONTENEDOR
+          ========================================================================= */}
+      <section className="relative w-full bg-white text-slate-900 py-16 sm:py-24 overflow-hidden border-t border-slate-100">
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
           {/* Header strip */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-slate-200">
-            <div className="space-y-2">
-
+            <div className="space-y-3">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.12]">
                 Ciudadela Miravalle:{' '}
-                <span className="font-serif italic font-normal text-amber-900">
-                  Infraestructura viva
+                <span className="font-serif italic font-normal text-[#22A33D]">
+                  Infraestructura viva.
                 </span>
               </h2>
               <p className="text-sm sm:text-base text-slate-700 max-w-2xl leading-relaxed">
@@ -637,20 +577,20 @@ export function HomeView({
 
             <button
               onClick={() => onNavigate('miravalle')}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-950 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap shadow-md hover:scale-105 active:scale-95"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-950 hover:bg-[#22A33D] text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap shadow-md hover:scale-105 active:scale-95"
             >
               <span>Ver Masterplan Miravalle</span>
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
 
-          {/* Carrusel de Amenidades con Flechas Flanqueadas a los Costados (Regla 2 Kindev) */}
+          {/* Carrusel de Amenidades con Contenedor Imagen 2 */}
           <div className="relative">
             {/* Botón Lateral Izquierdo */}
             <button
               onClick={prevMiravalle}
               aria-label="Amenidad anterior"
-              className="absolute -left-2 sm:-left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-600 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
+              className="absolute -left-2 sm:-left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-[#22A33D] text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
             >
               <ChevronLeft className="h-6 w-6 stroke-[2.5]" />
             </button>
@@ -659,79 +599,43 @@ export function HomeView({
             <button
               onClick={nextMiravalle}
               aria-label="Amenidad siguiente"
-              className="absolute -right-2 sm:-right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-600 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
+              className="absolute -right-2 sm:-right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-[#22A33D] text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
             >
               <ChevronRight className="h-6 w-6 stroke-[2.5]" />
             </button>
 
             {/* Slide de Amenidad Miravalle */}
-            <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xl overflow-hidden">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={miravalleIndex}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.35, ease: 'easeInOut' }}
-                  className="flex flex-col lg:grid lg:grid-cols-12 items-stretch"
-                >
-                  {/* Left Column: Image Full-Bleed (top, bottom, left) */}
-                  <div className="lg:col-span-7 w-full relative min-h-[260px] sm:min-h-[340px] lg:min-h-[420px]">
-                    <Image
-                      src={AMENITIES_MIRAVALLE[miravalleIndex].image}
-                      alt={AMENITIES_MIRAVALLE[miravalleIndex].title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 60vw"
-                      className="object-cover"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
-                    <div className="absolute top-4 left-4">
-                      <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#25D366] text-slate-950 shadow-md">
-                        {AMENITIES_MIRAVALLE[miravalleIndex].tag}
-                      </span>
-                    </div>
-                    <div className="absolute bottom-4 left-4 right-4 text-white text-[11px] sm:text-xs font-medium drop-shadow-md">
-                      Ciudadela Miravalle · Masterplan Urbanístico
-                    </div>
-                  </div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={miravalleIndex}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.35, ease: 'easeInOut' }}
+              >
+                <NatureContainerCard
+                  image={AMENITIES_MIRAVALLE[miravalleIndex].image}
+                  imageAlt={AMENITIES_MIRAVALLE[miravalleIndex].title}
+                  badgeTopLeft={AMENITIES_MIRAVALLE[miravalleIndex].tag}
+                  tagRight="Ciudadela Miravalle · Masterplan 🌿"
+                  title={AMENITIES_MIRAVALLE[miravalleIndex].title}
+                  description={AMENITIES_MIRAVALLE[miravalleIndex].description}
+                  primaryButtonText="Agendar Recorrido en Obra"
+                  onPrimaryClick={() => onOpenVisitModal('Recorrido Ciudadela Miravalle')}
+                  secondaryLinkText="Ver Masterplan Miravalle"
+                  onSecondaryClick={() => onNavigate('miravalle')}
+                />
+              </motion.div>
+            </AnimatePresence>
 
-                  {/* Right Column: Narrative Content with ergonomic padding */}
-                  <div className="lg:col-span-5 p-6 sm:p-8 lg:p-10 space-y-4 flex flex-col justify-center w-full">
-                    <span className="text-xs font-bold uppercase tracking-widest text-emerald-800">
-                      INFRAESTRUCTURA DE URBANIZACIÓN
-                    </span>
-
-                    <h3 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                      {AMENITIES_MIRAVALLE[miravalleIndex].title}
-                    </h3>
-
-                    <p className="text-xs sm:text-base text-slate-600 leading-relaxed">
-                      {AMENITIES_MIRAVALLE[miravalleIndex].description}
-                    </p>
-
-                    <div className="pt-2 sm:pt-3">
-                      <button
-                        onClick={() => onOpenVisitModal('Recorrido Ciudadela Miravalle')}
-                        className="w-full sm:w-auto px-6 py-3 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer shadow-md inline-flex items-center justify-center gap-2 active:scale-95"
-                      >
-                        <CalendarCheck2 className="h-4 w-4" />
-                        <span>Agendar Recorrido en Obra</span>
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            {/* Dots Indicators - Clean Floating Dots */}
+            {/* Dots Indicators */}
             <div className="flex items-center justify-center gap-2 mt-6">
               {AMENITIES_MIRAVALLE.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setMiravalleIndex(i)}
-                  className={`h-2 rounded-full transition-all cursor-pointer ${
-                    miravalleIndex === i ? 'w-8 bg-emerald-700' : 'w-2 bg-slate-300 hover:bg-slate-400'
+                  className={`h-2.5 rounded-full transition-all cursor-pointer ${
+                    miravalleIndex === i ? 'w-8 bg-[#22A33D]' : 'w-2.5 bg-slate-300 hover:bg-slate-400'
                   }`}
                   aria-label={`Ir a amenidad ${i + 1}`}
                 />
@@ -739,21 +643,19 @@ export function HomeView({
             </div>
           </div>
         </div>
-
-        {/* Section divider to Testimonials */}
       </section>
 
       {/* =========================================================================
-          6. FAMILIAS PROPIETARIAS & TESTIMONIOS (Carrusel Flanqueado - Blanco Puro)
+          5. CARRUSEL 4: FAMILIAS PROPIETARIAS & TESTIMONIOS (Diseño Suave Crema)
           ========================================================================= */}
-      <section className="relative w-full bg-white text-slate-900 py-16 sm:py-24 overflow-hidden border-t border-slate-100">
+      <section className="relative w-full bg-[#fbfbfa] text-slate-900 py-16 sm:py-24 overflow-hidden border-t border-slate-100">
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
           {/* Header strip */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-slate-200">
             <div className="space-y-2">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.12]">
                 Confianza respaldada por{' '}
-                <span className="font-serif italic font-normal text-emerald-800">
+                <span className="font-serif italic font-normal text-[#22A33D]">
                   escrituras entregadas
                 </span>
               </h2>
@@ -764,73 +666,52 @@ export function HomeView({
 
             <button
               onClick={() => onNavigate('contact')}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-900 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap shadow-md hover:scale-105 active:scale-95"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-900 hover:bg-[#22A33D] text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap shadow-md hover:scale-105 active:scale-95"
             >
               <span>Canales de Contacto Directo</span>
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
 
-          {/* Carrusel de Testimonios Reales con Flechas Flanqueadas a los Costados (Regla 2 Kindev) */}
-          <div className="relative">
-            {/* Botón Lateral Izquierdo */}
-            <button
-              onClick={prevTestimonial}
-              aria-label="Testimonio anterior"
-              className="absolute -left-2 sm:-left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-700 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
-            >
-              <ChevronLeft className="h-6 w-6 stroke-[2.5]" />
-            </button>
+          {/* Grilla 2x2 de Testimonios Reales (Diseño Ribbon acorde a la Paleta MGM) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12 sm:gap-y-16 mt-8">
+            {TESTIMONIALS_DATA.slice(0, 4).map((item, idx) => (
+              <div
+                key={idx}
+                className="bg-[#f4f7ee] rounded-br-[2.5rem] rounded-tr-[2.5rem] rounded-bl-[2.5rem] rounded-tl-lg border border-[#dce3d2] shadow-xl relative mt-8 sm:mt-10 p-6 sm:p-8 pt-18 sm:pt-22 min-h-[220px] transition-all hover:shadow-2xl"
+              >
+                {/* Ribbon Superior Verde MGM (#113d22 con detalles #5be196 y pliegue lateral) */}
+                <div className="absolute top-0 -left-3 sm:-left-4 bg-[#113d22] text-white py-3.5 sm:py-4 px-6 sm:px-8 rounded-tr-full rounded-br-full shadow-lg z-10 w-[90%] sm:w-[82%] border-y border-r border-[#22A33D]/30">
+                  {/* Pliegue 3D lateral inferior */}
+                  <div
+                    className="absolute top-full left-0 w-3 sm:w-4 h-3 sm:h-4 bg-[#0a2313]"
+                    style={{ clipPath: 'polygon(100% 0, 0 0, 100% 100%)' }}
+                  />
+                  <h4 className="font-bold text-base sm:text-lg leading-tight line-clamp-1 text-white">
+                    {item.name}
+                  </h4>
+                  <span className="text-xs sm:text-sm font-semibold text-[#5be196] line-clamp-1 block mt-0.5">
+                    {item.role}
+                  </span>
+                </div>
 
-            {/* Botón Lateral Derecho */}
-            <button
-              onClick={nextTestimonial}
-              aria-label="Testimonio siguiente"
-              className="absolute -right-2 sm:-right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-emerald-700 text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
-            >
-              <ChevronRight className="h-6 w-6 stroke-[2.5]" />
-            </button>
-
-            <div className="bg-[#FBFBFA] rounded-3xl border border-slate-200/90 p-8 sm:p-10 shadow-lg">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={testimonialIndex}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -15 }}
-                  transition={{ duration: 0.3 }}
-                  className="space-y-6 max-w-3xl"
-                >
-                  <div className="flex text-amber-400 gap-1">
-                    {[...Array(TESTIMONIALS_DATA[testimonialIndex].stars)].map((_, idx) => (
-                      <Star key={idx} className="h-5 w-5 fill-amber-400" />
+                {/* Área de Contenido con borde lateral verde corporativo #22A33D */}
+                <div className="pl-4 border-l-2 border-[#22A33D] h-full flex flex-col justify-start space-y-2.5">
+                  <div className="flex text-[#F58220] gap-1">
+                    {[...Array(item.stars)].map((_, starIdx) => (
+                      <Star key={starIdx} className="h-4 w-4 sm:h-5 sm:w-5 fill-[#F58220] text-[#F58220]" />
                     ))}
                   </div>
-
-                  <p className="text-base sm:text-xl text-slate-800 italic leading-relaxed font-serif">
-                    &ldquo;{TESTIMONIALS_DATA[testimonialIndex].text}&rdquo;
+                  <p className="text-sm sm:text-base text-slate-800 leading-relaxed font-serif italic">
+                    &ldquo;{item.text}&rdquo;
                   </p>
-
-                  <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div>
-                      <h4 className="text-base font-bold text-slate-900">
-                        {TESTIMONIALS_DATA[testimonialIndex].name}
-                      </h4>
-                      <span className="text-xs text-emerald-700 font-medium">
-                        {TESTIMONIALS_DATA[testimonialIndex].role}
-                      </span>
-                    </div>
-                    <span className="text-xs text-slate-500 font-mono">
-                      {TESTIMONIALS_DATA[testimonialIndex].location}
-                    </span>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Quick Action Capsule to WhatsApp & Office */}
-          <div className="rounded-3xl bg-gradient-to-r from-emerald-50 via-teal-50/40 to-slate-50 border border-emerald-200/80 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+          <div className="rounded-[2rem] bg-gradient-to-r from-[#eef8f0] via-[#fff7ed] to-slate-50 border border-[#22A33D]/25 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
             <div className="space-y-1 text-center sm:text-left">
               <h3 className="text-lg sm:text-xl font-bold text-slate-900">
                 ¿Deseas hablar directamente con un asesor notarial?
@@ -845,15 +726,15 @@ export function HomeView({
                 href={getGeneralWhatsAppUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm transition-all shadow-md inline-flex items-center justify-center gap-2 cursor-pointer active:scale-95 text-center"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-[#22A33D] hover:bg-[#1a8230] text-white font-black text-xs sm:text-sm transition-all shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2 cursor-pointer active:scale-95 text-center"
               >
-                <WhatsAppIcon size={18} className="text-slate-950 shrink-0" />
+                <WhatsAppIcon size={18} className="text-white shrink-0" />
                 <span>WhatsApp Oficial Inmediato</span>
               </a>
 
               <button
                 onClick={() => onOpenVisitModal('Agendamiento desde Inicio')}
-                className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer shadow-md active:scale-95 text-center"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-slate-900 hover:bg-[#F58220] text-white font-bold text-xs sm:text-sm transition-all cursor-pointer shadow-md active:scale-95 text-center"
               >
                 <span>Agendar Cita en Oficina</span>
               </button>

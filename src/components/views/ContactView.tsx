@@ -1,560 +1,605 @@
 'use client';
 
 import React, { useState } from 'react';
-import Image from 'next/image';
 import { motion } from 'motion/react';
 import {
+  MapPin,
   Phone,
   Mail,
-  MapPin,
   Clock,
+  Navigation,
+  ExternalLink,
+  Building2,
+  User,
+  Layers,
   Send,
+  MessageSquare,
   CalendarCheck2,
-  CheckCircle,
-  ShieldCheck,
-  ArrowRight,
+  CheckCircle2,
 } from 'lucide-react';
-import {
-  WHATSAPP_PHONE,
-  getGeneralWhatsAppUrl,
-  getMiravalleWhatsAppUrl,
-} from '@/src/data/lots';
-import {
-  WhatsAppIcon,
-  FacebookIcon,
-  InstagramIcon,
-  TikTokIcon,
-} from '../SocialIcons';
-import { WaveDarkToCream, WaveCreamToDark } from '../WaveDividers';
+import { WHATSAPP_PHONE } from '@/src/data/lots';
+import { WhatsAppIcon } from '../SocialIcons';
 
 interface ContactViewProps {
   onOpenVisitModal: (defaultInterest?: string) => void;
 }
 
+const sanitizeInput = (text: string) => {
+  if (typeof text !== 'string') return '';
+  return text
+    .replace(/[<>]/g, '')
+    .replace(/javascript:/gi, '')
+    .trim();
+};
+
 export function ContactView({ onOpenVisitModal }: ContactViewProps) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [interest, setInterest] = useState('Ciudadela Miravalle');
-  const [visitDate, setVisitDate] = useState('');
-  const [visitShift, setVisitShift] = useState('Mañana (09:00 - 12:00)');
-  const [message, setMessage] = useState('');
-  const [honeypot, setHoneypot] = useState('');
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    nombre: '',
+    telefono: '',
+    categoria: 'Ciudadela Miravalle',
+    mensaje: '',
+    honeypot: '',
+  });
+  const [errorMsg, setErrorMsg] = useState('');
+  const [isSent, setIsSent] = useState(false);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    if (errorMsg) setErrorMsg('');
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (honeypot) return; // bot detected
 
-    if (!name.trim() || !phone.trim()) {
+    // Verificación de trampa Honeypot anti-spam
+    if (formData.honeypot) {
       return;
     }
 
-    setIsSubmitted(true);
+    const cleanNombre = sanitizeInput(formData.nombre);
+    const cleanTelefono = sanitizeInput(formData.telefono);
+    const cleanMensaje = sanitizeInput(formData.mensaje);
 
-    const encoded = encodeURIComponent(
-      `Hola MGM Inmobiliaria, he solicitado agendamiento desde la web:\n\n` +
-        `• Nombre: ${name.trim()}\n` +
-        `• Teléfono: ${phone.trim()}\n` +
-        (email.trim() ? `• Email: ${email.trim()}\n` : '') +
-        `• Proyecto de interés: ${interest}\n` +
-        (visitDate ? `• Fecha solicitada: ${visitDate}\n` : '') +
-        `• Turno preferido: ${visitShift}\n` +
-        (message.trim() ? `• Mensaje: ${message.trim()}\n\n` : '\n') +
-        `Deseo coordinar el recorrido y transporte con un asesor de MGM Inmobiliaria.`
-    );
+    if (cleanNombre.length < 3) {
+      setErrorMsg('Por favor, ingresa un nombre válido (mínimo 3 caracteres).');
+      return;
+    }
+
+    const phoneRegex = /^[0-9+-\s()]{7,15}$/;
+    if (!phoneRegex.test(cleanTelefono)) {
+      setErrorMsg('Por favor, ingresa un número de teléfono válido.');
+      return;
+    }
+
+    setIsSent(true);
+
+    const textoMsg = `Hola Sociedad Civil MGM Inmobiliaria, mi nombre es ${cleanNombre}. Mi número es ${cleanTelefono}. Me interesa: ${formData.categoria}. Consulta: ${cleanMensaje}`;
+    const urlWa = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(textoMsg)}`;
 
     setTimeout(() => {
-      window.open(`https://wa.me/${WHATSAPP_PHONE}?text=${encoded}`, '_blank');
-    }, 400);
+      window.open(urlWa, '_blank');
+    }, 350);
   };
 
   return (
-    <div className="w-full overflow-hidden bg-white text-slate-900">
-      {/* 1. CINEMATIC FULL-WIDTH HERO BANNER */}
-      <section className="relative w-full min-h-[560px] md:min-h-[640px] lg:min-h-[700px] flex flex-col justify-between overflow-hidden bg-slate-950 text-white">
-        {/* Cinematic Backdrop Image with Slow Ken Burns Zoom Effect */}
-        <motion.div
-          initial={{ scale: 1 }}
-          animate={{ scale: [1, 1.08, 1] }}
-          transition={{ duration: 24, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute inset-0 w-full h-full pointer-events-none"
+    <div className="min-h-screen bg-[#FBFBFA] font-sans pb-16">
+      {/* =========================================================================
+          HERO BANNER DE CONTACTO (ESTILO AOVET ADAPTADO A PALETA MGM)
+          ========================================================================= */}
+      <section className="relative flex flex-col justify-center bg-gray-900 pt-20 pb-24 md:pb-36 overflow-hidden h-[540px] sm:h-[620px] md:h-[680px] lg:h-[720px] min-h-[540px] md:min-h-[620px] lg:min-h-[700px]">
+        {/* Background image + dark corporate overlay */}
+        <div
+          className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=85')`,
+          }}
         >
-          <Image
-            src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2160&q=90"
-            alt="Atención Inmediata MGM Inmobiliaria"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center brightness-[0.85]"
-            referrerPolicy="no-referrer"
-          />
-        </motion.div>
-
-        {/* Multi-layer Dark Gradient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/85 via-slate-950/35 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 bg-black/25 pointer-events-none" />
-
-        {/* Hero Content */}
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col justify-center pt-28 sm:pt-32 pb-8">
-          <div className="max-w-4xl space-y-5">
-
-
-            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.08] [text-wrap:balance]">
-              Contáctanos y agenda tu{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-400 font-serif italic font-normal">
-                asesoría personalizada.
-              </span>
-            </h1>
-
-            <p className="text-sm sm:text-base md:text-lg text-slate-200 max-w-2xl leading-relaxed drop-shadow-sm">
-              Estamos disponibles para responder tus preguntas técnicas, mostrarte la documentación jurídica notarial y coordinar un recorrido guiado en terreno.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-              <a
-                href={getGeneralWhatsAppUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-7 py-3.5 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm shadow-xl flex items-center gap-2.5 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
-              >
-                <WhatsAppIcon size={18} className="text-slate-950" />
-                <span>WhatsApp Oficial Inmediato</span>
-              </a>
-
-              <button
-                onClick={() => onOpenVisitModal('Agendamiento Directo desde Contacto')}
-                className="px-6 py-3.5 rounded-full bg-white/15 hover:bg-white/25 text-white font-bold text-xs sm:text-sm backdrop-blur-md border border-white/20 active:scale-95 transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap"
-              >
-                <CalendarCheck2 className="h-4 w-4" />
-                <span>Agendar Cita en Oficina</span>
-              </button>
-            </div>
-          </div>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#113d22]/85 via-black/55 to-[#113d22]/90" />
         </div>
 
-        {/* Dynamic Wave to White Section */}
-        <WaveDarkToCream fillColor="#FFFFFF" />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-grow flex flex-col justify-center pt-24 sm:pt-16 md:pt-14 pb-16 sm:pb-24">
+          {/* Insignia arquitectónica animada en SVG (Paleta Logo MGM: Naranja #F58220 y Verde #22A33D) */}
+          <div className="mb-4 sm:mb-6 flex justify-center w-full translate-y-3 sm:-translate-y-4 md:-translate-y-6">
+            <motion.svg
+              width="80"
+              height="90"
+              viewBox="0 0 80 90"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              initial="hidden"
+              animate="visible"
+            >
+              {/* Techo exterior - Naranja MGM (#F58220) */}
+              <motion.path
+                d="M10 52 L40 20 L70 52"
+                stroke="#F58220"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                variants={{
+                  hidden: { pathLength: 0, opacity: 0 },
+                  visible: {
+                    pathLength: 1,
+                    opacity: 1,
+                    transition: { duration: 1.4, ease: 'easeInOut' },
+                  },
+                }}
+              />
+              {/* Techo interior - Verde MGM (#22A33D) */}
+              <motion.path
+                d="M22 60 L40 40 L58 60"
+                stroke="#22A33D"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                variants={{
+                  hidden: { pathLength: 0, opacity: 0 },
+                  visible: {
+                    pathLength: 1,
+                    opacity: 1,
+                    transition: { duration: 1.2, delay: 0.3, ease: 'easeInOut' },
+                  },
+                }}
+              />
+              {/* Línea base - Naranja MGM (#F58220) */}
+              <motion.path
+                d="M16 72 L64 72"
+                stroke="#F58220"
+                strokeWidth="3"
+                strokeLinecap="round"
+                variants={{
+                  hidden: { pathLength: 0, opacity: 0 },
+                  visible: {
+                    pathLength: 1,
+                    opacity: 1,
+                    transition: { duration: 0.8, delay: 0.8, ease: 'easeOut' },
+                  },
+                }}
+              />
+            </motion.svg>
+          </div>
+
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={{ visible: { transition: { staggerChildren: 0.15, delayChildren: 0.2 } } }}
+            className="w-full"
+          >
+            <motion.h1
+              variants={{
+                hidden: { opacity: 0, y: 35, scale: 0.95 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  scale: 1,
+                  transition: { type: 'spring', stiffness: 110, damping: 12, duration: 0.8 },
+                },
+              }}
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold font-sans text-center leading-[1.12] tracking-tight mb-4 sm:mb-6 antialiased cursor-default select-none mx-auto max-w-5xl translate-y-2 sm:-translate-y-4 md:-translate-y-6 drop-shadow-2xl"
+            >
+              <span className="text-white">Ponte en </span>
+              <motion.span className="text-[#F58220] inline-block drop-shadow-[0_4px_20px_rgba(245,130,32,0.65)] [text-shadow:_0_2px_14px_rgba(245,130,32,0.85)]">
+                Contacto
+              </motion.span>
+            </motion.h1>
+
+            <motion.p
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+              }}
+              className="text-base sm:text-lg md:text-xl text-white/95 font-medium max-w-2xl mx-auto text-center mb-8 sm:mb-10 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] [text-shadow:_0_1px_8px_rgba(0,0,0,0.85)] translate-y-2 sm:-translate-y-4 md:-translate-y-6"
+            >
+              Estamos listos para atenderte. Comunícate con nuestro equipo técnico, legal y comercial
+              para agendamiento de visitas, cotizaciones de lotes y asesoría notarial personalizada.
+            </motion.p>
+
+            {/* Botones CTA estilo AOVET: Verde WhatsApp + Naranja Llamada */}
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, scale: 0.9 },
+                visible: { opacity: 1, scale: 1, transition: { type: 'spring', damping: 12, stiffness: 100 } },
+              }}
+              className="flex flex-wrap gap-3 sm:gap-4 justify-center items-center w-full sm:w-auto mx-auto translate-y-1 sm:-translate-y-2 md:-translate-y-4"
+            >
+              <a
+                href={`https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(
+                  'Hola Sociedad Civil MGM Inmobiliaria, deseo información y asesoría sobre los lotes disponibles.'
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 sm:py-4 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-bold text-xs sm:text-sm uppercase tracking-wider shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
+              >
+                <WhatsAppIcon size={20} className="text-slate-950" />
+                <span>WhatsApp</span>
+              </a>
+
+              <a
+                href={`tel:+${WHATSAPP_PHONE}`}
+                className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 sm:py-4 rounded-full bg-[#F58220] hover:bg-[#ea580c] text-white font-bold text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-orange-600/30 hover:shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
+              >
+                <Phone size={18} />
+                <span>Llamar a Asesor</span>
+              </a>
+            </motion.div>
+          </motion.div>
+        </div>
       </section>
 
-      {/* Main Content Sections with Organic Spacing */}
-      <div className="bg-white text-slate-900 py-12 sm:py-20 space-y-16 sm:space-y-24">
-
-      {/* Main Grid: Form + Direct Contact Information (Open Layout, ZERO Box-in-Box) */}
-      <motion.section
-        initial={{ opacity: 0, y: 35 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
-      >
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          {/* Left Form (7 cols) - Clean and open */}
-          <div className="lg:col-span-7 space-y-6">
-            <div className="border-b border-slate-200 pb-4">
-              <h2 className="text-2xl font-black text-slate-900">
-                Envíanos un mensaje directo
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                Te contactaremos a la brevedad por llamada telefónica o WhatsApp.
-              </p>
-            </div>
-
-            {isSubmitted ? (
-              <div className="py-12 text-center space-y-4">
-                <div className="h-16 w-16 bg-emerald-100 text-emerald-700 rounded-full mx-auto flex items-center justify-center">
-                  <CheckCircle className="h-8 w-8" />
-                </div>
-                <h3 className="text-xl font-bold text-slate-900">
-                  ¡Gracias por comunicarte con MGM Inmobiliaria!
-                </h3>
-                <p className="text-sm text-slate-600 max-w-md mx-auto">
-                  Tu consulta ha sido pre-cargada en WhatsApp para brindarte atención
-                  inmediata con un asesor asignado.
+      {/* =========================================================================
+          SECCIÓN PRINCIPAL DE FORMULARIO Y DATOS DE CONTACTO (ESTILO AOVET)
+          ========================================================================= */}
+      <section className="py-12 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-start">
+            {/* Columna Izquierda: Formulario Estilo Píldora Moderno */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="flex flex-col"
+            >
+              <div className="mb-6">
+                <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 font-sans mb-1.5">
+                  Envíanos un mensaje
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-600">
+                  Completa los campos a continuación y te responderemos a la brevedad.
                 </p>
-                <button
-                  onClick={() => {
-                    setIsSubmitted(false);
-                    setMessage('');
-                  }}
-                  className="px-5 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-semibold hover:bg-slate-800 transition-colors cursor-pointer"
-                >
-                  Enviar otro mensaje
-                </button>
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Honeypot for bot protection */}
-                <input
-                  type="text"
-                  name="_gotcha"
-                  value={honeypot}
-                  onChange={(e) => setHoneypot(e.target.value)}
-                  className="hidden"
-                  tabIndex={-1}
-                  autoComplete="off"
-                />
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1">
-                      Nombre y Apellido *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Ej. Andrés Salazar"
-                      className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-xs sm:text-sm text-slate-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1">
-                      Celular / WhatsApp *
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="Ej. 099 123 4567"
-                      className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-xs sm:text-sm text-slate-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
-                    />
-                  </div>
+              {errorMsg && (
+                <div className="mb-5 p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm rounded-2xl font-medium">
+                  {errorMsg}
                 </div>
+              )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1">
-                      Correo Electrónico (Opcional)
-                    </label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="ejemplo@correo.com"
-                      className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-xs sm:text-sm text-slate-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
-                    />
+              {isSent ? (
+                <div className="p-8 bg-white rounded-3xl border border-emerald-200 shadow-md text-center space-y-4">
+                  <div className="w-14 h-14 rounded-full bg-emerald-100 text-[#22A33D] mx-auto flex items-center justify-center">
+                    <CheckCircle2 size={32} />
                   </div>
-
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1">
-                      Proyecto o Lote de Interés
-                    </label>
-                    <select
-                      value={interest}
-                      onChange={(e) => setInterest(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-xs sm:text-sm text-slate-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer"
-                    >
-                      <option value="Ciudadela Miravalle">Ciudadela Miravalle (Lotes Residenciales)</option>
-                      <option value="Lotes Comerciales">Lotes Comerciales & Esquineros</option>
-                      <option value="Crédito Directo">Consulta de Crédito Directo Propio</option>
-                      <option value="Revisión de Escrituras">Revisión Notarial de Escrituras</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Date & Shift Selectors */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1">
-                      Fecha Estimada de Visita
-                    </label>
-                    <input
-                      type="date"
-                      value={visitDate}
-                      onChange={(e) => setVisitDate(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-xs sm:text-sm text-slate-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1">
-                      Turno Preferido
-                    </label>
-                    <select
-                      value={visitShift}
-                      onChange={(e) => setVisitShift(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-xs sm:text-sm text-slate-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer"
-                    >
-                      <option value="Mañana (09:00 - 12:00)">Mañana (09:00 - 12:00)</option>
-                      <option value="Tarde (14:00 - 17:00)">Tarde (14:00 - 17:00)</option>
-                      <option value="Fin de Semana (Previa Reserva)">Fin de Semana (Previa Reserva)</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1">
-                    Mensaje o Consulta Específica
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Cuéntanos si deseas transporte corporativo desde la oficina, qué metraje buscas o si quieres examinar las escrituras..."
-                    className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-xs sm:text-sm text-slate-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
-                  />
-                </div>
-
-                <div className="pt-2">
+                  <h3 className="text-lg font-bold text-slate-900">
+                    ¡Mensaje pre-cargado en WhatsApp!
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-600 max-w-sm mx-auto">
+                    Se ha abierto la línea directa de WhatsApp con un asesor oficial de Sociedad Civil MGM Inmobiliaria.
+                  </p>
                   <button
-                    type="submit"
-                    className="w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-sm shadow-md hover:shadow-lg active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+                    type="button"
+                    onClick={() => {
+                      setIsSent(false);
+                      setFormData({
+                        nombre: '',
+                        telefono: '',
+                        categoria: 'Ciudadela Miravalle',
+                        mensaje: '',
+                        honeypot: '',
+                      });
+                    }}
+                    className="px-6 py-2.5 rounded-full bg-slate-900 text-white text-xs font-bold hover:bg-[#F58220] transition-colors cursor-pointer"
                   >
-                    <WhatsAppIcon size={20} className="text-slate-950" />
-                    <span>Enviar Consulta al WhatsApp Oficial</span>
-                    <ArrowRight className="h-4 w-4" />
+                    Enviar otro mensaje
                   </button>
                 </div>
-              </form>
-            )}
-          </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                  {/* Campo Trampa Honeypot */}
+                  <div className="hidden" aria-hidden="true">
+                    <label htmlFor="honeypot">Website</label>
+                    <input
+                      type="text"
+                      id="honeypot"
+                      name="honeypot"
+                      value={formData.honeypot}
+                      onChange={handleChange}
+                      tabIndex={-1}
+                      autoComplete="off"
+                    />
+                  </div>
 
-          {/* Right Direct Details (5 cols) - Unboxed, pure typography & official social icons */}
-          <div className="lg:col-span-5 space-y-8 lg:pl-6 lg:border-l lg:border-slate-200">
-            {/* Direct Line Callout */}
-            <div className="space-y-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
-                Línea Directa de Atención
-              </span>
-              <a
-                href={getGeneralWhatsAppUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-mono text-2xl sm:text-3xl font-black text-slate-900 hover:text-emerald-700 transition-colors flex items-center gap-2"
-              >
-                <span>+593 99 195 2889</span>
-              </a>
-              <p className="text-xs text-slate-500">
-                Atención directa sin intermediarios con asesores autorizados de Sociedad Civil MGM Inmobiliaria.
-              </p>
-            </div>
+                  {/* Input Nombre (Pill) */}
+                  <div className="relative flex items-center bg-white rounded-full border border-gray-200 shadow-sm px-4 sm:px-5 py-3 sm:py-3.5 focus-within:ring-2 focus-within:ring-[#22A33D] focus-within:border-transparent transition-all">
+                    <div className="text-[#22A33D] mr-3 flex-shrink-0">
+                      <User size={18} />
+                    </div>
+                    <input
+                      type="text"
+                      id="nombre"
+                      name="nombre"
+                      value={formData.nombre}
+                      onChange={handleChange}
+                      required
+                      maxLength={100}
+                      className="w-full bg-transparent text-xs sm:text-sm text-slate-900 placeholder:text-gray-400 focus:outline-none"
+                      placeholder="Nombre completo *"
+                    />
+                  </div>
 
-            {/* Official Social Media Networks */}
-            <div className="space-y-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
-                Redes Sociales Oficiales
-              </span>
-              <div className="flex items-center gap-3">
-                {/* Official WhatsApp */}
-                <a
-                  href={getGeneralWhatsAppUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="WhatsApp Oficial"
-                  className="h-11 w-11 rounded-xl bg-[#25D366] text-white flex items-center justify-center shadow-sm hover:scale-105 active:scale-95 transition-all"
-                  title="WhatsApp Oficial"
-                >
-                  <WhatsAppIcon size={22} />
-                </a>
+                  {/* Input Teléfono / WhatsApp (Pill) */}
+                  <div className="relative flex items-center bg-white rounded-full border border-gray-200 shadow-sm px-4 sm:px-5 py-3 sm:py-3.5 focus-within:ring-2 focus-within:ring-[#22A33D] focus-within:border-transparent transition-all">
+                    <div className="text-[#22A33D] mr-3 flex-shrink-0">
+                      <Phone size={18} />
+                    </div>
+                    <input
+                      type="tel"
+                      id="telefono"
+                      name="telefono"
+                      value={formData.telefono}
+                      onChange={handleChange}
+                      required
+                      maxLength={20}
+                      className="w-full bg-transparent text-xs sm:text-sm text-slate-900 placeholder:text-gray-400 focus:outline-none"
+                      placeholder="Teléfono / WhatsApp *"
+                    />
+                  </div>
 
-                {/* Official Facebook */}
-                <a
-                  href="https://facebook.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Facebook Oficial"
-                  className="h-11 w-11 rounded-xl bg-[#1877F2] text-white flex items-center justify-center shadow-sm hover:scale-105 active:scale-95 transition-all"
-                  title="Facebook Oficial"
-                >
-                  <FacebookIcon size={20} />
-                </a>
+                  {/* Select Línea de Interés / Proyecto (Pill) */}
+                  <div className="relative flex items-center bg-white rounded-full border border-gray-200 shadow-sm px-4 sm:px-5 py-3 sm:py-3.5 focus-within:ring-2 focus-within:ring-[#22A33D] focus-within:border-transparent transition-all">
+                    <div className="text-[#22A33D] mr-3 flex-shrink-0">
+                      <Layers size={18} />
+                    </div>
+                    <select
+                      id="categoria"
+                      name="categoria"
+                      value={formData.categoria}
+                      onChange={handleChange}
+                      className="w-full bg-transparent text-xs sm:text-sm text-slate-900 focus:outline-none appearance-none cursor-pointer pr-4"
+                    >
+                      <option value="Ciudadela Miravalle">Ciudadela Miravalle (Lotes Residenciales) 🏡</option>
+                      <option value="Lotes Comerciales">Lotes Comerciales & Esquineros 🏢</option>
+                      <option value="Crédito Directo">Crédito Directo Propio (Sin banco) 💳</option>
+                      <option value="Revisión Notarial">Revisión Notarial de Escrituras 📜</option>
+                      <option value="Visita a Obra">Visita Guiada en Terreno con Transporte 🚗</option>
+                    </select>
+                  </div>
 
-                {/* Official Instagram */}
-                <a
-                  href="https://instagram.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Instagram Oficial"
-                  className="h-11 w-11 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white flex items-center justify-center shadow-sm hover:scale-105 active:scale-95 transition-all"
-                  title="Instagram Oficial"
-                >
-                  <InstagramIcon size={20} />
-                </a>
+                  {/* Textarea Mensaje (Rounded 3xl Pill) */}
+                  <div className="relative flex items-start bg-white rounded-3xl border border-gray-200 shadow-sm px-4 sm:px-5 py-3.5 focus-within:ring-2 focus-within:ring-[#22A33D] focus-within:border-transparent transition-all">
+                    <div className="text-[#22A33D] mr-3 mt-1 flex-shrink-0">
+                      <MessageSquare size={18} />
+                    </div>
+                    <textarea
+                      id="mensaje"
+                      name="mensaje"
+                      value={formData.mensaje}
+                      onChange={handleChange}
+                      required
+                      maxLength={1000}
+                      rows={3}
+                      className="w-full bg-transparent text-xs sm:text-sm text-slate-900 placeholder:text-gray-400 focus:outline-none resize-none"
+                      placeholder="¿En qué podemos asesorarte? *"
+                    />
+                  </div>
 
-                {/* Official TikTok */}
-                <a
-                  href="https://tiktok.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="TikTok Oficial"
-                  className="h-11 w-11 rounded-xl bg-black text-white flex items-center justify-center shadow-sm hover:scale-105 active:scale-95 transition-all"
-                  title="TikTok Oficial"
-                >
-                  <TikTokIcon size={20} />
-                </a>
-              </div>
-            </div>
+                  {/* Botón de Envío Pill con hover naranja MGM */}
+                  <button
+                    type="submit"
+                    className="w-full bg-[#113d22] hover:bg-[#F58220] text-white font-bold py-3.5 sm:py-4 rounded-full shadow-md hover:shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2 text-xs sm:text-sm uppercase tracking-wider cursor-pointer mt-1"
+                  >
+                    <span>Enviar Mensaje</span>
+                    <Send size={15} />
+                  </button>
+                </form>
+              )}
+            </motion.div>
 
-            {/* Schedule & Office Information */}
-            <div className="space-y-4 text-xs sm:text-sm text-slate-600 pt-2 border-t border-slate-200">
-              <div className="flex items-start gap-3">
-                <Clock className="h-5 w-5 text-emerald-700 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-bold text-slate-900 block">Horarios de Atención</span>
-                  <span>
-                    Lunes a Viernes: 08:30 – 18:00
-                    <br />
-                    Sábados: 09:00 – 16:00
-                    <br />
-                    Domingos: Recorridos en obra con reserva previa
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <MapPin className="h-5 w-5 text-emerald-700 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-bold text-slate-900 block">Ubicación de Proyectos</span>
-                  <span>Ecuador · Ciudadela Miravalle y Valles Residenciales en expansión</span>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <ShieldCheck className="h-5 w-5 text-emerald-700 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-bold text-slate-900 block">Garantía Jurídica Notarial</span>
-                  <span>Cada lote cuenta con plano catastral y ficha registral individual para verificación.</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Action Button for In-Person Visit */}
-            <div className="pt-2">
-              <button
-                onClick={() => onOpenVisitModal('Ciudadela Miravalle')}
-                className="w-full flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl bg-slate-900 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap"
-              >
-                <CalendarCheck2 className="h-4 w-4" />
-                <span>Agendar Visita en Terreno con Transporte</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </motion.section>
-
-      {/* 2. GOOGLE MAPS INTERACTIVE EMBED (Real Location of Ciudadela Miravalle & Offices) */}
-      <motion.section
-        initial={{ opacity: 0, y: 35 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
-      >
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-            <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 block">
-                Localización Satelital & Acceso Vial
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                Ubicación Exacta de Ciudadela Miravalle y Oficinas
-              </h2>
-            </div>
-            <a
-              href="https://maps.google.com/?q=Ciudadela+Miravalle+Ecuador"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 hover:text-emerald-800 transition-colors"
+            {/* Columna Derecha: Barra de Dirección + Mapa + Información con Animaciones e Iconos Iluminados */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="flex flex-col space-y-5"
             >
-              <span>Abrir en Google Maps App</span>
-              <ArrowRight className="h-4 w-4" />
-            </a>
-          </div>
+              {/* Barra Independiente de Ubicación Encima del Mapa con Animación */}
+              <motion.div
+                initial={{ opacity: 0, y: -20, scale: 0.96 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                whileHover={{ scale: 1.02, y: -2, boxShadow: '0 12px 30px -8px rgba(17,61,34,0.12)' }}
+                transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+                className="w-full bg-white rounded-2xl sm:rounded-full px-5 sm:px-6 py-3.5 sm:py-4 shadow-sm border border-gray-200/80 hover:border-[#22A33D]/40 transition-all duration-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 group cursor-default"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="relative flex-shrink-0">
+                    {/* Efecto de Iluminación Ambiental y Pulso Suave */}
+                    <div className="absolute inset-0 rounded-full bg-emerald-500/25 blur-md opacity-40 group-hover:opacity-100 transition-opacity duration-500 scale-150 pointer-events-none" />
+                    <MapPin
+                      size={26}
+                      strokeWidth={2.2}
+                      className="text-[#22A33D] relative z-10 filter drop-shadow-[0_0_6px_rgba(17,61,34,0.3)] group-hover:drop-shadow-[0_0_14px_rgba(34,163,61,0.9)] transition-all duration-300 group-hover:scale-110"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-slate-900 text-sm sm:text-base leading-tight group-hover:text-[#22A33D] transition-colors">
+                      MGM Inmobiliaria · Miravalle
+                    </h3>
+                    <p className="text-xs text-gray-600 leading-snug mt-0.5">
+                      Vía Principal Ciudadela Miravalle, Azuay, Ecuador
+                    </p>
+                  </div>
+                </div>
 
-          <div className="w-full h-80 sm:h-96 rounded-3xl overflow-hidden shadow-xl border border-slate-200 relative bg-slate-100">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127672.48425265487!2d-78.5833!3d-0.2298!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d59a4002422c9f%3A0x44b44695079a76f5!2sQuito%2C%20Ecuador!5e0!3m2!1ses!2sec!4v1700000000000!5m2!1ses!2sec"
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen={false}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Mapa de Ubicación Ciudadela Miravalle - MGM Inmobiliaria"
-              className="w-full h-full"
-            />
-            {/* Overlay badge with location details */}
-            <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-lg border border-slate-200/80 pointer-events-none max-w-xs">
-              <span className="text-[10px] font-mono font-bold text-emerald-700 uppercase block">
-                Proyecto Insignia
-              </span>
-              <span className="text-xs font-bold text-slate-900 block">
-                Ciudadela Miravalle · Etapas 1 & 2
-              </span>
-              <span className="text-[11px] text-slate-500">
-                A 15 min de vías arteriales, centros comerciales y transporte público.
-              </span>
-            </div>
+                <a
+                  href="https://maps.google.com/?q=Ciudadela+Miravalle+Ecuador"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#F58220] hover:text-[#ea580c] transition-all mt-1 sm:mt-0 group/link"
+                >
+                  <Navigation
+                    size={14}
+                    className="text-[#F58220] group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform duration-200"
+                  />
+                  <span className="group-hover/link:underline">Cómo llegar en GPS</span>
+                  <ExternalLink size={12} className="group-hover/link:opacity-80 transition-opacity" />
+                </a>
+              </motion.div>
+
+              {/* Contenedor del Mapa Interactivo (Limpio) */}
+              <div className="bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100 p-2 sm:p-3 relative group">
+                <div className="relative w-full h-64 sm:h-72 md:h-80 rounded-2xl overflow-hidden shadow-inner">
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127672.48425265487!2d-78.5833!3d-0.2298!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d59a4002422c9f%3A0x44b44695079a76f5!2sQuito%2C%20Ecuador!5e0!3m2!1ses!2sec!4v1700000000000!5m2!1ses!2sec"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen={false}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Ubicación Exacta Ciudadela Miravalle"
+                    className="w-full h-full"
+                  />
+                </div>
+              </div>
+
+              {/* Información de Contacto - Alternancia Verde & Naranja MGM con Efecto Glow */}
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={{
+                  hidden: { opacity: 0 },
+                  visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
+                }}
+                className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 pt-2"
+              >
+                {/* Sede Principal (Verde MGM #22A33D) */}
+                <motion.div
+                  variants={{
+                    hidden: { opacity: 0, scale: 0.88, y: 20 },
+                    visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+                  }}
+                  whileHover={{ scale: 1.04, y: -2 }}
+                  transition={{ type: 'spring', stiffness: 350, damping: 20 }}
+                  className="flex items-start gap-4 p-3 rounded-2xl hover:bg-white/80 transition-colors group cursor-default"
+                >
+                  <div className="relative flex-shrink-0 mt-0.5">
+                    <div className="absolute inset-0 rounded-full bg-[#22A33D]/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 scale-150 pointer-events-none" />
+                    <Building2
+                      size={28}
+                      strokeWidth={2.2}
+                      className="text-[#22A33D] relative z-10 filter drop-shadow-[0_0_6px_rgba(17,61,34,0.3)] group-hover:drop-shadow-[0_0_14px_rgba(34,163,61,0.85)] transition-all duration-300 group-hover:scale-110"
+                    />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900 mb-0.5">Sede Principal</h4>
+                    <p className="text-xs text-[#22A33D] font-semibold mb-0.5">
+                      Sociedad Civil MGM Inmobiliaria
+                    </p>
+                    <p className="text-xs text-gray-600 leading-relaxed">
+                      Ciudadela Miravalle<br />Azuay, Ecuador.
+                    </p>
+                  </div>
+                </motion.div>
+
+                {/* Horario de Atención (Naranja Cálido MGM #F58220) */}
+                <motion.div
+                  variants={{
+                    hidden: { opacity: 0, scale: 0.88, y: 20 },
+                    visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+                  }}
+                  whileHover={{ scale: 1.04, y: -2 }}
+                  transition={{ type: 'spring', stiffness: 350, damping: 20 }}
+                  className="flex items-start gap-4 p-3 rounded-2xl hover:bg-white/80 transition-colors group cursor-default"
+                >
+                  <div className="relative flex-shrink-0 mt-0.5">
+                    <div className="absolute inset-0 rounded-full bg-[#F58220]/25 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 scale-150 pointer-events-none" />
+                    <Clock
+                      size={28}
+                      strokeWidth={2.2}
+                      className="text-[#F58220] relative z-10 filter drop-shadow-[0_0_6px_rgba(245,130,32,0.35)] group-hover:drop-shadow-[0_0_14px_rgba(245,130,32,0.9)] transition-all duration-300 group-hover:scale-110"
+                    />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900 mb-0.5">Horario de Atención</h4>
+                    <p className="text-xs text-gray-700 font-medium leading-relaxed">
+                      Lunes a Viernes: 8:30 – 18:00
+                    </p>
+                    <p className="text-[11px] text-gray-500 mt-0.5">
+                      Sábados: 9:00 – 14:00 (Domingos previa cita)
+                    </p>
+                  </div>
+                </motion.div>
+
+                {/* Teléfono Directo (Verde MGM #22A33D) */}
+                <motion.div
+                  variants={{
+                    hidden: { opacity: 0, scale: 0.88, y: 20 },
+                    visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+                  }}
+                  whileHover={{ scale: 1.04, y: -2 }}
+                  transition={{ type: 'spring', stiffness: 350, damping: 20 }}
+                  className="flex items-start gap-4 p-3 rounded-2xl hover:bg-white/80 transition-colors group cursor-default"
+                >
+                  <div className="relative flex-shrink-0 mt-0.5">
+                    <div className="absolute inset-0 rounded-full bg-[#22A33D]/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 scale-150 pointer-events-none" />
+                    <Phone
+                      size={28}
+                      strokeWidth={2.2}
+                      className="text-[#22A33D] relative z-10 filter drop-shadow-[0_0_6px_rgba(17,61,34,0.3)] group-hover:drop-shadow-[0_0_14px_rgba(34,163,61,0.85)] transition-all duration-300 group-hover:scale-110"
+                    />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900 mb-0.5">Teléfono Directo</h4>
+                    <a
+                      href="tel:+593984887434"
+                      className="text-sm font-bold text-slate-900 hover:text-[#F58220] transition-colors block"
+                    >
+                      098 488 7434
+                    </a>
+                    <p className="text-[11px] text-gray-500">+593 99 924 7434</p>
+                  </div>
+                </motion.div>
+
+                {/* Correo Electrónico (Naranja Cálido MGM #F58220) */}
+                <motion.div
+                  variants={{
+                    hidden: { opacity: 0, scale: 0.88, y: 20 },
+                    visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+                  }}
+                  whileHover={{ scale: 1.04, y: -2 }}
+                  transition={{ type: 'spring', stiffness: 350, damping: 20 }}
+                  className="flex items-start gap-4 p-3 rounded-2xl hover:bg-white/80 transition-colors group cursor-default"
+                >
+                  <div className="relative flex-shrink-0 mt-0.5">
+                    <div className="absolute inset-0 rounded-full bg-[#F58220]/25 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 scale-150 pointer-events-none" />
+                    <Mail
+                      size={28}
+                      strokeWidth={2.2}
+                      className="text-[#F58220] relative z-10 filter drop-shadow-[0_0_6px_rgba(245,130,32,0.35)] group-hover:drop-shadow-[0_0_14px_rgba(245,130,32,0.9)] transition-all duration-300 group-hover:scale-110"
+                    />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900 mb-0.5">Correo Electrónico</h4>
+                    <a
+                      href="mailto:info@mgminmobiliaria.ec"
+                      className="text-xs text-gray-600 hover:text-[#F58220] transition-colors break-all font-medium"
+                    >
+                      info@mgminmobiliaria.ec
+                    </a>
+                  </div>
+                </motion.div>
+              </motion.div>
+
+              {/* Botón Acción Rápida: Modal de Visita Presencial (Naranja Corporativo MGM) */}
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => onOpenVisitModal('Ciudadela Miravalle')}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 px-5 rounded-full bg-[#F58220] hover:bg-[#ea580c] text-white font-bold text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-orange-500/25 transition-all cursor-pointer whitespace-nowrap active:scale-95"
+                >
+                  <CalendarCheck2 className="h-4 w-4" />
+                  <span>Agendar Visita en Terreno con Transporte</span>
+                </button>
+              </div>
+            </motion.div>
           </div>
         </div>
-      </motion.section>
-
-      {/* 3. GUÍA PRÁCTICA PARA EL DÍA DE LA VISITA */}
-      <motion.section
-        initial={{ opacity: 0, y: 35 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-4"
-      >
-        <div className="rounded-3xl bg-[#FBFBFA] p-8 sm:p-12 text-slate-900 border border-slate-200/90 shadow-sm space-y-6 relative overflow-hidden">
-          <div className="max-w-2xl space-y-1 relative z-10">
-            <span className="text-xs font-mono font-bold uppercase tracking-widest text-emerald-800 block">
-              Recomendaciones para el Cliente
-            </span>
-            <h3 className="text-2xl sm:text-3xl font-black text-slate-900">
-              Guía previa para el día de tu visita a obra
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-600">
-              Queremos que tu experiencia técnica en el terreno sea cómoda, transparente y segura.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-2 relative z-10">
-            <div className="space-y-1.5 border-l-2 border-emerald-600 pl-4 bg-white p-5 rounded-r-2xl border-y border-r border-slate-200/80 shadow-xs">
-              <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider block">
-                01 · Calzado Cómodo
-              </span>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Recomendamos zapatos deportivos o botas para caminar sobre el terreno natural y comprobar los linderos.
-              </p>
-            </div>
-
-            <div className="space-y-1.5 border-l-2 border-amber-500 pl-4 bg-white p-5 rounded-r-2xl border-y border-r border-slate-200/80 shadow-xs">
-              <span className="text-xs font-bold text-amber-800 uppercase tracking-wider block">
-                02 · Identificación Personal
-              </span>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Trae tu cédula o pasaporte original si deseas congelar la reserva inmediata del lote elegido.
-              </p>
-            </div>
-
-            <div className="space-y-1.5 border-l-2 border-teal-600 pl-4 bg-white p-5 rounded-r-2xl border-y border-r border-slate-200/80 shadow-xs">
-              <span className="text-xs font-bold text-teal-800 uppercase tracking-wider block">
-                03 · Transporte Corporativo
-              </span>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Si no dispones de vehículo propio, te recogemos en nuestras oficinas centrales previa coordinación.
-              </p>
-            </div>
-
-            <div className="space-y-1.5 border-l-2 border-emerald-600 pl-4 bg-white p-5 rounded-r-2xl border-y border-r border-slate-200/80 shadow-xs">
-              <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider block">
-                04 · Asesoría Legal Notarial
-              </span>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Tendrás acceso a planos catastrales, licencias de subdivisión y certificados de gravamen vigentes.
-              </p>
-            </div>
-          </div>
-        </div>
-      </motion.section>
-      </div>
+      </section>
     </div>
   );
 }

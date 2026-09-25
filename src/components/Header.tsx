@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { LogoMGM } from './LogoMGM';
-import { CalendarCheck2, Lock } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { WhatsAppIcon } from './SocialIcons';
 import { getGeneralWhatsAppUrl } from '@/src/data/lots';
 
@@ -11,37 +11,31 @@ export type PageView = 'home' | 'about' | 'properties' | 'miravalle' | 'contact'
 interface HeaderProps {
   currentPage: PageView;
   onNavigate: (page: PageView) => void;
-  onOpenVisitModal: (defaultInterest?: string) => void;
+  onOpenVisitModal?: (defaultInterest?: string) => void;
 }
 
 export function Header({
   currentPage,
   onNavigate,
-  onOpenVisitModal,
 }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Scroll listener for dynamic ghost-to-solid transition
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
-      setIsScrolled(scrollPosition > 60);
+      setIsScrolled(scrollPosition > 40);
     };
 
-    // Initial check
     handleScroll();
-
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Ghost mode is active on all pages when user is at top because all pages now have the cinematic hero banner
-  const isGhostMode = !isScrolled;
-
   const navLinks: { id: PageView; label: string }[] = [
     { id: 'home', label: 'Inicio' },
-    { id: 'about', label: 'Nosotros' },
     { id: 'properties', label: 'Lotes' },
+    { id: 'about', label: 'Nosotros' },
     { id: 'miravalle', label: 'Miravalle' },
     { id: 'contact', label: 'Contacto' },
   ];
@@ -49,31 +43,33 @@ export function Header({
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out ${
-        isGhostMode
-          ? 'bg-transparent border-b border-transparent shadow-none py-1 sm:py-2'
-          : 'bg-white/92 backdrop-blur-md border-b border-slate-200/80 shadow-sm py-0'
+        isScrolled
+          ? 'bg-[#113d22]/95 backdrop-blur-md border-b border-white/10 shadow-lg py-2'
+          : 'bg-transparent py-3 sm:py-4'
       }`}
     >
-      <div className="mx-auto flex h-16 sm:h-20 max-w-7xl items-center justify-between px-3 sm:px-6 lg:px-8">
-        {/* Zone 1: Brand Wordmark / Isotype */}
-        <button
-          onClick={() => onNavigate('home')}
-          className="group flex items-center gap-2 sm:gap-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg p-1 transition-transform cursor-pointer shrink-0"
-          aria-label="Ir a Inicio - Sociedad Civil MGM Inmobiliaria"
-        >
-          <div className="h-9 sm:h-12 w-auto flex items-center">
-            <LogoMGM
-              className="h-8 sm:h-11 w-auto"
-              variant="compact"
-              showSubtitle={true}
-              isGhost={isGhostMode}
-            />
-          </div>
-        </button>
+      <div className="relative w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+        {/* Lado Izquierdo: Logotipo Oficial MGM Inmobiliaria alineado a la letra A de "Tierra" */}
+        <div className="flex items-center shrink-0 pl-6 sm:pl-32 md:pl-[12rem] lg:pl-[17.5rem] xl:pl-[23.5rem] 2xl:pl-[27rem] z-10">
+          <button
+            onClick={() => onNavigate('home')}
+            className="flex items-center gap-2 sm:gap-3 text-left focus:outline-none cursor-pointer group"
+            aria-label="Sociedad Civil MGM Inmobiliaria"
+          >
+            <div className="h-12 sm:h-14 lg:h-16 w-auto flex items-center">
+              <LogoMGM
+                className="h-11 sm:h-13 lg:h-15 w-auto"
+                variant="compact"
+                showSubtitle={true}
+                isGhost={true}
+              />
+            </div>
+          </button>
+        </div>
 
-        {/* Zone 2: Navigation Links - Naked Words, NO container box, only active link gets framed ("enmarcado") */}
+        {/* Zona Central / Derecha: Enlaces de Navegación reubicados un poco más a la izquierda */}
         <nav
-          className="hidden md:flex items-center gap-1.5 lg:gap-3 transition-all duration-300"
+          className="hidden md:flex absolute left-[49%] lg:left-[52%] xl:left-[54%] -translate-x-1/2 items-center gap-4 lg:gap-6 xl:gap-7"
           aria-label="Navegación principal"
         >
           {navLinks.map((link) => {
@@ -82,76 +78,79 @@ export function Header({
               <button
                 key={link.id}
                 onClick={() => onNavigate(link.id)}
-                className={`relative px-4 py-1.5 text-sm transition-all duration-200 rounded-full whitespace-nowrap cursor-pointer ${
+                className={`relative py-1 text-base lg:text-[17px] font-bold tracking-wide transition-colors cursor-pointer ${
                   isActive
-                    ? isGhostMode
-                      ? 'border-2 border-white/90 text-white font-bold bg-white/15 backdrop-blur-sm shadow-md'
-                      : 'border-2 border-emerald-600 text-emerald-950 font-bold bg-emerald-50/90 shadow-xs'
-                    : isGhostMode
-                    ? 'text-white/80 hover:text-white font-medium hover:scale-105 border-2 border-transparent'
-                    : 'text-slate-600 hover:text-slate-950 font-medium hover:scale-105 border-2 border-transparent'
+                    ? 'text-white'
+                    : 'text-white/80 hover:text-white'
                 }`}
               >
-                {link.label}
+                <span>{link.label}</span>
+                {isActive && (
+                  <span className="absolute -bottom-1.5 left-0 right-0 h-[2.5px] bg-[#22A33D] rounded-full shadow-xs" />
+                )}
               </button>
             );
           })}
-        </nav>
 
-        {/* Zone 3: Primary Actions */}
-        <div className="flex items-center gap-1.5 sm:gap-3">
-          {/* Direct Official WhatsApp Icon Only */}
+          {/* Botón de WhatsApp al lado de Contacto */}
           <a
             href={getGeneralWhatsAppUrl()}
             target="_blank"
             rel="noopener noreferrer"
-            className={`h-9 w-9 sm:h-10 sm:w-10 rounded-full flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
-              isGhostMode
-                ? 'border border-emerald-400/50 bg-emerald-500/20 text-white backdrop-blur-md hover:bg-[#25D366] hover:text-slate-950 hover:border-[#25D366] shadow-sm hover:scale-105'
-                : 'border border-[#25D366]/40 bg-[#25D366]/15 text-emerald-950 hover:bg-[#25D366] hover:text-white hover:border-[#25D366] hover:shadow-sm hover:scale-105'
-            }`}
-            title="Contactar a MGM Inmobiliaria por WhatsApp Oficial"
-            aria-label="WhatsApp Oficial MGM Inmobiliaria"
+            aria-label="Contactar por WhatsApp Oficial"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-sm lg:text-base transition-all shadow-md hover:shadow-lg hover:scale-105 active:scale-95 cursor-pointer ml-1"
           >
-            <WhatsAppIcon
-              size={18}
-              className={`shrink-0 transition-colors ${
-                isGhostMode ? 'text-[#25D366]' : 'text-emerald-800'
-              }`}
-            />
+            <WhatsAppIcon size={18} className="text-white shrink-0 drop-shadow-xs" />
+            <span>WhatsApp</span>
           </a>
+        </nav>
 
-          {/* Primary CTA: Agendar Visita (Responsive text on mobile) */}
+        {/* Zona Derecha: Menú Hamburguesa en móvil (se retiró el botón de agendar cita) */}
+        <div className="flex md:hidden items-center gap-3 shrink-0 z-10">
+          {/* Menú Hamburguesa (3 rayitas) */}
           <button
-            onClick={() => onOpenVisitModal()}
-            className={`inline-flex items-center gap-1.5 sm:gap-2 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-bold shadow-sm transition-all hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer whitespace-nowrap ${
-              isGhostMode
-                ? 'bg-[#25D366] text-slate-950 hover:bg-[#22bf5b] shadow-black/20'
-                : 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white hover:from-emerald-700 hover:to-emerald-800'
-            }`}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+            aria-label="Abrir menú"
           >
-            <CalendarCheck2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">Agendar Visita</span>
-            <span className="sm:hidden">Visita</span>
-          </button>
-
-          {/* Admin CMS Access for advisors */}
-          <button
-            onClick={() => onNavigate('admin')}
-            title="Panel Administrativo CMS"
-            className={`h-9 w-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-              currentPage === 'admin'
-                ? 'bg-slate-900 text-white shadow-xs ring-2 ring-emerald-500'
-                : isGhostMode
-                ? 'text-white/80 hover:text-white hover:bg-white/20 border border-white/20'
-                : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'
-            }`}
-            aria-label="Panel CMS de Administración"
-          >
-            <Lock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <Menu className="h-5 w-5 text-white" />
           </button>
         </div>
       </div>
+
+      {/* Menú Desplegable Móvil */}
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-[#113d22]/98 border-t border-white/10 px-6 py-4 space-y-3 mt-2">
+          {navLinks.map((link) => (
+            <button
+              key={link.id}
+              onClick={() => {
+                onNavigate(link.id);
+                setMobileMenuOpen(false);
+              }}
+              className={`block w-full text-left py-2 text-base font-bold transition-colors ${
+                currentPage === link.id
+                  ? 'text-[#22A33D]'
+                  : 'text-white/90 hover:text-white'
+              }`}
+            >
+              {link.label}
+            </button>
+          ))}
+
+          {/* WhatsApp en menú móvil */}
+          <a
+            href={getGeneralWhatsAppUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-2.5 pt-3 pb-1 text-base font-bold text-[#25D366] hover:text-[#20ba59] border-t border-white/10 transition-colors"
+          >
+            <WhatsAppIcon size={20} className="text-[#25D366] shrink-0" />
+            <span>WhatsApp Oficial</span>
+          </a>
+        </div>
+      )}
     </header>
   );
 }

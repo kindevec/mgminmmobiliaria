@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -33,6 +33,25 @@ interface MiravalleViewProps {
   onOpenVisitModal: (defaultInterest?: string) => void;
 }
 
+const MIRAVALLE_HERO_IMAGES = [
+  {
+    url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1600&q=85',
+    alt: 'Terrenos y Topografía Urbanizada Miravalle',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1600&q=85',
+    alt: 'Avenidas Principales Adoquinadas Miravalle',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85',
+    alt: 'Pórtico de Acceso y Villas Residenciales',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1600&q=85',
+    alt: 'Complejo Polideportivo y Áreas Recreativas',
+  },
+];
+
 const GALLERY_RENDERS = [
   {
     title: 'Avenida Principal & Parterre Central',
@@ -64,6 +83,26 @@ export function MiravalleView({
   onNavigate,
   onOpenVisitModal,
 }: MiravalleViewProps) {
+  // Banner Continuous Real Estate Slideshow
+  const [heroImgIndex, setHeroImgIndex] = useState(0);
+  const [heroHovered, setHeroHovered] = useState(false);
+
+  useEffect(() => {
+    if (heroHovered) return;
+    const interval = setInterval(() => {
+      setHeroImgIndex((prev) => (prev + 1) % MIRAVALLE_HERO_IMAGES.length);
+    }, 2800);
+    return () => clearInterval(interval);
+  }, [heroHovered]);
+
+  const nextHeroImage = () => {
+    setHeroImgIndex((prev) => (prev + 1) % MIRAVALLE_HERO_IMAGES.length);
+  };
+
+  const prevHeroImage = () => {
+    setHeroImgIndex((prev) => (prev - 1 < 0 ? MIRAVALLE_HERO_IMAGES.length - 1 : prev - 1));
+  };
+
   // Carousel state for amenities
   const [activeSlide, setActiveSlide] = useState(0);
 
@@ -99,125 +138,94 @@ export function MiravalleView({
 
   return (
     <div className="w-full overflow-hidden bg-white text-slate-900">
-      {/* 1. CINEMATIC FULL-WIDTH HERO OF CIUDADELA MIRAVALLE */}
-      <section className="relative w-full min-h-[640px] md:min-h-[720px] lg:min-h-[780px] flex flex-col justify-between overflow-hidden bg-slate-950 text-white">
-        {/* Cinematic Backdrop Image with Slow Ken Burns Zoom Effect */}
-        <motion.div
-          initial={{ scale: 1 }}
-          animate={{ scale: [1, 1.08, 1] }}
-          transition={{ duration: 24, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute inset-0 w-full h-full pointer-events-none"
-        >
-          <Image
-            src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=2160&q=90"
-            alt="Terrenos y Topografía Urbanizada Miravalle"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center brightness-[0.85]"
-            referrerPolicy="no-referrer"
-          />
-        </motion.div>
+      {/* =========================================================================
+          1. BANNER CINEMÁTICO — 50/50 SLIDER (PALETA CORPORATIVA LOGO MGM)
+          ========================================================================= */}
+      <section className="relative w-full bg-[#113d22] text-white overflow-hidden">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-2 min-h-[640px] sm:min-h-[720px] lg:min-h-[800px] xl:min-h-[860px]">
+          
+          {/* LADO IZQUIERDO: 50% - Panel Verde MGM (#113d22) con Título y Párrafo (Sin botones ni iconos) */}
+          <div className="bg-[#113d22] flex flex-col justify-center items-center text-center px-6 sm:px-10 md:px-12 lg:px-14 xl:px-18 pt-36 sm:pt-44 lg:pt-48 pb-14 sm:pb-18 lg:pb-22 z-10 space-y-6 sm:space-y-8 max-w-3xl mx-auto">
+            
+            {/* Título Principal con Acento Verde (#5be196) */}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.08] tracking-tight [text-wrap:balance] text-center mx-auto">
+              Ciudadela Miravalle:
+              <br />
+              <span className="text-[#5be196]">El hogar que tu familia merece.</span>
+            </h1>
 
-        {/* Multi-layer Dark Gradient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/85 via-slate-950/35 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 bg-black/25 pointer-events-none" />
+            {/* Párrafo Descriptivo */}
+            <p className="text-base sm:text-lg lg:text-xl text-slate-200/90 leading-relaxed font-normal max-w-2xl text-center mx-auto">
+              Diseñada bajo rigurosos estándares urbanísticos: calzadas adoquinadas de 10 y 12 metros, redes subterráneas de electricidad, agua potable garantizada, complejo polideportivo y control de acceso 24 horas.
+            </p>
 
-        {/* Hero Content */}
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col justify-center pt-28 sm:pt-32 pb-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-            <div className="lg:col-span-7 space-y-6">
+          </div>
 
+          {/* LADO DERECHO: 50% - Carrusel Continuo Inmobiliario con Difuminación Perfecta */}
+          <div
+            className="relative w-full h-[460px] sm:h-[560px] lg:h-full min-h-[460px] sm:min-h-[560px] lg:min-h-full overflow-hidden group/hero-slider select-none bg-[#113d22]"
+            onMouseEnter={() => setHeroHovered(true)}
+            onMouseLeave={() => setHeroHovered(false)}
+          >
+            {/* Sombra suave inferior */}
+            <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 z-10 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
 
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-[1.08] [text-wrap:balance]">
-                Ciudadela Miravalle:{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300 font-serif italic font-normal">
-                  El hogar que tu familia merece.
-                </span>
-              </h1>
-
-              <p className="text-base sm:text-lg text-slate-200 leading-relaxed max-w-2xl drop-shadow-sm">
-                Diseñada bajo rigurosos estándares urbanísticos: calzadas adoquinadas de 10 y 12 metros, redes subterráneas de electricidad, agua potable garantizada, complejo polideportivo y control de acceso 24 horas.
-              </p>
-
-              {/* Metrics Ribbon */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-4 border-t border-white/20">
-                <div>
-                  <span className="font-mono text-2xl sm:text-3xl font-black text-white block">
-                    +300
-                  </span>
-                  <span className="text-xs text-slate-300 font-medium">Lotes Planificados</span>
-                </div>
-                <div>
-                  <span className="font-mono text-2xl sm:text-3xl font-black text-emerald-400 block">
-                    8.000 m²
-                  </span>
-                  <span className="text-xs text-slate-300 font-medium">Parques y Canchas</span>
-                </div>
-                <div>
-                  <span className="font-mono text-2xl sm:text-3xl font-black text-amber-400 block">
-                    100%
-                  </span>
-                  <span className="text-xs text-slate-300 font-medium">Redes Soterradas</span>
-                </div>
-                <div>
-                  <span className="font-mono text-2xl sm:text-3xl font-black text-white block">
-                    48 Meses
-                  </span>
-                  <span className="text-xs text-slate-300 font-medium">Crédito Directo</span>
-                </div>
-              </div>
-
-              {/* CTAs */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <button
-                  onClick={() => onOpenVisitModal('Ciudadela Miravalle')}
-                  className="px-7 py-3.5 rounded-full bg-gradient-to-r from-emerald-500 to-[#25D366] text-slate-950 font-black text-xs sm:text-sm hover:brightness-110 active:scale-95 transition-all shadow-xl flex items-center gap-2 cursor-pointer whitespace-nowrap"
+            {/* Carrusel continuo de imágenes con máscara progresiva */}
+            <div className="hero-mask-blend absolute inset-0 w-full h-full">
+              {MIRAVALLE_HERO_IMAGES.map((img, idx) => (
+                <div
+                  key={idx}
+                  className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                    heroImgIndex === idx ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none'
+                  }`}
                 >
-                  <CalendarCheck2 className="h-4 w-4 stroke-[2.5]" />
-                  <span>Agendar Recorrido a Miravalle</span>
-                </button>
-
-                <a
-                  href={getMiravalleWhatsAppUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-6 py-3.5 rounded-full bg-white/15 hover:bg-white/25 text-white font-bold text-xs sm:text-sm backdrop-blur-md border border-white/20 active:scale-95 transition-all flex items-center gap-2.5 cursor-pointer whitespace-nowrap"
-                >
-                  <WhatsAppIcon size={18} />
-                  <span>Consultar por WhatsApp</span>
-                </a>
-              </div>
+                  <Image
+                    src={img.url}
+                    alt={img.alt}
+                    fill
+                    priority={idx === 0}
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover object-center transform transition-transform duration-7000 ease-out hover:scale-105"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+              ))}
             </div>
 
-            {/* Right Visual Photo Mask */}
-            <div className="lg:col-span-5 relative flex justify-center">
-              <div className="relative aspect-[4/3] w-full max-w-md rounded-3xl overflow-hidden shadow-2xl bg-slate-900 border-4 border-white/20">
-                <Image
-                  src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80"
-                  alt="Ciudadela Miravalle Urbanismo"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 40vw"
-                  className="object-cover transition-transform duration-700 hover:scale-105"
-                  referrerPolicy="no-referrer"
+            {/* Flechas de navegación a los costados: SOLO aparecen ambas simultáneamente al pasar el mouse por la imagen */}
+            <button
+              type="button"
+              onClick={prevHeroImage}
+              aria-label="Imagen anterior"
+              className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/45 hover:bg-[#22A33D] text-white hover:text-white backdrop-blur-md border border-white/20 shadow-2xl flex items-center justify-center opacity-0 group-hover/hero-slider:opacity-100 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer pointer-events-none group-hover/hero-slider:pointer-events-auto"
+            >
+              <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
+            </button>
+
+            <button
+              type="button"
+              onClick={nextHeroImage}
+              aria-label="Imagen siguiente"
+              className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/45 hover:bg-[#22A33D] text-white hover:text-white backdrop-blur-md border border-white/20 shadow-2xl flex items-center justify-center opacity-0 group-hover/hero-slider:opacity-100 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer pointer-events-none group-hover/hero-slider:pointer-events-auto"
+            >
+              <ChevronRight className="w-6 h-6 stroke-[2.5]" />
+            </button>
+
+            {/* Indicadores de diapositiva (visibles al interactuar con el carrusel) */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15 opacity-0 group-hover/hero-slider:opacity-100 transition-opacity duration-300">
+              {MIRAVALLE_HERO_IMAGES.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setHeroImgIndex(i)}
+                  aria-label={`Ver imagen ${i + 1}`}
+                  className={`h-2 rounded-full transition-all cursor-pointer ${
+                    heroImgIndex === i ? 'w-6 bg-[#5be196]' : 'w-2 bg-white/50 hover:bg-white'
+                  }`}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
-                <div className="absolute bottom-5 left-6 right-6 text-white pointer-events-none">
-                  <span className="text-xs font-bold font-mono text-[#25D366] bg-black/60 px-3 py-1 rounded-full border border-white/20 backdrop-blur-md inline-block mb-1">
-                    Etapa 1 & 2 con Entregas Activas
-                  </span>
-                  <p className="text-xs text-slate-200 font-medium drop-shadow-sm">
-                    Vías adoquinadas, aceras y acometidas subterráneas.
-                  </p>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
-
-        {/* Dynamic Wave to Content */}
-        <WaveDarkToCream fillColor="#FFFFFF" />
       </section>
 
       {/* Main Content Sections with Organic Spacing */}
@@ -232,9 +240,6 @@ export function MiravalleView({
         className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
       >
         <div className="max-w-2xl mb-8 space-y-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 block">
-            Infraestructura & Bienestar
-          </span>
           <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
             Amenidades y obras diseñadas para perdurar
           </h2>
@@ -323,9 +328,6 @@ export function MiravalleView({
       >
         <div className="rounded-3xl bg-[#FBFBFA] border border-slate-200/90 p-8 sm:p-14 text-slate-900 shadow-xs">
           <div className="max-w-2xl mb-12 space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 block">
-              Diseño Urbanístico Aprobado
-            </span>
             <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
               Especificaciones técnicas del Master Plan
             </h2>
@@ -436,9 +438,6 @@ export function MiravalleView({
         className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
       >
         <div className="max-w-2xl mb-8 space-y-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 block">
-            Avance Técnico & Arquitectura
-          </span>
           <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
             Galería de Renders y Obras en Terreno
           </h2>
@@ -521,9 +520,6 @@ export function MiravalleView({
       >
         <div className="relative z-10 max-w-5xl mx-auto space-y-8">
           <div className="text-center space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-emerald-800 block">
-              ADQUISICIÓN DIRECTA & CRÉDITO PROPIO
-            </span>
             <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight [text-wrap:balance]">
               Planes Flexibles en Ciudadela Miravalle
             </h2>
@@ -630,9 +626,6 @@ export function MiravalleView({
           </div>
 
           <div className="max-w-2xl space-y-4 relative z-10">
-            <span className="text-xs font-bold font-mono uppercase tracking-widest text-[#25D366] block">
-              Servicio Exclusivo de Acompañamiento VIP
-            </span>
             <h3 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
               Te llevamos a Ciudadela Miravalle en transporte corporativo
             </h3>
