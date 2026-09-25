@@ -420,10 +420,10 @@ export function MiravalleView({
             </span>
             <button
               onClick={() => onNavigate('properties')}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-900 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer whitespace-nowrap"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-slate-900 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap text-center"
             >
               <span>Ver Lotes Disponibles en Miravalle</span>
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4 shrink-0" />
             </button>
           </div>
         </div>
@@ -575,12 +575,12 @@ export function MiravalleView({
             </motion.div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
             <button
               onClick={() => onOpenVisitModal('Ciudadela Miravalle')}
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-slate-900 text-white font-bold text-xs sm:text-sm hover:bg-emerald-700 transition-all shadow-md active:scale-95 cursor-pointer whitespace-nowrap"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-slate-900 text-white font-bold text-xs sm:text-sm hover:bg-emerald-700 transition-all shadow-md active:scale-95 cursor-pointer whitespace-normal sm:whitespace-nowrap text-center"
             >
-              <CalendarCheck2 className="h-4 w-4" />
+              <CalendarCheck2 className="h-4 w-4 shrink-0" />
               <span>Agendar Asesoría en Obra</span>
             </button>
 
@@ -588,9 +588,9 @@ export function MiravalleView({
               href={getMiravalleWhatsAppUrl()}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm transition-all shadow-md active:scale-95 whitespace-nowrap cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm transition-all shadow-md active:scale-95 whitespace-normal sm:whitespace-nowrap text-center cursor-pointer"
             >
-              <WhatsAppIcon size={18} className="text-slate-950" />
+              <WhatsAppIcon size={18} className="text-slate-950 shrink-0" />
               <span>Consultar Disponibilidad por WhatsApp</span>
             </a>
           </div>
@@ -635,12 +635,12 @@ export function MiravalleView({
               y asesor jurídico de MGM Inmobiliaria, sin ningún compromiso ni costo.
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
               <button
                 onClick={() => onOpenVisitModal('Recorrido VIP en Vehículo Corporativo - Miravalle')}
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer whitespace-nowrap"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap text-center"
               >
-                <Car className="h-4 w-4 text-emerald-800" />
+                <Car className="h-4 w-4 text-emerald-800 shrink-0" />
                 <span>Reservar Recorrido con Chofer</span>
               </button>
 
@@ -648,9 +648,9 @@ export function MiravalleView({
                 href={getMiravalleWhatsAppUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm transition-all whitespace-nowrap cursor-pointer shadow-md"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm transition-all whitespace-normal sm:whitespace-nowrap text-center cursor-pointer shadow-md"
               >
-                <WhatsAppIcon size={18} className="text-slate-950" />
+                <WhatsAppIcon size={18} className="text-slate-950 shrink-0" />
                 <span>Coordinar por WhatsApp</span>
               </a>
             </div>

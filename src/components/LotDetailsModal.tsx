@@ -54,7 +54,7 @@ export function LotDetailsModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-3xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 overflow-hidden max-h-[94vh] flex flex-col">
+      <div className="relative w-full max-w-3xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 overflow-hidden max-h-[94dvh] flex flex-col">
         {/* Modal Header Media Viewer */}
         <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] bg-slate-950 overflow-hidden shrink-0">
           <Image
@@ -227,7 +227,7 @@ export function LotDetailsModal({
         </div>
 
         {/* Modal Bottom Actions with Official WhatsApp Icon */}
-        <div className="p-3 sm:p-5 bg-white border-t border-slate-200 flex flex-col sm:flex-row gap-2.5 sm:gap-3">
+        <div className="p-3 sm:p-5 bg-white border-t border-slate-200 flex flex-col sm:flex-row gap-2.5 sm:gap-3 shrink-0">
           <button
             onClick={() => {
               onClose();

@@ -590,9 +590,9 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
                 <button
                   type="button"
                   onClick={() => onOpenVisitModal('Ciudadela Miravalle')}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 px-5 rounded-full bg-[#F58220] hover:bg-[#ea580c] text-white font-bold text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-orange-500/25 transition-all cursor-pointer whitespace-nowrap active:scale-95"
+                  className="w-full flex items-center justify-center gap-2 py-3.5 px-4 sm:px-5 rounded-full bg-[#F58220] hover:bg-[#ea580c] text-white font-bold text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-orange-500/25 transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap text-center active:scale-95"
                 >
-                  <CalendarCheck2 className="h-4 w-4" />
+                  <CalendarCheck2 className="h-4 w-4 shrink-0" />
                   <span>Agendar Visita en Terreno con Transporte</span>
                 </button>
               </div>

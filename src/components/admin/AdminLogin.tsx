@@ -34,7 +34,7 @@ export function AdminLogin({ onSuccess }: AdminLoginProps) {
   };
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
+    <div className="min-h-[70dvh] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md bg-white rounded-3xl p-8 sm:p-10 shadow-2xl border border-slate-200/90 relative overflow-hidden">
         {/* Glow ambient */}
         <div className="absolute -top-20 -right-20 w-44 h-44 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />

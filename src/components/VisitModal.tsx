@@ -72,7 +72,7 @@ export function VisitModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 overflow-hidden max-h-[94vh] sm:max-h-[90vh] flex flex-col">
+      <div className="relative w-full max-w-xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 overflow-hidden max-h-[94dvh] sm:max-h-[90dvh] flex flex-col">
         {/* Header */}
         <div className="bg-slate-950 p-4 sm:p-6 text-white relative">
           <button
@@ -261,7 +261,7 @@ export function VisitModal({
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm shadow-md active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+                  className="w-full flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm shadow-md active:scale-95 transition-all cursor-pointer text-center"
                 >
                   <WhatsAppIcon size={18} className="text-slate-950 shrink-0" />
                   <span>Confirmar & Agendar por WhatsApp Oficial</span>

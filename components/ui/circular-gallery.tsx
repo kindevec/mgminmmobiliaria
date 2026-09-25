@@ -192,7 +192,7 @@ const CircularGallery = React.forwardRef<CircularGalleryHandle, CircularGalleryP
         role="region"
         aria-label="Circular 3D Gallery"
         className={cn(
-          'relative w-full h-full flex items-center justify-center select-none cursor-grab active:cursor-grabbing overflow-hidden',
+          'relative w-full h-full flex items-center justify-center select-none cursor-grab active:cursor-grabbing overflow-hidden touch-pan-y',
           className
         )}
         style={{ perspective: '2000px' }}
@@ -226,7 +226,7 @@ const CircularGallery = React.forwardRef<CircularGalleryHandle, CircularGalleryP
                 key={item.id || item.photo.url + i}
                 role="group"
                 aria-label={item.common}
-                className="absolute w-[230px] sm:w-[260px] lg:w-[285px] xl:w-[310px] h-[440px] sm:h-[500px] lg:h-[550px] xl:h-[590px]"
+                className="absolute w-[210px] min-[360px]:w-[230px] sm:w-[260px] lg:w-[285px] xl:w-[310px] h-[410px] min-[360px]:h-[440px] sm:h-[500px] lg:h-[550px] xl:h-[590px]"
                 style={{
                   transform: `rotateY(${itemAngle}deg) translateZ(${responsiveRadius}px) translate(-50%, -50%)`,
                   left: '50%',

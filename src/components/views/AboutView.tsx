@@ -603,10 +603,10 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => onOpenVisitModal('Asesoría Jurídica y Notarial')}
-                className="px-7 py-3.5 rounded-full bg-[#F58220] hover:bg-[#ea580c] text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer whitespace-nowrap active:scale-95"
+                className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-[#F58220] hover:bg-[#ea580c] text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap text-center active:scale-95"
               >
                 Agendar Asesoría Legal
               </button>
@@ -614,9 +614,9 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
                 href={getGeneralWhatsAppUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm transition-all whitespace-nowrap cursor-pointer shadow-md active:scale-95"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm transition-all whitespace-normal sm:whitespace-nowrap text-center cursor-pointer shadow-md active:scale-95"
               >
-                <WhatsAppIcon size={18} className="text-slate-950" />
+                <WhatsAppIcon size={18} className="text-slate-950 shrink-0" />
                 <span>WhatsApp Oficial</span>
               </a>
             </div>

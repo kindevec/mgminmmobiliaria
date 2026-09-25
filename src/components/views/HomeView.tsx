@@ -577,10 +577,10 @@ export function HomeView({
 
             <button
               onClick={() => onNavigate('miravalle')}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-950 hover:bg-[#22A33D] text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap shadow-md hover:scale-105 active:scale-95"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-slate-950 hover:bg-[#22A33D] text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap text-center shadow-md hover:scale-105 active:scale-95"
             >
               <span>Ver Masterplan Miravalle</span>
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4 shrink-0" />
             </button>
           </div>
 
@@ -666,10 +666,10 @@ export function HomeView({
 
             <button
               onClick={() => onNavigate('contact')}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-900 hover:bg-[#22A33D] text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap shadow-md hover:scale-105 active:scale-95"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-slate-900 hover:bg-[#22A33D] text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap text-center shadow-md hover:scale-105 active:scale-95"
             >
               <span>Canales de Contacto Directo</span>
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4 shrink-0" />
             </button>
           </div>
 

@@ -147,13 +147,13 @@ export function InvestmentCalculator() {
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
               Plazo de Financiamiento Directo
             </label>
-            <div className="grid grid-cols-4 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
               {[12, 24, 36, 48].map((term) => (
                 <button
                   key={term}
                   type="button"
                   onClick={() => setMonths(term)}
-                  className={`py-3 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  className={`py-3 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
                     months === term
                       ? 'bg-slate-900 text-white font-black shadow-md scale-102'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -228,11 +228,11 @@ export function InvestmentCalculator() {
               href={quoteWhatsAppUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-sm shadow-md hover:scale-102 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+              className="w-full flex items-center justify-center gap-2 sm:gap-2.5 py-3.5 sm:py-4 px-4 sm:px-6 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm shadow-md hover:scale-102 active:scale-95 transition-all cursor-pointer text-center"
             >
-              <WhatsAppIcon size={20} className="text-slate-950" />
+              <WhatsAppIcon size={20} className="text-slate-950 shrink-0" />
               <span>Solicitar Plan en WhatsApp Oficial</span>
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4 shrink-0" />
             </a>
           </div>
         </div>
