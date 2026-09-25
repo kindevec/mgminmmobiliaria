@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { LogoMGM } from './LogoMGM';
-import { Menu } from 'lucide-react';
+import { Menu, X, CalendarCheck2, Lock } from 'lucide-react';
 import { WhatsAppIcon } from './SocialIcons';
 import { getGeneralWhatsAppUrl } from '@/src/data/lots';
 
@@ -17,6 +17,7 @@ interface HeaderProps {
 export function Header({
   currentPage,
   onNavigate,
+  onOpenVisitModal,
 }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -24,7 +25,7 @@ export function Header({
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
-      setIsScrolled(scrollPosition > 40);
+      setIsScrolled(scrollPosition > 30);
     };
 
     handleScroll();
@@ -44,21 +45,21 @@ export function Header({
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out ${
         isScrolled
-          ? 'bg-[#113d22]/95 backdrop-blur-md border-b border-white/10 shadow-lg py-2'
-          : 'bg-transparent py-3 sm:py-4'
+          ? 'bg-[#113d22]/95 backdrop-blur-md border-b border-white/10 shadow-lg py-2.5 sm:py-3'
+          : 'bg-[#113d22]/70 backdrop-blur-sm border-b border-white/10 py-3 sm:py-4'
       }`}
     >
-      <div className="relative w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        {/* Lado Izquierdo: Logotipo Oficial MGM Inmobiliaria alineado a la letra A de "Tierra" */}
-        <div className="flex items-center shrink-0 pl-6 sm:pl-32 md:pl-[12rem] lg:pl-[17.5rem] xl:pl-[23.5rem] 2xl:pl-[27rem] z-10">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 w-full">
+        {/* Zona Izquierda: Logotipo Oficial MGM Inmobiliaria */}
+        <div className="flex items-center shrink-0">
           <button
             onClick={() => onNavigate('home')}
-            className="flex items-center gap-2 sm:gap-3 text-left focus:outline-none cursor-pointer group"
-            aria-label="Sociedad Civil MGM Inmobiliaria"
+            className="flex items-center gap-2 sm:gap-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-xl p-1 transition-transform hover:scale-[1.02] active:scale-98 cursor-pointer"
+            aria-label="Ir a Inicio - Sociedad Civil MGM Inmobiliaria"
           >
-            <div className="h-12 sm:h-14 lg:h-16 w-auto flex items-center">
+            <div className="h-10 sm:h-12 lg:h-14 w-auto flex items-center">
               <LogoMGM
-                className="h-11 sm:h-13 lg:h-15 w-auto"
+                className="h-10 sm:h-12 lg:h-13 w-auto"
                 variant="compact"
                 showSubtitle={true}
                 isGhost={true}
@@ -67,9 +68,9 @@ export function Header({
           </button>
         </div>
 
-        {/* Zona Central / Derecha: Enlaces de Navegación reubicados un poco más a la izquierda */}
+        {/* Zona Central: Enlaces de Navegación de Alta Legibilidad */}
         <nav
-          className="hidden md:flex absolute left-[49%] lg:left-[52%] xl:left-[54%] -translate-x-1/2 items-center gap-4 lg:gap-6 xl:gap-7"
+          className="hidden md:flex items-center gap-1.5 lg:gap-2.5 xl:gap-3"
           aria-label="Navegación principal"
         >
           {navLinks.map((link) => {
@@ -78,49 +79,74 @@ export function Header({
               <button
                 key={link.id}
                 onClick={() => onNavigate(link.id)}
-                className={`relative py-1 text-base lg:text-[17px] font-bold tracking-wide transition-colors cursor-pointer ${
+                className={`relative px-3.5 sm:px-4 py-1.5 text-sm lg:text-[15px] font-bold tracking-wide transition-all rounded-full cursor-pointer whitespace-nowrap ${
                   isActive
-                    ? 'text-white'
-                    : 'text-white/80 hover:text-white'
+                    ? 'text-white bg-white/15 backdrop-blur-xs border border-white/20 shadow-xs'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
               >
                 <span>{link.label}</span>
                 {isActive && (
-                  <span className="absolute -bottom-1.5 left-0 right-0 h-[2.5px] bg-[#22A33D] rounded-full shadow-xs" />
+                  <span className="absolute -bottom-1 left-3 right-3 h-[2.5px] bg-[#22A33D] rounded-full shadow-xs" />
                 )}
               </button>
             );
           })}
+        </nav>
 
-          {/* Botón de WhatsApp al lado de Contacto */}
+        {/* Zona Derecha: Acciones Principales y Menú Móvil */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Botón WhatsApp */}
           <a
             href={getGeneralWhatsAppUrl()}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Contactar por WhatsApp Oficial"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-sm lg:text-base transition-all shadow-md hover:shadow-lg hover:scale-105 active:scale-95 cursor-pointer ml-1"
+            className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-xs sm:text-sm transition-all shadow-md hover:shadow-lg hover:scale-105 active:scale-95 cursor-pointer"
           >
-            <WhatsAppIcon size={18} className="text-white shrink-0 drop-shadow-xs" />
-            <span>WhatsApp</span>
+            <WhatsAppIcon size={17} className="text-white shrink-0 drop-shadow-xs" />
+            <span className="hidden sm:inline">WhatsApp</span>
           </a>
-        </nav>
 
-        {/* Zona Derecha: Menú Hamburguesa en móvil (se retiró el botón de agendar cita) */}
-        <div className="flex md:hidden items-center gap-3 shrink-0 z-10">
-          {/* Menú Hamburguesa (3 rayitas) */}
+          {/* CTA Agendar Visita en Desktop Grande */}
+          {onOpenVisitModal && (
+            <button
+              onClick={() => onOpenVisitModal()}
+              className="hidden xl:inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs sm:text-sm font-bold bg-[#F58220] hover:bg-[#e07316] text-white shadow-md transition-all hover:scale-105 active:scale-95 cursor-pointer whitespace-nowrap"
+            >
+              <CalendarCheck2 className="h-4 w-4" />
+              <span>Agendar Visita</span>
+            </button>
+          )}
+
+          {/* Acceso CMS Admin */}
+          <button
+            onClick={() => onNavigate('admin')}
+            title="Panel Administrativo CMS"
+            className={`h-9 w-9 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+              currentPage === 'admin'
+                ? 'bg-white text-slate-900 shadow-xs'
+                : 'text-white/70 hover:text-white hover:bg-white/15'
+            }`}
+            aria-label="Panel CMS de Administración"
+          >
+            <Lock className="h-3.5 w-3.5" />
+          </button>
+
+          {/* Toggle Menú Hamburguesa Móvil */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
-            aria-label="Abrir menú"
+            className="h-10 w-10 md:hidden rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+            aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
           >
-            <Menu className="h-5 w-5 text-white" />
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
       {/* Menú Desplegable Móvil */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#113d22]/98 border-t border-white/10 px-6 py-4 space-y-3 mt-2">
+        <div className="md:hidden bg-[#113d22]/98 backdrop-blur-xl border-t border-white/10 px-6 py-4 space-y-2.5 shadow-2xl animate-in slide-in-from-top-2 duration-200">
           {navLinks.map((link) => (
             <button
               key={link.id}
@@ -128,27 +154,41 @@ export function Header({
                 onNavigate(link.id);
                 setMobileMenuOpen(false);
               }}
-              className={`block w-full text-left py-2 text-base font-bold transition-colors ${
+              className={`block w-full text-left py-2 px-3 rounded-lg text-base font-bold transition-colors ${
                 currentPage === link.id
-                  ? 'text-[#22A33D]'
-                  : 'text-white/90 hover:text-white'
+                  ? 'text-[#5be196] bg-white/10 font-extrabold'
+                  : 'text-white/90 hover:text-white hover:bg-white/5'
               }`}
             >
               {link.label}
             </button>
           ))}
 
-          {/* WhatsApp en menú móvil */}
-          <a
-            href={getGeneralWhatsAppUrl()}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2.5 pt-3 pb-1 text-base font-bold text-[#25D366] hover:text-[#20ba59] border-t border-white/10 transition-colors"
-          >
-            <WhatsAppIcon size={20} className="text-[#25D366] shrink-0" />
-            <span>WhatsApp Oficial</span>
-          </a>
+          <div className="pt-3 border-t border-white/10 flex flex-col gap-2">
+            <a
+              href={getGeneralWhatsAppUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-center gap-2.5 w-full py-2.5 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-sm shadow-md active:scale-98 transition-all"
+            >
+              <WhatsAppIcon size={18} className="text-white shrink-0" />
+              <span>WhatsApp Oficial</span>
+            </a>
+
+            {onOpenVisitModal && (
+              <button
+                onClick={() => {
+                  onOpenVisitModal();
+                  setMobileMenuOpen(false);
+                }}
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#F58220] hover:bg-[#e07316] text-white font-bold text-sm shadow-md active:scale-98 transition-all cursor-pointer"
+              >
+                <CalendarCheck2 className="h-4 w-4" />
+                <span>Agendar Visita</span>
+              </button>
+            )}
+          </div>
         </div>
       )}
     </header>
