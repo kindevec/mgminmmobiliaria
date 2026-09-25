@@ -100,7 +100,7 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
       {/* =========================================================================
           1. BANNER CINEMÁTICO — PANORÁMICO INTEGRAL (SIN PARTICIONES VERTICALES)
           ========================================================================= */}
-      <section className="relative w-full bg-[#113d22] text-white overflow-hidden min-h-[600px] sm:min-h-[660px] lg:min-h-[720px] flex items-center justify-center">
+      <section className="relative w-full bg-[#113d22] text-white overflow-hidden min-h-[500px] sm:min-h-[540px] lg:min-h-[580px] flex items-center justify-center select-none">
         {/* Fondo fotográfico panorámico continuo (100% de la pantalla) */}
         <div
           className="absolute inset-0 w-full h-full overflow-hidden select-none"
@@ -129,27 +129,8 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
           {/* Degradado corporativo idéntico al banner de Contacto — Luminoso, limpio y continuo */}
           <div className="absolute inset-0 bg-gradient-to-b from-[#113d22]/85 via-black/55 to-[#113d22]/90 pointer-events-none" />
 
-          {/* Flechas de navegación discretas a los costados */}
-          <button
-            type="button"
-            onClick={prevHeroImage}
-            aria-label="Imagen anterior"
-            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-[#22A33D] text-white backdrop-blur-md border border-white/20 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer opacity-70 hover:opacity-100"
-          >
-            <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
-          </button>
-
-          <button
-            type="button"
-            onClick={nextHeroImage}
-            aria-label="Siguiente imagen"
-            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-[#22A33D] text-white backdrop-blur-md border border-white/20 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer opacity-70 hover:opacity-100"
-          >
-            <ChevronRight className="w-6 h-6 stroke-[2.5]" />
-          </button>
-
           {/* Indicadores de diapositiva */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15">
+          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15">
             {ABOUT_HERO_IMAGES.map((_, i) => (
               <button
                 key={i}
@@ -164,9 +145,9 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
         </div>
 
         {/* Contenido Central: Título y Párrafo */}
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-center items-center text-center pt-28 sm:pt-32 lg:pt-36 pb-16 sm:pb-20 space-y-6 sm:space-y-8">
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-center items-center text-center pt-24 sm:pt-28 lg:pt-32 pb-14 sm:pb-16 lg:pb-18 space-y-4 sm:space-y-6 select-text cursor-default">
           {/* Insignia arquitectónica animada en SVG */}
-          <AnimatedInsignia className="mb-0 sm:mb-1" size={76} />
+          <AnimatedInsignia className="mb-0 sm:mb-1" size={60} />
 
           <ScrollReveal direction="down" delay={0.05}>
             <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#5be196] drop-shadow-xs">
@@ -175,7 +156,7 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
           </ScrollReveal>
 
           <ScrollReveal direction="down" delay={0.15}>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.08] tracking-tight [text-wrap:balance] drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black text-white leading-[1.1] tracking-tight [text-wrap:balance] drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
               Solidez, transparencia y
               <br />
               <span className="text-[#5be196]">certeza jurídica</span> en cada metro cuadrado.
@@ -183,7 +164,7 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
           </ScrollReveal>
 
           <ScrollReveal direction="up" delay={0.25}>
-            <p className="text-base sm:text-lg lg:text-xl text-slate-100 leading-relaxed font-normal max-w-3xl drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">
+            <p className="text-sm sm:text-base lg:text-lg text-slate-100 leading-relaxed font-normal max-w-3xl drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">
               Somos una entidad inmobiliaria ecuatoriana constituida para transformar terrenos de alta vocación residencial en comunidades planificadas con obras concluidas, saneamiento legal definitivo y crédito directo.
             </p>
           </ScrollReveal>
@@ -193,7 +174,7 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
       {/* =========================================================================
           2. SECCIÓN: COMPROMISO ÉTICO & NOTARIAL (Diseño de Estudio con Máscaras)
           ========================================================================= */}
-      <section className="relative w-full bg-white text-slate-900 py-16 sm:py-24 overflow-hidden border-b border-slate-100">
+      <section className="relative w-full bg-white text-slate-900 pt-12 sm:pt-16 pb-8 sm:pb-10 overflow-hidden border-b border-slate-100">
         {/* Ambient Topographic & Architectural Mask over section canvas */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute inset-0 opacity-40 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]">
@@ -266,14 +247,14 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
                 Expertos en urbanismo, desarrollo y <span className="text-[#F58220]">certeza jurídica</span>
               </h2>
 
-              {/* Descriptive Paragraph - Centered */}
-              <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal text-center">
+              {/* Descriptive Paragraph - Justified */}
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal text-justify">
                 En <strong className="text-slate-900 font-bold">Sociedad Civil MGM Inmobiliaria</strong> transformamos terrenos en proyectos residenciales planificados con total certeza notarial. Erradicamos la incertidumbre en la adquisición de tierras, desarrollando obras con levantamientos topográficos georreferenciados y títulos individuales protocolizados ante Notario Público e inscritos en el Registro de la Propiedad.
               </p>
 
-              {/* Two Features Side by Side */}
+              {/* Two Features Side by Side Centered */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 pt-2">
-                <div className="flex items-center gap-3.5">
+                <div className="flex items-center justify-center gap-3.5 text-left">
                   <div className="h-11 w-11 rounded-xl bg-orange-50 border border-orange-200/80 flex items-center justify-center text-[#F58220] shrink-0 shadow-xs">
                     <FileCheck2 className="h-5 w-5 stroke-[2.2]" />
                   </div>
@@ -287,7 +268,7 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3.5">
+                <div className="flex items-center justify-center gap-3.5 text-left">
                   <div className="h-11 w-11 rounded-xl bg-emerald-100/80 border border-emerald-200/70 flex items-center justify-center text-emerald-800 shrink-0 shadow-xs">
                     <ShieldCheck className="h-5 w-5 stroke-[2.2]" />
                   </div>
@@ -321,9 +302,9 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
       {/* =========================================================================
           3. PILARES FUNDACIONALES (Luminoso & Arquitectónico)
           ========================================================================= */}
-      <section className="relative w-full bg-[#FBFBFA] text-slate-900 py-16 sm:py-24 overflow-hidden border-y border-slate-100">
+      <section className="relative w-full bg-[#FBFBFA] text-slate-900 pt-8 sm:pt-10 pb-16 sm:pb-24 overflow-hidden border-y border-slate-100">
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <ScrollReveal direction="down" delay={0.1} className="text-center max-w-3xl mx-auto space-y-3 mb-14">
+          <ScrollReveal direction="down" delay={0.1} className="text-center max-w-3xl mx-auto space-y-3 mb-8 sm:mb-10">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight [text-wrap:balance]">
               Los Pilares que Sostienen Cada Proyecto
             </h2>
@@ -332,15 +313,15 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
             </p>
           </ScrollReveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
             {/* Card 1: Soft Fresh Brand Green */}
             <ScrollReveal direction="left" delay={0.05}>
               <motion.div
                 whileHover={{ y: -6 }}
-                className="p-7 sm:p-8 rounded-[2rem] bg-[#eaf8ee] border border-[#22A33D]/25 text-[#113d22] flex flex-col justify-between min-h-[240px] sm:min-h-[260px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
+                className="p-6 sm:p-7 rounded-[2rem] bg-[#eaf8ee] border border-[#22A33D]/25 text-[#113d22] flex flex-col justify-between min-h-[250px] sm:min-h-[270px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
               >
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-2.5 text-[#113d22]">
+                  <h3 className="text-lg sm:text-xl font-bold tracking-tight mb-2 text-[#113d22]">
                     Transparencia Notarial
                   </h3>
                   <p className="text-xs sm:text-sm leading-relaxed text-slate-600">
@@ -348,7 +329,7 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
                   </p>
                 </div>
 
-                <div className="flex items-end justify-between mt-8 pt-2">
+                <div className="flex items-end justify-between mt-6 pt-2">
                   <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#113d22] text-white flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
                     <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </div>
@@ -361,10 +342,10 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
             <ScrollReveal direction="up" delay={0.12}>
               <motion.div
                 whileHover={{ y: -6 }}
-                className="p-7 sm:p-8 rounded-[2rem] bg-[#113d22] text-white flex flex-col justify-between min-h-[240px] sm:min-h-[260px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
+                className="p-6 sm:p-7 rounded-[2rem] bg-[#113d22] text-white flex flex-col justify-between min-h-[250px] sm:min-h-[270px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
               >
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-2.5 text-white">
+                  <h3 className="text-lg sm:text-xl font-bold tracking-tight mb-2 text-white">
                     Cumplimiento de Obra
                   </h3>
                   <p className="text-xs sm:text-sm leading-relaxed text-slate-300">
@@ -372,7 +353,7 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
                   </p>
                 </div>
 
-                <div className="flex items-end justify-between mt-8 pt-2">
+                <div className="flex items-end justify-between mt-6 pt-2">
                   <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/15 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
                     <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </div>
@@ -382,13 +363,13 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
             </ScrollReveal>
 
             {/* Card 3: Deep Green Gradient with #22A33D */}
-            <ScrollReveal direction="right" delay={0.18}>
+            <ScrollReveal direction="up" delay={0.19}>
               <motion.div
                 whileHover={{ y: -6 }}
-                className="p-7 sm:p-8 rounded-[2rem] bg-gradient-to-br from-[#113d22] via-[#164929] to-[#22A33D] text-white flex flex-col justify-between min-h-[240px] sm:min-h-[260px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
+                className="p-6 sm:p-7 rounded-[2rem] bg-gradient-to-br from-[#113d22] via-[#164929] to-[#22A33D] text-white flex flex-col justify-between min-h-[250px] sm:min-h-[270px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
               >
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-2.5 text-white">
+                  <h3 className="text-lg sm:text-xl font-bold tracking-tight mb-2 text-white">
                     Seguridad Jurídica
                   </h3>
                   <p className="text-xs sm:text-sm leading-relaxed text-slate-200">
@@ -396,7 +377,7 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
                   </p>
                 </div>
 
-                <div className="flex items-end justify-between mt-8 pt-2">
+                <div className="flex items-end justify-between mt-6 pt-2">
                   <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/15 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
                     <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </div>
@@ -405,38 +386,14 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
               </motion.div>
             </ScrollReveal>
 
-            {/* Card 4: Dark Forest Green */}
-            <ScrollReveal direction="left" delay={0.22}>
+            {/* Card 4: Warm Orange / Direct Financing Accent (#F58220) */}
+            <ScrollReveal direction="right" delay={0.26}>
               <motion.div
                 whileHover={{ y: -6 }}
-                className="p-7 sm:p-8 rounded-[2rem] bg-gradient-to-br from-[#0c2b18] to-[#174627] text-white flex flex-col justify-between min-h-[240px] sm:min-h-[260px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
+                className="p-6 sm:p-7 rounded-[2rem] bg-gradient-to-br from-[#fffaf5] to-[#fff3e6] border border-orange-200/90 text-slate-900 flex flex-col justify-between min-h-[250px] sm:min-h-[270px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
               >
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-2.5 text-white">
-                    Urbanismo Planificado
-                  </h3>
-                  <p className="text-xs sm:text-sm leading-relaxed text-slate-300">
-                    Levantamientos topográficos georreferenciados con coordenadas UTM, áreas verdes y trazados viales aprobados.
-                  </p>
-                </div>
-
-                <div className="flex items-end justify-between mt-8 pt-2">
-                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/15 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
-                    <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </div>
-                  <Scale className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.4] text-[#5be196] transition-transform duration-500 group-hover:scale-110" />
-                </div>
-              </motion.div>
-            </ScrollReveal>
-
-            {/* Card 5: Warm Orange / Direct Financing Accent (#F58220) */}
-            <ScrollReveal direction="up" delay={0.28}>
-              <motion.div
-                whileHover={{ y: -6 }}
-                className="p-7 sm:p-8 rounded-[2rem] bg-gradient-to-br from-[#fffaf5] to-[#fff3e6] border border-orange-200/90 text-slate-900 flex flex-col justify-between min-h-[240px] sm:min-h-[260px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
-              >
-                <div>
-                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-2.5 text-slate-900">
+                  <h3 className="text-lg sm:text-xl font-bold tracking-tight mb-2 text-slate-900">
                     Financiamiento Directo
                   </h3>
                   <p className="text-xs sm:text-sm leading-relaxed text-slate-600">
@@ -444,35 +401,11 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
                   </p>
                 </div>
 
-                <div className="flex items-end justify-between mt-8 pt-2">
+                <div className="flex items-end justify-between mt-6 pt-2">
                   <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#F58220] text-white hover:bg-[#ea580c] flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
                     <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </div>
                   <FileCheck2 className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.4] text-[#F58220] transition-transform duration-500 group-hover:scale-110" />
-                </div>
-              </motion.div>
-            </ScrollReveal>
-
-            {/* Card 6: Soft Fresh Brand Green */}
-            <ScrollReveal direction="right" delay={0.34}>
-              <motion.div
-                whileHover={{ y: -6 }}
-                className="p-7 sm:p-8 rounded-[2rem] bg-[#eaf8ee] border border-[#22A33D]/25 text-[#113d22] flex flex-col justify-between min-h-[240px] sm:min-h-[260px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
-              >
-                <div>
-                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-2.5 text-[#113d22]">
-                    Acompañamiento VIP
-                  </h3>
-                  <p className="text-xs sm:text-sm leading-relaxed text-slate-600">
-                    Asesoría técnica y jurídica en terreno con transporte corporativo exclusivo para que compruebes linderos con total tranquilidad.
-                  </p>
-                </div>
-
-                <div className="flex items-end justify-between mt-8 pt-2">
-                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#113d22] text-white hover:bg-[#22A33D] flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
-                    <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </div>
-                  <Award className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.4] text-[#22A33D]/80 transition-transform duration-500 group-hover:scale-110" />
                 </div>
               </motion.div>
             </ScrollReveal>
@@ -631,7 +564,7 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
       {/* =========================================================================
           5. PANORAMIC BOTTOM CTA (Luminoso)
           ========================================================================= */}
-      <section className="relative w-full bg-[#FBFBFA] text-slate-900 py-16 sm:py-20 overflow-hidden">
+      <section className="relative w-full bg-[#FBFBFA] text-slate-900 pt-10 sm:pt-14 pb-6 sm:pb-8 overflow-hidden">
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal direction="zoom" delay={0.15}>
             <div className="rounded-3xl bg-slate-900 border border-slate-800 p-8 sm:p-12 text-white flex flex-col sm:flex-row items-center justify-between gap-8 shadow-xl relative overflow-hidden">

@@ -148,48 +148,101 @@ export function HomeView({
   const [heroImgIndex, setHeroImgIndex] = useState(0);
   const [heroHovered, setHeroHovered] = useState(false);
 
+  // Transición automática suave del hero cada 5.5 segundos
   useEffect(() => {
     if (heroHovered) return;
     const interval = setInterval(() => {
-      setHeroImgIndex((prev) => (prev + 1) % HERO_REAL_ESTATE_IMAGES.length);
-    }, 2800);
+      setHeroImgIndex((prev) => (prev + 1 >= HERO_REAL_ESTATE_IMAGES.length ? 0 : prev + 1));
+    }, 5500);
     return () => clearInterval(interval);
   }, [heroHovered]);
 
-  const nextHeroImage = () => {
-    setHeroImgIndex((prev) => (prev + 1) % HERO_REAL_ESTATE_IMAGES.length);
-  };
+  // Detección de sección activa en pantalla para el catálogo de lotes y Miravalle
+  const catalogSectionRef = useRef<HTMLElement>(null);
+  const [isCatalogInView, setIsCatalogInView] = useState(false);
 
-  const prevHeroImage = () => {
-    setHeroImgIndex((prev) => (prev - 1 < 0 ? HERO_REAL_ESTATE_IMAGES.length - 1 : prev - 1));
-  };
+  const miravalleSectionRef = useRef<HTMLElement>(null);
+  const [isMiravalleInView, setIsMiravalleInView] = useState(false);
+
+  useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') return;
+
+    const catalogEl = catalogSectionRef.current;
+    const miravalleEl = miravalleSectionRef.current;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.target === catalogEl) {
+            setIsCatalogInView(entry.isIntersecting);
+          }
+          if (entry.target === miravalleEl) {
+            setIsMiravalleInView(entry.isIntersecting);
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+      }
+    );
+
+    if (catalogEl) observer.observe(catalogEl);
+    if (miravalleEl) observer.observe(miravalleEl);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   const catalogScrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-
-  const checkCatalogScroll = () => {
-    if (catalogScrollRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = catalogScrollRef.current;
-      setCanScrollLeft(scrollLeft > 10);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
-    }
-  };
+  const [isCatalogPaused, setIsCatalogPaused] = useState(false);
+  const showCatalogArrows = isCatalogInView || isCatalogPaused;
+  const showMiravalleArrows = isMiravalleInView;
 
   const scrollCatalog = (direction: 'left' | 'right') => {
     if (catalogScrollRef.current) {
-      const scrollAmount = catalogScrollRef.current.clientWidth > 768 ? 400 : 320;
-      catalogScrollRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth',
-      });
-      setTimeout(checkCatalogScroll, 320);
+      const el = catalogScrollRef.current;
+      // En móvil avanza el 100% del ancho (exactamente 1 tarjeta completa); en pantallas grandes por ancho de tarjeta
+      const scrollStep = el.clientWidth > 640 ? (el.clientWidth > 768 ? 420 : 380) : el.clientWidth;
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      if (direction === 'right') {
+        if (el.scrollLeft >= maxScroll - 10) {
+          el.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          el.scrollBy({ left: scrollStep, behavior: 'smooth' });
+        }
+      } else {
+        if (el.scrollLeft <= 10) {
+          el.scrollTo({ left: maxScroll, behavior: 'smooth' });
+        } else {
+          el.scrollBy({ left: -scrollStep, behavior: 'smooth' });
+        }
+      }
     }
   };
 
+  const handleCatalogArrowAction = (e: React.MouseEvent, direction: 'left' | 'right') => {
+    e.stopPropagation();
+    scrollCatalog(direction);
+  };
+
+  // Movimiento continuo automático de las tarjetas mientras no se esté interactuando
   useEffect(() => {
-    checkCatalogScroll();
-  }, [properties]);
+    if (isCatalogPaused) return;
+    const interval = setInterval(() => {
+      if (catalogScrollRef.current) {
+        const el = catalogScrollRef.current;
+        const scrollStep = el.clientWidth > 640 ? (el.clientWidth > 768 ? 420 : 380) : el.clientWidth;
+        const maxScroll = el.scrollWidth - el.clientWidth;
+        if (el.scrollLeft >= maxScroll - 10) {
+          el.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          el.scrollBy({ left: scrollStep, behavior: 'smooth' });
+        }
+      }
+    }, 3500);
+    return () => clearInterval(interval);
+  }, [isCatalogPaused]);
 
   const nextAbout = () => {
     setAboutIndex((prev) => (prev + 1 >= ABOUT_PILLARS.length ? 0 : prev + 1));
@@ -210,7 +263,9 @@ export function HomeView({
       {/* =========================================================================
           1. BANNER CINEMÁTICO — PANORÁMICO INTEGRAL (SIN PARTICIONES VERTICALES)
           ========================================================================= */}
-      <section className="relative w-full bg-[#113d22] text-white overflow-hidden min-h-[700px] sm:min-h-[780px] lg:min-h-[860px] flex items-center justify-center">
+      <section
+        className="relative w-full bg-[#113d22] text-white overflow-hidden min-h-[580px] sm:min-h-[640px] lg:min-h-[700px] flex items-center justify-center select-none"
+      >
         {/* Fondo fotográfico panorámico continuo (100% de la pantalla) */}
         <div
           className="absolute inset-0 w-full h-full overflow-hidden select-none"
@@ -239,31 +294,18 @@ export function HomeView({
           {/* Degradado corporativo idéntico al banner de Contacto — Luminoso, limpio y continuo */}
           <div className="absolute inset-0 bg-gradient-to-b from-[#113d22]/85 via-black/55 to-[#113d22]/90 pointer-events-none" />
 
-          {/* Flechas de navegación discretas a los costados para explorar las fotos */}
-          <button
-            type="button"
-            onClick={prevHeroImage}
-            aria-label="Imagen anterior"
-            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-[#22A33D] text-white backdrop-blur-md border border-white/20 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer opacity-70 hover:opacity-100"
-          >
-            <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
-          </button>
-
-          <button
-            type="button"
-            onClick={nextHeroImage}
-            aria-label="Siguiente imagen"
-            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-[#22A33D] text-white backdrop-blur-md border border-white/20 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer opacity-70 hover:opacity-100"
-          >
-            <ChevronRight className="w-6 h-6 stroke-[2.5]" />
-          </button>
-
           {/* Indicadores de diapositiva */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15 cursor-default"
+          >
             {HERO_REAL_ESTATE_IMAGES.map((_, i) => (
               <button
                 key={i}
-                onClick={() => setHeroImgIndex(i)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setHeroImgIndex(i);
+                }}
                 aria-label={`Ver imagen ${i + 1}`}
                 className={`h-2 rounded-full transition-all cursor-pointer ${
                   heroImgIndex === i ? 'w-6 bg-[#5be196]' : 'w-2 bg-white/50 hover:bg-white'
@@ -274,13 +316,13 @@ export function HomeView({
         </div>
 
         {/* Contenido Central: Título, Párrafo, Pilares y Acciones */}
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-center items-center text-center pt-28 sm:pt-32 lg:pt-36 pb-16 sm:pb-20 space-y-6 sm:space-y-8">
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-center items-center text-center pt-24 sm:pt-28 lg:pt-32 pb-14 sm:pb-16 lg:pb-18 space-y-4 sm:space-y-6 select-text cursor-default">
           {/* Insignia arquitectónica animada en SVG */}
-          <AnimatedInsignia className="mb-0 sm:mb-1" size={76} />
+          <AnimatedInsignia className="mb-0 sm:mb-1" size={60} />
 
           {/* Título Principal */}
           <ScrollReveal direction="down" delay={0.05} duration={0.7}>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.06] tracking-tight [text-wrap:balance] drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black text-white leading-[1.08] tracking-tight [text-wrap:balance] drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
               Tierra Firme, Certeza Jurídica
               <br />
               <span className="text-[#5be196]">y Patrimonio </span>
@@ -290,24 +332,24 @@ export function HomeView({
 
           {/* Párrafo Descriptivo */}
           <ScrollReveal direction="up" delay={0.15} duration={0.65}>
-            <p className="text-base sm:text-lg lg:text-xl text-slate-100 leading-relaxed font-normal max-w-3xl drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">
+            <p className="text-sm sm:text-base lg:text-lg text-slate-100 leading-relaxed font-normal max-w-3xl drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">
               Sociedad Civil MGM Inmobiliaria desarrolla comunidades residenciales con obras civiles concluidas, servicios básicos garantizados y crédito directo hasta 48 meses sin bancos ni buró de crédito.
             </p>
           </ScrollReveal>
 
           {/* 4 Pilares del Banner */}
           <ScrollReveal direction="up" delay={0.25} duration={0.65} className="w-full max-w-4xl">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 w-full pt-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3.5 w-full pt-1">
               {HERO_CONTAINER_FEATURES.map((item, idx) => {
                 const Icon = item.icon;
                 const isOrange = idx === 2; // Crédito Directo
                 return (
                   <div
                     key={idx}
-                    className="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3 text-center sm:text-left p-3 sm:p-3.5 rounded-2xl bg-black/30 backdrop-blur-xs border border-white/10 transition-transform duration-200 hover:scale-105 shadow-sm"
+                    className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-2.5 text-center sm:text-left p-2.5 sm:p-3 rounded-2xl bg-black/30 backdrop-blur-xs border border-white/10 transition-transform duration-200 hover:scale-105 shadow-sm"
                   >
-                    <Icon className={`w-6 h-6 sm:w-7 sm:h-7 shrink-0 stroke-[2.2] ${isOrange ? 'text-[#F58220]' : 'text-[#5be196]'}`} />
-                    <span className="text-xs sm:text-sm lg:text-base font-bold tracking-wide text-white leading-snug drop-shadow-xs">
+                    <Icon className={`w-5 h-5 sm:w-6 sm:h-6 shrink-0 stroke-[2.2] ${isOrange ? 'text-[#F58220]' : 'text-[#5be196]'}`} />
+                    <span className="text-xs sm:text-sm lg:text-sm font-bold tracking-wide text-white leading-snug drop-shadow-xs">
                       {item.title}
                     </span>
                   </div>
@@ -321,14 +363,14 @@ export function HomeView({
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 pt-1 sm:pt-2">
               <button
                 onClick={() => onNavigate('properties')}
-                className="inline-flex items-center gap-2 px-6 sm:px-8 py-3.5 rounded-full bg-[#22A33D] hover:bg-[#1a8230] text-white font-bold text-sm sm:text-base tracking-wide transition-all shadow-lg hover:shadow-[#22A33D]/30 hover:scale-105 active:scale-95 cursor-pointer border border-[#5be196]/30"
+                className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-[#22A33D] hover:bg-[#1a8230] text-white font-bold text-sm sm:text-base tracking-wide transition-all shadow-lg hover:shadow-[#22A33D]/30 hover:scale-105 active:scale-95 cursor-pointer border border-[#5be196]/30"
               >
                 <span>Explorar Proyectos</span>
                 <ArrowRight className="h-4 w-4 stroke-[2.5]" />
               </button>
               <button
                 onClick={() => onOpenVisitModal()}
-                className="inline-flex items-center gap-2 px-6 sm:px-7 py-3.5 rounded-full bg-white/15 hover:bg-[#F58220] hover:border-[#F58220] text-white font-medium text-sm sm:text-base border border-white/30 backdrop-blur-md transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md"
+                className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full bg-white/15 hover:bg-[#F58220] hover:border-[#F58220] text-white font-medium text-sm sm:text-base border border-white/30 backdrop-blur-md transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md"
               >
                 <span>Agendar Visita</span>
               </button>
@@ -341,7 +383,7 @@ export function HomeView({
       {/* =========================================================================
           2. SECCIÓN: PROYECTOS CONCLUIDOS & ARTE DEL URBANISMO (DISEÑO REFERENCIA)
           ========================================================================= */}
-      <section className="relative w-full bg-[#f2f7f4] text-slate-900 py-20 sm:py-28 lg:py-32 overflow-hidden border-b border-slate-200/60">
+      <section className="relative w-full bg-[#f2f7f4] text-slate-900 pt-14 sm:pt-20 lg:pt-24 pb-8 sm:pb-12 lg:pb-14 overflow-hidden border-b border-slate-200/60">
         {/* Topographic Background SVG provided by user */}
         <svg
           viewBox="0 0 800 600"
@@ -491,83 +533,86 @@ export function HomeView({
       {/* =========================================================================
           3. CATÁLOGO DE LOTES & VIVIENDAS — SLIDER ARQUITECTÓNICO FORMAL
           ========================================================================= */}
-      <section className="relative w-full bg-[#fbfbfa] text-slate-900 py-16 sm:py-24 overflow-hidden border-b border-slate-100">
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
+      <section
+        ref={catalogSectionRef}
+        className="relative w-full bg-[#fbfbfa] text-slate-900 pt-6 sm:pt-10 lg:pt-12 pb-14 sm:pb-20 overflow-hidden border-b border-slate-100"
+      >
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
           
-          {/* Encabezado: Título + Filtros por Pestañas + Controles de Navegación */}
-          <ScrollReveal direction="left" delay={0.1} className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-slate-200">
-            <div className="space-y-2">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#22A33D] block">
-                INVENTARIO DISPONIBLE & EN ENTREGA
+          {/* Encabezado Centrado: Título, Párrafo y Botón Ver Todo */}
+          <ScrollReveal direction="down" delay={0.1} className="flex flex-col items-center text-center max-w-3xl mx-auto space-y-3 sm:space-y-4 pb-4 sm:pb-6 border-b border-slate-200">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.12] [text-wrap:balance]">
+              Lotes y viviendas con{' '}
+              <span className="font-serif italic font-normal text-[#F58220]">
+                crédito directo
               </span>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.12]">
-                Lotes y viviendas con{' '}
-                <span className="font-serif italic font-normal text-[#F58220]">
-                  crédito directo
-                </span>
-              </h2>
-              <p className="text-sm sm:text-base text-slate-600 max-w-xl leading-relaxed">
-                Revisa disponibilidad en tiempo real, metrajes exactos y facilidades de pago directo hasta 48 meses.
-              </p>
-            </div>
+            </h2>
+            <p className="text-sm sm:text-base text-slate-600 max-w-2xl leading-relaxed">
+              Revisa disponibilidad en tiempo real, metrajes exactos y facilidades de pago directo hasta 48 meses.
+            </p>
 
-            {/* Botón Ver Todo */}
-            <button
-              onClick={() => onNavigate('properties')}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-900 hover:bg-[#113d22] text-white text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap shadow-xs hover:shadow-md hover:scale-102 active:scale-98 shrink-0 self-start sm:self-end"
-            >
-              <span>Ver Todo ({properties.length})</span>
-              <ArrowRight className="h-4 w-4" />
-            </button>
+            {/* Botón Ver Todo Centrado */}
+            <div className="pt-1 flex justify-center w-full">
+              <button
+                onClick={() => onNavigate('properties')}
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-slate-900 hover:bg-[#113d22] text-white text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap shadow-sm hover:shadow-md hover:scale-105 active:scale-95"
+              >
+                <span>Ver Todo ({properties.length})</span>
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
           </ScrollReveal>
 
           {/* SLIDER HORIZONTAL CON BOTONES DE NAVEGACIÓN A LOS LADOS */}
-          <ScrollReveal direction="up" delay={0.2} className="relative group/carousel">
-            {/* Botón Lateral Izquierdo */}
+          <ScrollReveal direction="up" delay={0.2} className="relative group/carousel max-w-md sm:max-w-none mx-auto px-7 sm:px-0">
+            {/* Botón Lateral Izquierdo: visible cuando el usuario está en la sección */}
             <button
-              onClick={() => scrollCatalog('left')}
-              disabled={!canScrollLeft}
+              type="button"
+              onClick={(e) => handleCatalogArrowAction(e, 'left')}
               aria-label="Desplazar a la izquierda"
-              className={`absolute -left-3 sm:-left-5 lg:-left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-slate-200/90 flex items-center justify-center transition-all duration-200 shadow-xl backdrop-blur-md cursor-pointer ${
-                canScrollLeft
-                  ? 'bg-white/95 hover:bg-[#113d22] text-slate-800 hover:text-white hover:scale-110 active:scale-95'
-                  : 'bg-white/50 text-slate-300 opacity-0 pointer-events-none'
+              className={`catalog-arrow-btn absolute left-0 sm:-left-5 lg:-left-6 top-1/2 -translate-y-1/2 z-30 w-7 h-7 sm:w-12 sm:h-12 rounded-full border border-slate-200/90 flex items-center justify-center transition-all duration-300 shadow-xl sm:shadow-2xl backdrop-blur-md cursor-pointer bg-white/95 hover:bg-[#113d22] text-slate-800 hover:text-white hover:scale-110 active:scale-95 sm:group-hover/carousel:opacity-100 sm:group-hover/carousel:scale-100 sm:group-hover/carousel:pointer-events-auto ${
+                showCatalogArrows
+                  ? 'opacity-100 scale-100 pointer-events-auto'
+                  : 'opacity-0 scale-90 pointer-events-none'
               }`}
             >
-              <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 stroke-[2.2]" />
+              <ChevronLeft className="h-4 w-4 sm:h-6 sm:w-6 stroke-[2.2]" />
             </button>
 
-            {/* Botón Lateral Derecho */}
+            {/* Botón Lateral Derecho: visible cuando el usuario está en la sección */}
             <button
-              onClick={() => scrollCatalog('right')}
-              disabled={!canScrollRight}
+              type="button"
+              onClick={(e) => handleCatalogArrowAction(e, 'right')}
               aria-label="Desplazar a la derecha"
-              className={`absolute -right-3 sm:-right-5 lg:-right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-slate-200/90 flex items-center justify-center transition-all duration-200 shadow-xl backdrop-blur-md cursor-pointer ${
-                canScrollRight
-                  ? 'bg-white/95 hover:bg-[#113d22] text-slate-800 hover:text-white hover:scale-110 active:scale-95'
-                  : 'bg-white/50 text-slate-300 opacity-0 pointer-events-none'
+              className={`catalog-arrow-btn absolute right-0 sm:-right-5 lg:-right-6 top-1/2 -translate-y-1/2 z-30 w-7 h-7 sm:w-12 sm:h-12 rounded-full border border-slate-200/90 flex items-center justify-center transition-all duration-300 shadow-xl sm:shadow-2xl backdrop-blur-md cursor-pointer bg-white/95 hover:bg-[#113d22] text-slate-800 hover:text-white hover:scale-110 active:scale-95 sm:group-hover/carousel:opacity-100 sm:group-hover/carousel:scale-100 sm:group-hover/carousel:pointer-events-auto ${
+                showCatalogArrows
+                  ? 'opacity-100 scale-100 pointer-events-auto'
+                  : 'opacity-0 scale-90 pointer-events-none'
               }`}
             >
-              <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 stroke-[2.2]" />
+              <ChevronRight className="h-4 w-4 sm:h-6 sm:w-6 stroke-[2.2]" />
             </button>
 
             {/* Carrusel */}
             <div
               ref={catalogScrollRef}
-              onScroll={checkCatalogScroll}
-              className="flex gap-5 sm:gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory py-4 px-1 scrollbar-none"
+              onMouseEnter={() => setIsCatalogPaused(true)}
+              onMouseLeave={() => setIsCatalogPaused(false)}
+              onTouchStart={() => setIsCatalogPaused(true)}
+              onTouchEnd={() => {
+                setTimeout(() => setIsCatalogPaused(false), 3000);
+              }}
+              className="flex gap-0 sm:gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory py-4 scrollbar-none"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {properties.map((lot) => (
                 <div
                   key={lot.id}
-                  className="min-w-[290px] sm:min-w-[330px] md:min-w-[350px] lg:min-w-[370px] max-w-[390px] snap-start shrink-0 bg-white rounded-3xl border border-slate-200/90 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group select-none"
+                  onClick={() => onSelectLot(lot)}
+                  className="w-full min-w-full sm:min-w-[360px] md:min-w-[385px] lg:min-w-[410px] max-w-full sm:max-w-[425px] snap-center shrink-0 bg-white rounded-3xl border border-slate-200/90 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group select-none cursor-pointer"
                 >
                   {/* Imagen y Badges */}
-                  <div
-                    onClick={() => onSelectLot(lot)}
-                    className="relative w-full h-[220px] sm:h-[240px] overflow-hidden bg-slate-950 cursor-pointer"
-                  >
+                  <div className="relative w-full h-[220px] sm:h-[240px] overflow-hidden bg-slate-950">
                     <Image
                       src={lot.image}
                       alt={lot.name}
@@ -621,8 +666,7 @@ export function HomeView({
                   <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
                     <div className="space-y-2">
                       <h3
-                        onClick={() => onSelectLot(lot)}
-                        className="text-base sm:text-lg font-black text-slate-900 leading-snug tracking-tight group-hover:text-[#22A33D] transition-colors cursor-pointer line-clamp-1"
+                        className="text-base sm:text-lg font-black text-slate-900 leading-snug tracking-tight group-hover:text-[#22A33D] transition-colors line-clamp-1"
                         title={lot.name}
                       >
                         {lot.name}
@@ -678,8 +722,12 @@ export function HomeView({
                       {/* Botones de Acción */}
                       <div className="grid grid-cols-2 gap-2 pt-1">
                         <button
-                          onClick={() => onSelectLot(lot)}
-                          className="w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-[#113d22] text-white font-bold text-xs transition-all hover:scale-102 active:scale-95 cursor-pointer text-center shadow-xs flex items-center justify-center gap-1.5"
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSelectLot(lot);
+                          }}
+                          className="action-btn-ficha w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-[#113d22] text-white font-bold text-xs transition-all hover:scale-102 active:scale-95 cursor-pointer text-center shadow-xs flex items-center justify-center gap-1.5"
                         >
                           <span>Ver Ficha</span>
                           <ArrowRight className="h-3.5 w-3.5" />
@@ -687,6 +735,7 @@ export function HomeView({
 
                         <a
                           href={getLotWhatsAppUrl(lot.name, lot.code, lot.priceUSD)}
+                          onClick={(e) => e.stopPropagation()}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="w-full py-2.5 px-3 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-xs transition-all hover:scale-102 active:scale-95 cursor-pointer text-center shadow-xs flex items-center justify-center gap-1.5"
@@ -708,49 +757,62 @@ export function HomeView({
       {/* =========================================================================
           4. CARRUSEL 3: PROYECTO INSIGNIA CIUDADELA MIRAVALLE — DISEÑO CONTENEDOR
           ========================================================================= */}
-      <section className="relative w-full bg-white text-slate-900 py-16 sm:py-24 overflow-hidden border-t border-slate-100">
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
-          {/* Header strip */}
-          <ScrollReveal direction="right" delay={0.1} className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-slate-200">
-            <div className="space-y-3">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.12]">
-                Ciudadela Miravalle:{' '}
-                <span className="font-serif italic font-normal text-[#22A33D]">
-                  Infraestructura viva.
-                </span>
-              </h2>
-              <p className="text-sm sm:text-base text-slate-700 max-w-2xl leading-relaxed">
-                Más de 300 lotes planificados, calzadas adoquinadas de alto tránsito, 8.000 m² de áreas deportivas y recreativas, y redes eléctricas soterradas.
-              </p>
-            </div>
+      <section
+        ref={miravalleSectionRef}
+        className="relative w-full bg-white text-slate-900 pt-8 sm:pt-14 pb-14 sm:pb-20 overflow-hidden border-t border-slate-100"
+      >
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
+          {/* Encabezado Centrado: Título, Párrafo y Botón */}
+          <ScrollReveal direction="down" delay={0.1} className="flex flex-col items-center text-center max-w-3xl mx-auto space-y-3 sm:space-y-4 pb-4 sm:pb-6 border-b border-slate-200">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.12] [text-wrap:balance]">
+              Ciudadela Miravalle:{' '}
+              <span className="font-serif italic font-normal text-[#22A33D]">
+                Infraestructura viva.
+              </span>
+            </h2>
+            <p className="text-sm sm:text-base text-slate-600 max-w-2xl leading-relaxed">
+              Más de 300 lotes planificados, calzadas adoquinadas de alto tránsito, 8.000 m² de áreas deportivas y recreativas, y redes eléctricas soterradas.
+            </p>
 
-            <button
-              onClick={() => onNavigate('miravalle')}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-slate-950 hover:bg-[#22A33D] text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap text-center shadow-md hover:scale-105 active:scale-95"
-            >
-              <span>Ver Masterplan Miravalle</span>
-              <ArrowRight className="h-4 w-4 shrink-0" />
-            </button>
+            <div className="pt-1 flex justify-center w-full">
+              <button
+                onClick={() => onNavigate('miravalle')}
+                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-slate-950 hover:bg-[#22A33D] text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap text-center shadow-md hover:scale-105 active:scale-95"
+              >
+                <span>Ver Masterplan Miravalle</span>
+                <ArrowRight className="h-4 w-4 shrink-0" />
+              </button>
+            </div>
           </ScrollReveal>
 
           {/* Carrusel de Amenidades con Contenedor Imagen 2 */}
-          <ScrollReveal direction="zoom" delay={0.2} className="relative">
-            {/* Botón Lateral Izquierdo */}
+          <ScrollReveal direction="zoom" delay={0.2} className="relative group/miravalle max-w-md sm:max-w-4xl lg:max-w-5xl mx-auto px-7 sm:px-0">
+            {/* Botón Lateral Izquierdo: visible cuando el usuario está en la sección */}
             <button
+              type="button"
               onClick={prevMiravalle}
               aria-label="Amenidad anterior"
-              className="absolute -left-2 sm:-left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-[#22A33D] text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
+              className={`miravalle-arrow-btn absolute left-0 sm:-left-5 lg:-left-6 top-1/2 -translate-y-1/2 z-30 w-7 h-7 sm:w-12 sm:h-12 rounded-full border border-slate-200/90 flex items-center justify-center transition-all duration-300 shadow-xl sm:shadow-2xl backdrop-blur-md cursor-pointer bg-white/95 hover:bg-[#22A33D] text-slate-800 hover:text-white hover:scale-110 active:scale-95 sm:group-hover/miravalle:opacity-100 sm:group-hover/miravalle:scale-100 sm:group-hover/miravalle:pointer-events-auto ${
+                showMiravalleArrows
+                  ? 'opacity-100 scale-100 pointer-events-auto'
+                  : 'opacity-0 scale-90 pointer-events-none'
+              }`}
             >
-              <ChevronLeft className="h-6 w-6 stroke-[2.5]" />
+              <ChevronLeft className="h-4 w-4 sm:h-6 sm:w-6 stroke-[2.2]" />
             </button>
 
-            {/* Botón Lateral Derecho */}
+            {/* Botón Lateral Derecho: visible cuando el usuario está en la sección */}
             <button
+              type="button"
               onClick={nextMiravalle}
               aria-label="Amenidad siguiente"
-              className="absolute -right-2 sm:-right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white hover:bg-[#22A33D] text-slate-800 hover:text-white shadow-xl border border-slate-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
+              className={`miravalle-arrow-btn absolute right-0 sm:-right-5 lg:-right-6 top-1/2 -translate-y-1/2 z-30 w-7 h-7 sm:w-12 sm:h-12 rounded-full border border-slate-200/90 flex items-center justify-center transition-all duration-300 shadow-xl sm:shadow-2xl backdrop-blur-md cursor-pointer bg-white/95 hover:bg-[#22A33D] text-slate-800 hover:text-white hover:scale-110 active:scale-95 sm:group-hover/miravalle:opacity-100 sm:group-hover/miravalle:scale-100 sm:group-hover/miravalle:pointer-events-auto ${
+                showMiravalleArrows
+                  ? 'opacity-100 scale-100 pointer-events-auto'
+                  : 'opacity-0 scale-90 pointer-events-none'
+              }`}
             >
-              <ChevronRight className="h-6 w-6 stroke-[2.5]" />
+              <ChevronRight className="h-4 w-4 sm:h-6 sm:w-6 stroke-[2.2]" />
             </button>
 
             {/* Slide de Amenidad Miravalle */}
@@ -770,6 +832,7 @@ export function HomeView({
                   title={AMENITIES_MIRAVALLE[miravalleIndex].title}
                   description={AMENITIES_MIRAVALLE[miravalleIndex].description}
                   primaryButtonText="Agendar Recorrido en Obra"
+                  primaryButtonIcon={<MapPin className="h-4 w-4 text-white" />}
                   onPrimaryClick={() => onOpenVisitModal('Recorrido Ciudadela Miravalle')}
                   secondaryLinkText="Ver Masterplan Miravalle"
                   onSecondaryClick={() => onNavigate('miravalle')}
@@ -797,33 +860,33 @@ export function HomeView({
       {/* =========================================================================
           5. CARRUSEL 4: FAMILIAS PROPIETARIAS & TESTIMONIOS (Diseño Suave Crema)
           ========================================================================= */}
-      <section className="relative w-full bg-[#fbfbfa] text-slate-900 py-16 sm:py-24 overflow-hidden border-t border-slate-100">
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
-          {/* Header strip */}
-          <ScrollReveal direction="down" delay={0.1} className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-slate-200">
-            <div className="space-y-2">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.12]">
-                Confianza respaldada por{' '}
-                <span className="font-serif italic font-normal text-[#22A33D]">
-                  escrituras entregadas
-                </span>
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-600 max-w-xl leading-relaxed">
-                Comunícate directamente con nuestro equipo directivo, revisa la documentación jurídica en notaría y conoce las experiencias de familias que ya construyen su patrimonio.
-              </p>
-            </div>
+      <section className="relative w-full bg-[#fbfbfa] text-slate-900 pt-8 sm:pt-14 pb-6 sm:pb-8 overflow-hidden border-t border-slate-100">
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
+          {/* Encabezado Centrado: Título, Párrafo y Botón */}
+          <ScrollReveal direction="down" delay={0.1} className="flex flex-col items-center text-center max-w-3xl mx-auto space-y-3 sm:space-y-4 pb-4 sm:pb-6 border-b border-slate-200">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.12] [text-wrap:balance]">
+              Confianza respaldada por{' '}
+              <span className="font-serif italic font-normal text-[#22A33D]">
+                escrituras entregadas
+              </span>
+            </h2>
+            <p className="text-xs sm:text-sm sm:text-base text-slate-600 max-w-2xl leading-relaxed">
+              Comunícate directamente con nuestro equipo directivo, revisa la documentación jurídica en notaría y conoce las experiencias de familias que ya construyen su patrimonio.
+            </p>
 
-            <button
-              onClick={() => onNavigate('contact')}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-slate-900 hover:bg-[#22A33D] text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap text-center shadow-md hover:scale-105 active:scale-95"
-            >
-              <span>Canales de Contacto Directo</span>
-              <ArrowRight className="h-4 w-4 shrink-0" />
-            </button>
+            <div className="pt-1 flex justify-center w-full">
+              <button
+                onClick={() => onNavigate('contact')}
+                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-slate-950 hover:bg-[#22A33D] text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap text-center shadow-md hover:scale-105 active:scale-95"
+              >
+                <span>Canales de Contacto Directo</span>
+                <ArrowRight className="h-4 w-4 shrink-0" />
+              </button>
+            </div>
           </ScrollReveal>
 
           {/* Grilla 2x2 de Testimonios Reales (Diseño Ribbon acorde a la Paleta MGM) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12 sm:gap-y-16 mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 sm:gap-y-12 mt-2 sm:mt-4">
             {TESTIMONIALS_DATA.slice(0, 4).map((item, idx) => (
               <ScrollReveal
                 key={idx}
@@ -831,7 +894,7 @@ export function HomeView({
                 delay={0.1 + (idx * 0.08)}
               >
                 <div
-                  className="bg-[#f4f7ee] rounded-br-[2.5rem] rounded-tr-[2.5rem] rounded-bl-[2.5rem] rounded-tl-lg border border-[#dce3d2] shadow-xl relative mt-8 sm:mt-10 p-6 sm:p-8 pt-18 sm:pt-22 min-h-[220px] transition-all hover:shadow-2xl"
+                  className="bg-[#f4f7ee] rounded-br-[2.5rem] rounded-tr-[2.5rem] rounded-bl-[2.5rem] rounded-tl-lg border border-[#dce3d2] shadow-xl relative mt-4 sm:mt-6 p-6 sm:p-8 pt-18 sm:pt-22 min-h-[220px] transition-all hover:shadow-2xl"
                 >
                   {/* Ribbon Superior Verde MGM (#113d22 con detalles #5be196 y pliegue lateral) */}
                   <div className="absolute top-0 -left-3 sm:-left-4 bg-[#113d22] text-white py-3.5 sm:py-4 px-6 sm:px-8 rounded-tr-full rounded-br-full shadow-lg z-10 w-[90%] sm:w-[82%] border-y border-r border-[#22A33D]/30">
@@ -865,7 +928,7 @@ export function HomeView({
           </div>
 
           {/* Quick Action Capsule to WhatsApp & Office */}
-          <ScrollReveal direction="zoom" delay={0.15}>
+          <ScrollReveal direction="zoom" delay={0.15} className="pt-6 sm:pt-10">
             <div className="rounded-[2rem] bg-gradient-to-r from-[#eef8f0] via-[#fff7ed] to-slate-50 border border-[#22A33D]/25 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
               <div className="space-y-1 text-center sm:text-left">
                 <h3 className="text-lg sm:text-xl font-bold text-slate-900">

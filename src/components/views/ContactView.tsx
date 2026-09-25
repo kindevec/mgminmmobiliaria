@@ -90,7 +90,7 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
       {/* =========================================================================
           HERO BANNER DE CONTACTO (ESTILO AOVET ADAPTADO A PALETA MGM)
           ========================================================================= */}
-      <section className="relative flex flex-col justify-center bg-gray-900 pt-20 pb-24 md:pb-36 overflow-hidden h-[540px] sm:h-[620px] md:h-[680px] lg:h-[720px] min-h-[540px] md:min-h-[620px] lg:min-h-[700px]">
+      <section className="relative flex flex-col justify-center bg-[#113d22] overflow-hidden min-h-[500px] sm:min-h-[540px] lg:min-h-[580px] select-none">
         {/* Background image + dark corporate overlay */}
         <div
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
@@ -101,9 +101,9 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
           <div className="absolute inset-0 bg-gradient-to-b from-[#113d22]/85 via-black/55 to-[#113d22]/90" />
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-grow flex flex-col justify-center pt-24 sm:pt-16 md:pt-14 pb-16 sm:pb-24">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-grow flex flex-col justify-center items-center text-center pt-24 sm:pt-28 lg:pt-32 pb-14 sm:pb-16 lg:pb-18">
           {/* Insignia arquitectónica animada en SVG (Paleta Logo MGM: Naranja #F58220 y Verde #22A33D) */}
-          <AnimatedInsignia className="mb-4 sm:mb-6 translate-y-3 sm:-translate-y-4 md:-translate-y-6" size={80} />
+          <AnimatedInsignia className="mb-3 sm:mb-4" size={64} />
 
           <motion.div
             initial="hidden"
@@ -121,7 +121,7 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
                   transition: { type: 'spring', stiffness: 110, damping: 12, duration: 0.8 },
                 },
               }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold font-sans text-center leading-[1.12] tracking-tight mb-4 sm:mb-6 antialiased cursor-default select-none mx-auto max-w-5xl translate-y-2 sm:-translate-y-4 md:-translate-y-6 drop-shadow-2xl"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold font-sans text-center leading-[1.12] tracking-tight mb-3 sm:mb-4 antialiased cursor-default select-none mx-auto max-w-5xl drop-shadow-2xl"
             >
               <span className="text-white">Ponte en </span>
               <motion.span className="text-[#F58220] inline-block drop-shadow-[0_4px_20px_rgba(245,130,32,0.65)] [text-shadow:_0_2px_14px_rgba(245,130,32,0.85)]">
@@ -134,19 +134,19 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
               }}
-              className="text-base sm:text-lg md:text-xl text-white/95 font-medium max-w-2xl mx-auto text-center mb-8 sm:mb-10 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] [text-shadow:_0_1px_8px_rgba(0,0,0,0.85)] translate-y-2 sm:-translate-y-4 md:-translate-y-6"
+              className="text-sm sm:text-base md:text-lg text-white/95 font-medium max-w-2xl mx-auto text-center mb-6 sm:mb-8 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] [text-shadow:_0_1px_8px_rgba(0,0,0,0.85)]"
             >
               Estamos listos para atenderte. Comunícate con nuestro equipo técnico, legal y comercial
               para agendamiento de visitas, cotizaciones de lotes y asesoría notarial personalizada.
             </motion.p>
 
-            {/* Botones CTA estilo AOVET: Verde WhatsApp + Naranja Llamada */}
+            {/* Botón CTA: WhatsApp directo */}
             <motion.div
               variants={{
                 hidden: { opacity: 0, scale: 0.9 },
                 visible: { opacity: 1, scale: 1, transition: { type: 'spring', damping: 12, stiffness: 100 } },
               }}
-              className="flex flex-wrap gap-3 sm:gap-4 justify-center items-center w-full sm:w-auto mx-auto translate-y-1 sm:-translate-y-2 md:-translate-y-4"
+              className="flex justify-center items-center w-full sm:w-auto mx-auto"
             >
               <a
                 href={`https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(
@@ -154,18 +154,10 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 sm:py-4 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-bold text-xs sm:text-sm uppercase tracking-wider shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 sm:py-4 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-bold text-xs sm:text-sm uppercase tracking-wider shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
               >
                 <WhatsAppIcon size={20} className="text-slate-950" />
-                <span>WhatsApp</span>
-              </a>
-
-              <a
-                href={`tel:+${WHATSAPP_PHONE}`}
-                className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 sm:py-4 rounded-full bg-[#F58220] hover:bg-[#ea580c] text-white font-bold text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-orange-600/30 hover:shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
-              >
-                <Phone size={18} />
-                <span>Llamar a Asesor</span>
+                <span>Conversar por WhatsApp</span>
               </a>
             </motion.div>
           </motion.div>
@@ -175,7 +167,7 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
       {/* =========================================================================
           SECCIÓN PRINCIPAL DE FORMULARIO Y DATOS DE CONTACTO (ESTILO AOVET)
           ========================================================================= */}
-      <section className="py-12 sm:py-16">
+      <section className="pt-10 sm:pt-14 pb-6 sm:pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-start">
             {/* Columna Izquierda: Formulario Estilo Píldora Moderno */}

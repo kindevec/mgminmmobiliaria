@@ -70,7 +70,7 @@ export function NatureContainerCard({
             {primaryButtonIcon ? (
               primaryButtonIcon
             ) : (
-              <MapPin className="h-4 w-4 text-[#F58220]" />
+              <MapPin className="h-4 w-4 text-white" />
             )}
             <span>{primaryButtonText}</span>
           </button>

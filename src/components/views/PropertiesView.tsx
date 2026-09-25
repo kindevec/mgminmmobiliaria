@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useId } from 'react';
+import React, { useState, useEffect, useRef, useId } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -93,9 +93,21 @@ export function PropertiesView({
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [maxPrice, setMaxPrice] = useState<number>(initialMaxPrice || 120000);
   const [minArea, setMinArea] = useState<number>(0);
+  const [mobilePage, setMobilePage] = useState<number>(1);
+  const MOBILE_PAGE_SIZE = 5;
+  const searchBarRef = useRef<HTMLDivElement>(null);
 
-  // Mobile drawer filter toggle
-  const [showMobileFilters, setShowMobileFilters] = useState<boolean>(false);
+  const scrollToSearchBar = () => {
+    if (searchBarRef.current) {
+      const yOffset = -75;
+      const y = searchBarRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    setMobilePage(1);
+  }, [searchQuery, selectedTypes, selectedCategories, selectedStatuses, maxPrice, minArea]);
 
   const toggleType = (val: string) => {
     setSelectedTypes((prev) =>
@@ -134,6 +146,8 @@ export function PropertiesView({
     return matchesSearch && matchesType && matchesCategory && matchesStatus && matchesPrice && matchesArea;
   });
 
+  const totalMobilePages = Math.max(1, Math.ceil(filteredLots.length / MOBILE_PAGE_SIZE));
+
   const hasAnyFilterActive =
     searchQuery.trim().length > 0 ||
     selectedTypes.length > 0 ||
@@ -149,6 +163,7 @@ export function PropertiesView({
     setSelectedStatuses([]);
     setMaxPrice(120000);
     setMinArea(0);
+    setMobilePage(1);
   };
 
   const getTypeCount = (type: string) => properties.filter((p) => p.type === type).length;
@@ -160,7 +175,7 @@ export function PropertiesView({
       {/* =========================================================================
           1. BANNER CINEMÁTICO — PANORÁMICO INTEGRAL (SIN PARTICIONES VERTICALES)
           ========================================================================= */}
-      <section className="relative w-full bg-[#113d22] text-white overflow-hidden min-h-[600px] sm:min-h-[660px] lg:min-h-[720px] flex items-center justify-center">
+      <section className="relative w-full bg-[#113d22] text-white overflow-hidden min-h-[500px] sm:min-h-[540px] lg:min-h-[580px] flex items-center justify-center select-none">
         {/* Fondo fotográfico panorámico continuo (100% de la pantalla) */}
         <div
           className="absolute inset-0 w-full h-full overflow-hidden select-none"
@@ -189,27 +204,8 @@ export function PropertiesView({
           {/* Degradado corporativo idéntico al banner de Contacto — Luminoso, limpio y continuo */}
           <div className="absolute inset-0 bg-gradient-to-b from-[#113d22]/85 via-black/55 to-[#113d22]/90 pointer-events-none" />
 
-          {/* Flechas de navegación discretas a los costados */}
-          <button
-            type="button"
-            onClick={prevHeroImage}
-            aria-label="Imagen anterior"
-            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-[#22A33D] text-white backdrop-blur-md border border-white/20 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer opacity-70 hover:opacity-100"
-          >
-            <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
-          </button>
-
-          <button
-            type="button"
-            onClick={nextHeroImage}
-            aria-label="Siguiente imagen"
-            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-[#22A33D] text-white backdrop-blur-md border border-white/20 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer opacity-70 hover:opacity-100"
-          >
-            <ChevronRight className="w-6 h-6 stroke-[2.5]" />
-          </button>
-
           {/* Indicadores de diapositiva */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15">
+          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15">
             {PROPERTIES_HERO_IMAGES.map((_, i) => (
               <button
                 key={i}
@@ -224,9 +220,9 @@ export function PropertiesView({
         </div>
 
         {/* Contenido Central: Título y Párrafo */}
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-center items-center text-center pt-28 sm:pt-32 lg:pt-36 pb-16 sm:pb-20 space-y-6 sm:space-y-8">
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-center items-center text-center pt-24 sm:pt-28 lg:pt-32 pb-14 sm:pb-16 lg:pb-18 space-y-4 sm:space-y-6 select-text cursor-default">
           {/* Insignia arquitectónica animada en SVG */}
-          <AnimatedInsignia className="mb-0 sm:mb-1" size={76} />
+          <AnimatedInsignia className="mb-0 sm:mb-1" size={60} />
 
           <ScrollReveal direction="down" delay={0.05}>
             <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#5be196] drop-shadow-xs">
@@ -235,7 +231,7 @@ export function PropertiesView({
           </ScrollReveal>
 
           <ScrollReveal direction="down" delay={0.15}>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.08] tracking-tight [text-wrap:balance] drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black text-white leading-[1.1] tracking-tight [text-wrap:balance] drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
               Lotes urbanizados y proyectos con
               <br />
               <span className="text-[#5be196]">escrituras inmediatas</span>{' '}
@@ -244,7 +240,7 @@ export function PropertiesView({
           </ScrollReveal>
 
           <ScrollReveal direction="up" delay={0.25}>
-            <p className="text-base sm:text-lg lg:text-xl text-slate-100 leading-relaxed font-normal max-w-3xl drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">
+            <p className="text-sm sm:text-base lg:text-lg text-slate-100 leading-relaxed font-normal max-w-3xl drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">
               Propiedades legalizadas con vías concluidas, alcantarillado, acometidas soterradas y crédito directo de hasta 48 meses. Elige tu terreno y agenda tu visita guiada en obra.
             </p>
           </ScrollReveal>
@@ -254,174 +250,144 @@ export function PropertiesView({
       {/* =========================================================================
           2. SECCIÓN: "FILTRO MODERNO & CATÁLOGO DE PROPIEDADES (Blanco Puro)"
           ========================================================================= */}
-      <section className="relative w-full bg-white text-slate-900 py-10 sm:py-16 overflow-hidden">
-        <div className="relative z-10 mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 space-y-8">
+      <section className="relative w-full bg-white text-slate-900 pt-4 sm:pt-10 pb-6 sm:pb-8 overflow-hidden">
+        <div className="relative z-10 mx-auto max-w-[1440px] px-1 sm:px-4 lg:px-8 space-y-3.5 sm:space-y-6">
           
-          {/* BARRA SUPERIOR: SOLO BARRA DE BÚSQUEDA CON BOTÓN LIMPIAR */}
-          <ScrollReveal direction="down" delay={0.1} className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-full border border-slate-200/90 p-2 sm:p-2.5 shadow-md flex items-center justify-between gap-3">
-            <div className="relative flex-1">
-              <Search className="h-4 w-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Buscar por código de lote (ej: MV-102), sector, metraje..."
-                className="w-full bg-transparent pl-11 pr-10 py-2.5 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none font-medium"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer transition-colors"
-                  title="Borrar texto"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              )}
-            </div>
-
-            {/* Mobile Filter Toggle Button */}
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setShowMobileFilters(!showMobileFilters)}
-                className="lg:hidden px-4 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                <SlidersHorizontal className="h-3.5 w-3.5 text-[#22A33D]" />
-                <span>Filtros</span>
-                {(selectedTypes.length + selectedStatuses.length + selectedCategories.length + (maxPrice < 120000 ? 1 : 0) + (minArea > 0 ? 1 : 0)) > 0 && (
-                  <span className="w-4 h-4 rounded-full bg-[#22A33D] text-white text-[10px] font-bold flex items-center justify-center">
-                    {selectedTypes.length + selectedStatuses.length + selectedCategories.length + (maxPrice < 120000 ? 1 : 0) + (minArea > 0 ? 1 : 0)}
-                  </span>
+          {/* BARRA SUPERIOR: SOLO BARRA DE BÚSQUEDA */}
+          <div ref={searchBarRef} className="scroll-mt-20 sm:scroll-mt-24" />
+          <ScrollReveal direction="down" delay={0.1} className="w-full">
+            <div className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-full border border-slate-200/90 p-1 sm:p-2.5 shadow-xs hover:shadow-md transition-shadow flex items-center gap-2 sm:gap-3">
+              <div className="relative flex-1">
+                <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4 absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Buscar por código (ej: MV-102), sector, metraje..."
+                  className="w-full bg-transparent pl-8 sm:pl-11 pr-8 sm:pr-10 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none font-medium"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer transition-colors"
+                    title="Borrar texto"
+                  >
+                    <X className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                  </button>
                 )}
-              </button>
-
-              {/* Botón Limpiar */}
-              {hasAnyFilterActive && (
-                <button
-                  type="button"
-                  onClick={resetFilters}
-                  title="Limpiar todos los filtros"
-                  className="px-4 sm:px-5 py-2.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer shadow-xs active:scale-95"
-                >
-                  <RotateCcw className="h-3.5 w-3.5" />
-                  <span>Limpiar</span>
-                </button>
-              )}
+              </div>
             </div>
           </ScrollReveal>
 
-          {/* MAIN CONTAINER: SIDEBAR A LA IZQUIERDA + PROPIEDADES A LA DERECHA */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-2">
+          {/* MAIN CONTAINER: SIDEBAR A LA IZQUIERDA (MÓVIL Y PC) + PROPIEDADES A LA DERECHA */}
+          <div className="flex gap-2 sm:gap-3.5 lg:gap-7 items-start pt-0.5 sm:pt-1">
             
-            {/* LADO IZQUIERDO: PANEL DE FILTROS SIN CONTENEDOR (DIRECTO SOBRE EL FONDO) */}
-            <aside className={`lg:col-span-4 xl:col-span-3 space-y-6 ${showMobileFilters ? 'block' : 'hidden lg:block'}`}>
-              <ScrollReveal direction="left" delay={0.15} className="space-y-6 sticky top-24 pr-1">
+            {/* LADO IZQUIERDO: BARRA DE FILTROS EN MÓVIL Y PC (MÁS ANCHA Y CÓMODA EN MÓVIL) */}
+            <aside className="w-[105px] min-[390px]:w-[118px] sm:w-[140px] md:w-[190px] lg:w-[250px] xl:w-[270px] shrink-0 sticky top-16 sm:top-24 max-h-[calc(100vh-4.5rem)] overflow-y-auto scrollbar-thin bg-slate-50/90 sm:bg-transparent p-2 sm:p-2.5 lg:p-0 rounded-2xl sm:rounded-none border border-slate-200/80 sm:border-none space-y-3 sm:space-y-5">
+              <ScrollReveal direction="left" delay={0.15} className="space-y-3 sm:space-y-5 pr-0.5 sm:pr-1">
                 
-                {/* Header Opciones de Filtro con botón Limpiar idéntico al de la barra de búsqueda */}
-                <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-200/80">
-                  <h3 className="text-lg font-bold text-slate-900 tracking-tight">
-                    Opciones de Filtro
+                {/* Header Opciones de Filtro */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pb-2 sm:pb-2.5 border-b border-slate-200/80">
+                  <h3 className="text-xs sm:text-base font-bold text-slate-900 tracking-tight flex items-center justify-center sm:justify-start gap-1">
+                    <SlidersHorizontal className="h-3 w-3 sm:h-4 sm:w-4 text-[#22A33D] shrink-0" />
+                    <span>Filtros</span>
                   </h3>
                   {hasAnyFilterActive && (
                     <button
                       type="button"
                       onClick={resetFilters}
                       title="Limpiar todos los filtros"
-                      className="px-3.5 py-1.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer shadow-xs active:scale-95"
+                      className="px-2 sm:px-2.5 py-1 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 text-[10px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1 shrink-0 cursor-pointer shadow-2xs active:scale-95 w-full sm:w-auto"
                     >
-                      <RotateCcw className="h-3.5 w-3.5" />
+                      <RotateCcw className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                       <span>Limpiar</span>
                     </button>
                   )}
                 </div>
 
                 {/* 1. Por Categoría / Tipo */}
-                <div className="space-y-3 pb-5 border-b border-slate-200/70">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                    Por Categoría
+                <div className="space-y-1.5 sm:space-y-2.5 pb-2.5 sm:pb-4 border-b border-slate-200/70">
+                  <h4 className="text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-800 text-center sm:text-left">
+                    Categoría
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-1 sm:space-y-1.5">
                     {[
-                      { label: 'Lotes de Terreno', value: 'Lote de Terreno' },
-                      { label: 'Villas & Casas', value: 'Vivienda' },
-                      { label: 'Proyectos en Planos', value: 'Proyecto en Planos' },
+                      { labelDesktop: 'Lotes de Terreno', labelMobile: 'Lotes', value: 'Lote de Terreno' },
+                      { labelDesktop: 'Villas & Casas', labelMobile: 'Villas', value: 'Vivienda' },
+                      { labelDesktop: 'Proyectos Planos', labelMobile: 'Planos', value: 'Proyecto en Planos' },
                     ].map((item) => {
                       const isChecked = selectedTypes.includes(item.value);
                       return (
-                        <label
+                        <button
                           key={item.value}
+                          type="button"
                           onClick={() => toggleType(item.value)}
-                          className="flex items-center gap-3 py-1 cursor-pointer group select-none"
-                        >
-                          <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
+                          className={`w-full py-1.5 px-1.5 sm:px-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all text-center sm:text-left flex items-center justify-center sm:justify-start gap-1 sm:gap-2 cursor-pointer ${
                             isChecked
-                              ? 'bg-[#22A33D] border-[#22A33D] text-white shadow-xs'
-                              : 'border-slate-300 bg-white group-hover:border-slate-400'
+                              ? 'bg-[#22A33D] text-white shadow-xs font-bold'
+                              : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200/80 sm:border-transparent'
+                          }`}
+                        >
+                          <div className={`hidden sm:flex w-3.5 h-3.5 rounded border items-center justify-center shrink-0 ${
+                            isChecked ? 'bg-white text-[#22A33D] border-white' : 'border-slate-300 bg-white'
                           }`}>
-                            {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                            {isChecked && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                           </div>
-                          <span className={`text-xs sm:text-sm transition-colors ${
-                            isChecked ? 'font-bold text-slate-900' : 'text-slate-600 group-hover:text-slate-900'
-                          }`}>
-                            {item.label}
+                          <span className="truncate">
+                            <span className="hidden sm:inline">{item.labelDesktop}</span>
+                            <span className="sm:hidden">{item.labelMobile}</span>
                           </span>
-                        </label>
+                        </button>
                       );
                     })}
                   </div>
                 </div>
 
                 {/* 2. Disponibilidad */}
-                <div className="space-y-3 pb-5 border-b border-slate-200/70">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                    Disponibilidad
+                <div className="space-y-1.5 sm:space-y-2.5 pb-2.5 sm:pb-4 border-b border-slate-200/70">
+                  <h4 className="text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-800 text-center sm:text-left">
+                    Estado
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-1 sm:space-y-1.5">
                     {[
-                      { label: 'Disponibles', value: 'Disponible', dot: 'bg-[#25D366]' },
-                      { label: 'En Reserva', value: 'En Reserva', dot: 'bg-amber-400' },
-                      { label: 'Vendidos', value: 'Vendido', dot: 'bg-slate-300' },
+                      { labelDesktop: 'Disponibles', labelMobile: 'Disponibles', value: 'Disponible', dot: 'bg-[#25D366]' },
+                      { labelDesktop: 'En Reserva', labelMobile: 'Reserva', value: 'En Reserva', dot: 'bg-amber-400' },
+                      { labelDesktop: 'Vendidos', labelMobile: 'Vendidos', value: 'Vendido', dot: 'bg-slate-300' },
                     ].map((item) => {
                       const isChecked = selectedStatuses.includes(item.value);
                       return (
-                        <label
+                        <button
                           key={item.value}
+                          type="button"
                           onClick={() => toggleStatus(item.value)}
-                          className="flex items-center gap-3 py-1 cursor-pointer group select-none"
-                        >
-                          <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
+                          className={`w-full py-1.5 px-1.5 sm:px-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all text-center sm:text-left flex items-center justify-center sm:justify-start gap-1.5 cursor-pointer ${
                             isChecked
-                              ? 'bg-[#22A33D] border-[#22A33D] text-white shadow-xs'
-                              : 'border-slate-300 bg-white group-hover:border-slate-400'
-                          }`}>
-                            {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
-                          </div>
-                          <span className="flex items-center gap-1.5 text-xs sm:text-sm text-slate-700">
-                            <span className={`w-2 h-2 rounded-full ${item.dot}`} />
-                            <span className={isChecked ? 'font-bold text-slate-900' : 'text-slate-600 group-hover:text-slate-900'}>
-                              {item.label}
-                            </span>
+                              ? 'bg-[#22A33D] text-white shadow-xs font-bold'
+                              : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200/80 sm:border-transparent'
+                          }`}
+                        >
+                          <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full shrink-0 ${item.dot}`} />
+                          <span className="truncate">
+                            <span className="hidden sm:inline">{item.labelDesktop}</span>
+                            <span className="sm:hidden">{item.labelMobile}</span>
                           </span>
-                        </label>
+                        </button>
                       );
                     })}
                   </div>
                 </div>
 
                 {/* 3. Precio */}
-                <div className="space-y-3 pb-5 border-b border-slate-200/70">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                      Presupuesto Máximo
+                <div className="space-y-1.5 sm:space-y-2.5 pb-2.5 sm:pb-4 border-b border-slate-200/70">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-0.5">
+                    <h4 className="text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-800 text-center sm:text-left">
+                      Precio
                     </h4>
-                    <span className="font-mono text-xs font-bold text-[#F58220] bg-orange-50 px-2 py-0.5 rounded-md border border-orange-200/60">
-                      ${maxPrice.toLocaleString()} USD
+                    <span className="font-mono text-[9px] sm:text-xs font-bold text-[#F58220] bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200/60 text-center inline-block w-fit mx-auto sm:mx-0">
+                      <span className="sm:hidden">${Math.round(maxPrice / 1000)}k</span>
+                      <span className="hidden sm:inline">${maxPrice.toLocaleString()}</span>
                     </span>
-                  </div>
-                  <div className="text-[11px] text-slate-500 font-mono flex justify-between">
-                    <span>$20,000</span>
-                    <span>$120,000</span>
                   </div>
                   <input
                     type="range"
@@ -435,45 +401,47 @@ export function PropertiesView({
                 </div>
 
                 {/* 4. Categoría del Terreno */}
-                <div className="space-y-3 pb-5 border-b border-slate-200/70">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                    Categoría del Terreno
+                <div className="space-y-1.5 sm:space-y-2.5 pb-2.5 sm:pb-4 border-b border-slate-200/70">
+                  <h4 className="text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-800 text-center sm:text-left">
+                    Tipo
                   </h4>
-                  <div className="space-y-2">
-                    {['Residencial', 'Esquinero', 'Comercial', 'Campestre'].map((cat) => {
-                      const isChecked = selectedCategories.includes(cat);
+                  <div className="space-y-1 sm:space-y-1.5">
+                    {[
+                      { labelDesktop: 'Residencial', labelMobile: 'Residencial', value: 'Residencial' },
+                      { labelDesktop: 'Esquinero', labelMobile: 'Esquinero', value: 'Esquinero' },
+                      { labelDesktop: 'Comercial', labelMobile: 'Comercial', value: 'Comercial' },
+                      { labelDesktop: 'Campestre', labelMobile: 'Campestre', value: 'Campestre' },
+                    ].map((cat) => {
+                      const isChecked = selectedCategories.includes(cat.value);
                       return (
-                        <label
-                          key={cat}
-                          onClick={() => toggleCategory(cat)}
-                          className="flex items-center gap-3 py-1 cursor-pointer group select-none"
-                        >
-                          <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
+                        <button
+                          key={cat.value}
+                          type="button"
+                          onClick={() => toggleCategory(cat.value)}
+                          className={`w-full py-1.5 px-1.5 sm:px-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all text-center sm:text-left flex items-center justify-center sm:justify-start gap-1 cursor-pointer ${
                             isChecked
-                              ? 'bg-[#22A33D] border-[#22A33D] text-white shadow-xs'
-                              : 'border-slate-300 bg-white group-hover:border-slate-400'
-                          }`}>
-                            {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
-                          </div>
-                          <span className={`text-xs sm:text-sm transition-colors ${
-                            isChecked ? 'font-bold text-slate-900' : 'text-slate-600 group-hover:text-slate-900'
-                          }`}>
-                            {cat}
+                              ? 'bg-[#22A33D] text-white shadow-xs font-bold'
+                              : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200/80 sm:border-transparent'
+                          }`}
+                        >
+                          <span className="truncate">
+                            <span className="hidden sm:inline">{cat.labelDesktop}</span>
+                            <span className="sm:hidden">{cat.labelMobile}</span>
                           </span>
-                        </label>
+                        </button>
                       );
                     })}
                   </div>
                 </div>
 
                 {/* 5. Área Mínima de Terreno (m²) */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                      Área Mínima
+                <div className="space-y-1.5 sm:space-y-2.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-0.5">
+                    <h4 className="text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-800 text-center sm:text-left">
+                      Área
                     </h4>
-                    <span className="font-mono text-xs font-bold text-[#22A33D]">
-                      {minArea > 0 ? `${minArea} m²` : 'Cualquiera'}
+                    <span className="font-mono text-[9px] sm:text-xs font-bold text-[#22A33D] text-center inline-block mx-auto sm:mx-0">
+                      {minArea > 0 ? `≥${minArea}m²` : 'Todas'}
                     </span>
                   </div>
                   <input
@@ -489,90 +457,138 @@ export function PropertiesView({
               </ScrollReveal>
             </aside>
 
-            {/* LADO DERECHO: CONTADOR Y GRID DE PROPIEDADES */}
-            <main className="lg:col-span-8 xl:col-span-9 space-y-6">
+            {/* LADO DERECHO: CONTADOR Y GRID DE PROPIEDADES (2 POR FILA EN MÓVIL) */}
+            <main className="flex-1 min-w-0 space-y-3 sm:space-y-5">
               
               {/* Results Count & Removable Active Chips */}
-              <ScrollReveal direction="right" delay={0.1} className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600 pb-1 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-[#22A33D]" />
+              <ScrollReveal direction="right" delay={0.1} className="flex flex-wrap items-center justify-between gap-1.5 sm:gap-3 text-[10px] sm:text-xs text-slate-600 pb-1 border-b border-slate-100">
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-[#22A33D]" />
                   <span>
-                    Mostrando <strong className="text-slate-950 font-bold">{filteredLots.length}</strong> de{' '}
-                    {properties.length} propiedades
+                    <strong className="text-slate-950 font-bold">{filteredLots.length}</strong> de{' '}
+                    {properties.length}
                   </span>
                 </div>
 
                 {/* Removable chips */}
-                <div className="flex flex-wrap items-center gap-1.5">
+                <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
                   {selectedTypes.map((t) => (
-                    <span key={t} className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-800 text-[11px] font-semibold">
-                      Tipo: {t}
+                    <span key={t} className="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-slate-100 text-slate-800 text-[9px] sm:text-[11px] font-semibold">
+                      {t}
                       <button type="button" onClick={() => toggleType(t)} className="hover:text-rose-600 cursor-pointer ml-0.5">
-                        <X className="h-3 w-3" />
+                        <X className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                       </button>
                     </span>
                   ))}
                   {selectedStatuses.map((s) => (
-                    <span key={s} className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-800 text-[11px] font-semibold">
-                      Estado: {s}
+                    <span key={s} className="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-slate-100 text-slate-800 text-[9px] sm:text-[11px] font-semibold">
+                      {s}
                       <button type="button" onClick={() => toggleStatus(s)} className="hover:text-rose-600 cursor-pointer ml-0.5">
-                        <X className="h-3 w-3" />
+                        <X className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                       </button>
                     </span>
                   ))}
                   {selectedCategories.map((c) => (
-                    <span key={c} className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-800 text-[11px] font-semibold">
-                      Cat: {c}
+                    <span key={c} className="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-slate-100 text-slate-800 text-[9px] sm:text-[11px] font-semibold">
+                      {c}
                       <button type="button" onClick={() => toggleCategory(c)} className="hover:text-rose-600 cursor-pointer ml-0.5">
-                        <X className="h-3 w-3" />
+                        <X className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                       </button>
                     </span>
                   ))}
                   {maxPrice < 120000 && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-orange-50 text-[#ea580c] border border-orange-200 text-[11px] font-semibold">
-                      ${maxPrice.toLocaleString()} USD
+                    <span className="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-orange-50 text-[#ea580c] border border-orange-200 text-[9px] sm:text-[11px] font-semibold">
+                      ${maxPrice.toLocaleString()}
                       <button type="button" onClick={() => setMaxPrice(120000)} className="hover:text-rose-600 cursor-pointer ml-0.5">
-                        <X className="h-3 w-3" />
+                        <X className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                       </button>
                     </span>
                   )}
                   {minArea > 0 && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-900 border border-emerald-200 text-[11px] font-semibold">
-                      Área ≥ {minArea} m²
+                    <span className="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-900 border border-emerald-200 text-[9px] sm:text-[11px] font-semibold">
+                      ≥ {minArea} m²
                       <button type="button" onClick={() => setMinArea(0)} className="hover:text-rose-600 cursor-pointer ml-0.5">
-                        <X className="h-3 w-3" />
+                        <X className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                       </button>
                     </span>
                   )}
                 </div>
               </ScrollReveal>
 
-              {/* Grid or Empty State - Tarjetas más anchas en 2 columnas */}
+              {/* Grid or Empty State - 1 POR FILA EN MÓVIL (5 TARJETAS CON FLECHAS DE NAVEGACIÓN), 2 EN TABLET, 3-4 EN PC */}
               {filteredLots.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-7 lg:gap-8">
-                  {filteredLots.map((lot, idx) => (
-                    <ScrollReveal
-                      key={lot.id}
-                      direction="up"
-                      delay={(idx % 4) * 0.08}
-                      duration={0.55}
-                    >
-                      <PropertyCard
-                        lot={lot}
-                        dark={false}
-                        onSelectLot={onSelectLot}
-                        onOpenVisitModal={onOpenVisitModal}
-                      />
-                    </ScrollReveal>
-                  ))}
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+                    {filteredLots.map((lot, idx) => {
+                      const isVisibleOnMobile =
+                        idx >= (mobilePage - 1) * MOBILE_PAGE_SIZE &&
+                        idx < mobilePage * MOBILE_PAGE_SIZE;
+
+                      return (
+                        <ScrollReveal
+                          key={lot.id}
+                          direction="up"
+                          delay={(idx % 5) * 0.06}
+                          duration={0.45}
+                          className={`w-full flex justify-center ${isVisibleOnMobile ? 'flex' : 'hidden sm:flex'}`}
+                        >
+                          <PropertyCard
+                            lot={lot}
+                            dark={false}
+                            onSelectLot={onSelectLot}
+                            onOpenVisitModal={onOpenVisitModal}
+                          />
+                        </ScrollReveal>
+                      );
+                    })}
+                  </div>
+
+                  {/* Flechas de navegación solo en móvil después de la 5ª tarjeta */}
+                  {totalMobilePages > 1 && (
+                    <div className="sm:hidden pt-3 pb-3 flex items-center justify-center gap-2.5 w-full">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMobilePage((p) => Math.max(1, p - 1));
+                          scrollToSearchBar();
+                        }}
+                        disabled={mobilePage === 1}
+                        aria-label="Página anterior"
+                        className="h-10 px-3.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95 disabled:opacity-30 disabled:pointer-events-none disabled:shadow-none bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
+                      >
+                        <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
+                        <span>Anterior</span>
+                      </button>
+
+                      <div className="flex items-center justify-center px-3.5 h-10 rounded-xl bg-slate-100 border border-slate-200/90 font-mono text-xs font-bold text-slate-800">
+                        <span className="text-[#22A33D] font-black">{mobilePage}</span>
+                        <span className="text-slate-400 mx-1">/</span>
+                        <span>{totalMobilePages}</span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMobilePage((p) => Math.min(totalMobilePages, p + 1));
+                          scrollToSearchBar();
+                        }}
+                        disabled={mobilePage === totalMobilePages}
+                        aria-label="Página siguiente"
+                        className="h-10 px-3.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95 disabled:opacity-30 disabled:pointer-events-none disabled:shadow-none bg-[#113d22] text-white hover:bg-[#F58220]"
+                      >
+                        <span>Siguiente</span>
+                        <ChevronRight className="w-4 h-4 stroke-[2.5]" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
-                <div className="text-center py-20 bg-white/80 backdrop-blur-md rounded-3xl border border-slate-200 p-8 shadow-sm max-w-xl mx-auto space-y-4">
-                  <div className="h-16 w-16 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-                    <Search className="h-8 w-8" />
+                <div className="text-center py-16 sm:py-20 bg-white/80 backdrop-blur-md rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm max-w-xl mx-auto space-y-4">
+                  <div className="h-14 w-14 sm:h-16 sm:w-16 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                    <Search className="h-7 w-7 sm:h-8 sm:w-8" />
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-lg font-bold text-slate-900">
+                    <h3 className="text-base sm:text-lg font-bold text-slate-900">
                       No hay propiedades con estos filtros
                     </h3>
                     <p className="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto">
@@ -582,7 +598,7 @@ export function PropertiesView({
                   <button
                     type="button"
                     onClick={resetFilters}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-950 text-white font-bold text-xs hover:bg-[#22A33D] transition-all cursor-pointer shadow-md active:scale-95"
+                    className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full bg-slate-950 text-white font-bold text-xs hover:bg-[#22A33D] transition-all cursor-pointer shadow-md active:scale-95"
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
                     <span>Restablecer Filtros</span>

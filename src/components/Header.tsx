@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { LogoMGM } from './LogoMGM';
-import { Menu, X, CalendarCheck2, Lock } from 'lucide-react';
+import { CalendarCheck2, Lock } from 'lucide-react';
 import { WhatsAppIcon } from './SocialIcons';
 import { getGeneralWhatsAppUrl } from '@/src/data/lots';
 
@@ -21,7 +21,6 @@ export function Header({
   onOpenVisitModal,
 }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -114,20 +113,8 @@ export function Header({
           })}
         </nav>
 
-        {/* Zona Derecha: Acciones Principales y Menú Móvil */}
+        {/* Zona Derecha: Acciones Principales */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          {/* Botón WhatsApp */}
-          <a
-            href={getGeneralWhatsAppUrl()}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Contactar por WhatsApp Oficial"
-            className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-xs sm:text-sm transition-all shadow-[0_2px_10px_rgba(0,0,0,0.35)] hover:shadow-lg hover:scale-105 active:scale-95 cursor-pointer"
-          >
-            <WhatsAppIcon size={17} className="text-white shrink-0 drop-shadow-xs" />
-            <span className="hidden sm:inline">WhatsApp</span>
-          </a>
-
           {/* CTA Agendar Visita en Desktop Grande */}
           {onOpenVisitModal && (
             <button
@@ -139,7 +126,19 @@ export function Header({
             </button>
           )}
 
-          {/* Acceso CMS Admin */}
+          {/* Botón WhatsApp - Ahora toma el lugar que tenía el Administrador */}
+          <a
+            href={getGeneralWhatsAppUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Contactar por WhatsApp Oficial"
+            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-xs sm:text-sm transition-all shadow-[0_2px_10px_rgba(0,0,0,0.35)] hover:shadow-lg hover:scale-105 active:scale-95 cursor-pointer"
+          >
+            <WhatsAppIcon size={17} className="text-white shrink-0 drop-shadow-xs" />
+            <span className="hidden sm:inline">WhatsApp</span>
+          </a>
+
+          {/* Acceso CMS Admin - Ahora en el lugar donde estaba el botón hamburguesa */}
           <a
             href={getPageCanonicalHash('admin')}
             onClick={(e) => {
@@ -147,84 +146,19 @@ export function Header({
               onNavigate('admin');
             }}
             title="Panel Administrativo CMS"
-            className={`h-9 w-9 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+            className={`h-9 w-9 sm:h-10 sm:w-10 rounded-full flex items-center justify-center transition-all cursor-pointer ${
               currentPage === 'admin'
                 ? 'bg-white text-slate-900 shadow-xs'
                 : isScrolled
-                ? 'text-white/70 hover:text-white hover:bg-white/15'
-                : 'text-white bg-black/25 hover:bg-black/40 border border-white/20 drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]'
+                ? 'text-white/80 hover:text-white bg-white/10 hover:bg-white/20'
+                : 'text-white bg-black/30 hover:bg-black/45 border border-white/25 drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]'
             }`}
             aria-label="Panel CMS de Administración"
           >
-            <Lock className="h-3.5 w-3.5" />
+            <Lock className="h-4 w-4" />
           </a>
-
-          {/* Toggle Menú Hamburguesa Móvil (Desaparecido en AboutView) */}
-          {currentPage !== 'about' && (
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`h-10 w-10 md:hidden rounded-full flex items-center justify-center transition-colors cursor-pointer shadow-sm ${
-                isScrolled
-                  ? 'bg-white/10 hover:bg-white/20 text-white'
-                  : 'bg-black/30 hover:bg-black/45 text-white border border-white/25 drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]'
-              }`}
-              aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
-          )}
         </div>
       </div>
-
-      {/* Menú Desplegable Móvil */}
-      {mobileMenuOpen && currentPage !== 'about' && (
-        <div className="md:hidden bg-[#113d22] border-t border-white/10 px-6 py-4 space-y-2.5 shadow-2xl animate-in slide-in-from-top-2 duration-200">
-          {navLinks.map((link) => (
-            <a
-              key={link.id}
-              href={link.hash}
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate(link.id);
-                setMobileMenuOpen(false);
-              }}
-              className={`block w-full text-left py-2 px-3 rounded-lg text-base font-bold transition-colors ${
-                currentPage === link.id
-                  ? 'text-[#5be196] bg-white/10 font-extrabold'
-                  : 'text-white/90 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              {link.label}
-            </a>
-          ))}
-
-          <div className="pt-3 border-t border-white/10 flex flex-col gap-2">
-            <a
-              href={getGeneralWhatsAppUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-2.5 w-full py-2.5 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-sm shadow-md active:scale-98 transition-all"
-            >
-              <WhatsAppIcon size={18} className="text-white shrink-0" />
-              <span>WhatsApp Oficial</span>
-            </a>
-
-            {onOpenVisitModal && (
-              <button
-                onClick={() => {
-                  onOpenVisitModal();
-                  setMobileMenuOpen(false);
-                }}
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#F58220] hover:bg-[#e07316] text-white font-bold text-sm shadow-md active:scale-98 transition-all cursor-pointer"
-              >
-                <CalendarCheck2 className="h-4 w-4" />
-                <span>Agendar Visita</span>
-              </button>
-            )}
-          </div>
-        </div>
-      )}
     </header>
   );
 }
