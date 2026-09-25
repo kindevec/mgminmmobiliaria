@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Home, Award, Layers, Trees, MessageSquare } from 'lucide-react';
+import { getPageCanonicalHash } from '@/src/data/navigation';
 import type { PageView } from './Header';
 
 interface BottomNavProps {
@@ -47,11 +48,13 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
       <div className="flex items-center justify-around px-2">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = currentPage === item.id;
+          const isActive = currentPage === item.id || (item.id === 'properties' && currentPage === 'property-detail');
           return (
-            <button
+            <a
               key={item.id}
-              onClick={() => {
+              href={getPageCanonicalHash(item.id)}
+              onClick={(e) => {
+                e.preventDefault();
                 onNavigate(item.id);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
@@ -100,7 +103,7 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
               >
                 {item.label}
               </span>
-            </button>
+            </a>
           );
         })}
       </div>

@@ -35,22 +35,30 @@ export const metadata: Metadata = {
       'Lotes urbanizados con escrituras al día, servicios soterrados y proyectos exclusivos como Ciudadela Miravalle. Invierte con respaldo legal.',
     type: 'website',
     locale: 'es_EC',
-    siteName: 'MGM Inmobiliaria',
+    siteName: 'Sociedad Civil MGM Inmobiliaria',
     images: [
       {
-        url: '/opengraph-image',
-        width: 1200,
-        height: 630,
+        url: '/og-image.jpg',
+        width: 800,
+        height: 800,
         alt: 'Sociedad Civil MGM Inmobiliaria - Logotipo Oficial',
+        type: 'image/jpeg',
+      },
+      {
+        url: '/og-image-square.jpg',
+        width: 800,
+        height: 800,
+        alt: 'Sociedad Civil MGM Inmobiliaria - Logo Cuadrado',
+        type: 'image/jpeg',
       },
     ],
   },
   twitter: {
-    card: 'summary_large_image',
+    card: 'summary',
     title: 'MGM Inmobiliaria | Lotes y Proyectos Residenciales en Ecuador',
     description:
       'Lotes urbanizados con escrituras al día, servicios soterrados y proyectos como Ciudadela Miravalle.',
-    images: ['/opengraph-image'],
+    images: ['/og-image.jpg'],
   },
   icons: {
     icon: '/logo-mgm.svg',

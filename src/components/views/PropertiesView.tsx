@@ -24,6 +24,8 @@ import {
 import { useProperties } from '@/src/context/PropertyContext';
 import type { LotProperty } from '@/src/data/lots';
 import { PropertyCard } from '../PropertyCard';
+import { ScrollReveal } from '../common/ScrollReveal';
+import { AnimatedInsignia } from '../common/AnimatedInsignia';
 
 const PROPERTIES_HERO_IMAGES = [
   {
@@ -156,93 +158,96 @@ export function PropertiesView({
   return (
     <div className="w-full overflow-hidden bg-white text-slate-900">
       {/* =========================================================================
-          1. BANNER CINEMÁTICO — 50/50 SLIDER (PALETA CORPORATIVA LOGO MGM)
+          1. BANNER CINEMÁTICO — PANORÁMICO INTEGRAL (SIN PARTICIONES VERTICALES)
           ========================================================================= */}
-      <section className="relative w-full bg-[#113d22] text-white overflow-hidden">
-        <div className="w-full grid grid-cols-1 lg:grid-cols-2 min-h-[640px] sm:min-h-[720px] lg:min-h-[800px] xl:min-h-[860px]">
-          
-          {/* LADO IZQUIERDO: 50% - Panel Verde MGM (#113d22) con Título y Párrafo (Sin botones ni iconos) */}
-          <div className="bg-[#113d22] flex flex-col justify-center items-center text-center px-6 sm:px-10 md:px-12 lg:px-14 xl:px-18 pt-36 sm:pt-44 lg:pt-48 pb-14 sm:pb-18 lg:pb-22 z-10 space-y-6 sm:space-y-8 max-w-3xl mx-auto">
-            
-            {/* Título Principal con Acento Verde y Naranja MGM */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.08] tracking-tight [text-wrap:balance] text-center mx-auto">
+      <section className="relative w-full bg-[#113d22] text-white overflow-hidden min-h-[600px] sm:min-h-[660px] lg:min-h-[720px] flex items-center justify-center">
+        {/* Fondo fotográfico panorámico continuo (100% de la pantalla) */}
+        <div
+          className="absolute inset-0 w-full h-full overflow-hidden select-none"
+          onMouseEnter={() => setHeroHovered(true)}
+          onMouseLeave={() => setHeroHovered(false)}
+        >
+          {PROPERTIES_HERO_IMAGES.map((img, idx) => (
+            <div
+              key={idx}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                heroImgIndex === idx ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <Image
+                src={img.url}
+                alt={img.alt}
+                fill
+                priority={idx === 0}
+                sizes="100vw"
+                className="object-cover object-center transform transition-transform duration-7000 ease-out hover:scale-105"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+          ))}
+
+          {/* Degradado corporativo idéntico al banner de Contacto — Luminoso, limpio y continuo */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#113d22]/85 via-black/55 to-[#113d22]/90 pointer-events-none" />
+
+          {/* Flechas de navegación discretas a los costados */}
+          <button
+            type="button"
+            onClick={prevHeroImage}
+            aria-label="Imagen anterior"
+            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-[#22A33D] text-white backdrop-blur-md border border-white/20 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer opacity-70 hover:opacity-100"
+          >
+            <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
+          </button>
+
+          <button
+            type="button"
+            onClick={nextHeroImage}
+            aria-label="Siguiente imagen"
+            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-[#22A33D] text-white backdrop-blur-md border border-white/20 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer opacity-70 hover:opacity-100"
+          >
+            <ChevronRight className="w-6 h-6 stroke-[2.5]" />
+          </button>
+
+          {/* Indicadores de diapositiva */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15">
+            {PROPERTIES_HERO_IMAGES.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setHeroImgIndex(i)}
+                aria-label={`Ver imagen ${i + 1}`}
+                className={`h-2 rounded-full transition-all cursor-pointer ${
+                  heroImgIndex === i ? 'w-6 bg-[#5be196]' : 'w-2 bg-white/50 hover:bg-white'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Contenido Central: Título y Párrafo */}
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-center items-center text-center pt-28 sm:pt-32 lg:pt-36 pb-16 sm:pb-20 space-y-6 sm:space-y-8">
+          {/* Insignia arquitectónica animada en SVG */}
+          <AnimatedInsignia className="mb-0 sm:mb-1" size={76} />
+
+          <ScrollReveal direction="down" delay={0.05}>
+            <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#5be196] drop-shadow-xs">
+              Catálogo Oficial de Propiedades
+            </span>
+          </ScrollReveal>
+
+          <ScrollReveal direction="down" delay={0.15}>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.08] tracking-tight [text-wrap:balance] drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
               Lotes urbanizados y proyectos con
               <br />
               <span className="text-[#5be196]">escrituras inmediatas</span>{' '}
               <span className="text-[#F58220]">&amp; crédito directo</span>.
             </h1>
+          </ScrollReveal>
 
-            {/* Párrafo Descriptivo */}
-            <p className="text-base sm:text-lg lg:text-xl text-slate-200/90 leading-relaxed font-normal max-w-2xl text-center mx-auto">
+          <ScrollReveal direction="up" delay={0.25}>
+            <p className="text-base sm:text-lg lg:text-xl text-slate-100 leading-relaxed font-normal max-w-3xl drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">
               Propiedades legalizadas con vías concluidas, alcantarillado, acometidas soterradas y crédito directo de hasta 48 meses. Elige tu terreno y agenda tu visita guiada en obra.
             </p>
-
-          </div>
-
-          {/* LADO DERECHO: 50% - Carrusel Continuo Inmobiliario con Difuminación Perfecta */}
-          <div
-            className="relative w-full h-[460px] sm:h-[560px] lg:h-full min-h-[460px] sm:min-h-[560px] lg:min-h-full overflow-hidden group/hero-slider select-none bg-[#113d22]"
-            onMouseEnter={() => setHeroHovered(true)}
-            onMouseLeave={() => setHeroHovered(false)}
-          >
-            {/* Sombra suave inferior */}
-            <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 z-10 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
-
-            {/* Carrusel continuo de imágenes con máscara progresiva */}
-            <div className="hero-mask-blend absolute inset-0 w-full h-full">
-              {PROPERTIES_HERO_IMAGES.map((img, idx) => (
-                <div
-                  key={idx}
-                  className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                    heroImgIndex === idx ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none'
-                  }`}
-                >
-                  <Image
-                    src={img.url}
-                    alt={img.alt}
-                    fill
-                    priority={idx === 0}
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover object-center transform transition-transform duration-7000 ease-out hover:scale-105"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-              ))}
-            </div>
-
-            {/* Flechas de navegación a los costados: SOLO aparecen ambas simultáneamente al pasar el mouse por la imagen */}
-            <button
-              type="button"
-              onClick={prevHeroImage}
-              aria-label="Imagen anterior"
-              className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/45 hover:bg-[#22A33D] text-white hover:text-white backdrop-blur-md border border-white/20 shadow-2xl flex items-center justify-center opacity-0 group-hover/hero-slider:opacity-100 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer pointer-events-none group-hover/hero-slider:pointer-events-auto"
-            >
-              <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
-            </button>
-
-            <button
-              type="button"
-              onClick={nextHeroImage}
-              aria-label="Imagen siguiente"
-              className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/45 hover:bg-[#22A33D] text-white hover:text-white backdrop-blur-md border border-white/20 shadow-2xl flex items-center justify-center opacity-0 group-hover/hero-slider:opacity-100 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer pointer-events-none group-hover/hero-slider:pointer-events-auto"
-            >
-              <ChevronRight className="w-6 h-6 stroke-[2.5]" />
-            </button>
-
-            {/* Indicadores de diapositiva (visibles al interactuar con el carrusel) */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15 opacity-0 group-hover/hero-slider:opacity-100 transition-opacity duration-300">
-              {PROPERTIES_HERO_IMAGES.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setHeroImgIndex(i)}
-                  aria-label={`Ver imagen ${i + 1}`}
-                  className={`h-2 rounded-full transition-all cursor-pointer ${
-                    heroImgIndex === i ? 'w-6 bg-[#5be196]' : 'w-2 bg-white/50 hover:bg-white'
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 
@@ -253,7 +258,7 @@ export function PropertiesView({
         <div className="relative z-10 mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 space-y-8">
           
           {/* BARRA SUPERIOR: SOLO BARRA DE BÚSQUEDA CON BOTÓN LIMPIAR */}
-          <div className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-full border border-slate-200/90 p-2 sm:p-2.5 shadow-md flex items-center justify-between gap-3">
+          <ScrollReveal direction="down" delay={0.1} className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-full border border-slate-200/90 p-2 sm:p-2.5 shadow-md flex items-center justify-between gap-3">
             <div className="relative flex-1">
               <Search className="h-4 w-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
@@ -304,14 +309,14 @@ export function PropertiesView({
                 </button>
               )}
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* MAIN CONTAINER: SIDEBAR A LA IZQUIERDA + PROPIEDADES A LA DERECHA */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-2">
             
             {/* LADO IZQUIERDO: PANEL DE FILTROS SIN CONTENEDOR (DIRECTO SOBRE EL FONDO) */}
             <aside className={`lg:col-span-4 xl:col-span-3 space-y-6 ${showMobileFilters ? 'block' : 'hidden lg:block'}`}>
-              <div className="space-y-6 sticky top-24 pr-1">
+              <ScrollReveal direction="left" delay={0.15} className="space-y-6 sticky top-24 pr-1">
                 
                 {/* Header Opciones de Filtro con botón Limpiar idéntico al de la barra de búsqueda */}
                 <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-200/80">
@@ -481,15 +486,14 @@ export function PropertiesView({
                     className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#22A33D]"
                   />
                 </div>
-
-              </div>
+              </ScrollReveal>
             </aside>
 
             {/* LADO DERECHO: CONTADOR Y GRID DE PROPIEDADES */}
             <main className="lg:col-span-8 xl:col-span-9 space-y-6">
               
               {/* Results Count & Removable Active Chips */}
-              <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600 pb-1 border-b border-slate-100">
+              <ScrollReveal direction="right" delay={0.1} className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600 pb-1 border-b border-slate-100">
                 <div className="flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-[#22A33D]" />
                   <span>
@@ -541,19 +545,25 @@ export function PropertiesView({
                     </span>
                   )}
                 </div>
-              </div>
+              </ScrollReveal>
 
               {/* Grid or Empty State - Tarjetas más anchas en 2 columnas */}
               {filteredLots.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-7 lg:gap-8">
-                  {filteredLots.map((lot) => (
-                    <PropertyCard
+                  {filteredLots.map((lot, idx) => (
+                    <ScrollReveal
                       key={lot.id}
-                      lot={lot}
-                      dark={false}
-                      onSelectLot={onSelectLot}
-                      onOpenVisitModal={onOpenVisitModal}
-                    />
+                      direction="up"
+                      delay={(idx % 4) * 0.08}
+                      duration={0.55}
+                    >
+                      <PropertyCard
+                        lot={lot}
+                        dark={false}
+                        onSelectLot={onSelectLot}
+                        onOpenVisitModal={onOpenVisitModal}
+                      />
+                    </ScrollReveal>
                   ))}
                 </div>
               ) : (

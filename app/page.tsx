@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Header, type PageView } from '@/src/components/Header';
+import { Header } from '@/src/components/Header';
 import { BottomNav } from '@/src/components/BottomNav';
 import { Footer } from '@/src/components/Footer';
 import { WhatsAppFAB } from '@/src/components/WhatsAppFAB';
 import { VisitModal } from '@/src/components/VisitModal';
-import { LotDetailsModal } from '@/src/components/LotDetailsModal';
+import { PropertyDetailView } from '@/src/components/views/PropertyDetailView';
 import { InteractiveBackground } from '@/src/components/InteractiveBackground';
 import { HomeView } from '@/src/components/views/HomeView';
 import { AboutView } from '@/src/components/views/AboutView';
@@ -15,9 +15,14 @@ import { PropertiesView } from '@/src/components/views/PropertiesView';
 import { MiravalleView } from '@/src/components/views/MiravalleView';
 import { ContactView } from '@/src/components/views/ContactView';
 import { AdminView } from '@/src/components/views/AdminView';
-import { PropertyProvider } from '@/src/context/PropertyContext';
+import { PropertyProvider, useProperties } from '@/src/context/PropertyContext';
 import { ScrollToTop } from '@/src/components/ScrollToTop';
-import type { LotProperty } from '@/src/data/lots';
+import { LOTS_DATA, type LotProperty } from '@/src/data/lots';
+import {
+  type PageView,
+  PAGES_CONFIG,
+  resolvePageFromHash,
+} from '@/src/data/navigation';
 
 export default function HomePage() {
   return (
@@ -28,9 +33,9 @@ export default function HomePage() {
 }
 
 function HomePageContent() {
+  const { properties } = useProperties();
   const [currentPage, setCurrentPage] = useState<PageView>('home');
   const [selectedLot, setSelectedLot] = useState<LotProperty | null>(null);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isVisitModalOpen, setIsVisitModalOpen] = useState(false);
   const [visitInterest, setVisitInterest] = useState('Ciudadela Miravalle');
 
@@ -39,25 +44,87 @@ function HomePageContent() {
   const [filterType, setFilterType] = useState('Todos');
   const [filterMaxPrice, setFilterMaxPrice] = useState(100000);
 
-  // Handle URL hash navigation
+  // Sincronización robusta bidireccional con el hash de la URL (Back / Forward nativo)
   useEffect(() => {
-    const handleHash = () => {
-      const hash = window.location.hash.replace('#', '') as PageView;
-      const validPages: PageView[] = ['home', 'about', 'properties', 'miravalle', 'contact', 'admin'];
-      if (validPages.includes(hash)) {
-        setCurrentPage(hash);
+    const handleUrlSync = () => {
+      const rawHash = window.location.hash;
+      const targetPage = resolvePageFromHash(rawHash);
+      const pageConfig = PAGES_CONFIG[targetPage];
+
+      // 1. Actualizar el título de la página en la pestaña e historial del navegador
+      if (typeof document !== 'undefined' && pageConfig?.fullTitle) {
+        document.title = pageConfig.fullTitle;
       }
+
+      // 2. Comprobar si el hash incluye un lote específico (ej. #lote/vm-101 o #lotes/vm-101)
+      const cleanHash = decodeURIComponent(rawHash).replace(/^#\/?/, '').trim();
+      if (cleanHash.includes('/')) {
+        const parts = cleanHash.split('/');
+        const lotIdentifier = parts[1]?.toLowerCase();
+        if (lotIdentifier) {
+          const matchedLot =
+            properties.find(
+              (l) => l.code.toLowerCase() === lotIdentifier || l.id.toLowerCase() === lotIdentifier
+            ) ||
+            LOTS_DATA.find(
+              (l) => l.code.toLowerCase() === lotIdentifier || l.id.toLowerCase() === lotIdentifier
+            );
+          if (matchedLot) {
+            setSelectedLot(matchedLot);
+            if (typeof document !== 'undefined') {
+              document.title = `${matchedLot.code} - ${matchedLot.name} | MGM Inmobiliaria`;
+            }
+          }
+        }
+      }
+
+      // 3. Cambiar vista si es diferente y realizar scroll hacia arriba
+      setCurrentPage((prev) => {
+        if (prev !== targetPage) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        return targetPage;
+      });
     };
 
-    handleHash();
-    window.addEventListener('hashchange', handleHash);
-    return () => window.removeEventListener('hashchange', handleHash);
-  }, []);
+    // Sincronizar en carga inicial
+    handleUrlSync();
+
+    // Escuchar tanto hashchange como popstate para retroceder y avanzar con total fidelidad
+    window.addEventListener('hashchange', handleUrlSync);
+    window.addEventListener('popstate', handleUrlSync);
+
+    return () => {
+      window.removeEventListener('hashchange', handleUrlSync);
+      window.removeEventListener('popstate', handleUrlSync);
+    };
+  }, [properties]);
 
   const handleNavigate = (page: PageView) => {
+    const targetHash = PAGES_CONFIG[page]?.hash || 'inicio';
+    const currentHash = decodeURIComponent(window.location.hash)
+      .replace(/^#\/?/, '')
+      .toLowerCase()
+      .trim();
+
+    // 1. Cerrar modales abiertos
+    setIsVisitModalOpen(false);
+
+    // 2. Inmediatamente cambiar la vista en React sin depender de eventos asíncronos del navegador
     setCurrentPage(page);
-    window.location.hash = page;
+
+    // 3. Actualizar título de la página en la pestaña
+    if (typeof document !== 'undefined') {
+      document.title = PAGES_CONFIG[page]?.fullTitle || 'MGM Inmobiliaria';
+    }
+
+    // 4. Scroll suave hacia arriba
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // 5. Actualizar la URL si es diferente
+    if (currentHash !== targetHash && !(currentHash === '' && page === 'home')) {
+      window.location.hash = targetHash;
+    }
   };
 
   const handleHeroFilterSearch = (location: string, type: string, maxPrice: number) => {
@@ -76,7 +143,12 @@ function HomePageContent() {
 
   const handleSelectLot = (lot: LotProperty) => {
     setSelectedLot(lot);
-    setIsDetailsModalOpen(true);
+    setCurrentPage('property-detail');
+    if (typeof document !== 'undefined') {
+      document.title = `${lot.code} - ${lot.name} | MGM Inmobiliaria`;
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.location.hash = `lote/${encodeURIComponent(lot.code.toLowerCase())}`;
   };
 
   return (
@@ -145,6 +217,16 @@ function HomePageContent() {
             {currentPage === 'admin' && (
               <AdminView onNavigate={handleNavigate} />
             )}
+
+            {currentPage === 'property-detail' && (
+              <PropertyDetailView
+                lot={selectedLot || properties[0] || LOTS_DATA[0]}
+                allLots={properties.length > 0 ? properties : LOTS_DATA}
+                onNavigate={handleNavigate}
+                onSelectLot={handleSelectLot}
+                onOpenVisitModal={handleOpenVisitModal}
+              />
+            )}
           </motion.div>
         </AnimatePresence>
       </main>
@@ -166,16 +248,6 @@ function HomePageContent() {
         isOpen={isVisitModalOpen}
         onClose={() => setIsVisitModalOpen(false)}
         defaultInterest={visitInterest}
-      />
-
-      <LotDetailsModal
-        lot={selectedLot}
-        isOpen={isDetailsModalOpen}
-        onClose={() => setIsDetailsModalOpen(false)}
-        onOpenVisitModal={(code) => {
-          setIsDetailsModalOpen(false);
-          handleOpenVisitModal(code);
-        }}
       />
     </div>
   );

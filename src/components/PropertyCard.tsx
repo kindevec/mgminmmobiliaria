@@ -24,6 +24,7 @@ interface PropertyCardProps {
 
 export function PropertyCard({
   lot,
+  onSelectLot,
   onOpenVisitModal,
   dark = false,
 }: PropertyCardProps) {
@@ -198,30 +199,43 @@ export function PropertyCard({
             </div>
           </div>
 
-          {/* Botones de acción: Exclusivos en la cara trasera / descripción (Naranja Visita + Verde WhatsApp) */}
-          <div className="pt-3 border-t border-slate-200/80 flex items-center gap-2">
+          {/* Botones de acción: Ficha Completa + Visita + WhatsApp */}
+          <div className="pt-2.5 border-t border-slate-200/80 space-y-2">
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                onOpenVisitModal(lot.code);
+                onSelectLot(lot);
               }}
-              className="flex-1 bg-[#F58220] hover:bg-[#ea580c] text-white py-2.5 px-3 rounded-xl text-xs font-bold transition-all hover:scale-102 active:scale-95 cursor-pointer shadow-md text-center inline-flex items-center justify-center gap-1.5"
+              className="w-full bg-[#113d22] hover:bg-[#22A33D] text-white py-2 px-3 rounded-xl text-xs font-bold transition-all hover:scale-[1.02] active:scale-95 cursor-pointer shadow-xs text-center inline-flex items-center justify-center gap-1.5"
             >
-              <span>Visitar</span>
+              <span>Ver Ficha Completa &amp; Fotos</span>
               <ArrowUpRight className="h-3.5 w-3.5" />
             </button>
 
-            <a
-              href={getLotWhatsAppUrl(lot.code, lot.name, lot.priceUSD)}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="flex-1 bg-[#22A33D] hover:bg-[#1a8230] text-white py-2.5 px-3 rounded-xl text-xs font-bold transition-all hover:scale-102 active:scale-95 cursor-pointer shadow-md text-center inline-flex items-center justify-center gap-1.5"
-            >
-              <WhatsAppIcon size={16} className="text-white" />
-              <span>WhatsApp</span>
-            </a>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenVisitModal(lot.code);
+                }}
+                className="flex-1 bg-[#F58220] hover:bg-[#ea580c] text-white py-2 px-2.5 rounded-xl text-[11px] font-bold transition-all hover:scale-[1.02] active:scale-95 cursor-pointer shadow-xs text-center inline-flex items-center justify-center gap-1"
+              >
+                <span>Visitar</span>
+              </button>
+
+              <a
+                href={getLotWhatsAppUrl(lot.code, lot.name, lot.priceUSD)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="flex-1 bg-[#22A33D] hover:bg-[#1a8230] text-white py-2 px-2.5 rounded-xl text-[11px] font-bold transition-all hover:scale-[1.02] active:scale-95 cursor-pointer shadow-xs text-center inline-flex items-center justify-center gap-1"
+              >
+                <WhatsAppIcon size={14} className="text-white" />
+                <span>WhatsApp</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>

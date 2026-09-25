@@ -25,8 +25,9 @@ import {
 import type { PageView } from '../Header';
 import { AMENITIES_MIRAVALLE, getMiravalleWhatsAppUrl } from '@/src/data/lots';
 import { WhatsAppIcon } from '../SocialIcons';
-import { InvestmentCalculator } from '../InvestmentCalculator';
 import { WaveDarkToCream, WaveCreamToDark } from '../WaveDividers';
+import { ScrollReveal } from '../common/ScrollReveal';
+import { AnimatedInsignia } from '../common/AnimatedInsignia';
 
 interface MiravalleViewProps {
   onNavigate: (page: PageView) => void;
@@ -139,92 +140,95 @@ export function MiravalleView({
   return (
     <div className="w-full overflow-hidden bg-white text-slate-900">
       {/* =========================================================================
-          1. BANNER CINEMÁTICO — 50/50 SLIDER (PALETA CORPORATIVA LOGO MGM)
+          1. BANNER CINEMÁTICO — PANORÁMICO INTEGRAL (SIN PARTICIONES VERTICALES)
           ========================================================================= */}
-      <section className="relative w-full bg-[#113d22] text-white overflow-hidden">
-        <div className="w-full grid grid-cols-1 lg:grid-cols-2 min-h-[640px] sm:min-h-[720px] lg:min-h-[800px] xl:min-h-[860px]">
-          
-          {/* LADO IZQUIERDO: 50% - Panel Verde MGM (#113d22) con Título y Párrafo (Sin botones ni iconos) */}
-          <div className="bg-[#113d22] flex flex-col justify-center items-center text-center px-6 sm:px-10 md:px-12 lg:px-14 xl:px-18 pt-36 sm:pt-44 lg:pt-48 pb-14 sm:pb-18 lg:pb-22 z-10 space-y-6 sm:space-y-8 max-w-3xl mx-auto">
-            
-            {/* Título Principal con Acento Verde (#5be196) */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.08] tracking-tight [text-wrap:balance] text-center mx-auto">
+      <section className="relative w-full bg-[#113d22] text-white overflow-hidden min-h-[600px] sm:min-h-[660px] lg:min-h-[720px] flex items-center justify-center">
+        {/* Fondo fotográfico panorámico continuo (100% de la pantalla) */}
+        <div
+          className="absolute inset-0 w-full h-full overflow-hidden select-none"
+          onMouseEnter={() => setHeroHovered(true)}
+          onMouseLeave={() => setHeroHovered(false)}
+        >
+          {MIRAVALLE_HERO_IMAGES.map((img, idx) => (
+            <div
+              key={idx}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                heroImgIndex === idx ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <Image
+                src={img.url}
+                alt={img.alt}
+                fill
+                priority={idx === 0}
+                sizes="100vw"
+                className="object-cover object-center transform transition-transform duration-7000 ease-out hover:scale-105"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+          ))}
+
+          {/* Degradado corporativo idéntico al banner de Contacto — Luminoso, limpio y continuo */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#113d22]/85 via-black/55 to-[#113d22]/90 pointer-events-none" />
+
+          {/* Flechas de navegación discretas a los costados */}
+          <button
+            type="button"
+            onClick={prevHeroImage}
+            aria-label="Imagen anterior"
+            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-[#22A33D] text-white backdrop-blur-md border border-white/20 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer opacity-70 hover:opacity-100"
+          >
+            <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
+          </button>
+
+          <button
+            type="button"
+            onClick={nextHeroImage}
+            aria-label="Siguiente imagen"
+            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-[#22A33D] text-white backdrop-blur-md border border-white/20 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer opacity-70 hover:opacity-100"
+          >
+            <ChevronRight className="w-6 h-6 stroke-[2.5]" />
+          </button>
+
+          {/* Indicadores de diapositiva */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15">
+            {MIRAVALLE_HERO_IMAGES.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setHeroImgIndex(i)}
+                aria-label={`Ver imagen ${i + 1}`}
+                className={`h-2 rounded-full transition-all cursor-pointer ${
+                  heroImgIndex === i ? 'w-6 bg-[#5be196]' : 'w-2 bg-white/50 hover:bg-white'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Contenido Central: Título y Párrafo */}
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-center items-center text-center pt-28 sm:pt-32 lg:pt-36 pb-16 sm:pb-20 space-y-6 sm:space-y-8">
+          {/* Insignia arquitectónica animada en SVG */}
+          <AnimatedInsignia className="mb-0 sm:mb-1" size={76} />
+
+          <ScrollReveal direction="down" delay={0.05}>
+            <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#5be196] drop-shadow-xs">
+              Proyecto Insignia MGM Inmobiliaria
+            </span>
+          </ScrollReveal>
+
+          <ScrollReveal direction="down" delay={0.15}>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.08] tracking-tight [text-wrap:balance] drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
               Ciudadela Miravalle:
               <br />
               <span className="text-[#5be196]">El hogar que tu familia merece.</span>
             </h1>
+          </ScrollReveal>
 
-            {/* Párrafo Descriptivo */}
-            <p className="text-base sm:text-lg lg:text-xl text-slate-200/90 leading-relaxed font-normal max-w-2xl text-center mx-auto">
+          <ScrollReveal direction="up" delay={0.25}>
+            <p className="text-base sm:text-lg lg:text-xl text-slate-100 leading-relaxed font-normal max-w-3xl drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">
               Diseñada bajo rigurosos estándares urbanísticos: calzadas adoquinadas de 10 y 12 metros, redes subterráneas de electricidad, agua potable garantizada, complejo polideportivo y control de acceso 24 horas.
             </p>
-
-          </div>
-
-          {/* LADO DERECHO: 50% - Carrusel Continuo Inmobiliario con Difuminación Perfecta */}
-          <div
-            className="relative w-full h-[460px] sm:h-[560px] lg:h-full min-h-[460px] sm:min-h-[560px] lg:min-h-full overflow-hidden group/hero-slider select-none bg-[#113d22]"
-            onMouseEnter={() => setHeroHovered(true)}
-            onMouseLeave={() => setHeroHovered(false)}
-          >
-            {/* Sombra suave inferior */}
-            <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 z-10 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
-
-            {/* Carrusel continuo de imágenes con máscara progresiva */}
-            <div className="hero-mask-blend absolute inset-0 w-full h-full">
-              {MIRAVALLE_HERO_IMAGES.map((img, idx) => (
-                <div
-                  key={idx}
-                  className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                    heroImgIndex === idx ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none'
-                  }`}
-                >
-                  <Image
-                    src={img.url}
-                    alt={img.alt}
-                    fill
-                    priority={idx === 0}
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover object-center transform transition-transform duration-7000 ease-out hover:scale-105"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-              ))}
-            </div>
-
-            {/* Flechas de navegación a los costados: SOLO aparecen ambas simultáneamente al pasar el mouse por la imagen */}
-            <button
-              type="button"
-              onClick={prevHeroImage}
-              aria-label="Imagen anterior"
-              className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/45 hover:bg-[#22A33D] text-white hover:text-white backdrop-blur-md border border-white/20 shadow-2xl flex items-center justify-center opacity-0 group-hover/hero-slider:opacity-100 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer pointer-events-none group-hover/hero-slider:pointer-events-auto"
-            >
-              <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
-            </button>
-
-            <button
-              type="button"
-              onClick={nextHeroImage}
-              aria-label="Imagen siguiente"
-              className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/45 hover:bg-[#22A33D] text-white hover:text-white backdrop-blur-md border border-white/20 shadow-2xl flex items-center justify-center opacity-0 group-hover/hero-slider:opacity-100 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer pointer-events-none group-hover/hero-slider:pointer-events-auto"
-            >
-              <ChevronRight className="w-6 h-6 stroke-[2.5]" />
-            </button>
-
-            {/* Indicadores de diapositiva (visibles al interactuar con el carrusel) */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15 opacity-0 group-hover/hero-slider:opacity-100 transition-opacity duration-300">
-              {MIRAVALLE_HERO_IMAGES.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setHeroImgIndex(i)}
-                  aria-label={`Ver imagen ${i + 1}`}
-                  className={`h-2 rounded-full transition-all cursor-pointer ${
-                    heroImgIndex === i ? 'w-6 bg-[#5be196]' : 'w-2 bg-white/50 hover:bg-white'
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 
@@ -232,24 +236,18 @@ export function MiravalleView({
       <div className="space-y-16 sm:space-y-24 py-10">
 
       {/* 2. AMENITIES CAROUSEL WITH STRICT SIDE-FLANKED CONTROLS */}
-      <motion.section
-        initial={{ opacity: 0, y: 35 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
-      >
-        <div className="max-w-2xl mb-8 space-y-2">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <ScrollReveal direction="left" delay={0.1} className="max-w-2xl mb-8 space-y-2">
           <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
             Amenidades y obras diseñadas para perdurar
           </h2>
           <p className="text-xs sm:text-sm text-slate-600">
             En Ciudadela Miravalle no compras solo tierra: adquieres un entorno seguro, ordenado y rodeado de naturaleza.
           </p>
-        </div>
+        </ScrollReveal>
 
         {/* Carousel Visual Box with SIDE-FLANKED controls */}
-        <div className="relative w-full rounded-3xl overflow-hidden bg-white border border-slate-200/90 shadow-xl">
+        <ScrollReveal direction="up" delay={0.18} className="relative w-full rounded-3xl overflow-hidden bg-white border border-slate-200/90 shadow-xl">
           {/* Side-Flanked Control: LEFT-4 */}
           <button
             onClick={prevSlide}
@@ -315,139 +313,146 @@ export function MiravalleView({
               </div>
             </div>
           </div>
-        </div>
-      </motion.section>
+        </ScrollReveal>
+      </section>
 
       {/* 3. MASTERPLAN SPECS & URBAN PLANNING */}
-      <motion.section
-        initial={{ opacity: 0, y: 35 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
-      >
-        <div className="rounded-3xl bg-[#FBFBFA] border border-slate-200/90 p-8 sm:p-14 text-slate-900 shadow-xs">
-          <div className="max-w-2xl mb-12 space-y-2">
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              Especificaciones técnicas del Master Plan
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600">
-              Construye tu vivienda bajo normativa que protege la armonía arquitectónica y la plusvalía de toda la comunidad.
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="rounded-3xl bg-[#FBFBFA] border border-slate-200/90 p-6 sm:p-8 lg:p-10 text-slate-900 shadow-xs">
+          {/* Header con distribución horizontal eficiente (sin vacíos a la derecha) */}
+          <ScrollReveal direction="down" delay={0.1} className="mb-6 sm:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 pb-5 border-b border-slate-200/80">
+            <div className="max-w-xl space-y-1">
+              <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-800 mb-0.5">
+                <Building className="h-3.5 w-3.5 text-emerald-700" />
+                <span>Normativa & Estándares Constructivos</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+                Especificaciones técnicas del Master Plan
+              </h2>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-600 max-w-md leading-relaxed">
+              Construye tu vivienda bajo normativa técnica que protege la armonía arquitectónica, seguridad vial y la plusvalía de toda la comunidad.
             </p>
-          </div>
+          </ScrollReveal>
 
-          {/* Open 3-Column Specifications with Hairline Dividers */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:divide-x md:divide-slate-200">
-            <div className="space-y-4 md:pr-6">
-              <div className="flex items-center gap-2 text-slate-900 font-bold text-lg">
-                <Zap className="h-6 w-6 text-amber-600 shrink-0" />
+          {/* 3 Columnas compactas y balanceadas */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 md:divide-x md:divide-slate-200/80">
+            <ScrollReveal direction="left" delay={0.15} className="space-y-3.5 md:pr-4 lg:pr-6">
+              <div className="flex items-center gap-2.5 text-slate-900 font-bold text-base sm:text-lg">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/15 text-amber-600 flex items-center justify-center shrink-0 border border-amber-200/70">
+                  <Zap className="h-4.5 w-4.5 stroke-[2.2]" />
+                </div>
                 <h4>Servicios Básicos</h4>
               </div>
-              <ul className="text-xs sm:text-sm text-slate-600 space-y-3 leading-relaxed">
+              <ul className="text-xs sm:text-sm text-slate-600 space-y-2.5 leading-snug">
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-700 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold shrink-0 mt-0.5">•</span>
                   <span>Red eléctrica subterránea con transformadores propios.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-700 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold shrink-0 mt-0.5">•</span>
                   <span>Red matriz de agua potable certificada y probada.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-700 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold shrink-0 mt-0.5">•</span>
                   <span>Sistema de alcantarillado sanitario y pluvial separado.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-700 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold shrink-0 mt-0.5">•</span>
                   <span>Ductería subterránea lista para conexión de fibra óptica.</span>
                 </li>
               </ul>
-            </div>
+            </ScrollReveal>
 
-            <div className="space-y-4 md:px-6">
-              <div className="flex items-center gap-2 text-slate-900 font-bold text-lg">
-                <Car className="h-6 w-6 text-emerald-700 shrink-0" />
+            <ScrollReveal direction="up" delay={0.2} className="space-y-3.5 md:px-4 lg:px-6">
+              <div className="flex items-center gap-2.5 text-slate-900 font-bold text-base sm:text-lg">
+                <div className="w-8 h-8 rounded-lg bg-emerald-600/15 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200/70">
+                  <Car className="h-4.5 w-4.5 stroke-[2.2]" />
+                </div>
                 <h4>Vías & Movilidad</h4>
               </div>
-              <ul className="text-xs sm:text-sm text-slate-600 space-y-3 leading-relaxed">
+              <ul className="text-xs sm:text-sm text-slate-600 space-y-2.5 leading-snug">
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-700 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold shrink-0 mt-0.5">•</span>
                   <span>Avenidas principales de 12 metros con parterre central.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-700 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold shrink-0 mt-0.5">•</span>
                   <span>Calles secundarias de 10 metros con adoquín de alto tonelaje.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-700 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold shrink-0 mt-0.5">•</span>
                   <span>Aceras peatonales con adoquín podotáctil y arbolado.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-700 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold shrink-0 mt-0.5">•</span>
                   <span>Bahías de parqueo para visitantes y retornos amplios.</span>
                 </li>
               </ul>
-            </div>
+            </ScrollReveal>
 
-            <div className="space-y-4 md:pl-6">
-              <div className="flex items-center gap-2 text-slate-900 font-bold text-lg">
-                <ShieldCheck className="h-6 w-6 text-emerald-700 shrink-0" />
+            <ScrollReveal direction="right" delay={0.25} className="space-y-3.5 md:pl-4 lg:pl-6">
+              <div className="flex items-center gap-2.5 text-slate-900 font-bold text-base sm:text-lg">
+                <div className="w-8 h-8 rounded-lg bg-[#113d22]/15 text-[#113d22] flex items-center justify-center shrink-0 border border-[#113d22]/20">
+                  <ShieldCheck className="h-4.5 w-4.5 stroke-[2.2]" />
+                </div>
                 <h4>Seguridad & Entorno</h4>
               </div>
-              <ul className="text-xs sm:text-sm text-slate-600 space-y-3 leading-relaxed">
+              <ul className="text-xs sm:text-sm text-slate-600 space-y-2.5 leading-snug">
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-700 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold shrink-0 mt-0.5">•</span>
                   <span>Garita de control vehicular y peatonal 24 horas.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-700 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold shrink-0 mt-0.5">•</span>
                   <span>Cerramiento perimetral de seguridad en todo el predio.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-700 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold shrink-0 mt-0.5">•</span>
                   <span>Circuito de cámaras de monitoreo en accesos principales.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-700 font-bold">•</span>
+                  <span className="text-emerald-700 font-bold shrink-0 mt-0.5">•</span>
                   <span>Retiro vegetal y sendero ecológico con iluminación LED.</span>
                 </li>
               </ul>
-            </div>
+            </ScrollReveal>
           </div>
 
-          <div className="mt-12 pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <span className="text-xs font-semibold text-slate-600">
-              Etapa 1: 85% Vendida · Etapa 2: Preventa con precios promocionales de inauguración
-            </span>
+          {/* Barra inferior compacta de status y acción */}
+          <ScrollReveal direction="zoom" delay={0.15} className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-xs sm:text-sm font-semibold text-slate-700">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100/90 text-emerald-800 border border-emerald-200/60 shadow-2xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                Etapa 1: 85% Vendida
+              </span>
+              <span className="text-slate-400 hidden sm:inline">·</span>
+              <span className="text-slate-600">Etapa 2: Preventa con precios promocionales</span>
+            </div>
             <button
               onClick={() => onNavigate('properties')}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-slate-900 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap text-center"
+              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 sm:py-3 rounded-full bg-[#113d22] hover:bg-[#F58220] text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer whitespace-normal sm:whitespace-nowrap text-center"
             >
               <span>Ver Lotes Disponibles en Miravalle</span>
               <ArrowRight className="h-4 w-4 shrink-0" />
             </button>
-          </div>
+          </ScrollReveal>
         </div>
-      </motion.section>
+      </section>
 
       {/* 4. GALERÍA DE RENDERS & AVANCES DE OBRA */}
-      <motion.section
-        initial={{ opacity: 0, y: 35 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
-      >
-        <div className="max-w-2xl mb-8 space-y-2">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <ScrollReveal direction="left" delay={0.1} className="max-w-2xl mb-8 space-y-2">
           <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
             Galería de Renders y Obras en Terreno
           </h2>
           <p className="text-xs sm:text-sm text-slate-600">
             Comprueba el estándar de construcción y el avance en tiempo real de Ciudadela Miravalle.
           </p>
-        </div>
+        </ScrollReveal>
 
         {/* Gallery Carousel Box with SIDE-FLANKED controls */}
-        <div className="relative w-full rounded-3xl overflow-hidden bg-slate-900 border border-slate-200/90 shadow-xl">
+        <ScrollReveal direction="up" delay={0.18} className="relative w-full rounded-3xl overflow-hidden bg-slate-900 border border-slate-200/90 shadow-xl">
           {/* Side-Flanked Control: LEFT-4 */}
           <button
             onClick={prevGallery}
@@ -490,10 +495,10 @@ export function MiravalleView({
               </p>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* Thumbnail Selector Pills */}
-        <div className="flex items-center gap-2 mt-4 overflow-x-auto pb-1">
+        <ScrollReveal direction="up" delay={0.25} className="flex items-center gap-2 mt-4 overflow-x-auto pb-1">
           {GALLERY_RENDERS.map((item, idx) => (
             <button
               key={idx}
@@ -507,110 +512,205 @@ export function MiravalleView({
               {item.title}
             </button>
           ))}
+        </ScrollReveal>
+      </section>
+
+      {/* 5. FACILIDADES DE ADQUISICIÓN DIRECTA EN MIRAVALLE (ESTÁNDAR KINDEV: CERO BOX-IN-BOX) */}
+      <section className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        <div className="space-y-10 sm:space-y-14">
+          {/* Header con jerarquía expresiva y micro-indicador */}
+          <div className="text-center max-w-3xl mx-auto space-y-3 sm:space-y-4">
+            <ScrollReveal direction="down" delay={0.06}>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/70 text-emerald-800 text-xs font-bold uppercase tracking-wider">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Financiamiento Directo &amp; Legalidad Garantizada</span>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal direction="down" delay={0.12}>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight [text-wrap:balance]">
+                Planes Flexibles en <span className="text-emerald-700">Ciudadela Miravalle</span>
+              </h2>
+            </ScrollReveal>
+
+            <ScrollReveal direction="up" delay={0.18}>
+              <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+                Elige tu lote desde <span className="font-bold text-slate-900">180 m² hasta 320 m²</span> con facilidades de pago directo con la promotora. Sin requisitos bancarios, sin avales externos y con entrega de minuta notariada desde el primer abono.
+              </p>
+            </ScrollReveal>
+          </div>
+
+          {/* Grid de beneficios: Superficie abierta, nivel único, micro-interacciones suaves */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+            {/* Card 1: 0% */}
+            <ScrollReveal direction="up" delay={0.08}>
+              <motion.div
+                whileHover={{ y: -5 }}
+                transition={{ duration: 0.2 }}
+                className="group relative h-full rounded-2xl bg-white border border-slate-200/80 p-6 sm:p-7 shadow-xs hover:shadow-xl hover:border-emerald-600/30 transition-all duration-300 flex flex-col justify-between overflow-hidden"
+              >
+                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-600 to-teal-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-4xl sm:text-5xl font-black text-emerald-700 font-mono tracking-tight">0%</span>
+                    <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700 group-hover:scale-110 transition-transform duration-300">
+                      <ShieldCheck className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-slate-900 text-base sm:text-lg mb-1.5">Sin Buró Crediticio</h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      Aprobación directa con MGM Inmobiliaria, sin historiales crediticios bancarios ni avalistas externos.
+                    </p>
+                  </div>
+                </div>
+                <div className="pt-4 mt-5 border-t border-slate-100 flex items-center gap-2 text-xs font-semibold text-emerald-800">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>Aprobación directa en 24h</span>
+                </div>
+              </motion.div>
+            </ScrollReveal>
+
+            {/* Card 2: 48 Meses */}
+            <ScrollReveal direction="up" delay={0.16}>
+              <motion.div
+                whileHover={{ y: -5 }}
+                transition={{ duration: 0.2 }}
+                className="group relative h-full rounded-2xl bg-white border border-slate-200/80 p-6 sm:p-7 shadow-xs hover:shadow-xl hover:border-amber-500/30 transition-all duration-300 flex flex-col justify-between overflow-hidden"
+              >
+                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-500 to-amber-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-baseline">
+                      <span className="text-4xl sm:text-5xl font-black text-amber-600 font-mono tracking-tight">48</span>
+                      <span className="ml-1.5 text-base sm:text-lg font-bold font-sans text-amber-700">Meses</span>
+                    </div>
+                    <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-700 group-hover:scale-110 transition-transform duration-300">
+                      <DollarSign className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-slate-900 text-base sm:text-lg mb-1.5">Pagos Fijos en USD</h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      Cuotas pactadas sin variaciones ni intereses sorpresa, en dólares americanos, adaptadas a tu flujo de ingresos.
+                    </p>
+                  </div>
+                </div>
+                <div className="pt-4 mt-5 border-t border-slate-100 flex items-center gap-2 text-xs font-semibold text-amber-800">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                  <span>Sin intereses bancarios</span>
+                </div>
+              </motion.div>
+            </ScrollReveal>
+
+            {/* Card 3: 100% */}
+            <ScrollReveal direction="up" delay={0.24}>
+              <motion.div
+                whileHover={{ y: -5 }}
+                transition={{ duration: 0.2 }}
+                className="group relative h-full rounded-2xl bg-white border border-slate-200/80 p-6 sm:p-7 shadow-xs hover:shadow-xl hover:border-teal-500/30 transition-all duration-300 flex flex-col justify-between overflow-hidden"
+              >
+                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-teal-500 to-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-4xl sm:text-5xl font-black text-teal-700 font-mono tracking-tight">100%</span>
+                    <div className="w-11 h-11 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-700 group-hover:scale-110 transition-transform duration-300">
+                      <FileText className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-slate-900 text-base sm:text-lg mb-1.5">Entrega Notariada</h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      Linderos georreferenciados con coordenadas UTM y entrega de clave catastral oficial respaldada.
+                    </p>
+                  </div>
+                </div>
+                <div className="pt-4 mt-5 border-t border-slate-100 flex items-center gap-2 text-xs font-semibold text-teal-800">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+                  <span>Seguridad jurídica total</span>
+                </div>
+              </motion.div>
+            </ScrollReveal>
+
+            {/* Card 4: 10% Off */}
+            <ScrollReveal direction="up" delay={0.32}>
+              <motion.div
+                whileHover={{ y: -5 }}
+                transition={{ duration: 0.2 }}
+                className="group relative h-full rounded-2xl bg-white border border-slate-200/80 p-6 sm:p-7 shadow-xs hover:shadow-xl hover:border-emerald-600/30 transition-all duration-300 flex flex-col justify-between overflow-hidden"
+              >
+                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-600 to-teal-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-baseline">
+                      <span className="text-4xl sm:text-5xl font-black text-emerald-700 font-mono tracking-tight">10%</span>
+                      <span className="ml-1.5 text-base sm:text-lg font-bold font-sans text-emerald-700 uppercase">Off</span>
+                    </div>
+                    <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700 group-hover:scale-110 transition-transform duration-300">
+                      <Sparkles className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-slate-900 text-base sm:text-lg mb-1.5">Bono Pago de Contado</h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      Descuento preferencial inmediato y escrituración prioritaria por cancelación al contado.
+                    </p>
+                  </div>
+                </div>
+                <div className="pt-4 mt-5 border-t border-slate-100 flex items-center gap-2 text-xs font-semibold text-emerald-800">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>Escrituración prioritaria</span>
+                </div>
+              </motion.div>
+            </ScrollReveal>
+          </div>
+
+          {/* Bloque CTA ergonómico y micro-garantías */}
+          <ScrollReveal direction="up" delay={0.2} className="flex flex-col items-center justify-center gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 w-full sm:w-auto">
+              <button
+                onClick={() => onOpenVisitModal('Ciudadela Miravalle')}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-slate-900 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm transition-all shadow-md hover:shadow-xl active:scale-95 cursor-pointer whitespace-nowrap text-center"
+              >
+                <CalendarCheck2 className="h-4 w-4 shrink-0 text-emerald-400" />
+                <span>Agendar Asesoría en Obra</span>
+              </button>
+
+              <a
+                href={getMiravalleWhatsAppUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm transition-all shadow-md hover:shadow-xl active:scale-95 whitespace-nowrap text-center cursor-pointer"
+              >
+                <WhatsAppIcon size={18} className="text-slate-950 shrink-0" />
+                <span>Consultar Disponibilidad por WhatsApp</span>
+              </a>
+            </div>
+
+            {/* Micro-puntos de confianza */}
+            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-slate-700 pt-1 font-medium">
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                Minuta notariada desde la cuota 1
+              </span>
+              <span className="hidden sm:inline text-slate-300">•</span>
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                Transporte institucional gratuito para visitas
+              </span>
+              <span className="hidden sm:inline text-slate-300">•</span>
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                Asesoría técnica y legal sin costo
+              </span>
+            </div>
+          </ScrollReveal>
         </div>
-      </motion.section>
-
-      {/* 5. FACILIDADES DE ADQUISICIÓN DIRECTA EN MIRAVALLE */}
-      <motion.section
-        initial={{ opacity: 0, y: 35 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 rounded-3xl overflow-hidden bg-[#FBFBFA] text-slate-900 shadow-sm border border-slate-200/90"
-      >
-        <div className="relative z-10 max-w-5xl mx-auto space-y-8">
-          <div className="text-center space-y-3">
-            <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight [text-wrap:balance]">
-              Planes Flexibles en Ciudadela Miravalle
-            </h2>
-            <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
-              Elige tu lote desde 180 m² hasta 320 m² con facilidades de pago directo.
-              Sin requisitos bancarios y con entrega de minuta notariada desde el primer pago.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
-            <motion.div
-              whileHover={{ y: -4 }}
-              className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs space-y-2"
-            >
-              <div className="text-3xl font-black text-emerald-700 font-mono">0%</div>
-              <h4 className="font-extrabold text-slate-900 text-sm">Sin Buró Crediticio</h4>
-              <p className="text-xs text-slate-600">
-                Aprobación directa con MGM Inmobiliaria, sin historiales crediticios ni avalistas externos.
-              </p>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ y: -4 }}
-              className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs space-y-2"
-            >
-              <div className="text-3xl font-black text-amber-600 font-mono">48 Meses</div>
-              <h4 className="font-extrabold text-slate-900 text-sm">Pagos Fijos en USD</h4>
-              <p className="text-xs text-slate-600">
-                Cuotas pactadas sin variaciones, en dólares americanos, adaptadas a tu flujo de ingresos.
-              </p>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ y: -4 }}
-              className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs space-y-2"
-            >
-              <div className="text-3xl font-black text-teal-700 font-mono">100%</div>
-              <h4 className="font-extrabold text-slate-900 text-sm">Entrega Notariada</h4>
-              <p className="text-xs text-slate-600">
-                Linderos georreferenciados con coordenadas UTM y entrega de clave catastral oficial.
-              </p>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ y: -4 }}
-              className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs space-y-2"
-            >
-              <div className="text-3xl font-black text-emerald-700 font-mono">10% Off</div>
-              <h4 className="font-extrabold text-slate-900 text-sm">Bono Pago de Contado</h4>
-              <p className="text-xs text-slate-600">
-                Descuento preferencial inmediato y escrituración prioritaria por cancelación al contado.
-              </p>
-            </motion.div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
-            <button
-              onClick={() => onOpenVisitModal('Ciudadela Miravalle')}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-slate-900 text-white font-bold text-xs sm:text-sm hover:bg-emerald-700 transition-all shadow-md active:scale-95 cursor-pointer whitespace-normal sm:whitespace-nowrap text-center"
-            >
-              <CalendarCheck2 className="h-4 w-4 shrink-0" />
-              <span>Agendar Asesoría en Obra</span>
-            </button>
-
-            <a
-              href={getMiravalleWhatsAppUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm transition-all shadow-md active:scale-95 whitespace-normal sm:whitespace-nowrap text-center cursor-pointer"
-            >
-              <WhatsAppIcon size={18} className="text-slate-950 shrink-0" />
-              <span>Consultar Disponibilidad por WhatsApp</span>
-            </a>
-          </div>
-        </div>
-      </motion.section>
-
-      {/* 5.5 SIMULADOR FINANCIERO INTERACTIVO DIRECTO */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <InvestmentCalculator />
       </section>
 
       {/* 6. VIP RECORRIDO EN VEHÍCULO CORPORATIVO CTA (With Photographic Landscape Background) */}
-      <motion.section
-        initial={{ opacity: 0, y: 35 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-4"
-      >
-        <div className="rounded-3xl bg-slate-900 p-8 sm:p-14 text-white shadow-xl border border-slate-800 relative overflow-hidden">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-4">
+        <ScrollReveal direction="zoom" delay={0.15} className="rounded-3xl bg-slate-900 p-8 sm:p-14 text-white shadow-xl border border-slate-800 relative overflow-hidden">
           {/* Panoramic Luxury Transport / Road Backdrop */}
           <div className="absolute inset-0 pointer-events-none">
             <Image
@@ -655,8 +755,8 @@ export function MiravalleView({
               </a>
             </div>
           </div>
-        </div>
-      </motion.section>
+        </ScrollReveal>
+      </section>
       </div>
     </div>
   );

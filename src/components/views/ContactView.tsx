@@ -17,8 +17,10 @@ import {
   CalendarCheck2,
   CheckCircle2,
 } from 'lucide-react';
-import { WHATSAPP_PHONE } from '@/src/data/lots';
-import { WhatsAppIcon } from '../SocialIcons';
+import { WHATSAPP_PHONE, getGeneralWhatsAppUrl } from '@/src/data/lots';
+import { WhatsAppIcon, FacebookIcon, InstagramIcon, TikTokIcon } from '../SocialIcons';
+import { ScrollReveal } from '../common/ScrollReveal';
+import { AnimatedInsignia } from '../common/AnimatedInsignia';
 
 interface ContactViewProps {
   onOpenVisitModal: (defaultInterest?: string) => void;
@@ -101,65 +103,7 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-grow flex flex-col justify-center pt-24 sm:pt-16 md:pt-14 pb-16 sm:pb-24">
           {/* Insignia arquitectónica animada en SVG (Paleta Logo MGM: Naranja #F58220 y Verde #22A33D) */}
-          <div className="mb-4 sm:mb-6 flex justify-center w-full translate-y-3 sm:-translate-y-4 md:-translate-y-6">
-            <motion.svg
-              width="80"
-              height="90"
-              viewBox="0 0 80 90"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              initial="hidden"
-              animate="visible"
-            >
-              {/* Techo exterior - Naranja MGM (#F58220) */}
-              <motion.path
-                d="M10 52 L40 20 L70 52"
-                stroke="#F58220"
-                strokeWidth="3.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                variants={{
-                  hidden: { pathLength: 0, opacity: 0 },
-                  visible: {
-                    pathLength: 1,
-                    opacity: 1,
-                    transition: { duration: 1.4, ease: 'easeInOut' },
-                  },
-                }}
-              />
-              {/* Techo interior - Verde MGM (#22A33D) */}
-              <motion.path
-                d="M22 60 L40 40 L58 60"
-                stroke="#22A33D"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                variants={{
-                  hidden: { pathLength: 0, opacity: 0 },
-                  visible: {
-                    pathLength: 1,
-                    opacity: 1,
-                    transition: { duration: 1.2, delay: 0.3, ease: 'easeInOut' },
-                  },
-                }}
-              />
-              {/* Línea base - Naranja MGM (#F58220) */}
-              <motion.path
-                d="M16 72 L64 72"
-                stroke="#F58220"
-                strokeWidth="3"
-                strokeLinecap="round"
-                variants={{
-                  hidden: { pathLength: 0, opacity: 0 },
-                  visible: {
-                    pathLength: 1,
-                    opacity: 1,
-                    transition: { duration: 0.8, delay: 0.8, ease: 'easeOut' },
-                  },
-                }}
-              />
-            </motion.svg>
-          </div>
+          <AnimatedInsignia className="mb-4 sm:mb-6 translate-y-3 sm:-translate-y-4 md:-translate-y-6" size={80} />
 
           <motion.div
             initial="hidden"
@@ -235,13 +179,7 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-start">
             {/* Columna Izquierda: Formulario Estilo Píldora Moderno */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="flex flex-col"
-            >
+            <ScrollReveal direction="left" delay={0.1} className="flex flex-col">
               <div className="mb-6">
                 <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 font-sans mb-1.5">
                   Envíanos un mensaje
@@ -385,16 +323,58 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
                   </button>
                 </form>
               )}
-            </motion.div>
+
+              {/* Canales de Contacto en Redes Sociales — Solo iconos, sin contenedores */}
+              <div className="mt-6 pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+                <span className="text-xs font-semibold text-slate-600">
+                  O contáctanos directamente en redes:
+                </span>
+                <div className="flex items-center gap-5">
+                  <a
+                    href={getGeneralWhatsAppUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="WhatsApp MGM Inmobiliaria"
+                    className="text-[#25D366] hover:text-[#20bd5a] hover:scale-115 transition-all cursor-pointer"
+                  >
+                    <WhatsAppIcon size={26} />
+                  </a>
+
+                  <a
+                    href="https://facebook.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Facebook MGM Inmobiliaria"
+                    className="text-[#1877F2] hover:text-[#1464cc] hover:scale-115 transition-all cursor-pointer"
+                  >
+                    <FacebookIcon size={26} />
+                  </a>
+
+                  <a
+                    href="https://instagram.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Instagram MGM Inmobiliaria"
+                    className="text-[#E4405F] hover:text-[#d02d4c] hover:scale-115 transition-all cursor-pointer"
+                  >
+                    <InstagramIcon size={26} />
+                  </a>
+
+                  <a
+                    href="https://tiktok.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="TikTok MGM Inmobiliaria"
+                    className="text-slate-800 hover:text-black hover:scale-115 transition-all cursor-pointer"
+                  >
+                    <TikTokIcon size={26} />
+                  </a>
+                </div>
+              </div>
+            </ScrollReveal>
 
             {/* Columna Derecha: Barra de Dirección + Mapa + Información con Animaciones e Iconos Iluminados */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex flex-col space-y-5"
-            >
+            <ScrollReveal direction="right" delay={0.2} className="flex flex-col space-y-5">
               {/* Barra Independiente de Ubicación Encima del Mapa con Animación */}
               <motion.div
                 initial={{ opacity: 0, y: -20, scale: 0.96 }}
@@ -596,7 +576,7 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
                   <span>Agendar Visita en Terreno con Transporte</span>
                 </button>
               </div>
-            </motion.div>
+            </ScrollReveal>
           </div>
         </div>
       </section>

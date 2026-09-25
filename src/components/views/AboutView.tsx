@@ -23,6 +23,8 @@ import type { PageView } from '../Header';
 import { getGeneralWhatsAppUrl } from '@/src/data/lots';
 import { WhatsAppIcon } from '../SocialIcons';
 import { WaveCreamToDark, TopographicContours } from '../WaveDividers';
+import { ScrollReveal } from '../common/ScrollReveal';
+import { AnimatedInsignia } from '../common/AnimatedInsignia';
 
 interface AboutViewProps {
   onNavigate: (page: PageView) => void;
@@ -45,6 +47,29 @@ const ABOUT_HERO_IMAGES = [
   {
     url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1600&q=85',
     alt: 'Planificación Urbana y Certeza Notarial',
+  },
+];
+
+const ACQUISITION_BG_PROPERTIES = [
+  {
+    url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Lotes de terreno y topografía Miravalle',
+    className: 'sm:-translate-y-4',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Villa residencial de lujo',
+    className: 'sm:translate-y-6',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Residencia en desarrollo urbanizado',
+    className: 'sm:-translate-y-6',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1524813686514-a57563d77d66?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Parcelas campestres y entorno natural',
+    className: 'sm:translate-y-4',
   },
 ];
 
@@ -73,92 +98,95 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
   return (
     <div className="w-full overflow-hidden bg-white text-slate-900">
       {/* =========================================================================
-          1. BANNER CINEMÁTICO — 50/50 SLIDER (PALETA CORPORATIVA LOGO MGM)
+          1. BANNER CINEMÁTICO — PANORÁMICO INTEGRAL (SIN PARTICIONES VERTICALES)
           ========================================================================= */}
-      <section className="relative w-full bg-[#113d22] text-white overflow-hidden">
-        <div className="w-full grid grid-cols-1 lg:grid-cols-2 min-h-[640px] sm:min-h-[720px] lg:min-h-[800px] xl:min-h-[860px]">
-          
-          {/* LADO IZQUIERDO: 50% - Panel Verde MGM (#113d22) con Título y Párrafo (Sin botones ni iconos) */}
-          <div className="bg-[#113d22] flex flex-col justify-center items-center text-center px-6 sm:px-10 md:px-12 lg:px-14 xl:px-18 pt-36 sm:pt-44 lg:pt-48 pb-14 sm:pb-18 lg:pb-22 z-10 space-y-6 sm:space-y-8 max-w-3xl mx-auto">
-            
-            {/* Título Principal con Acento Verde (#5be196) */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.08] tracking-tight [text-wrap:balance] text-center mx-auto">
+      <section className="relative w-full bg-[#113d22] text-white overflow-hidden min-h-[600px] sm:min-h-[660px] lg:min-h-[720px] flex items-center justify-center">
+        {/* Fondo fotográfico panorámico continuo (100% de la pantalla) */}
+        <div
+          className="absolute inset-0 w-full h-full overflow-hidden select-none"
+          onMouseEnter={() => setHeroHovered(true)}
+          onMouseLeave={() => setHeroHovered(false)}
+        >
+          {ABOUT_HERO_IMAGES.map((img, idx) => (
+            <div
+              key={idx}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                heroImgIndex === idx ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <Image
+                src={img.url}
+                alt={img.alt}
+                fill
+                priority={idx === 0}
+                sizes="100vw"
+                className="object-cover object-center transform transition-transform duration-7000 ease-out hover:scale-105"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+          ))}
+
+          {/* Degradado corporativo idéntico al banner de Contacto — Luminoso, limpio y continuo */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#113d22]/85 via-black/55 to-[#113d22]/90 pointer-events-none" />
+
+          {/* Flechas de navegación discretas a los costados */}
+          <button
+            type="button"
+            onClick={prevHeroImage}
+            aria-label="Imagen anterior"
+            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-[#22A33D] text-white backdrop-blur-md border border-white/20 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer opacity-70 hover:opacity-100"
+          >
+            <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
+          </button>
+
+          <button
+            type="button"
+            onClick={nextHeroImage}
+            aria-label="Siguiente imagen"
+            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-[#22A33D] text-white backdrop-blur-md border border-white/20 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer opacity-70 hover:opacity-100"
+          >
+            <ChevronRight className="w-6 h-6 stroke-[2.5]" />
+          </button>
+
+          {/* Indicadores de diapositiva */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15">
+            {ABOUT_HERO_IMAGES.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setHeroImgIndex(i)}
+                aria-label={`Ver imagen ${i + 1}`}
+                className={`h-2 rounded-full transition-all cursor-pointer ${
+                  heroImgIndex === i ? 'w-6 bg-[#5be196]' : 'w-2 bg-white/50 hover:bg-white'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Contenido Central: Título y Párrafo */}
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-center items-center text-center pt-28 sm:pt-32 lg:pt-36 pb-16 sm:pb-20 space-y-6 sm:space-y-8">
+          {/* Insignia arquitectónica animada en SVG */}
+          <AnimatedInsignia className="mb-0 sm:mb-1" size={76} />
+
+          <ScrollReveal direction="down" delay={0.05}>
+            <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#5be196] drop-shadow-xs">
+              Nuestra Identidad Institucional
+            </span>
+          </ScrollReveal>
+
+          <ScrollReveal direction="down" delay={0.15}>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.08] tracking-tight [text-wrap:balance] drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
               Solidez, transparencia y
               <br />
               <span className="text-[#5be196]">certeza jurídica</span> en cada metro cuadrado.
             </h1>
+          </ScrollReveal>
 
-            {/* Párrafo Descriptivo */}
-            <p className="text-base sm:text-lg lg:text-xl text-slate-200/90 leading-relaxed font-normal max-w-2xl text-center mx-auto">
+          <ScrollReveal direction="up" delay={0.25}>
+            <p className="text-base sm:text-lg lg:text-xl text-slate-100 leading-relaxed font-normal max-w-3xl drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">
               Somos una entidad inmobiliaria ecuatoriana constituida para transformar terrenos de alta vocación residencial en comunidades planificadas con obras concluidas, saneamiento legal definitivo y crédito directo.
             </p>
-
-          </div>
-
-          {/* LADO DERECHO: 50% - Carrusel Continuo Inmobiliario con Difuminación Perfecta */}
-          <div
-            className="relative w-full h-[460px] sm:h-[560px] lg:h-full min-h-[460px] sm:min-h-[560px] lg:min-h-full overflow-hidden group/hero-slider select-none bg-[#113d22]"
-            onMouseEnter={() => setHeroHovered(true)}
-            onMouseLeave={() => setHeroHovered(false)}
-          >
-            {/* Sombra suave inferior */}
-            <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 z-10 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
-
-            {/* Carrusel continuo de imágenes con máscara progresiva */}
-            <div className="hero-mask-blend absolute inset-0 w-full h-full">
-              {ABOUT_HERO_IMAGES.map((img, idx) => (
-                <div
-                  key={idx}
-                  className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                    heroImgIndex === idx ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none'
-                  }`}
-                >
-                  <Image
-                    src={img.url}
-                    alt={img.alt}
-                    fill
-                    priority={idx === 0}
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover object-center transform transition-transform duration-7000 ease-out hover:scale-105"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-              ))}
-            </div>
-
-            {/* Flechas de navegación a los costados: SOLO aparecen ambas simultáneamente al pasar el mouse por la imagen */}
-            <button
-              type="button"
-              onClick={prevHeroImage}
-              aria-label="Imagen anterior"
-              className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/45 hover:bg-[#22A33D] text-white hover:text-white backdrop-blur-md border border-white/20 shadow-2xl flex items-center justify-center opacity-0 group-hover/hero-slider:opacity-100 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer pointer-events-none group-hover/hero-slider:pointer-events-auto"
-            >
-              <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
-            </button>
-
-            <button
-              type="button"
-              onClick={nextHeroImage}
-              aria-label="Imagen siguiente"
-              className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/45 hover:bg-[#22A33D] text-white hover:text-white backdrop-blur-md border border-white/20 shadow-2xl flex items-center justify-center opacity-0 group-hover/hero-slider:opacity-100 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer pointer-events-none group-hover/hero-slider:pointer-events-auto"
-            >
-              <ChevronRight className="w-6 h-6 stroke-[2.5]" />
-            </button>
-
-            {/* Indicadores de diapositiva (visibles al interactuar con el carrusel) */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15 opacity-0 group-hover/hero-slider:opacity-100 transition-opacity duration-300">
-              {ABOUT_HERO_IMAGES.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setHeroImgIndex(i)}
-                  aria-label={`Ver imagen ${i + 1}`}
-                  className={`h-2 rounded-full transition-all cursor-pointer ${
-                    heroImgIndex === i ? 'w-6 bg-[#5be196]' : 'w-2 bg-white/50 hover:bg-white'
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 
@@ -186,11 +214,9 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             {/* Left Column: Enlarged asymmetric organic curved image container with floating badge */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, ease: 'easeOut' }}
+            <ScrollReveal
+              direction="left"
+              delay={0.15}
               className="lg:col-span-6 w-full flex justify-center items-center relative py-6"
             >
               <div className="relative w-full max-w-[580px] sm:max-w-[640px] lg:max-w-[660px]">
@@ -227,14 +253,12 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </ScrollReveal>
 
             {/* Right Column: Bold Headline, Paragraph, Two Features, Centered CTA Button */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, ease: 'easeOut' }}
+            <ScrollReveal
+              direction="right"
+              delay={0.15}
               className="lg:col-span-6 flex flex-col justify-center space-y-6 sm:space-y-7 pl-0 lg:pl-4"
             >
               {/* Bold Title - Centered with Orange Accent */}
@@ -289,7 +313,7 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
                   <ArrowRight className="w-4 h-4 stroke-[2.2]" />
                 </button>
               </div>
-            </motion.div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
@@ -299,171 +323,159 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
           ========================================================================= */}
       <section className="relative w-full bg-[#FBFBFA] text-slate-900 py-16 sm:py-24 overflow-hidden border-y border-slate-100">
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto space-y-3 mb-14">
+          <ScrollReveal direction="down" delay={0.1} className="text-center max-w-3xl mx-auto space-y-3 mb-14">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight [text-wrap:balance]">
               Los Pilares que Sostienen Cada Proyecto
             </h2>
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
               Trabajamos bajo estándares rigurosos de honestidad contractual, solvencia técnica y responsabilidad social comunitaria.
             </p>
-          </div>
+          </ScrollReveal>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
             {/* Card 1: Soft Fresh Brand Green */}
-            <motion.div
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0 }}
-              whileHover={{ y: -6 }}
-              className="p-7 sm:p-8 rounded-[2rem] bg-[#eaf8ee] border border-[#22A33D]/25 text-[#113d22] flex flex-col justify-between min-h-[240px] sm:min-h-[260px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
-            >
-              <div>
-                <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-2.5 text-[#113d22]">
-                  Transparencia Notarial
-                </h3>
-                <p className="text-xs sm:text-sm leading-relaxed text-slate-600">
-                  Documentación legal abierta y a disposición de cada cliente antes de firmar cualquier compromiso económico.
-                </p>
-              </div>
-
-              <div className="flex items-end justify-between mt-8 pt-2">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#113d22] text-white flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
-                  <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            <ScrollReveal direction="left" delay={0.05}>
+              <motion.div
+                whileHover={{ y: -6 }}
+                className="p-7 sm:p-8 rounded-[2rem] bg-[#eaf8ee] border border-[#22A33D]/25 text-[#113d22] flex flex-col justify-between min-h-[240px] sm:min-h-[260px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
+              >
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-2.5 text-[#113d22]">
+                    Transparencia Notarial
+                  </h3>
+                  <p className="text-xs sm:text-sm leading-relaxed text-slate-600">
+                    Documentación legal abierta y a disposición de cada cliente antes de firmar cualquier compromiso económico.
+                  </p>
                 </div>
-                <FileText className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.4] text-[#22A33D]/80 transition-transform duration-500 group-hover:scale-110" />
-              </div>
-            </motion.div>
+
+                <div className="flex items-end justify-between mt-8 pt-2">
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#113d22] text-white flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
+                    <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </div>
+                  <FileText className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.4] text-[#22A33D]/80 transition-transform duration-500 group-hover:scale-110" />
+                </div>
+              </motion.div>
+            </ScrollReveal>
 
             {/* Card 2: Deep Dark Forest Green (#113d22) */}
-            <motion.div
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.08 }}
-              whileHover={{ y: -6 }}
-              className="p-7 sm:p-8 rounded-[2rem] bg-[#113d22] text-white flex flex-col justify-between min-h-[240px] sm:min-h-[260px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
-            >
-              <div>
-                <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-2.5 text-white">
-                  Cumplimiento de Obra
-                </h3>
-                <p className="text-xs sm:text-sm leading-relaxed text-slate-300">
-                  Vías concluidas, alcantarillado instalado y obras de urbanismo palpables y verificables en el terreno.
-                </p>
-              </div>
-
-              <div className="flex items-end justify-between mt-8 pt-2">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/15 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
-                  <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            <ScrollReveal direction="up" delay={0.12}>
+              <motion.div
+                whileHover={{ y: -6 }}
+                className="p-7 sm:p-8 rounded-[2rem] bg-[#113d22] text-white flex flex-col justify-between min-h-[240px] sm:min-h-[260px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
+              >
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-2.5 text-white">
+                    Cumplimiento de Obra
+                  </h3>
+                  <p className="text-xs sm:text-sm leading-relaxed text-slate-300">
+                    Vías concluidas, alcantarillado instalado y obras de urbanismo palpables y verificables en el terreno.
+                  </p>
                 </div>
-                <Building2 className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.4] text-[#5be196] transition-transform duration-500 group-hover:scale-110" />
-              </div>
-            </motion.div>
+
+                <div className="flex items-end justify-between mt-8 pt-2">
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/15 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
+                    <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </div>
+                  <Building2 className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.4] text-[#5be196] transition-transform duration-500 group-hover:scale-110" />
+                </div>
+              </motion.div>
+            </ScrollReveal>
 
             {/* Card 3: Deep Green Gradient with #22A33D */}
-            <motion.div
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.16 }}
-              whileHover={{ y: -6 }}
-              className="p-7 sm:p-8 rounded-[2rem] bg-gradient-to-br from-[#113d22] via-[#164929] to-[#22A33D] text-white flex flex-col justify-between min-h-[240px] sm:min-h-[260px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
-            >
-              <div>
-                <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-2.5 text-white">
-                  Seguridad Jurídica
-                </h3>
-                <p className="text-xs sm:text-sm leading-relaxed text-slate-200">
-                  Títulos individuales protocolizados ante Notario Público e inscritos legalmente en el Registro de la Propiedad.
-                </p>
-              </div>
-
-              <div className="flex items-end justify-between mt-8 pt-2">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/15 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
-                  <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            <ScrollReveal direction="right" delay={0.18}>
+              <motion.div
+                whileHover={{ y: -6 }}
+                className="p-7 sm:p-8 rounded-[2rem] bg-gradient-to-br from-[#113d22] via-[#164929] to-[#22A33D] text-white flex flex-col justify-between min-h-[240px] sm:min-h-[260px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
+              >
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-2.5 text-white">
+                    Seguridad Jurídica
+                  </h3>
+                  <p className="text-xs sm:text-sm leading-relaxed text-slate-200">
+                    Títulos individuales protocolizados ante Notario Público e inscritos legalmente en el Registro de la Propiedad.
+                  </p>
                 </div>
-                <ShieldCheck className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.4] text-[#5be196] transition-transform duration-500 group-hover:scale-110" />
-              </div>
-            </motion.div>
+
+                <div className="flex items-end justify-between mt-8 pt-2">
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/15 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
+                    <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </div>
+                  <ShieldCheck className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.4] text-[#5be196] transition-transform duration-500 group-hover:scale-110" />
+                </div>
+              </motion.div>
+            </ScrollReveal>
 
             {/* Card 4: Dark Forest Green */}
-            <motion.div
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.24 }}
-              whileHover={{ y: -6 }}
-              className="p-7 sm:p-8 rounded-[2rem] bg-gradient-to-br from-[#0c2b18] to-[#174627] text-white flex flex-col justify-between min-h-[240px] sm:min-h-[260px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
-            >
-              <div>
-                <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-2.5 text-white">
-                  Urbanismo Planificado
-                </h3>
-                <p className="text-xs sm:text-sm leading-relaxed text-slate-300">
-                  Levantamientos topográficos georreferenciados con coordenadas UTM, áreas verdes y trazados viales aprobados.
-                </p>
-              </div>
-
-              <div className="flex items-end justify-between mt-8 pt-2">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/15 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
-                  <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            <ScrollReveal direction="left" delay={0.22}>
+              <motion.div
+                whileHover={{ y: -6 }}
+                className="p-7 sm:p-8 rounded-[2rem] bg-gradient-to-br from-[#0c2b18] to-[#174627] text-white flex flex-col justify-between min-h-[240px] sm:min-h-[260px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
+              >
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-2.5 text-white">
+                    Urbanismo Planificado
+                  </h3>
+                  <p className="text-xs sm:text-sm leading-relaxed text-slate-300">
+                    Levantamientos topográficos georreferenciados con coordenadas UTM, áreas verdes y trazados viales aprobados.
+                  </p>
                 </div>
-                <Scale className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.4] text-[#5be196] transition-transform duration-500 group-hover:scale-110" />
-              </div>
-            </motion.div>
+
+                <div className="flex items-end justify-between mt-8 pt-2">
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/15 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
+                    <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </div>
+                  <Scale className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.4] text-[#5be196] transition-transform duration-500 group-hover:scale-110" />
+                </div>
+              </motion.div>
+            </ScrollReveal>
 
             {/* Card 5: Warm Orange / Direct Financing Accent (#F58220) */}
-            <motion.div
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.32 }}
-              whileHover={{ y: -6 }}
-              className="p-7 sm:p-8 rounded-[2rem] bg-gradient-to-br from-[#fffaf5] to-[#fff3e6] border border-orange-200/90 text-slate-900 flex flex-col justify-between min-h-[240px] sm:min-h-[260px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
-            >
-              <div>
-                <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-2.5 text-slate-900">
-                  Financiamiento Directo
-                </h3>
-                <p className="text-xs sm:text-sm leading-relaxed text-slate-600">
-                  Crédito directo con la urbanizadora hasta 48 meses en cuotas fijas. Sin trámites bancarios complejos ni historial crediticio excluyente.
-                </p>
-              </div>
-
-              <div className="flex items-end justify-between mt-8 pt-2">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#F58220] text-white hover:bg-[#ea580c] flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
-                  <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            <ScrollReveal direction="up" delay={0.28}>
+              <motion.div
+                whileHover={{ y: -6 }}
+                className="p-7 sm:p-8 rounded-[2rem] bg-gradient-to-br from-[#fffaf5] to-[#fff3e6] border border-orange-200/90 text-slate-900 flex flex-col justify-between min-h-[240px] sm:min-h-[260px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
+              >
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-2.5 text-slate-900">
+                    Financiamiento Directo
+                  </h3>
+                  <p className="text-xs sm:text-sm leading-relaxed text-slate-600">
+                    Crédito directo con la urbanizadora hasta 48 meses en cuotas fijas. Sin trámites bancarios complejos ni historial crediticio excluyente.
+                  </p>
                 </div>
-                <FileCheck2 className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.4] text-[#F58220] transition-transform duration-500 group-hover:scale-110" />
-              </div>
-            </motion.div>
+
+                <div className="flex items-end justify-between mt-8 pt-2">
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#F58220] text-white hover:bg-[#ea580c] flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
+                    <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </div>
+                  <FileCheck2 className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.4] text-[#F58220] transition-transform duration-500 group-hover:scale-110" />
+                </div>
+              </motion.div>
+            </ScrollReveal>
 
             {/* Card 6: Soft Fresh Brand Green */}
-            <motion.div
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              whileHover={{ y: -6 }}
-              className="p-7 sm:p-8 rounded-[2rem] bg-[#eaf8ee] border border-[#22A33D]/25 text-[#113d22] flex flex-col justify-between min-h-[240px] sm:min-h-[260px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
-            >
-              <div>
-                <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-2.5 text-[#113d22]">
-                  Acompañamiento VIP
-                </h3>
-                <p className="text-xs sm:text-sm leading-relaxed text-slate-600">
-                  Asesoría técnica y jurídica en terreno con transporte corporativo exclusivo para que compruebes linderos con total tranquilidad.
-                </p>
-              </div>
-
-              <div className="flex items-end justify-between mt-8 pt-2">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#113d22] text-white hover:bg-[#22A33D] flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
-                  <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            <ScrollReveal direction="right" delay={0.34}>
+              <motion.div
+                whileHover={{ y: -6 }}
+                className="p-7 sm:p-8 rounded-[2rem] bg-[#eaf8ee] border border-[#22A33D]/25 text-[#113d22] flex flex-col justify-between min-h-[240px] sm:min-h-[260px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
+              >
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-2.5 text-[#113d22]">
+                    Acompañamiento VIP
+                  </h3>
+                  <p className="text-xs sm:text-sm leading-relaxed text-slate-600">
+                    Asesoría técnica y jurídica en terreno con transporte corporativo exclusivo para que compruebes linderos con total tranquilidad.
+                  </p>
                 </div>
-                <Award className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.4] text-[#22A33D]/80 transition-transform duration-500 group-hover:scale-110" />
-              </div>
-            </motion.div>
+
+                <div className="flex items-end justify-between mt-8 pt-2">
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#113d22] text-white hover:bg-[#22A33D] flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
+                    <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </div>
+                  <Award className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.4] text-[#22A33D]/80 transition-transform duration-500 group-hover:scale-110" />
+                </div>
+              </motion.div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
@@ -472,23 +484,53 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
           4. PROCESO DE ADQUISICIÓN — DISEÑO CUADRO VERDE CLARO & PALETA CORPORATIVA MGM
           ========================================================================= */}
       <section className="relative w-full bg-[#113d22] text-white py-16 sm:py-24 overflow-hidden border-b border-emerald-950/40">
-        {/* Ambient Topographic Texture Mask */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* Fondo con máscara de imágenes de propiedades y sombreado verde corporativo */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
+          {/* Mosaico de propiedades con máscara radial suave */}
+          <div
+            className="absolute inset-0 opacity-45"
+            style={{
+              WebkitMaskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0) 98%)',
+              maskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0) 98%)',
+            }}
+          >
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 h-full w-full p-3 sm:p-6 scale-105">
+              {ACQUISITION_BG_PROPERTIES.map((prop, idx) => (
+                <div
+                  key={idx}
+                  className={`relative w-full h-full overflow-hidden rounded-3xl sm:rounded-[2.5rem] shadow-2xl border border-white/10 ${prop.className}`}
+                >
+                  <Image
+                    src={prop.url}
+                    alt={prop.alt}
+                    fill
+                    sizes="(max-width: 640px) 50vw, 25vw"
+                    className="object-cover object-center filter saturate-110 brightness-95"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/25" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Sombreado y degradado corporativo idéntico al banner de inicio (verdecito sombreado de Contacto) */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#113d22]/85 via-black/55 to-[#113d22]/90 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#113d22]/85 via-transparent to-[#113d22]/80 pointer-events-none" />
+
+          {/* Resplandores ambientales y textura topográfica */}
+          <div className="absolute -top-32 -left-32 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#F58220]/20 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute inset-0 opacity-15 [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_80%)]">
             <TopographicContours className="text-[#5be196]/30" />
           </div>
-          <div className="absolute -top-32 -left-32 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#F58220]/15 rounded-full blur-3xl pointer-events-none" />
         </div>
 
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
             {/* Left Column: Heading, Paragraph, Centered CTA Button */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.65, ease: 'easeOut' }}
+            <ScrollReveal
+              direction="left"
+              delay={0.15}
               className="lg:col-span-6 flex flex-col justify-center space-y-6 sm:space-y-8"
             >
               <div className="space-y-4 text-center lg:text-left">
@@ -511,14 +553,12 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
                   <ArrowRight className="w-4 h-4 stroke-[2.5]" />
                 </button>
               </div>
-            </motion.div>
+            </ScrollReveal>
 
             {/* Right Column: Light Green Container with the 4 steps */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.65, ease: 'easeOut' }}
+            <ScrollReveal
+              direction="right"
+              delay={0.15}
               className="lg:col-span-6 w-full flex justify-center"
             >
               <div className="w-full max-w-[560px] bg-[#eaf8ee] text-[#113d22] rounded-[2.5rem] p-7 sm:p-9 lg:p-10 shadow-2xl space-y-6 border border-[#22A33D]/30">
@@ -583,7 +623,7 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
@@ -593,34 +633,36 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
           ========================================================================= */}
       <section className="relative w-full bg-[#FBFBFA] text-slate-900 py-16 sm:py-20 overflow-hidden">
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl bg-slate-900 border border-slate-800 p-8 sm:p-12 text-white flex flex-col sm:flex-row items-center justify-between gap-8 shadow-xl relative overflow-hidden">
-            <div className="space-y-2 max-w-xl text-center sm:text-left">
-              <h3 className="text-2xl sm:text-3xl font-black text-white">
-                ¿Deseas examinar la documentación jurídica?
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Agendamos una reunión con nuestro equipo notarial para que revises planos catastrales, certificados de gravámenes y licencias de urbanismo con total transparencia.
-              </p>
-            </div>
+          <ScrollReveal direction="zoom" delay={0.15}>
+            <div className="rounded-3xl bg-slate-900 border border-slate-800 p-8 sm:p-12 text-white flex flex-col sm:flex-row items-center justify-between gap-8 shadow-xl relative overflow-hidden">
+              <div className="space-y-2 max-w-xl text-center sm:text-left">
+                <h3 className="text-2xl sm:text-3xl font-black text-white">
+                  ¿Deseas examinar la documentación jurídica?
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  Agendamos una reunión con nuestro equipo notarial para que revises planos catastrales, certificados de gravámenes y licencias de urbanismo con total transparencia.
+                </p>
+              </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={() => onOpenVisitModal('Asesoría Jurídica y Notarial')}
-                className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-[#F58220] hover:bg-[#ea580c] text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap text-center active:scale-95"
-              >
-                Agendar Asesoría Legal
-              </button>
-              <a
-                href={getGeneralWhatsAppUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm transition-all whitespace-normal sm:whitespace-nowrap text-center cursor-pointer shadow-md active:scale-95"
-              >
-                <WhatsAppIcon size={18} className="text-slate-950 shrink-0" />
-                <span>WhatsApp Oficial</span>
-              </a>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => onOpenVisitModal('Asesoría Jurídica y Notarial')}
+                  className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-[#F58220] hover:bg-[#ea580c] text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap text-center active:scale-95"
+                >
+                  Agendar Asesoría Legal
+                </button>
+                <a
+                  href={getGeneralWhatsAppUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm transition-all whitespace-normal sm:whitespace-nowrap text-center cursor-pointer shadow-md active:scale-95"
+                >
+                  <WhatsAppIcon size={18} className="text-slate-950 shrink-0" />
+                  <span>WhatsApp Oficial</span>
+                </a>
+              </div>
             </div>
-          </div>
+          </ScrollReveal>
         </div>
       </section>
     </div>
