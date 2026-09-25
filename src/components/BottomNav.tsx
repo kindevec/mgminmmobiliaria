@@ -20,18 +20,18 @@ interface BottomNavProps {
 function getBarPath(cx: number, w: number, h: number, progress: number = 1): string {
   const r = (n: number) => Math.round(n * 10) / 10;
 
-  // Corte superior debajo del cuadro naranja (#F58220) (58px total para caja de 48px -> 5px de espacio a cada lado)
-  const tw = 29;                   // semi-ancho = 29px (ancho total = 58px)
-  const sh = 6 * progress;         // hombro curvo hacia el borde superior
-  const td = 30 * progress;        // profundidad del corte superior (se hunde hacia abajo)
-  const rc = 10 * progress;        // radio de esquinas inferiores
+  // Corte superior debajo del cuadro naranja (#F58220) (54px total para caja de 44px -> 5px de espacio a cada lado)
+  const tw = 27;                   // semi-ancho = 27px (ancho total = 54px)
+  const sh = 5 * progress;         // hombro curvo hacia el borde superior
+  const td = 24 * progress;        // profundidad del corte superior (se hunde hacia abajo)
+  const rc = 8 * progress;         // radio de esquinas inferiores
 
-  // Hendidura inferior para la barrita de nombres (86px total para barrita de 76px -> 5px a cada lado)
+  // Hendidura inferior para la barrita de nombres (82px total para barrita de 72px -> 5px a cada lado)
   // Con forma cápsula redondeada que replica la forma de la barrita misma
-  const bw = 43;                   // semi-ancho = 43px (ancho total = 86px)
-  const b_sh = 6 * progress;       // hombro curvo hacia el borde inferior
-  const bd = 32 * progress;        // profundidad de la hendidura hacia arriba en la barra
-  const b_rc = 16 * progress;      // radio redondeado cápsula que replica la forma de la barrita
+  const bw = 41;                   // semi-ancho = 41px (ancho total = 82px)
+  const b_sh = 5 * progress;       // hombro curvo hacia el borde inferior
+  const bd = 34.5 * progress;      // profundidad de la hendidura hacia arriba en la barra (con separación mínima superior)
+  const b_rc = 13.5 * progress;    // radio redondeado cápsula que replica la forma de la barrita
 
   return [
     `M 0,0`,
@@ -76,14 +76,14 @@ function getBarPath(cx: number, w: number, h: number, progress: number = 1): str
 }
 
 /**
- * Bisel superior que resalta el corte bajo el cuadro verde (#5be196) descendiendo
+ * Bisel superior que resalta el corte bajo el cuadro naranja (#F58220) descendiendo
  */
 function getTopBorderPath(cx: number, w: number, progress: number = 1): string {
   const r = (n: number) => Math.round(n * 10) / 10;
-  const tw = 29;
-  const sh = 6 * progress;
-  const td = 30 * progress;
-  const rc = 10 * progress;
+  const tw = 27;
+  const sh = 5 * progress;
+  const td = 24 * progress;
+  const rc = 8 * progress;
 
   return [
     `M 0,0.5`,
@@ -104,10 +104,10 @@ function getTopBorderPath(cx: number, w: number, progress: number = 1): string {
  */
 function getBottomBorderPath(cx: number, w: number, h: number, progress: number = 1): string {
   const r = (n: number) => Math.round(n * 10) / 10;
-  const bw = 43;
-  const b_sh = 6 * progress;
-  const bd = 32 * progress;
-  const b_rc = 16 * progress;
+  const bw = 41;
+  const b_sh = 5 * progress;
+  const bd = 34.5 * progress;
+  const b_rc = 13.5 * progress;
 
   return [
     `M ${r(w)},${r(h - 0.5)}`,
@@ -167,7 +167,7 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
 
   const [dimensions, setDimensions] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 390,
-    height: 74,
+    height: 62,
     activeX: 195,
   });
 
@@ -201,13 +201,13 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
   return (
     <nav
       ref={navRef}
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-transparent drop-shadow-[0_-4px_30px_rgba(0,0,0,0.55)] pb-[max(env(safe-area-inset-bottom),18px)] pt-3 transition-all select-none overflow-visible"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-transparent drop-shadow-[0_-4px_30px_rgba(0,0,0,0.55)] pb-[max(env(safe-area-inset-bottom),10px)] pt-2 transition-all select-none overflow-visible"
       aria-label="Navegación móvil inferior"
     >
       {/* ========================================================
           BARRA CORTADA DINÁMICA: LA HENDIDURA SE HUNDE HACIA ABAJO
           - Centrada exactamente con el contenedor del icono activo.
-          - Fondo verde corporativo (#22A33D a #113d22).
+          - Fondo verde hero (#5be196 a #3ecb7e / #22A33D).
          ======================================================== */}
       <svg
         className="absolute inset-0 w-full h-full pointer-events-none -z-10 overflow-visible"
@@ -216,16 +216,17 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
       >
         <defs>
           <linearGradient id="navBarGreenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#22A33D" />
-            <stop offset="100%" stopColor="#113d22" />
+            <stop offset="0%" stopColor="#6ef7aa" />
+            <stop offset="45%" stopColor="#5be196" />
+            <stop offset="100%" stopColor="#34bf74" />
           </linearGradient>
 
           <filter id="cutoutInnerShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="#062512" floodOpacity="0.6" />
+            <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="#047857" floodOpacity="0.4" />
           </filter>
         </defs>
 
-        {/* Cuerpo de la barra verde */}
+        {/* Cuerpo de la barra verde hero */}
         <motion.path
           key={`bar-body-${activeIndex}-${clickCount}`}
           initial={
@@ -315,20 +316,20 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
                 onNavigate(item.id);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="relative flex flex-col items-center justify-center py-1 px-1 rounded-2xl cursor-pointer min-w-[58px] sm:min-w-[64px] h-[52px] touch-manipulation group"
+              className="relative flex flex-col items-center justify-center py-0.5 px-1 rounded-2xl cursor-pointer min-w-[56px] sm:min-w-[62px] h-[44px] touch-manipulation group"
               aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}
             >
               {isActive ? (
                 <>
                   {/* ========================================================
-                      1. CUADRO NARANJA HERO (#F58220): ELEVADO (-top-[36px])
+                      1. CUADRO NARANJA HERO (#F58220): ELEVADO (-top-[28px])
                       Centrado al 50% con 5px a los lados.
-                      Comienza abajo en su columna (y=54) y se eleva hacia arriba (y=0).
+                      Comienza abajo en su columna (y=44) y se eleva hacia arriba (y=0).
                      ======================================================== */}
                   <motion.div
                     key={`square-${item.id}-${clickCount}`}
-                    initial={clickCount > 0 ? { y: 54 } : false}
+                    initial={clickCount > 0 ? { y: 44 } : false}
                     animate={{ y: 0 }}
                     transition={{
                       duration: 1.25,
@@ -336,37 +337,37 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
                     }}
                     whileTap={{ scale: 0.94 }}
                     style={{ left: '50%', x: '-50%' }}
-                    className="absolute -top-[36px] w-12 h-12 rounded-2xl bg-gradient-to-b from-[#ffa352] via-[#F58220] to-[#d94e08] flex items-center justify-center text-white z-20 cursor-pointer shadow-[0_0_20px_#F58220,0_0_40px_rgba(245,130,32,0.65),0_0_60px_rgba(245,130,32,0.35)]"
+                    className="absolute -top-[28px] w-11 h-11 rounded-2xl bg-gradient-to-b from-[#ffa352] via-[#F58220] to-[#d94e08] flex items-center justify-center text-black z-20 cursor-pointer shadow-[0_0_18px_#F58220,0_0_36px_rgba(245,130,32,0.6),0_0_50px_rgba(245,130,32,0.3)]"
                   >
-                    <Icon className="w-6 h-6 stroke-[2.5] text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
+                    <Icon className="w-5.5 h-5.5 stroke-[2.5] text-black drop-shadow-[0_1px_1px_rgba(255,255,255,0.4)]" />
                   </motion.div>
 
                   {/* ========================================================
                       2. BARRITA DEL NOMBRE EN NARANJA HERO (#F58220)
                       - Abrazada perfectamente por la pestaña inferior de la barra.
                       - Centrada al 50% con 5px a los lados.
-                      - Animación fluida.
+                      - Elevada más arriba dentro de la barra.
                      ======================================================== */}
                   <motion.div
                     key={`label-${item.id}-${clickCount}`}
-                    initial={clickCount > 0 ? { y: -54 } : false}
+                    initial={clickCount > 0 ? { y: -36 } : false}
                     animate={{ y: 0 }}
                     transition={{
                       duration: 1.25,
                       ease: [0.16, 1, 0.3, 1],
                     }}
                     style={{ left: '50%', x: '-50%' }}
-                    className="absolute -bottom-[10px] w-[76px] h-[20px] rounded-full bg-gradient-to-r from-[#ffa352] via-[#F58220] to-[#ffa352] flex items-center justify-center z-20 shadow-[0_0_16px_rgba(245,130,32,0.75)]"
+                    className="absolute bottom-[1.5px] w-[72px] h-[19px] rounded-full bg-gradient-to-r from-[#ffa352] via-[#F58220] to-[#ffa352] flex items-center justify-center z-20 shadow-[0_0_14px_rgba(245,130,32,0.7)]"
                   >
-                    <span className="text-[9px] font-black uppercase tracking-wider text-white whitespace-nowrap px-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
+                    <span className="text-[8.5px] font-black uppercase tracking-wider text-black whitespace-nowrap px-1">
                       {item.label}
                     </span>
                   </motion.div>
                 </>
               ) : (
-                /* Ícono en reposo sobre la barra verde */
-                <div className="flex items-center justify-center w-11 h-11 text-white/80 group-hover:text-white transition-colors">
-                  <Icon className="w-6 h-6 stroke-[2.2]" />
+                /* Ícono en reposo sobre la barra verde hero en negro con alto contraste */
+                <div className="flex items-center justify-center w-10 h-10 text-slate-950/85 group-hover:text-black transition-colors">
+                  <Icon className="w-5.5 h-5.5 stroke-[2.4]" />
                 </div>
               )}
             </a>
