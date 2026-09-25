@@ -20,7 +20,7 @@ interface BottomNavProps {
 function getBarPath(cx: number, w: number, h: number, progress: number = 1): string {
   const r = (n: number) => Math.round(n * 10) / 10;
 
-  // Corte superior debajo del cuadro verde (#5be196) (58px total para caja de 48px -> 5px de espacio a cada lado)
+  // Corte superior debajo del cuadro naranja (#F58220) (58px total para caja de 48px -> 5px de espacio a cada lado)
   const tw = 29;                   // semi-ancho = 29px (ancho total = 58px)
   const sh = 6 * progress;         // hombro curvo hacia el borde superior
   const td = 30 * progress;        // profundidad del corte superior (se hunde hacia abajo)
@@ -207,7 +207,7 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
       {/* ========================================================
           BARRA CORTADA DINÁMICA: LA HENDIDURA SE HUNDE HACIA ABAJO
           - Centrada exactamente con el contenedor del icono activo.
-          - Fondo naranja corporativo (#F58220 a #d94e08).
+          - Fondo verde corporativo (#22A33D a #113d22).
          ======================================================== */}
       <svg
         className="absolute inset-0 w-full h-full pointer-events-none -z-10 overflow-visible"
@@ -216,16 +216,16 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
       >
         <defs>
           <linearGradient id="navBarGreenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#F58220" />
-            <stop offset="100%" stopColor="#d94e08" />
+            <stop offset="0%" stopColor="#22A33D" />
+            <stop offset="100%" stopColor="#113d22" />
           </linearGradient>
 
           <filter id="cutoutInnerShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="#7c2d12" floodOpacity="0.5" />
+            <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="#062512" floodOpacity="0.6" />
           </filter>
         </defs>
 
-        {/* Cuerpo de la barra naranja */}
+        {/* Cuerpo de la barra verde */}
         <motion.path
           key={`bar-body-${activeIndex}-${clickCount}`}
           initial={
@@ -322,7 +322,7 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
               {isActive ? (
                 <>
                   {/* ========================================================
-                      1. CUADRO VERDE MENTA HERO (#5be196): ELEVADO (-top-[36px])
+                      1. CUADRO NARANJA HERO (#F58220): ELEVADO (-top-[36px])
                       Centrado al 50% con 5px a los lados.
                       Comienza abajo en su columna (y=54) y se eleva hacia arriba (y=0).
                      ======================================================== */}
@@ -336,13 +336,13 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
                     }}
                     whileTap={{ scale: 0.94 }}
                     style={{ left: '50%', x: '-50%' }}
-                    className="absolute -top-[36px] w-12 h-12 rounded-2xl bg-gradient-to-b from-[#7ef5b1] via-[#5be196] to-[#22A33D] flex items-center justify-center text-slate-950 z-20 cursor-pointer shadow-[0_0_20px_#5be196,0_0_40px_rgba(91,225,150,0.65),0_0_60px_rgba(91,225,150,0.35)]"
+                    className="absolute -top-[36px] w-12 h-12 rounded-2xl bg-gradient-to-b from-[#ffa352] via-[#F58220] to-[#d94e08] flex items-center justify-center text-white z-20 cursor-pointer shadow-[0_0_20px_#F58220,0_0_40px_rgba(245,130,32,0.65),0_0_60px_rgba(245,130,32,0.35)]"
                   >
-                    <Icon className="w-6 h-6 stroke-[2.5] text-slate-950 drop-shadow-[0_1px_2px_rgba(255,255,255,0.4)]" />
+                    <Icon className="w-6 h-6 stroke-[2.5] text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
                   </motion.div>
 
                   {/* ========================================================
-                      2. BARRITA DEL NOMBRE EN VERDE HERO (#5be196)
+                      2. BARRITA DEL NOMBRE EN NARANJA HERO (#F58220)
                       - Abrazada perfectamente por la pestaña inferior de la barra.
                       - Centrada al 50% con 5px a los lados.
                       - Animación fluida.
@@ -356,16 +356,16 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
                       ease: [0.16, 1, 0.3, 1],
                     }}
                     style={{ left: '50%', x: '-50%' }}
-                    className="absolute -bottom-[10px] w-[76px] h-[20px] rounded-full bg-gradient-to-r from-[#7ef5b1] via-[#5be196] to-[#7ef5b1] flex items-center justify-center z-20 shadow-[0_0_16px_rgba(91,225,150,0.75)]"
+                    className="absolute -bottom-[10px] w-[76px] h-[20px] rounded-full bg-gradient-to-r from-[#ffa352] via-[#F58220] to-[#ffa352] flex items-center justify-center z-20 shadow-[0_0_16px_rgba(245,130,32,0.75)]"
                   >
-                    <span className="text-[9px] font-black uppercase tracking-wider text-slate-950 whitespace-nowrap px-1">
+                    <span className="text-[9px] font-black uppercase tracking-wider text-white whitespace-nowrap px-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
                       {item.label}
                     </span>
                   </motion.div>
                 </>
               ) : (
-                /* Ícono en reposo sobre la barra naranja (negro sólido con alto contraste) */
-                <div className="flex items-center justify-center w-11 h-11 text-slate-950/80 group-hover:text-black transition-colors">
+                /* Ícono en reposo sobre la barra verde */
+                <div className="flex items-center justify-center w-11 h-11 text-white/80 group-hover:text-white transition-colors">
                   <Icon className="w-6 h-6 stroke-[2.2]" />
                 </div>
               )}
