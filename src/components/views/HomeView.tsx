@@ -38,6 +38,7 @@ import { WhatsAppIcon } from '../SocialIcons';
 import { TopographicContours } from '../WaveDividers';
 import { ScrollReveal } from '../common/ScrollReveal';
 import { AnimatedInsignia } from '../common/AnimatedInsignia';
+import { HeroNavArrows } from '../HeroNavArrows';
 
 interface HomeViewProps {
   onNavigate: (page: PageView) => void;
@@ -144,6 +145,47 @@ export function HomeView({
   // Carousel 3: Miravalle
   const [miravalleIndex, setMiravalleIndex] = useState(0);
 
+  // Mobile 3D Stacked Pillars Carousel State (Tun Tun Store style)
+  const [activePillarIndex, setActivePillarIndex] = useState(0);
+  const [pillarTouchStart, setPillarTouchStart] = useState<number | null>(null);
+  const [pillarTouchEnd, setPillarTouchEnd] = useState<number | null>(null);
+  const [isPillarHovered, setIsPillarHovered] = useState(false);
+
+  const nextPillar = () => {
+    setActivePillarIndex((prev) => (prev + 1) % ABOUT_PILLARS.length);
+  };
+
+  const prevPillar = () => {
+    setActivePillarIndex((prev) => (prev - 1 + ABOUT_PILLARS.length) % ABOUT_PILLARS.length);
+  };
+
+  useEffect(() => {
+    if (isPillarHovered) return;
+    const interval = setInterval(() => {
+      setActivePillarIndex((prev) => (prev + 1) % ABOUT_PILLARS.length);
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [isPillarHovered]);
+
+  const onPillarTouchStart = (e: React.TouchEvent) => {
+    setPillarTouchEnd(null);
+    setPillarTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onPillarTouchMove = (e: React.TouchEvent) => {
+    setPillarTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onPillarTouchEnd = () => {
+    if (pillarTouchStart === null || pillarTouchEnd === null) return;
+    const distance = pillarTouchStart - pillarTouchEnd;
+    if (distance > 45) {
+      nextPillar();
+    } else if (distance < -45) {
+      prevPillar();
+    }
+  };
+
   // Banner Continuous Real Estate Slideshow
   const [heroImgIndex, setHeroImgIndex] = useState(0);
   const [heroHovered, setHeroHovered] = useState(false);
@@ -156,6 +198,14 @@ export function HomeView({
     }, 5500);
     return () => clearInterval(interval);
   }, [heroHovered]);
+
+  const nextHeroImage = () => {
+    setHeroImgIndex((prev) => (prev + 1 >= HERO_REAL_ESTATE_IMAGES.length ? 0 : prev + 1));
+  };
+
+  const prevHeroImage = () => {
+    setHeroImgIndex((prev) => (prev - 1 < 0 ? HERO_REAL_ESTATE_IMAGES.length - 1 : prev - 1));
+  };
 
   // Detección de sección activa en pantalla para el catálogo de lotes y Miravalle
   const catalogSectionRef = useRef<HTMLElement>(null);
@@ -264,7 +314,7 @@ export function HomeView({
           1. BANNER CINEMÁTICO — PANORÁMICO INTEGRAL (SIN PARTICIONES VERTICALES)
           ========================================================================= */}
       <section
-        className="relative w-full bg-[#113d22] text-white overflow-hidden min-h-[580px] sm:min-h-[640px] lg:min-h-[700px] flex items-center justify-center select-none"
+        className="group/hero relative w-full bg-[#113d22] text-white overflow-hidden min-h-[460px] sm:min-h-[640px] lg:min-h-[700px] flex items-center justify-center select-none"
       >
         {/* Fondo fotográfico panorámico continuo (100% de la pantalla) */}
         <div
@@ -315,14 +365,19 @@ export function HomeView({
           </div>
         </div>
 
+        {/* Controles de navegación manual translúcidos con materialización al hover */}
+        <HeroNavArrows onPrev={prevHeroImage} onNext={nextHeroImage} />
+
         {/* Contenido Central: Título, Párrafo, Pilares y Acciones */}
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-center items-center text-center pt-24 sm:pt-28 lg:pt-32 pb-14 sm:pb-16 lg:pb-18 space-y-4 sm:space-y-6 select-text cursor-default">
+        <div className="relative z-10 max-w-5xl mx-auto px-5 sm:px-10 lg:px-8 w-full flex flex-col justify-center items-center text-center pt-20 sm:pt-28 lg:pt-32 pb-8 sm:pb-16 lg:pb-18 space-y-3.5 sm:space-y-6 select-text cursor-default">
           {/* Insignia arquitectónica animada en SVG */}
-          <AnimatedInsignia className="mb-0 sm:mb-1" size={60} />
+          <div className="scale-90 sm:scale-100">
+            <AnimatedInsignia className="mb-0 sm:mb-1" size={54} />
+          </div>
 
           {/* Título Principal */}
           <ScrollReveal direction="down" delay={0.05} duration={0.7}>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black text-white leading-[1.08] tracking-tight [text-wrap:balance] drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-black text-white leading-tight sm:leading-[1.08] tracking-tight [text-wrap:balance] drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
               Tierra Firme, Certeza Jurídica
               <br />
               <span className="text-[#5be196]">y Patrimonio </span>
@@ -332,13 +387,13 @@ export function HomeView({
 
           {/* Párrafo Descriptivo */}
           <ScrollReveal direction="up" delay={0.15} duration={0.65}>
-            <p className="text-sm sm:text-base lg:text-lg text-slate-100 leading-relaxed font-normal max-w-3xl drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">
+            <p className="text-xs sm:text-base lg:text-lg text-slate-100 leading-relaxed font-normal max-w-3xl drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">
               Sociedad Civil MGM Inmobiliaria desarrolla comunidades residenciales con obras civiles concluidas, servicios básicos garantizados y crédito directo hasta 48 meses sin bancos ni buró de crédito.
             </p>
           </ScrollReveal>
 
-          {/* 4 Pilares del Banner */}
-          <ScrollReveal direction="up" delay={0.25} duration={0.65} className="w-full max-w-4xl">
+          {/* 4 Pilares del Banner (Ocultos en móvil, visibles en pantallas sm en adelante) */}
+          <ScrollReveal direction="up" delay={0.25} duration={0.65} className="hidden sm:block w-full max-w-4xl">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3.5 w-full pt-1">
               {HERO_CONTAINER_FEATURES.map((item, idx) => {
                 const Icon = item.icon;
@@ -360,17 +415,17 @@ export function HomeView({
 
           {/* Botones de Acción Inmobiliaria */}
           <ScrollReveal direction="zoom" delay={0.35} duration={0.6}>
-            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 pt-1 sm:pt-2">
+            <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 pt-1 sm:pt-2">
               <button
                 onClick={() => onNavigate('properties')}
-                className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-[#22A33D] hover:bg-[#1a8230] text-white font-bold text-sm sm:text-base tracking-wide transition-all shadow-lg hover:shadow-[#22A33D]/30 hover:scale-105 active:scale-95 cursor-pointer border border-[#5be196]/30"
+                className="inline-flex items-center gap-2 px-5 sm:px-8 py-2.5 sm:py-3.5 rounded-full bg-[#22A33D] hover:bg-[#1a8230] text-white font-bold text-xs sm:text-base tracking-wide transition-all shadow-lg hover:shadow-[#22A33D]/30 hover:scale-105 active:scale-95 cursor-pointer border border-[#5be196]/30"
               >
                 <span>Explorar Proyectos</span>
                 <ArrowRight className="h-4 w-4 stroke-[2.5]" />
               </button>
               <button
                 onClick={() => onOpenVisitModal()}
-                className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full bg-white/15 hover:bg-[#F58220] hover:border-[#F58220] text-white font-medium text-sm sm:text-base border border-white/30 backdrop-blur-md transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md"
+                className="inline-flex items-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3.5 rounded-full bg-white/15 hover:bg-[#F58220] hover:border-[#F58220] text-white font-medium text-xs sm:text-base border border-white/30 backdrop-blur-md transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md"
               >
                 <span>Agendar Visita</span>
               </button>
@@ -402,18 +457,159 @@ export function HomeView({
 
         <div className="relative z-10 mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
           {/* Encabezado visible únicamente en móviles (< lg) */}
-          <ScrollReveal direction="up" delay={0.1} className="lg:hidden text-center max-w-2xl mx-auto space-y-3 mb-10">
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-[1.15] [text-wrap:balance]">
+          <ScrollReveal direction="up" delay={0.1} className="lg:hidden text-center max-w-2xl mx-auto space-y-3 mb-6 sm:mb-8">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-[1.15] [text-wrap:balance]">
               Descubre la Solidez y <br />
               <span className="text-[#22A33D]">Urbanismo</span> a Través de Nuestros Proyectos
             </h2>
-            <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal max-w-md mx-auto">
               Sociedad Civil MGM Inmobiliaria transforma predios estratégicos en ciudadelas residenciales planificadas con obras concluidas, servicios básicos garantizados y certeza jurídica notarial.
             </p>
           </ScrollReveal>
 
-          {/* Grilla Arquitectónica de 3 Columnas: Mismo ancho en todas las tarjetas y boxes redondeados sin cortar la imagen */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
+          {/* Carrusel 3D Móvil de Tarjetas Sobremontadas */}
+          <div className="block lg:hidden w-[calc(100%+2rem)] -mx-4 sm:mx-auto sm:w-full sm:max-w-xl mb-6 overflow-hidden">
+            <div
+              className="relative w-full h-[410px] sm:h-[450px] flex items-center justify-center touch-pan-y select-none"
+              onTouchStart={onPillarTouchStart}
+              onTouchMove={onPillarTouchMove}
+              onTouchEnd={onPillarTouchEnd}
+              onMouseEnter={() => setIsPillarHovered(true)}
+              onMouseLeave={() => setIsPillarHovered(false)}
+            >
+              {ABOUT_PILLARS.map((item, idx) => {
+                const len = ABOUT_PILLARS.length;
+                const diff = (idx - activePillarIndex + len) % len;
+
+                let position: 'center' | 'left' | 'right' | 'hidden' = 'hidden';
+                let transform = 'translateX(0) scale(0.65)';
+                let zIndex = 1;
+                let opacity = 0;
+                let pointerEvents: 'auto' | 'none' = 'none';
+
+                if (diff === 0) {
+                  position = 'center';
+                  transform = 'translateX(0) scale(1)';
+                  zIndex = 20;
+                  opacity = 1;
+                  pointerEvents = 'auto';
+                } else if (diff === 1) {
+                  position = 'right';
+                  transform = 'translateX(20.5%) scale(0.88)';
+                  zIndex = 10;
+                  opacity = 0.85;
+                  pointerEvents = 'auto';
+                } else if (diff === len - 1) {
+                  position = 'left';
+                  transform = 'translateX(-20.5%) scale(0.88)';
+                  zIndex = 10;
+                  opacity = 0.85;
+                  pointerEvents = 'auto';
+                } else {
+                  position = 'hidden';
+                  transform = 'translateX(0) scale(0.6)';
+                  zIndex = 5;
+                  opacity = 0;
+                  pointerEvents = 'none';
+                }
+
+                const isOrange = idx === 2;
+
+                return (
+                  <div
+                    key={idx}
+                    className={`absolute w-[76%] max-w-[360px] h-[370px] sm:h-[410px] rounded-[2rem] overflow-hidden shadow-2xl transition-all duration-500 ease-out cursor-pointer bg-slate-900 border ${
+                      position === 'center'
+                        ? 'border-emerald-500/60 shadow-2xl shadow-emerald-950/30'
+                        : 'border-white/30 shadow-lg'
+                    }`}
+                    style={{
+                      transform,
+                      zIndex,
+                      opacity,
+                      pointerEvents,
+                    }}
+                    onClick={() => {
+                      if (position === 'left') prevPillar();
+                      else if (position === 'right') nextPillar();
+                      else onNavigate('properties');
+                    }}
+                  >
+                    <Image
+                      src={item.image}
+                      alt={item.title}
+                      fill
+                      sizes="(max-width: 640px) 80vw, 360px"
+                      className="object-cover object-center"
+                      referrerPolicy="no-referrer"
+                      priority={idx === 0}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-black/20 pointer-events-none" />
+
+                    {/* Caja Blanca Flotante con Título y Subtítulo */}
+                    <div className="absolute bottom-3 inset-x-3 z-10 bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl shadow-xl border border-white/80 text-center">
+                      <h4 className={`text-xs sm:text-sm font-black leading-snug tracking-tight ${isOrange ? 'text-[#F58220]' : 'text-[#22A33D]'}`}>
+                        {item.title}
+                      </h4>
+                      <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium line-clamp-1 mt-0.5">
+                        {item.subtitle}
+                      </p>
+                    </div>
+
+                    {/* Overlay semitransparente para las tarjetas laterales inactivas */}
+                    {position !== 'center' && (
+                      <div className="absolute inset-0 bg-black/40 backdrop-blur-[0.5px] pointer-events-none transition-opacity duration-500 rounded-[2rem] z-20" />
+                    )}
+                  </div>
+                );
+              })}
+
+              {/* Flechas de Navegación Compactas */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  prevPillar();
+                }}
+                aria-label="Pilar anterior"
+                className="absolute left-1 top-1/2 -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-black/60 hover:bg-[#22A33D] active:scale-95 text-white backdrop-blur-md border border-white/25 flex items-center justify-center transition-all cursor-pointer shadow-md"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  nextPillar();
+                }}
+                aria-label="Siguiente pilar"
+                className="absolute right-1 top-1/2 -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-black/60 hover:bg-[#22A33D] active:scale-95 text-white backdrop-blur-md border border-white/25 flex items-center justify-center transition-all cursor-pointer shadow-md"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Indicadores de Puntos (Dots) */}
+            <div className="flex items-center justify-center gap-1.5 mt-2">
+              {ABOUT_PILLARS.map((_, dotIdx) => (
+                <button
+                  key={dotIdx}
+                  type="button"
+                  onClick={() => setActivePillarIndex(dotIdx)}
+                  aria-label={`Ir a pilar ${dotIdx + 1}`}
+                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                    activePillarIndex === dotIdx
+                      ? 'w-6 bg-[#22A33D]'
+                      : 'w-2 bg-slate-300 hover:bg-slate-400'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Grilla Arquitectónica de 3 Columnas: Mismo ancho en todas las tarjetas y boxes redondeados sin cortar la imagen (Visible solo en desktop lg+) */}
+          <div className="hidden lg:grid lg:grid-cols-12 gap-6 sm:gap-8 items-start">
             {/* Columna Izquierda: 1 Tarjeta Lateral a la altura de la palabra "Urbanismo" (Pilar 0) */}
             <ScrollReveal direction="left" delay={0.15} className="lg:col-span-3 flex justify-center lg:justify-end lg:mt-14 xl:mt-16 w-full">
               <div
@@ -602,150 +798,15 @@ export function HomeView({
               onTouchEnd={() => {
                 setTimeout(() => setIsCatalogPaused(false), 3000);
               }}
-              className="flex gap-0 sm:gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory py-4 scrollbar-none"
+              className="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory py-4 scrollbar-none"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {properties.map((lot) => (
                 <div
                   key={lot.id}
-                  onClick={() => onSelectLot(lot)}
-                  className="w-full min-w-full sm:min-w-[360px] md:min-w-[385px] lg:min-w-[410px] max-w-full sm:max-w-[425px] snap-center shrink-0 bg-white rounded-3xl border border-slate-200/90 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group select-none cursor-pointer"
+                  className="w-full min-w-full sm:min-w-[360px] md:min-w-[385px] lg:min-w-[410px] max-w-full sm:max-w-[425px] snap-center shrink-0 flex flex-col"
                 >
-                  {/* Imagen y Badges */}
-                  <div className="relative w-full h-[220px] sm:h-[240px] overflow-hidden bg-slate-950">
-                    <Image
-                      src={lot.image}
-                      alt={lot.name}
-                      fill
-                      sizes="(max-width: 640px) 300px, 400px"
-                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent pointer-events-none" />
-
-                    {/* Badges superiores */}
-                    <div className="absolute top-3.5 inset-x-3.5 flex items-center justify-between z-10">
-                      <span className="text-xs font-mono font-black text-white bg-slate-950/85 px-3 py-1 rounded-full backdrop-blur-md border border-white/20 shadow-xs">
-                        {lot.code}
-                      </span>
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide backdrop-blur-md shadow-xs ${
-                          lot.status === 'Disponible'
-                            ? 'bg-emerald-950/85 text-emerald-300 border border-emerald-500/30'
-                            : lot.status === 'En Reserva'
-                            ? 'bg-amber-950/85 text-amber-300 border border-amber-500/30'
-                            : 'bg-slate-900/85 text-slate-300 border border-white/20'
-                        }`}
-                      >
-                        <span
-                          className={`h-1.5 w-1.5 rounded-full ${
-                            lot.status === 'Disponible'
-                              ? 'bg-[#25D366]'
-                              : lot.status === 'En Reserva'
-                              ? 'bg-amber-400'
-                              : 'bg-slate-400'
-                          }`}
-                        />
-                        {lot.status}
-                      </span>
-                    </div>
-
-                    {/* Proyecto & Tipo */}
-                    <div className="absolute bottom-3 left-3.5 right-3.5 z-10 flex items-center justify-between text-white text-[11px] font-medium drop-shadow-md">
-                      <span className="flex items-center gap-1 bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-lg">
-                        <MapPin className="h-3 w-3 text-[#5be196]" />
-                        {lot.project}
-                      </span>
-                      <span className="bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-lg">
-                        {lot.type}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Cuerpo Formal con Especificaciones */}
-                  <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
-                    <div className="space-y-2">
-                      <h3
-                        className="text-base sm:text-lg font-black text-slate-900 leading-snug tracking-tight group-hover:text-[#22A33D] transition-colors line-clamp-1"
-                        title={lot.name}
-                      >
-                        {lot.name}
-                      </h3>
-                      <p className="text-xs text-slate-500 font-medium line-clamp-1">
-                        {lot.zone} · {lot.topography}
-                      </p>
-
-                      {/* Ficha métrica compacta */}
-                      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
-                        <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100">
-                          <Ruler className="h-4 w-4 text-[#22A33D] shrink-0" />
-                          <div className="min-w-0">
-                            <span className="text-[10px] text-slate-400 block font-semibold uppercase">Superficie</span>
-                            <span className="text-xs font-bold text-slate-800 truncate block">{lot.areaM2} m²</span>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100">
-                          <CreditCard className="h-4 w-4 text-[#F58220] shrink-0" />
-                          <div className="min-w-0">
-                            <span className="text-[10px] text-slate-400 block font-semibold uppercase">Financiamiento</span>
-                            <span className="text-xs font-bold text-slate-800 truncate block">Hasta {lot.maxMonths} meses</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Precios y Botones */}
-                    <div className="pt-3 border-t border-slate-100 space-y-3">
-                      <div className="flex items-baseline justify-between">
-                        <div>
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                            Precio de Lista
-                          </span>
-                          <span className="text-xl font-black text-slate-900 font-mono tracking-tight">
-                            ${lot.priceUSD.toLocaleString('es-EC')}
-                            <span className="text-xs font-semibold text-slate-500 font-sans ml-1">USD</span>
-                          </span>
-                        </div>
-
-                        <div className="text-right">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#22A33D] block">
-                            Cuota Mensual
-                          </span>
-                          <span className="text-sm sm:text-base font-black text-[#22A33D] font-mono">
-                            ${lot.estimatedMonthlyUSD}
-                            <span className="text-xs font-semibold text-slate-500 font-sans">/mes</span>
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Botones de Acción */}
-                      <div className="grid grid-cols-2 gap-2 pt-1">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onSelectLot(lot);
-                          }}
-                          className="action-btn-ficha w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-[#113d22] text-white font-bold text-xs transition-all hover:scale-102 active:scale-95 cursor-pointer text-center shadow-xs flex items-center justify-center gap-1.5"
-                        >
-                          <span>Ver Ficha</span>
-                          <ArrowRight className="h-3.5 w-3.5" />
-                        </button>
-
-                        <a
-                          href={getLotWhatsAppUrl(lot.name, lot.code, lot.priceUSD)}
-                          onClick={(e) => e.stopPropagation()}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-full py-2.5 px-3 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-xs transition-all hover:scale-102 active:scale-95 cursor-pointer text-center shadow-xs flex items-center justify-center gap-1.5"
-                        >
-                          <WhatsAppIcon size={14} className="text-white shrink-0" />
-                          <span>WhatsApp</span>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
+                  <PropertyCard lot={lot} onSelectLot={onSelectLot} />
                 </div>
               ))}
             </div>

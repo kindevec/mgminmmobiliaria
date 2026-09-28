@@ -21,6 +21,60 @@ interface FooterProps {
   onOpenVisitModal: () => void;
 }
 
+function SocialIconsStrip({ size = 22 }: { size?: number }) {
+  return (
+    <div className="flex items-center gap-3">
+      <motion.a
+        href={getGeneralWhatsAppUrl()}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="WhatsApp MGM Inmobiliaria"
+        whileHover={{ scale: 1.15, y: -2 }}
+        whileTap={{ scale: 0.95 }}
+        className="text-[#25D366] hover:text-[#20bd5a] transition-all cursor-pointer"
+      >
+        <WhatsAppIcon size={size} />
+      </motion.a>
+
+      <motion.a
+        href="https://facebook.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Facebook MGM Inmobiliaria"
+        whileHover={{ scale: 1.15, y: -2 }}
+        whileTap={{ scale: 0.95 }}
+        className="text-[#1877F2] hover:text-[#3b82f6] transition-all cursor-pointer"
+      >
+        <FacebookIcon size={size} />
+      </motion.a>
+
+      <motion.a
+        href="https://instagram.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Instagram MGM Inmobiliaria"
+        whileHover={{ scale: 1.15, y: -2 }}
+        whileTap={{ scale: 0.95 }}
+        className="text-[#E4405F] hover:text-[#f43f5e] transition-all cursor-pointer"
+      >
+        <InstagramIcon size={size} />
+      </motion.a>
+
+      <motion.a
+        href="https://tiktok.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="TikTok MGM Inmobiliaria"
+        whileHover={{ scale: 1.15, y: -2 }}
+        whileTap={{ scale: 0.95 }}
+        className="text-slate-300 hover:text-white transition-all cursor-pointer"
+      >
+        <TikTokIcon size={size} />
+      </motion.a>
+    </div>
+  );
+}
+
 export function Footer({ onNavigate, onOpenVisitModal }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
@@ -32,7 +86,7 @@ export function Footer({ onNavigate, onOpenVisitModal }: FooterProps) {
   return (
     <footer
       id="main-footer"
-      className="relative z-10 border-t border-white/10 pt-4 sm:pt-6 pb-20 md:pb-6 overflow-hidden text-slate-200 bg-[#113d22] shadow-[0_-8px_30px_rgba(0,0,0,0.35)]"
+      className="relative z-10 border-t border-white/10 pt-3.5 sm:pt-6 pb-20 md:pb-6 overflow-hidden text-slate-200 bg-[#113d22] shadow-[0_-8px_30px_rgba(0,0,0,0.35)]"
     >
       {/* Sutil resplandor ambiental en el fondo */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -44,13 +98,14 @@ export function Footer({ onNavigate, onOpenVisitModal }: FooterProps) {
         {/* ========================================================
             LAYOUT COMPACTO: LOGO + MISIÓN + REDES Y CONTACTO MÍNIMO
            ======================================================== */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 mb-4 sm:mb-6 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-8 mb-3 sm:mb-6 items-center">
           
           {/* ----------------------------------------------------
               COLUMNA 1: Logo Oficial, Misión & Redes Sociales
              ---------------------------------------------------- */}
-          <div className="lg:col-span-6 flex flex-col gap-2.5 text-left">
-            <div className="flex items-center">
+          <div className="lg:col-span-6 flex flex-col gap-2 sm:gap-2.5 text-left">
+            {/* Fila Cabecera: Logo a la izquierda, Redes a la derecha en móvil */}
+            <div className="flex items-center justify-between lg:justify-start gap-4">
               <motion.a
                 href={getPageCanonicalHash('home')}
                 onClick={(e) => {
@@ -61,86 +116,45 @@ export function Footer({ onNavigate, onOpenVisitModal }: FooterProps) {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <LogoMGM className="h-8 sm:h-9 w-auto" variant="full" showSubtitle={true} isGhost={true} />
+                <LogoMGM className="h-7 sm:h-9 w-auto" variant="full" showSubtitle={true} isGhost={true} />
               </motion.a>
+
+              {/* Redes Sociales en Móvil (Ubicadas a la derecha del Logo para eliminar el vacío y ganar espacio vertical) */}
+              <div className="lg:hidden">
+                <SocialIconsStrip size={20} />
+              </div>
             </div>
 
             {/* Misión inmobiliaria */}
-            <p className="text-[11.5px] sm:text-[12px] text-slate-300 font-normal leading-relaxed max-w-md">
+            <p className="text-[11px] sm:text-[12px] text-slate-300 font-normal leading-relaxed max-w-md">
               Sociedad Civil MGM Inmobiliaria. Desarrolladores de comunidades urbanizadas planificadas en Azuay, Ecuador. Solidez jurídica notarial y crédito directo sin intermediarios.
             </p>
 
-            {/* Redes Sociales Oficiales — Directos sin contenedor */}
-            <div className="flex items-center gap-4 pt-1">
-              <motion.a
-                href={getGeneralWhatsAppUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="WhatsApp MGM Inmobiliaria"
-                whileHover={{ scale: 1.2, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className="text-[#25D366] hover:text-[#20bd5a] transition-all cursor-pointer"
-              >
-                <WhatsAppIcon size={24} />
-              </motion.a>
-
-              <motion.a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook MGM Inmobiliaria"
-                whileHover={{ scale: 1.2, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className="text-[#1877F2] hover:text-[#3b82f6] transition-all cursor-pointer"
-              >
-                <FacebookIcon size={24} />
-              </motion.a>
-
-              <motion.a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram MGM Inmobiliaria"
-                whileHover={{ scale: 1.2, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className="text-[#E4405F] hover:text-[#f43f5e] transition-all cursor-pointer"
-              >
-                <InstagramIcon size={24} />
-              </motion.a>
-
-              <motion.a
-                href="https://tiktok.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="TikTok MGM Inmobiliaria"
-                whileHover={{ scale: 1.2, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className="text-slate-300 hover:text-white transition-all cursor-pointer"
-              >
-                <TikTokIcon size={24} />
-              </motion.a>
+            {/* Redes Sociales en Escritorio */}
+            <div className="hidden lg:block pt-0.5">
+              <SocialIconsStrip size={24} />
             </div>
           </div>
 
           {/* ----------------------------------------------------
-              COLUMNA 2: Contacto Directo Ultra-Compacto & Ordenado (2x2)
+              COLUMNA 2: Contacto Directo 2 Columnas (Sin espacios vacíos)
              ---------------------------------------------------- */}
-          <div className="lg:col-span-6 flex flex-col gap-2 text-left">
-            <span className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-[#5be196] flex items-center gap-1.5">
+          <div className="lg:col-span-6 flex flex-col gap-1.5 sm:gap-2 text-left">
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#5be196] flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#5be196]" />
               <span>Atención Directa</span>
             </span>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-xs">
+            <div className="grid grid-cols-2 gap-x-2.5 sm:gap-x-4 gap-y-1.5 sm:gap-y-2 text-xs">
               {/* Teléfono & WhatsApp */}
               <a
                 href="tel:+593984887434"
-                className="py-1 flex items-center gap-2.5 transition-all group cursor-pointer"
+                className="py-0.5 sm:py-1 flex items-center gap-2 sm:gap-2.5 transition-all group cursor-pointer min-w-0"
               >
-                <Phone size={18} strokeWidth={2.2} className="text-[#25D366] shrink-0 group-hover:scale-110 transition-transform" />
+                <Phone size={16} strokeWidth={2.2} className="text-[#25D366] shrink-0 sm:w-[18px] sm:h-[18px] group-hover:scale-110 transition-transform" />
                 <div className="min-w-0">
-                  <span className="block text-[9px] uppercase font-bold text-slate-300 tracking-wider">Llamadas / WhatsApp</span>
-                  <span className="block text-[11.5px] sm:text-xs font-semibold text-white group-hover:text-[#5be196] truncate">
+                  <span className="block text-[8.5px] sm:text-[9px] uppercase font-bold text-slate-300 tracking-wider truncate">Llamadas / WA</span>
+                  <span className="block text-[10.5px] sm:text-xs font-semibold text-white group-hover:text-[#5be196] truncate">
                     +593 98 488 7434
                   </span>
                 </div>
@@ -149,12 +163,13 @@ export function Footer({ onNavigate, onOpenVisitModal }: FooterProps) {
               {/* Correo Electrónico */}
               <a
                 href="mailto:info@mgminmobiliaria.ec"
-                className="py-1 flex items-center gap-2.5 transition-all group cursor-pointer"
+                className="py-0.5 sm:py-1 flex items-center gap-2 sm:gap-2.5 transition-all group cursor-pointer min-w-0"
+                title="info@mgminmobiliaria.ec"
               >
-                <Mail size={18} strokeWidth={2.2} className="text-[#F58220] shrink-0 group-hover:scale-110 transition-transform" />
+                <Mail size={16} strokeWidth={2.2} className="text-[#F58220] shrink-0 sm:w-[18px] sm:h-[18px] group-hover:scale-110 transition-transform" />
                 <div className="min-w-0">
-                  <span className="block text-[9px] uppercase font-bold text-slate-300 tracking-wider">Correo Notarial</span>
-                  <span className="block text-[11.5px] sm:text-xs font-semibold text-white group-hover:text-[#F58220] truncate">
+                  <span className="block text-[8.5px] sm:text-[9px] uppercase font-bold text-slate-300 tracking-wider truncate">Correo Notarial</span>
+                  <span className="block text-[10.5px] sm:text-xs font-semibold text-white group-hover:text-[#F58220] truncate">
                     info@mgminmobiliaria.ec
                   </span>
                 </div>
@@ -165,24 +180,25 @@ export function Footer({ onNavigate, onOpenVisitModal }: FooterProps) {
                 href="https://maps.google.com/?q=Ciudadela+Miravalle+Ecuador"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="py-1 flex items-center gap-2.5 transition-all group cursor-pointer"
+                className="py-0.5 sm:py-1 flex items-center gap-2 sm:gap-2.5 transition-all group cursor-pointer min-w-0"
+                title="Ciudadela Miravalle · Azuay"
               >
-                <MapPin size={18} strokeWidth={2.2} className="text-[#5be196] shrink-0 group-hover:scale-110 transition-transform" />
+                <MapPin size={16} strokeWidth={2.2} className="text-[#5be196] shrink-0 sm:w-[18px] sm:h-[18px] group-hover:scale-110 transition-transform" />
                 <div className="min-w-0">
-                  <span className="block text-[9px] uppercase font-bold text-slate-300 tracking-wider">Ubicación</span>
-                  <span className="block text-[11.5px] sm:text-xs font-semibold text-white group-hover:text-[#5be196] truncate">
-                    Ciudadela Miravalle · Azuay
+                  <span className="block text-[8.5px] sm:text-[9px] uppercase font-bold text-slate-300 tracking-wider truncate">Ubicación</span>
+                  <span className="block text-[10.5px] sm:text-xs font-semibold text-white group-hover:text-[#5be196] truncate">
+                    Ciudadela Miravalle
                   </span>
                 </div>
               </a>
 
               {/* Horario de Atención */}
-              <div className="py-1 flex items-center gap-2.5">
-                <Clock size={18} strokeWidth={2.2} className="text-[#F58220] shrink-0" />
+              <div className="py-0.5 sm:py-1 flex items-center gap-2 sm:gap-2.5 min-w-0">
+                <Clock size={16} strokeWidth={2.2} className="text-[#F58220] shrink-0 sm:w-[18px] sm:h-[18px]" />
                 <div className="min-w-0">
-                  <span className="block text-[9px] uppercase font-bold text-slate-300 tracking-wider">Horario de Atención</span>
-                  <span className="block text-[11.5px] sm:text-xs font-semibold text-white truncate">
-                    Lun - Sáb: 8:30 - 18:00
+                  <span className="block text-[8.5px] sm:text-[9px] uppercase font-bold text-slate-300 tracking-wider truncate">Horario</span>
+                  <span className="block text-[10.5px] sm:text-xs font-semibold text-white truncate">
+                    Lun-Sáb: 8:30-18:00
                   </span>
                 </div>
               </div>
@@ -191,16 +207,17 @@ export function Footer({ onNavigate, onOpenVisitModal }: FooterProps) {
         </div>
 
         {/* ========================================================
-            BARRA INFERIOR / SUB-FOOTER (EXACTA A CASA KINTI)
+            BARRA INFERIOR / SUB-FOOTER
            ======================================================== */}
-        <div className="pt-2.5 sm:pt-4 border-t border-white/10 text-[10.5px] sm:text-xs text-slate-300 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 font-medium">
+        <div className="pt-2 sm:pt-3.5 border-t border-white/10 text-[10px] sm:text-xs text-slate-300 flex flex-col sm:flex-row items-center justify-between gap-1.5 sm:gap-4 font-medium">
           
           {/* Izquierda: Copyright y Enlaces Legales */}
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1 text-center sm:text-left">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-2.5 gap-y-0.5 text-center sm:text-left">
             <p>
-              © {currentYear} Sociedad Civil MGM Inmobiliaria. Todos los derechos reservados.
+              © {currentYear} Sociedad Civil MGM Inmobiliaria.
             </p>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              <span className="text-slate-500">•</span>
               <button
                 type="button"
                 onClick={() => handleNavClick('contact')}
@@ -208,7 +225,7 @@ export function Footer({ onNavigate, onOpenVisitModal }: FooterProps) {
               >
                 Privacidad
               </button>
-              <span>·</span>
+              <span className="text-slate-500">•</span>
               <button
                 type="button"
                 onClick={() => handleNavClick('contact')}
@@ -219,13 +236,13 @@ export function Footer({ onNavigate, onOpenVisitModal }: FooterProps) {
             </div>
           </div>
 
-          {/* Derecha: Firma Oficial KINDEV (EXACTAMENTE IGUAL A CASA KINTI) */}
+          {/* Derecha: Firma Oficial KINDEV */}
           <div className="flex justify-center">
             <a 
               href="https://www.kindevsas.com/" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="hover:opacity-95 transition-all text-[11px] sm:text-sm flex items-center gap-1.5 sm:gap-2 group"
+              className="hover:opacity-95 transition-all text-[10.5px] sm:text-sm flex items-center gap-1.5 sm:gap-2 group"
               title="Desarrollado por KINDEV"
               aria-label="Desarrollado por KINDEV"
             >
@@ -235,14 +252,14 @@ export function Footer({ onNavigate, onOpenVisitModal }: FooterProps) {
                 <img 
                   src={kindevIcon} 
                   alt="KINDEV Logo" 
-                  width="28" 
-                  height="28" 
+                  width="24" 
+                  height="24" 
                   loading="lazy" 
                   decoding="async" 
-                  className="relative z-10 w-6 h-6 sm:w-7.5 sm:h-7.5 object-contain drop-shadow-[0_2px_8px_rgba(34,163,61,0.5)] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 ease-out inline-block"
+                  className="relative z-10 w-5 h-5 sm:w-7 sm:h-7 object-contain drop-shadow-[0_2px_8px_rgba(34,163,61,0.5)] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 ease-out inline-block"
                 />
               </div>
-              <span className="text-[10.5px] sm:text-xs text-slate-400 group-hover:text-emerald-400 transition-colors font-semibold tracking-wide">
+              <span className="text-[10px] sm:text-xs text-slate-400 group-hover:text-emerald-400 transition-colors font-semibold tracking-wide">
                 Desarrollado por{" "}
                 <span className="font-bold text-white group-hover:text-emerald-400 inline-block">
                   KINDEV

@@ -25,6 +25,7 @@ import { WhatsAppIcon } from '../SocialIcons';
 import { WaveCreamToDark, TopographicContours } from '../WaveDividers';
 import { ScrollReveal } from '../common/ScrollReveal';
 import { AnimatedInsignia } from '../common/AnimatedInsignia';
+import { HeroNavArrows } from '../HeroNavArrows';
 
 interface AboutViewProps {
   onNavigate: (page: PageView) => void;
@@ -83,7 +84,7 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
     if (heroHovered) return;
     const interval = setInterval(() => {
       setHeroImgIndex((prev) => (prev + 1) % ABOUT_HERO_IMAGES.length);
-    }, 2800);
+    }, 5000);
     return () => clearInterval(interval);
   }, [heroHovered]);
 
@@ -100,7 +101,7 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
       {/* =========================================================================
           1. BANNER CINEMÁTICO — PANORÁMICO INTEGRAL (SIN PARTICIONES VERTICALES)
           ========================================================================= */}
-      <section className="relative w-full bg-[#113d22] text-white overflow-hidden min-h-[500px] sm:min-h-[540px] lg:min-h-[580px] flex items-center justify-center select-none">
+      <section className="group/hero relative w-full bg-[#113d22] text-white overflow-hidden min-h-[500px] sm:min-h-[540px] lg:min-h-[580px] flex items-center justify-center select-none">
         {/* Fondo fotográfico panorámico continuo (100% de la pantalla) */}
         <div
           className="absolute inset-0 w-full h-full overflow-hidden select-none"
@@ -144,8 +145,11 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
           </div>
         </div>
 
+        {/* Controles de navegación manual translúcidos con materialización al hover */}
+        <HeroNavArrows onPrev={prevHeroImage} onNext={nextHeroImage} />
+
         {/* Contenido Central: Título y Párrafo */}
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-center items-center text-center pt-24 sm:pt-28 lg:pt-32 pb-14 sm:pb-16 lg:pb-18 space-y-4 sm:space-y-6 select-text cursor-default">
+        <div className="relative z-10 max-w-4xl mx-auto px-8 sm:px-10 lg:px-8 w-full flex flex-col justify-center items-center text-center pt-24 sm:pt-28 lg:pt-32 pb-14 sm:pb-16 lg:pb-18 space-y-4 sm:space-y-6 select-text cursor-default">
           {/* Insignia arquitectónica animada en SVG */}
           <AnimatedInsignia className="mb-0 sm:mb-1" size={60} />
 

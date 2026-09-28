@@ -37,6 +37,8 @@ export function Header({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const isGreenHeader = isScrolled || currentPage === 'property-detail';
+
   const navLinks: { id: PageView; label: string; hash: string }[] = [
     { id: 'home', label: 'Inicio', hash: getPageCanonicalHash('home') },
     { id: 'properties', label: 'Lotes', hash: getPageCanonicalHash('properties') },
@@ -48,7 +50,7 @@ export function Header({
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out ${
-        isScrolled
+        isGreenHeader
           ? 'bg-[#113d22] border-b border-white/10 shadow-2xl py-2.5 sm:py-3'
           : 'bg-transparent border-b border-transparent shadow-none py-3 sm:py-4.5'
       }`}
@@ -94,15 +96,15 @@ export function Header({
                 }}
                 className={`relative px-3.5 sm:px-4 py-1.5 text-sm lg:text-[15px] font-bold tracking-wide transition-all rounded-full cursor-pointer whitespace-nowrap ${
                   isActive
-                    ? isScrolled
+                    ? isGreenHeader
                       ? 'text-white bg-white/15 backdrop-blur-xs border border-white/20 shadow-xs'
                       : 'text-white bg-black/35 backdrop-blur-xs border border-white/30 shadow-md'
-                    : isScrolled
+                    : isGreenHeader
                     ? 'text-white/80 hover:text-white hover:bg-white/10'
                     : 'text-white hover:text-white hover:bg-black/25 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]'
                 }`}
               >
-                <span className={!isScrolled ? 'drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]' : ''}>
+                <span className={!isGreenHeader ? 'drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]' : ''}>
                   {link.label}
                 </span>
                 {isActive && (
@@ -149,7 +151,7 @@ export function Header({
             className={`h-9 w-9 sm:h-10 sm:w-10 rounded-full flex items-center justify-center transition-all cursor-pointer ${
               currentPage === 'admin'
                 ? 'bg-white text-slate-900 shadow-xs'
-                : isScrolled
+                : isGreenHeader
                 ? 'text-white/80 hover:text-white bg-white/10 hover:bg-white/20'
                 : 'text-white bg-black/30 hover:bg-black/45 border border-white/25 drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]'
             }`}

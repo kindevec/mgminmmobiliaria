@@ -26,6 +26,7 @@ import type { LotProperty } from '@/src/data/lots';
 import { PropertyCard } from '../PropertyCard';
 import { ScrollReveal } from '../common/ScrollReveal';
 import { AnimatedInsignia } from '../common/AnimatedInsignia';
+import { HeroNavArrows } from '../HeroNavArrows';
 
 const PROPERTIES_HERO_IMAGES = [
   {
@@ -54,6 +55,58 @@ interface PropertiesViewProps {
   initialMaxPrice?: number;
 }
 
+interface MobileCarouselSectionProps {
+  title: string;
+  subtitle: string;
+  icon: React.ComponentType<{ className?: string }>;
+  badgeText: string;
+  lots: LotProperty[];
+  onSelectLot: (lot: LotProperty) => void;
+  onOpenVisitModal: (lotCode: string) => void;
+}
+
+function MobileCarouselSection({
+  title,
+  subtitle,
+  icon: Icon,
+  badgeText,
+  lots,
+  onSelectLot,
+  onOpenVisitModal,
+}: MobileCarouselSectionProps) {
+  if (lots.length === 0) return null;
+
+  return (
+    <div className="space-y-2.5 pt-1">
+      <div className="flex items-center justify-between px-1">
+        <div className="space-y-0.5">
+          <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-[#22A33D]">
+            <Icon className="h-3.5 w-3.5 text-[#22A33D] shrink-0" />
+            <span>{title}</span>
+          </div>
+          <p className="text-[11px] text-slate-500 font-medium leading-tight">{subtitle}</p>
+        </div>
+        <span className="text-[10px] font-bold text-slate-500 bg-slate-100 border border-slate-200/60 px-2 py-0.5 rounded-full shrink-0">
+          {badgeText}
+        </span>
+      </div>
+
+      <div className="flex gap-3.5 overflow-x-auto pb-3 pt-1 -mx-2 px-2 snap-x snap-mandatory scrollbar-none touch-pan-x">
+        {lots.map((lot) => (
+          <div key={lot.id} className="w-[84vw] sm:w-[350px] max-w-[370px] shrink-0 snap-start">
+            <PropertyCard
+              lot={lot}
+              dark={false}
+              onSelectLot={onSelectLot}
+              onOpenVisitModal={onOpenVisitModal}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function PropertiesView({
   onSelectLot,
   onOpenVisitModal,
@@ -71,7 +124,7 @@ export function PropertiesView({
     if (heroHovered) return;
     const interval = setInterval(() => {
       setHeroImgIndex((prev) => (prev + 1) % PROPERTIES_HERO_IMAGES.length);
-    }, 2800);
+    }, 5000);
     return () => clearInterval(interval);
   }, [heroHovered]);
 
@@ -93,6 +146,7 @@ export function PropertiesView({
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [maxPrice, setMaxPrice] = useState<number>(initialMaxPrice || 120000);
   const [minArea, setMinArea] = useState<number>(0);
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [mobilePage, setMobilePage] = useState<number>(1);
   const MOBILE_PAGE_SIZE = 5;
   const searchBarRef = useRef<HTMLDivElement>(null);
@@ -156,6 +210,25 @@ export function PropertiesView({
     maxPrice < 120000 ||
     minArea > 0;
 
+  const activeFiltersCount =
+    (searchQuery.trim().length > 0 ? 1 : 0) +
+    (selectedTypes.length > 0 ? 1 : 0) +
+    (selectedCategories.length > 0 ? 1 : 0) +
+    (selectedStatuses.length > 0 ? 1 : 0) +
+    (maxPrice < 120000 ? 1 : 0) +
+    (minArea > 0 ? 1 : 0);
+
+  const villasLots = properties.filter((p) => p.type === 'Vivienda');
+  const residentialLots = properties.filter(
+    (p) => p.type === 'Lote de Terreno' && p.category === 'Residencial'
+  );
+  const cornerLots = properties.filter(
+    (p) => p.category === 'Esquinero' || p.category === 'Campestre' || p.category === 'Comercial'
+  );
+  const directCreditLots = properties.filter(
+    (p) => p.status === 'Disponible' && (p.priceUSD <= 38000 || p.type === 'Lote de Terreno')
+  );
+
   const resetFilters = () => {
     setSearchQuery('');
     setSelectedTypes([]);
@@ -175,7 +248,7 @@ export function PropertiesView({
       {/* =========================================================================
           1. BANNER CINEMÁTICO — PANORÁMICO INTEGRAL (SIN PARTICIONES VERTICALES)
           ========================================================================= */}
-      <section className="relative w-full bg-[#113d22] text-white overflow-hidden min-h-[500px] sm:min-h-[540px] lg:min-h-[580px] flex items-center justify-center select-none">
+      <section className="group/hero relative w-full bg-[#113d22] text-white overflow-hidden min-h-[500px] sm:min-h-[540px] lg:min-h-[580px] flex items-center justify-center select-none">
         {/* Fondo fotográfico panorámico continuo (100% de la pantalla) */}
         <div
           className="absolute inset-0 w-full h-full overflow-hidden select-none"
@@ -219,8 +292,11 @@ export function PropertiesView({
           </div>
         </div>
 
+        {/* Controles de navegación manual translúcidos con materialización al hover */}
+        <HeroNavArrows onPrev={prevHeroImage} onNext={nextHeroImage} />
+
         {/* Contenido Central: Título y Párrafo */}
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-center items-center text-center pt-24 sm:pt-28 lg:pt-32 pb-14 sm:pb-16 lg:pb-18 space-y-4 sm:space-y-6 select-text cursor-default">
+        <div className="relative z-10 max-w-4xl mx-auto px-8 sm:px-10 lg:px-8 w-full flex flex-col justify-center items-center text-center pt-24 sm:pt-28 lg:pt-32 pb-14 sm:pb-16 lg:pb-18 space-y-4 sm:space-y-6 select-text cursor-default">
           {/* Insignia arquitectónica animada en SVG */}
           <AnimatedInsignia className="mb-0 sm:mb-1" size={60} />
 
@@ -280,11 +356,375 @@ export function PropertiesView({
             </div>
           </ScrollReveal>
 
-          {/* MAIN CONTAINER: SIDEBAR A LA IZQUIERDA (MÓVIL Y PC) + PROPIEDADES A LA DERECHA */}
-          <div className="flex gap-2 sm:gap-3.5 lg:gap-7 items-start pt-0.5 sm:pt-1">
+          {/* =========================================================================
+              VISTA MÓVIL (< lg): BARRA DE FILTROS HORIZONTAL + CARRUSELES POR CATEGORÍA
+              - Cero box-in-box.
+              - Cards ocupan todo el ancho (w-[84vw] en carrusel, w-full en filtrado).
+              - Menú de filtros horizontal que despliega verticalmente.
+              ========================================================================= */}
+          <div className="block lg:hidden space-y-4 pt-1">
+            {/* 1. Barra Horizontal de Filtros y Chips de 1 Toque */}
+            <div className="flex items-center gap-2 overflow-x-auto scrollbar-none py-1 -mx-1 px-1">
+              {/* Botón Principal de Filtros */}
+              <button
+                type="button"
+                onClick={() => setIsMobileFiltersOpen((prev) => !prev)}
+                className={`shrink-0 h-9 px-3.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-xs active:scale-95 border ${
+                  isMobileFiltersOpen || hasAnyFilterActive
+                    ? 'bg-[#113d22] text-white border-[#22A33D]'
+                    : 'bg-white text-slate-800 border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <SlidersHorizontal className={`h-3.5 w-3.5 ${hasAnyFilterActive ? 'text-[#5be196]' : 'text-[#22A33D]'}`} />
+                <span>Filtros</span>
+                {activeFiltersCount > 0 && (
+                  <span className="w-4.5 h-4.5 rounded-full bg-[#F58220] text-white text-[10px] font-black flex items-center justify-center">
+                    {activeFiltersCount}
+                  </span>
+                )}
+                <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-300 ${isMobileFiltersOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Chips Rápidos Horizontales */}
+              <button
+                type="button"
+                onClick={resetFilters}
+                className={`shrink-0 h-9 px-3 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+                  !hasAnyFilterActive
+                    ? 'bg-[#22A33D] text-white border-[#22A33D] font-bold shadow-xs'
+                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                Todos ({properties.length})
+              </button>
+
+              <button
+                type="button"
+                onClick={() => toggleType('Lote de Terreno')}
+                className={`shrink-0 h-9 px-3 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+                  selectedTypes.includes('Lote de Terreno')
+                    ? 'bg-[#22A33D] text-white border-[#22A33D] font-bold shadow-xs'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                Lotes
+              </button>
+
+              <button
+                type="button"
+                onClick={() => toggleType('Vivienda')}
+                className={`shrink-0 h-9 px-3 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+                  selectedTypes.includes('Vivienda')
+                    ? 'bg-[#22A33D] text-white border-[#22A33D] font-bold shadow-xs'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                Villas MGM
+              </button>
+
+              <button
+                type="button"
+                onClick={() => toggleCategory('Esquinero')}
+                className={`shrink-0 h-9 px-3 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+                  selectedCategories.includes('Esquinero')
+                    ? 'bg-[#22A33D] text-white border-[#22A33D] font-bold shadow-xs'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                Esquineros
+              </button>
+
+              <button
+                type="button"
+                onClick={() => toggleStatus('Disponible')}
+                className={`shrink-0 h-9 px-3 rounded-full text-xs font-semibold transition-all cursor-pointer border flex items-center gap-1.5 ${
+                  selectedStatuses.includes('Disponible')
+                    ? 'bg-[#22A33D] text-white border-[#22A33D] font-bold shadow-xs'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-[#25D366]" />
+                <span>Disponibles</span>
+              </button>
+
+              {hasAnyFilterActive && (
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="shrink-0 h-9 px-3 rounded-full text-xs font-bold transition-all cursor-pointer bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 flex items-center gap-1"
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  <span>Limpiar</span>
+                </button>
+              )}
+            </div>
+
+            {/* 2. Menú Desplegable Vertical de Filtros Completos (Limpio, sin box-in-box) */}
+            <AnimatePresence>
+              {isMobileFiltersOpen && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.35, ease: 'easeInOut' }}
+                  className="overflow-hidden"
+                >
+                  <div className="pt-2 pb-4 space-y-4 border-y border-slate-200/90 bg-white">
+                    {/* Fila 1: Tipo de Inmueble */}
+                    <div className="space-y-1.5">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
+                        Tipo de Inmueble
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {[
+                          { label: 'Lotes de Terreno', value: 'Lote de Terreno' },
+                          { label: 'Villas & Casas', value: 'Vivienda' },
+                          { label: 'Proyectos en Planos', value: 'Proyecto en Planos' },
+                        ].map((item) => {
+                          const isSelected = selectedTypes.includes(item.value);
+                          return (
+                            <button
+                              key={item.value}
+                              type="button"
+                              onClick={() => toggleType(item.value)}
+                              className={`py-1.5 px-3 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                                isSelected
+                                  ? 'bg-[#22A33D] text-white font-bold shadow-xs'
+                                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                              }`}
+                            >
+                              {item.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Fila 2: Disponibilidad y Topografía */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
+                          Disponibilidad
+                        </span>
+                        <div className="flex flex-col gap-1.5">
+                          {[
+                            { label: 'Disponibles', value: 'Disponible', dot: 'bg-[#25D366]' },
+                            { label: 'En Reserva', value: 'En Reserva', dot: 'bg-amber-400' },
+                            { label: 'Vendidos', value: 'Vendido', dot: 'bg-slate-300' },
+                          ].map((item) => {
+                            const isSelected = selectedStatuses.includes(item.value);
+                            return (
+                              <button
+                                key={item.value}
+                                type="button"
+                                onClick={() => toggleStatus(item.value)}
+                                className={`py-1.5 px-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+                                  isSelected
+                                    ? 'bg-[#22A33D] text-white font-bold shadow-xs'
+                                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                                }`}
+                              >
+                                <span className={`w-1.5 h-1.5 rounded-full ${item.dot}`} />
+                                <span className="truncate">{item.label}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
+                          Topografía / Tipo
+                        </span>
+                        <div className="flex flex-col gap-1.5">
+                          {[
+                            { label: 'Residencial', value: 'Residencial' },
+                            { label: 'Esquinero', value: 'Esquinero' },
+                            { label: 'Campestre', value: 'Campestre' },
+                            { label: 'Comercial', value: 'Comercial' },
+                          ].map((cat) => {
+                            const isSelected = selectedCategories.includes(cat.value);
+                            return (
+                              <button
+                                key={cat.value}
+                                type="button"
+                                onClick={() => toggleCategory(cat.value)}
+                                className={`py-1.5 px-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer truncate ${
+                                  isSelected
+                                    ? 'bg-[#22A33D] text-white font-bold shadow-xs'
+                                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                                }`}
+                              >
+                                {cat.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Fila 3: Sliders de Precio y Área */}
+                    <div className="space-y-3 pt-1">
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-bold text-slate-700">Presupuesto Máximo</span>
+                          <span className="font-mono font-bold text-[#F58220] bg-orange-50 px-2 py-0.5 rounded border border-orange-200/60">
+                            ${maxPrice.toLocaleString()} USD
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min={20000}
+                          max={120000}
+                          step={2500}
+                          value={maxPrice}
+                          onChange={(e) => setMaxPrice(Number(e.target.value))}
+                          className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#F58220]"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-bold text-slate-700">Área Mínima de Terreno</span>
+                          <span className="font-mono font-bold text-[#22A33D]">
+                            {minArea > 0 ? `≥ ${minArea} m²` : 'Cualquier tamaño'}
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min={0}
+                          max={500}
+                          step={20}
+                          value={minArea}
+                          onChange={(e) => setMinArea(Number(e.target.value))}
+                          className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#22A33D]"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Acciones */}
+                    <div className="flex items-center gap-2 pt-2">
+                      {hasAnyFilterActive && (
+                        <button
+                          type="button"
+                          onClick={resetFilters}
+                          className="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <RotateCcw className="h-3.5 w-3.5" />
+                          <span>Restablecer</span>
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setIsMobileFiltersOpen(false)}
+                        className="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs bg-[#113d22] text-white hover:bg-[#22A33D] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+                      >
+                        <span>Ver {filteredLots.length} propiedades</span>
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* 3. Contenido de Propiedades en Móvil */}
+            {hasAnyFilterActive ? (
+              /* Vista con Filtros Activos: Cards a ancho completo */
+              <div className="space-y-4 pt-1">
+                <div className="flex items-center justify-between text-xs text-slate-600 pb-1 border-b border-slate-100">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#22A33D]" />
+                    <span>
+                      <strong className="text-slate-900 font-bold">{filteredLots.length}</strong> de {properties.length} opciones
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={resetFilters}
+                    className="text-[#F58220] font-bold text-[11px] hover:underline cursor-pointer"
+                  >
+                    Ver por categorías
+                  </button>
+                </div>
+
+                {filteredLots.length > 0 ? (
+                  <div className="space-y-4">
+                    {filteredLots.map((lot) => (
+                      <div key={lot.id} className="w-full">
+                        <PropertyCard
+                          lot={lot}
+                          dark={false}
+                          onSelectLot={onSelectLot}
+                          onOpenVisitModal={onOpenVisitModal}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 bg-white rounded-3xl border border-slate-200 p-6 space-y-3">
+                    <Search className="h-8 w-8 mx-auto text-slate-400" />
+                    <h3 className="text-base font-bold text-slate-900">No hay propiedades con estos filtros</h3>
+                    <button
+                      type="button"
+                      onClick={resetFilters}
+                      className="px-4 py-2 rounded-full bg-[#113d22] text-white text-xs font-bold"
+                    >
+                      Restablecer filtros
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Vista por Defecto: Varios Carruseles Horizontales por Categoría */
+              <div className="space-y-7 pt-1">
+                <MobileCarouselSection
+                  title="Villas & Casas Terminadas"
+                  subtitle="Viviendas listas para entrega con jardín privado y acabados premium"
+                  icon={Home}
+                  badgeText={`${villasLots.length} viviendas`}
+                  lots={villasLots}
+                  onSelectLot={onSelectLot}
+                  onOpenVisitModal={onOpenVisitModal}
+                />
+
+                <MobileCarouselSection
+                  title="Lotes Residenciales Centrales"
+                  subtitle="Terrenos 100% planos con vías adoquinadas y obras concluidas"
+                  icon={Layers}
+                  badgeText={`${residentialLots.length} lotes`}
+                  lots={residentialLots}
+                  onSelectLot={onSelectLot}
+                  onOpenVisitModal={onOpenVisitModal}
+                />
+
+                <MobileCarouselSection
+                  title="Lotes Esquineros & Campestres"
+                  subtitle="Doble frente, mayor superficie y vistas panorámicas a la naturaleza"
+                  icon={MapPin}
+                  badgeText={`${cornerLots.length} opciones`}
+                  lots={cornerLots}
+                  onSelectLot={onSelectLot}
+                  onOpenVisitModal={onOpenVisitModal}
+                />
+
+                <MobileCarouselSection
+                  title="Opciones con Crédito Directo MGM"
+                  subtitle="Financiamiento ágil hasta 48 meses directamente con la urbanizadora"
+                  icon={Sparkles}
+                  badgeText={`${directCreditLots.length} lotes`}
+                  lots={directCreditLots}
+                  onSelectLot={onSelectLot}
+                  onOpenVisitModal={onOpenVisitModal}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* MAIN CONTAINER: SIDEBAR A LA IZQUIERDA (SOLO DESKTOP lg+) + PROPIEDADES A LA DERECHA */}
+          <div className="hidden lg:flex gap-7 items-start pt-1">
             
-            {/* LADO IZQUIERDO: BARRA DE FILTROS EN MÓVIL Y PC (MÁS ANCHA Y CÓMODA EN MÓVIL) */}
-            <aside className="w-[105px] min-[390px]:w-[118px] sm:w-[140px] md:w-[190px] lg:w-[250px] xl:w-[270px] shrink-0 sticky top-16 sm:top-24 max-h-[calc(100vh-4.5rem)] overflow-y-auto scrollbar-thin bg-slate-50/90 sm:bg-transparent p-2 sm:p-2.5 lg:p-0 rounded-2xl sm:rounded-none border border-slate-200/80 sm:border-none space-y-3 sm:space-y-5">
+            {/* LADO IZQUIERDO: BARRA DE FILTROS EN PC */}
+            <aside className="w-[250px] xl:w-[270px] shrink-0 sticky top-24 max-h-[calc(100vh-4.5rem)] overflow-y-auto scrollbar-thin space-y-5">
               <ScrollReveal direction="left" delay={0.15} className="space-y-3 sm:space-y-5 pr-0.5 sm:pr-1">
                 
                 {/* Header Opciones de Filtro */}
@@ -515,10 +955,10 @@ export function PropertiesView({
                 </div>
               </ScrollReveal>
 
-              {/* Grid or Empty State - 1 POR FILA EN MÓVIL (5 TARJETAS CON FLECHAS DE NAVEGACIÓN), 2 EN TABLET, 3-4 EN PC */}
+              {/* Grid or Empty State - 3 POR FILA EN PC (AMPLIAS, SIN APRETAR) */}
               {filteredLots.length > 0 ? (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8">
                     {filteredLots.map((lot, idx) => {
                       const isVisibleOnMobile =
                         idx >= (mobilePage - 1) * MOBILE_PAGE_SIZE &&
@@ -528,9 +968,9 @@ export function PropertiesView({
                         <ScrollReveal
                           key={lot.id}
                           direction="up"
-                          delay={(idx % 5) * 0.06}
+                          delay={(idx % 3) * 0.08}
                           duration={0.45}
-                          className={`w-full flex justify-center ${isVisibleOnMobile ? 'flex' : 'hidden sm:flex'}`}
+                          className={`w-full ${isVisibleOnMobile ? 'block' : 'hidden sm:block'}`}
                         >
                           <PropertyCard
                             lot={lot}

@@ -12,114 +12,60 @@ interface BottomNavProps {
 }
 
 /**
- * 1. Corte superior: Con 5px de espacio a los lados del cuadro del icono (ancho 58px para caja de 48px).
- *    Animable verticalmente de 0 a 1 (se hunde hacia abajo).
- * 2. Corte inferior: Espejo exacto al contrario con 5px de espacio a los lados de la barrita del nombre (ancho 86px para barra de 76px).
- *    Animable verticalmente de 0 a 1 (se hunde hacia arriba).
+ * Cuna cóncava superior sutil y elegante bajo el icono sobresaliente (#F58220).
+ * Borde inferior 100% continuo y sólido (cero agujeros o cortes transparentes que dejen ver el fondo).
  */
 function getBarPath(cx: number, w: number, h: number, progress: number = 1): string {
   const r = (n: number) => Math.round(n * 10) / 10;
 
-  // Corte superior debajo del cuadro naranja (#F58220) (54px total para caja de 44px -> 5px de espacio a cada lado)
-  const tw = 27;                   // semi-ancho = 27px (ancho total = 54px)
-  const sh = 5 * progress;         // hombro curvo hacia el borde superior
-  const td = 24 * progress;        // profundidad del corte superior (se hunde hacia abajo)
-  const rc = 8 * progress;         // radio de esquinas inferiores
-
-  // Hendidura inferior para la barrita de nombres (82px total para barrita de 72px -> 5px a cada lado)
-  // Con forma cápsula redondeada que replica la forma de la barrita misma
-  const bw = 41;                   // semi-ancho = 41px (ancho total = 82px)
-  const b_sh = 5 * progress;       // hombro curvo hacia el borde inferior
-  const bd = 34.5 * progress;      // profundidad de la hendidura hacia arriba en la barra (con separación mínima superior)
-  const b_rc = 13.5 * progress;    // radio redondeado cápsula que replica la forma de la barrita
+  // Cuna cóncava suave y discreta debajo del botón sobresaliente (sin huecos agresivos)
+  const tw = 24;               // semi-ancho del descanso central (48px)
+  const sh = 10 * progress;    // transición curva suave (10px)
+  const td = 6.5 * progress;   // profundidad muy sutil (6.5px) para no adelgazar en exceso la barra
+  const rc = 5 * progress;     // radio de curvatura inferior
 
   return [
     `M 0,0`,
-    // Borde superior hacia el corte del cuadro
+    // Borde superior hacia el hombro izquierdo de la cuna
     `L ${r(cx - tw - sh)},0`,
-    `C ${r(cx - tw - sh / 2)},0 ${r(cx - tw)},${r(sh / 2)} ${r(cx - tw)},${r(sh)}`,
-    // Pared vertical izquierda del corte
-    `L ${r(cx - tw)},${r(td - rc)}`,
-    // Esquina inferior izquierda redondeada
+    // Transición suave hacia el descanso
+    `C ${r(cx - tw - sh / 2)},0 ${r(cx - tw)},${r(sh / 2)} ${r(cx - tw)},${r(td - rc)}`,
     `C ${r(cx - tw)},${r(td)} ${r(cx - tw + rc / 2)},${r(td)} ${r(cx - tw + rc)},${r(td)}`,
-    // Base horizontal del corte bajo el cuadro
+    // Base suave horizontal
     `L ${r(cx + tw - rc)},${r(td)}`,
-    // Esquina inferior derecha redondeada
+    // Curva derecha de subida
     `C ${r(cx + tw - rc / 2)},${r(td)} ${r(cx + tw)},${r(td)} ${r(cx + tw)},${r(td - rc)}`,
-    // Pared vertical derecha del corte
-    `L ${r(cx + tw)},${r(sh)}`,
-    // Hombro derecho hacia el borde superior
     `C ${r(cx + tw)},${r(sh / 2)} ${r(cx + tw + sh / 2)},0 ${r(cx + tw + sh)},0`,
     // Borde superior hacia la esquina derecha
     `L ${r(w)},0`,
-    // Borde lateral derecho
+    // Lateral derecho continuo
     `L ${r(w)},${r(h)}`,
-    // Borde inferior hasta la hendidura inferior
-    `L ${r(cx + bw + b_sh)},${r(h)}`,
-    // Hombro curvo hacia la hendidura
-    `C ${r(cx + bw + b_sh * 0.45)},${r(h)} ${r(cx + bw)},${r(h - b_sh * 0.45)} ${r(cx + bw)},${r(h - b_sh)}`,
-    // Pared vertical derecha de la hendidura (hacia arriba)
-    `L ${r(cx + bw)},${r(h - bd + b_rc)}`,
-    // Esquina superior derecha ampliamente redondeada (forma cápsula como la barrita)
-    `C ${r(cx + bw)},${r(h - bd + b_rc * 0.45)} ${r(cx + bw - b_rc * 0.45)},${r(h - bd)} ${r(cx + bw - b_rc)},${r(h - bd)}`,
-    // Techo horizontal de la hendidura
-    `L ${r(cx - bw + b_rc)},${r(h - bd)}`,
-    // Esquina superior izquierda ampliamente redondeada (forma cápsula como la barrita)
-    `C ${r(cx - bw + b_rc * 0.45)},${r(h - bd)} ${r(cx - bw)},${r(h - bd + b_rc * 0.45)} ${r(cx - bw)},${r(h - bd + b_rc)}`,
-    // Pared vertical izquierda de la hendidura (hacia abajo)
-    `L ${r(cx - bw)},${r(h - b_sh)}`,
-    // Hombro curvo hacia el borde inferior de la barra
-    `C ${r(cx - bw)},${r(h - b_sh * 0.45)} ${r(cx - bw - b_sh * 0.45)},${r(h)} ${r(cx - bw - b_sh)},${r(h)}`,
+    // Base inferior CONTINUA y sólida: erradica cortes y huecos por donde se filtraba el fondo
+    `L 0,${r(h)}`,
     // Cierre hacia la esquina izquierda
-    `L 0,${r(h)} Z`,
+    `Z`,
   ].join(' ');
 }
 
 /**
- * Bisel superior que resalta el corte bajo el cuadro naranja (#F58220) descendiendo
+ * Bisel superior fino y sutil que resalta la cuna cóncava superior
  */
 function getTopBorderPath(cx: number, w: number, progress: number = 1): string {
   const r = (n: number) => Math.round(n * 10) / 10;
-  const tw = 27;
-  const sh = 5 * progress;
-  const td = 24 * progress;
-  const rc = 8 * progress;
+  const tw = 24;
+  const sh = 10 * progress;
+  const td = 6.5 * progress;
+  const rc = 5 * progress;
 
   return [
     `M 0,0.5`,
     `L ${r(cx - tw - sh)},0.5`,
-    `C ${r(cx - tw - sh / 2)},0.5 ${r(cx - tw)},${r(sh / 2 + 0.5)} ${r(cx - tw)},${r(sh + 0.5)}`,
-    `L ${r(cx - tw)},${r(td - rc + 0.5)}`,
+    `C ${r(cx - tw - sh / 2)},0.5 ${r(cx - tw)},${r(sh / 2 + 0.5)} ${r(cx - tw)},${r(td - rc + 0.5)}`,
     `C ${r(cx - tw)},${r(td + 0.5)} ${r(cx - tw + rc / 2)},${r(td + 0.5)} ${r(cx - tw + rc)},${r(td + 0.5)}`,
     `L ${r(cx + tw - rc)},${r(td + 0.5)}`,
     `C ${r(cx + tw - rc / 2)},${r(td + 0.5)} ${r(cx + tw)},${r(td + 0.5)} ${r(cx + tw)},${r(td - rc + 0.5)}`,
-    `L ${r(cx + tw)},${r(sh + 0.5)}`,
     `C ${r(cx + tw)},${r(sh / 2 + 0.5)} ${r(cx + tw + sh / 2)},0.5 ${r(cx + tw + sh)},0.5`,
     `L ${r(w)},0.5`,
-  ].join(' ');
-}
-
-/**
- * Bisel inferior que resalta la hendidura de la barrita con forma redondeada cápsula
- */
-function getBottomBorderPath(cx: number, w: number, h: number, progress: number = 1): string {
-  const r = (n: number) => Math.round(n * 10) / 10;
-  const bw = 41;
-  const b_sh = 5 * progress;
-  const bd = 34.5 * progress;
-  const b_rc = 13.5 * progress;
-
-  return [
-    `M ${r(w)},${r(h - 0.5)}`,
-    `L ${r(cx + bw + b_sh)},${r(h - 0.5)}`,
-    `C ${r(cx + bw + b_sh * 0.45)},${r(h - 0.5)} ${r(cx + bw)},${r(h - b_sh * 0.45 - 0.5)} ${r(cx + bw)},${r(h - b_sh - 0.5)}`,
-    `L ${r(cx + bw)},${r(h - bd + b_rc - 0.5)}`,
-    `C ${r(cx + bw)},${r(h - bd + b_rc * 0.45 - 0.5)} ${r(cx + bw - b_rc * 0.45)},${r(h - bd - 0.5)} ${r(cx + bw - b_rc)},${r(h - bd - 0.5)}`,
-    `L ${r(cx - bw + b_rc)},${r(h - bd - 0.5)}`,
-    `C ${r(cx - bw + b_rc * 0.45)},${r(h - bd - 0.5)} ${r(cx - bw)},${r(h - bd + b_rc * 0.45 - 0.5)} ${r(cx - bw)},${r(h - bd + b_rc - 0.5)}`,
-    `L ${r(cx - bw)},${r(h - b_sh - 0.5)}`,
-    `C ${r(cx - bw)},${r(h - b_sh * 0.45 - 0.5)} ${r(cx - bw - b_sh * 0.45)},${r(h - 0.5)} ${r(cx - bw - b_sh)},${r(h - 0.5)}`,
-    `L 0,${r(h - 0.5)}`,
   ].join(' ');
 }
 
@@ -167,7 +113,7 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
 
   const [dimensions, setDimensions] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 390,
-    height: 62,
+    height: 48,
     activeX: 195,
   });
 
@@ -185,7 +131,7 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
         }
         setDimensions({
           width: navRect.width,
-          height: navRect.height,
+          height: navRect.height || 48,
           activeX: cx,
         });
       }
@@ -201,13 +147,14 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
   return (
     <nav
       ref={navRef}
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-transparent drop-shadow-[0_-4px_30px_rgba(0,0,0,0.55)] pb-[max(env(safe-area-inset-bottom),10px)] pt-2 transition-all select-none overflow-visible"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-transparent drop-shadow-[0_-4px_24px_rgba(0,0,0,0.35)] pb-[max(env(safe-area-inset-bottom),6px)] transition-all select-none overflow-visible"
       aria-label="Navegación móvil inferior"
     >
       {/* ========================================================
-          BARRA CORTADA DINÁMICA: LA HENDIDURA SE HUNDE HACIA ABAJO
-          - Centrada exactamente con el contenedor del icono activo.
-          - Fondo verde hero (#5be196 a #3ecb7e / #22A33D).
+          BARRA CONTINUA CÓNCAVA: DISCRETA, COMPACTA Y SIN HUECOS
+          - Fondo verde hero (#6ef7aa a #34bf74).
+          - Cuna suave de 6.5px bajo el cuadro naranja sin cortar el fondo.
+          - Base inferior 100% continua y sólida.
          ======================================================== */}
       <svg
         className="absolute inset-0 w-full h-full pointer-events-none -z-10 overflow-visible"
@@ -222,7 +169,7 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
           </linearGradient>
 
           <filter id="cutoutInnerShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="#047857" floodOpacity="0.4" />
+            <feDropShadow dx="0" dy="1.5" stdDeviation="2" floodColor="#047857" floodOpacity="0.35" />
           </filter>
         </defs>
 
@@ -238,7 +185,7 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
             d: getBarPath(targetX, dimensions.width, dimensions.height, 1),
           }}
           transition={{
-            duration: 1.25,
+            duration: 0.45,
             ease: [0.16, 1, 0.3, 1],
           }}
           fill="url(#navBarGreenGrad)"
@@ -246,7 +193,7 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
           filter="url(#cutoutInnerShadow)"
         />
 
-        {/* Bisel superior bien visible que se hunde lentamente hacia abajo */}
+        {/* Bisel superior sutil */}
         <motion.path
           key={`bar-top-${activeIndex}-${clickCount}`}
           initial={
@@ -258,36 +205,16 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
             d: getTopBorderPath(targetX, dimensions.width, 1),
           }}
           transition={{
-            duration: 1.25,
+            duration: 0.45,
             ease: [0.16, 1, 0.3, 1],
           }}
-          stroke="rgba(255, 255, 255, 0.22)"
-          strokeWidth={1.3}
-          fill="none"
-        />
-
-        {/* Bisel inferior de la abertura que se hunde lentamente hacia arriba */}
-        <motion.path
-          key={`bar-bottom-${activeIndex}-${clickCount}`}
-          initial={
-            clickCount > 0
-              ? { d: getBottomBorderPath(targetX, dimensions.width, dimensions.height, 0) }
-              : false
-          }
-          animate={{
-            d: getBottomBorderPath(targetX, dimensions.width, dimensions.height, 1),
-          }}
-          transition={{
-            duration: 1.25,
-            ease: [0.16, 1, 0.3, 1],
-          }}
-          stroke="rgba(255, 255, 255, 0.26)"
-          strokeWidth={1.3}
+          stroke="rgba(255, 255, 255, 0.3)"
+          strokeWidth={1}
           fill="none"
         />
       </svg>
 
-      <div className="flex items-center justify-around px-2">
+      <div className="flex items-center justify-around px-2 h-[48px]">
         {navItems.map((item, index) => {
           const Icon = item.icon;
           const isActive =
@@ -316,58 +243,55 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
                 onNavigate(item.id);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="relative flex flex-col items-center justify-center py-0.5 px-1 rounded-2xl cursor-pointer min-w-[56px] sm:min-w-[62px] h-[44px] touch-manipulation group"
+              className="relative flex flex-col items-center justify-center py-0.5 px-1 rounded-2xl cursor-pointer min-w-[52px] sm:min-w-[60px] h-[46px] touch-manipulation group"
               aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}
             >
               {isActive ? (
                 <>
                   {/* ========================================================
-                      1. CUADRO NARANJA HERO (#F58220): ELEVADO (-top-[28px])
-                      Centrado al 50% con 5px a los lados.
-                      Comienza abajo en su columna (y=44) y se eleva hacia arriba (y=0).
+                      1. CUADRO NARANJA HERO (#F58220): SOBRESALE CON DISTINCIÓN
+                      Compacto (40x40px), flotando elegantemente a -top-3.5
                      ======================================================== */}
                   <motion.div
                     key={`square-${item.id}-${clickCount}`}
-                    initial={clickCount > 0 ? { y: 44 } : false}
-                    animate={{ y: 0 }}
+                    initial={clickCount > 0 ? { scale: 0.85, y: 8 } : false}
+                    animate={{ scale: 1, y: 0 }}
                     transition={{
-                      duration: 1.25,
+                      duration: 0.4,
                       ease: [0.16, 1, 0.3, 1],
                     }}
-                    whileTap={{ scale: 0.94 }}
+                    whileTap={{ scale: 0.93 }}
                     style={{ left: '50%', x: '-50%' }}
-                    className="absolute -top-[28px] w-11 h-11 rounded-2xl bg-gradient-to-b from-[#ffa352] via-[#F58220] to-[#d94e08] flex items-center justify-center text-black z-20 cursor-pointer shadow-[0_0_18px_#F58220,0_0_36px_rgba(245,130,32,0.6),0_0_50px_rgba(245,130,32,0.3)]"
+                    className="absolute -top-3.5 w-10 h-10 rounded-2xl bg-gradient-to-b from-[#ffa352] via-[#F58220] to-[#d94e08] flex items-center justify-center text-black z-20 cursor-pointer shadow-[0_4px_14px_rgba(245,130,32,0.5),0_0_20px_rgba(245,130,32,0.25)] border border-white/25"
                   >
-                    <Icon className="w-5.5 h-5.5 stroke-[2.5] text-black drop-shadow-[0_1px_1px_rgba(255,255,255,0.4)]" />
+                    <Icon className="w-5 h-5 stroke-[2.5] text-black drop-shadow-[0_1px_1px_rgba(255,255,255,0.4)]" />
                   </motion.div>
 
                   {/* ========================================================
-                      2. BARRITA DEL NOMBRE EN NARANJA HERO (#F58220)
-                      - Abrazada perfectamente por la pestaña inferior de la barra.
-                      - Centrada al 50% con 5px a los lados.
-                      - Elevada más arriba dentro de la barra.
+                      2. ETIQUETA INFERIOR DISCRETA Y DE LUJO
+                      Sutil sobre la barra sólida, sin romperla ni ahondar huecos
                      ======================================================== */}
                   <motion.div
                     key={`label-${item.id}-${clickCount}`}
-                    initial={clickCount > 0 ? { y: -36 } : false}
-                    animate={{ y: 0 }}
+                    initial={clickCount > 0 ? { opacity: 0, scale: 0.9 } : false}
+                    animate={{ opacity: 1, scale: 1 }}
                     transition={{
-                      duration: 1.25,
+                      duration: 0.35,
                       ease: [0.16, 1, 0.3, 1],
                     }}
                     style={{ left: '50%', x: '-50%' }}
-                    className="absolute bottom-[1.5px] w-[72px] h-[19px] rounded-full bg-gradient-to-r from-[#ffa352] via-[#F58220] to-[#ffa352] flex items-center justify-center z-20 shadow-[0_0_14px_rgba(245,130,32,0.7)]"
+                    className="absolute bottom-1 z-20 pointer-events-none"
                   >
-                    <span className="text-[8.5px] font-black uppercase tracking-wider text-black whitespace-nowrap px-1">
+                    <span className="text-[9px] font-black uppercase tracking-wider text-slate-950 bg-black/10 px-2 py-0.5 rounded-full whitespace-nowrap">
                       {item.label}
                     </span>
                   </motion.div>
                 </>
               ) : (
                 /* Ícono en reposo sobre la barra verde hero en negro con alto contraste */
-                <div className="flex items-center justify-center w-10 h-10 text-slate-950/85 group-hover:text-black transition-colors">
-                  <Icon className="w-5.5 h-5.5 stroke-[2.4]" />
+                <div className="flex items-center justify-center w-9 h-9 text-slate-950/80 group-hover:text-black transition-colors">
+                  <Icon className="w-5 h-5 stroke-[2.3]" />
                 </div>
               )}
             </a>

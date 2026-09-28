@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { motion } from 'motion/react';
 import {
   MapPin,
@@ -21,10 +22,30 @@ import { WHATSAPP_PHONE, getGeneralWhatsAppUrl } from '@/src/data/lots';
 import { WhatsAppIcon, FacebookIcon, InstagramIcon, TikTokIcon } from '../SocialIcons';
 import { ScrollReveal } from '../common/ScrollReveal';
 import { AnimatedInsignia } from '../common/AnimatedInsignia';
+import { HeroNavArrows } from '../HeroNavArrows';
 
 interface ContactViewProps {
   onOpenVisitModal: (defaultInterest?: string) => void;
 }
+
+const CONTACT_HERO_IMAGES = [
+  {
+    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85',
+    alt: 'Atención Personalizada y Asesoría Notarial MGM Inmobiliaria',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1600&q=85',
+    alt: 'Urbanismo y Visitas de Campo Guiadas',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1600&q=85',
+    alt: 'Topografía Urbanizada y Terrenos en Venta',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1600&q=85',
+    alt: 'Oficinas y Atención al Cliente MGM Inmobiliaria',
+  },
+];
 
 const sanitizeInput = (text: string) => {
   if (typeof text !== 'string') return '';
@@ -35,6 +56,26 @@ const sanitizeInput = (text: string) => {
 };
 
 export function ContactView({ onOpenVisitModal }: ContactViewProps) {
+  // Banner Continuous Real Estate Slideshow
+  const [heroImgIndex, setHeroImgIndex] = useState(0);
+  const [heroHovered, setHeroHovered] = useState(false);
+
+  useEffect(() => {
+    if (heroHovered) return;
+    const interval = setInterval(() => {
+      setHeroImgIndex((prev) => (prev + 1) % CONTACT_HERO_IMAGES.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [heroHovered]);
+
+  const nextHeroImage = () => {
+    setHeroImgIndex((prev) => (prev + 1) % CONTACT_HERO_IMAGES.length);
+  };
+
+  const prevHeroImage = () => {
+    setHeroImgIndex((prev) => (prev - 1 < 0 ? CONTACT_HERO_IMAGES.length - 1 : prev - 1));
+  };
+
   const [formData, setFormData] = useState({
     nombre: '',
     telefono: '',
@@ -90,18 +131,54 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
       {/* =========================================================================
           HERO BANNER DE CONTACTO (ESTILO AOVET ADAPTADO A PALETA MGM)
           ========================================================================= */}
-      <section className="relative flex flex-col justify-center bg-[#113d22] overflow-hidden min-h-[500px] sm:min-h-[540px] lg:min-h-[580px] select-none">
-        {/* Background image + dark corporate overlay */}
+      <section className="group/hero relative flex flex-col justify-center bg-[#113d22] overflow-hidden min-h-[500px] sm:min-h-[540px] lg:min-h-[580px] select-none">
+        {/* Fondo fotográfico panorámico continuo (100% de la pantalla) */}
         <div
-          className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=85')`,
-          }}
+          className="absolute inset-0 w-full h-full overflow-hidden select-none"
+          onMouseEnter={() => setHeroHovered(true)}
+          onMouseLeave={() => setHeroHovered(false)}
         >
-          <div className="absolute inset-0 bg-gradient-to-b from-[#113d22]/85 via-black/55 to-[#113d22]/90" />
+          {CONTACT_HERO_IMAGES.map((img, idx) => (
+            <div
+              key={idx}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                heroImgIndex === idx ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <Image
+                src={img.url}
+                alt={img.alt}
+                fill
+                priority={idx === 0}
+                sizes="100vw"
+                className="object-cover object-center transform transition-transform duration-7000 ease-out hover:scale-105"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+          ))}
+
+          {/* Degradado corporativo idéntico al banner de Contacto — Luminoso, limpio y continuo */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#113d22]/85 via-black/55 to-[#113d22]/90 pointer-events-none" />
+
+          {/* Indicadores de diapositiva */}
+          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15">
+            {CONTACT_HERO_IMAGES.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setHeroImgIndex(i)}
+                aria-label={`Ver imagen ${i + 1}`}
+                className={`h-2 rounded-full transition-all cursor-pointer ${
+                  heroImgIndex === i ? 'w-6 bg-[#5be196]' : 'w-2 bg-white/50 hover:bg-white'
+                }`}
+              />
+            ))}
+          </div>
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-grow flex flex-col justify-center items-center text-center pt-24 sm:pt-28 lg:pt-32 pb-14 sm:pb-16 lg:pb-18">
+        {/* Controles de navegación manual translúcidos con materialización al hover */}
+        <HeroNavArrows onPrev={prevHeroImage} onNext={nextHeroImage} />
+
+        <div className="relative z-10 max-w-7xl mx-auto px-8 sm:px-10 lg:px-8 w-full flex-grow flex flex-col justify-center items-center text-center pt-24 sm:pt-28 lg:pt-32 pb-14 sm:pb-16 lg:pb-18">
           {/* Insignia arquitectónica animada en SVG (Paleta Logo MGM: Naranja #F58220 y Verde #22A33D) */}
           <AnimatedInsignia className="mb-3 sm:mb-4" size={64} />
 
