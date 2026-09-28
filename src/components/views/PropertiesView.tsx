@@ -144,12 +144,12 @@ export function PropertiesView({
   );
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
-  const [maxPrice, setMaxPrice] = useState<number>(initialMaxPrice || 120000);
-  const [minArea, setMinArea] = useState<number>(0);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [mobilePage, setMobilePage] = useState<number>(1);
   const MOBILE_PAGE_SIZE = 5;
   const searchBarRef = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
+  const catalogSectionRef = useRef<HTMLElement>(null);
 
   const scrollToSearchBar = () => {
     if (searchBarRef.current) {
@@ -159,9 +159,60 @@ export function PropertiesView({
     }
   };
 
+  // Snap suave cuando el usuario hace scroll down desde el hero hacia el catálogo
+  useEffect(() => {
+    let snappedDown = false;
+    let snappedUp = false;
+
+    const getCatalogY = () => {
+      if (!searchBarRef.current) return 0;
+      return Math.max(0, searchBarRef.current.getBoundingClientRect().top + window.pageYOffset - 72);
+    };
+
+    const handleScroll = () => {
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      const catalogY = getCatalogY();
+      if (catalogY <= 0) return;
+
+      // Si volvió al tope absoluto, resetear flags
+      if (scrollY <= 10) {
+        snappedDown = false;
+        snappedUp = true;
+      } else if (scrollY >= catalogY - 5) {
+        snappedDown = true;
+        snappedUp = false;
+      }
+    };
+
+    const handleWheel = (e: WheelEvent) => {
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      const catalogY = getCatalogY();
+      if (catalogY <= 0) return;
+
+      // Solo si el usuario está en el Hero (arriba) y rueda hacia abajo
+      if (e.deltaY > 0 && scrollY < catalogY - 80 && !snappedDown) {
+        snappedDown = true;
+        window.scrollTo({ top: catalogY, behavior: 'smooth' });
+      }
+      // Solo si el usuario está en el tope exacto del catálogo y rueda hacia arriba
+      else if (e.deltaY < 0 && scrollY >= catalogY - 10 && scrollY <= catalogY + 40 && !snappedUp) {
+        snappedUp = true;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('wheel', handleWheel, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
+
   useEffect(() => {
     setMobilePage(1);
-  }, [searchQuery, selectedTypes, selectedCategories, selectedStatuses, maxPrice, minArea]);
+  }, [searchQuery, selectedTypes, selectedCategories, selectedStatuses]);
 
   const toggleType = (val: string) => {
     setSelectedTypes((prev) =>
@@ -194,10 +245,8 @@ export function PropertiesView({
     const matchesType = selectedTypes.length === 0 || selectedTypes.includes(lot.type);
     const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(lot.category);
     const matchesStatus = selectedStatuses.length === 0 || selectedStatuses.includes(lot.status);
-    const matchesPrice = lot.priceUSD <= maxPrice;
-    const matchesArea = lot.areaM2 >= minArea;
 
-    return matchesSearch && matchesType && matchesCategory && matchesStatus && matchesPrice && matchesArea;
+    return matchesSearch && matchesType && matchesCategory && matchesStatus;
   });
 
   const totalMobilePages = Math.max(1, Math.ceil(filteredLots.length / MOBILE_PAGE_SIZE));
@@ -206,17 +255,13 @@ export function PropertiesView({
     searchQuery.trim().length > 0 ||
     selectedTypes.length > 0 ||
     selectedCategories.length > 0 ||
-    selectedStatuses.length > 0 ||
-    maxPrice < 120000 ||
-    minArea > 0;
+    selectedStatuses.length > 0;
 
   const activeFiltersCount =
     (searchQuery.trim().length > 0 ? 1 : 0) +
     (selectedTypes.length > 0 ? 1 : 0) +
     (selectedCategories.length > 0 ? 1 : 0) +
-    (selectedStatuses.length > 0 ? 1 : 0) +
-    (maxPrice < 120000 ? 1 : 0) +
-    (minArea > 0 ? 1 : 0);
+    (selectedStatuses.length > 0 ? 1 : 0);
 
   const villasLots = properties.filter((p) => p.type === 'Vivienda');
   const residentialLots = properties.filter(
@@ -234,8 +279,6 @@ export function PropertiesView({
     setSelectedTypes([]);
     setSelectedCategories([]);
     setSelectedStatuses([]);
-    setMaxPrice(120000);
-    setMinArea(0);
     setMobilePage(1);
   };
 
@@ -244,11 +287,11 @@ export function PropertiesView({
   const getCategoryCount = (category: string) => properties.filter((p) => p.category === category).length;
 
   return (
-    <div className="w-full overflow-hidden bg-white text-slate-900">
+    <div className="w-full bg-white text-slate-900">
       {/* =========================================================================
           1. BANNER CINEMÁTICO — PANORÁMICO INTEGRAL (SIN PARTICIONES VERTICALES)
           ========================================================================= */}
-      <section className="group/hero relative w-full bg-[#113d22] text-white overflow-hidden min-h-[500px] sm:min-h-[540px] lg:min-h-[580px] flex items-center justify-center select-none">
+      <section ref={heroRef} className="group/hero relative w-full bg-[#113d22] text-white overflow-hidden min-h-[500px] sm:min-h-[540px] lg:min-h-[580px] flex items-center justify-center select-none">
         {/* Fondo fotográfico panorámico continuo (100% de la pantalla) */}
         <div
           className="absolute inset-0 w-full h-full overflow-hidden select-none"
@@ -563,44 +606,7 @@ export function PropertiesView({
                       </div>
                     </div>
 
-                    {/* Fila 3: Sliders de Precio y Área */}
-                    <div className="space-y-3 pt-1">
-                      <div className="space-y-1.5">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="font-bold text-slate-700">Presupuesto Máximo</span>
-                          <span className="font-mono font-bold text-[#F58220] bg-orange-50 px-2 py-0.5 rounded border border-orange-200/60">
-                            ${maxPrice.toLocaleString()} USD
-                          </span>
-                        </div>
-                        <input
-                          type="range"
-                          min={20000}
-                          max={120000}
-                          step={2500}
-                          value={maxPrice}
-                          onChange={(e) => setMaxPrice(Number(e.target.value))}
-                          className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#F58220]"
-                        />
-                      </div>
 
-                      <div className="space-y-1.5">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="font-bold text-slate-700">Área Mínima de Terreno</span>
-                          <span className="font-mono font-bold text-[#22A33D]">
-                            {minArea > 0 ? `≥ ${minArea} m²` : 'Cualquier tamaño'}
-                          </span>
-                        </div>
-                        <input
-                          type="range"
-                          min={0}
-                          max={500}
-                          step={20}
-                          value={minArea}
-                          onChange={(e) => setMinArea(Number(e.target.value))}
-                          className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#22A33D]"
-                        />
-                      </div>
-                    </div>
 
                     {/* Acciones */}
                     <div className="flex items-center gap-2 pt-2">
@@ -818,29 +824,7 @@ export function PropertiesView({
                   </div>
                 </div>
 
-                {/* 3. Precio */}
-                <div className="space-y-1.5 sm:space-y-2.5 pb-2.5 sm:pb-4 border-b border-slate-200/70">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-0.5">
-                    <h4 className="text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-800 text-center sm:text-left">
-                      Precio
-                    </h4>
-                    <span className="font-mono text-[9px] sm:text-xs font-bold text-[#F58220] bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200/60 text-center inline-block w-fit mx-auto sm:mx-0">
-                      <span className="sm:hidden">${Math.round(maxPrice / 1000)}k</span>
-                      <span className="hidden sm:inline">${maxPrice.toLocaleString()}</span>
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min={20000}
-                    max={120000}
-                    step={2500}
-                    value={maxPrice}
-                    onChange={(e) => setMaxPrice(Number(e.target.value))}
-                    className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#F58220]"
-                  />
-                </div>
-
-                {/* 4. Categoría del Terreno */}
+                {/* 3. Categoría del Terreno */}
                 <div className="space-y-1.5 sm:space-y-2.5 pb-2.5 sm:pb-4 border-b border-slate-200/70">
                   <h4 className="text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-800 text-center sm:text-left">
                     Tipo
@@ -872,27 +856,6 @@ export function PropertiesView({
                       );
                     })}
                   </div>
-                </div>
-
-                {/* 5. Área Mínima de Terreno (m²) */}
-                <div className="space-y-1.5 sm:space-y-2.5">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-0.5">
-                    <h4 className="text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-800 text-center sm:text-left">
-                      Área
-                    </h4>
-                    <span className="font-mono text-[9px] sm:text-xs font-bold text-[#22A33D] text-center inline-block mx-auto sm:mx-0">
-                      {minArea > 0 ? `≥${minArea}m²` : 'Todas'}
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min={0}
-                    max={500}
-                    step={20}
-                    value={minArea}
-                    onChange={(e) => setMinArea(Number(e.target.value))}
-                    className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#22A33D]"
-                  />
                 </div>
               </ScrollReveal>
             </aside>
@@ -936,22 +899,6 @@ export function PropertiesView({
                       </button>
                     </span>
                   ))}
-                  {maxPrice < 120000 && (
-                    <span className="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-orange-50 text-[#ea580c] border border-orange-200 text-[9px] sm:text-[11px] font-semibold">
-                      ${maxPrice.toLocaleString()}
-                      <button type="button" onClick={() => setMaxPrice(120000)} className="hover:text-rose-600 cursor-pointer ml-0.5">
-                        <X className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                      </button>
-                    </span>
-                  )}
-                  {minArea > 0 && (
-                    <span className="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-900 border border-emerald-200 text-[9px] sm:text-[11px] font-semibold">
-                      ≥ {minArea} m²
-                      <button type="button" onClick={() => setMinArea(0)} className="hover:text-rose-600 cursor-pointer ml-0.5">
-                        <X className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                      </button>
-                    </span>
-                  )}
                 </div>
               </ScrollReveal>
 

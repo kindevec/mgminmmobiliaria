@@ -1010,13 +1010,6 @@ export function HomeView({
                   <WhatsAppIcon size={18} className="text-white shrink-0" />
                   <span>WhatsApp Oficial Inmediato</span>
                 </a>
-
-                <button
-                  onClick={() => onOpenVisitModal('Agendamiento desde Inicio')}
-                  className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-slate-900 hover:bg-[#F58220] text-white font-bold text-xs sm:text-sm transition-all cursor-pointer shadow-md active:scale-95 text-center"
-                >
-                  <span>Agendar Cita en Oficina</span>
-                </button>
               </div>
             </div>
           </ScrollReveal>

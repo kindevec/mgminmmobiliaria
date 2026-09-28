@@ -166,8 +166,8 @@ function HomePageContent() {
         onOpenVisitModal={handleOpenVisitModal}
       />
 
-      {/* 2. Main Content Container with Strict Anti-Overflow & Luminous Light Base */}
-      <main className="flex-1 w-full overflow-x-hidden pb-24 md:pb-12 pt-0 bg-white">
+      {/* 2. Main Content Container with Strict Anti-Overflow */}
+      <main className="flex-1 w-full overflow-x-hidden pb-24 md:pb-12 pt-0">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={currentPage}
@@ -175,7 +175,7 @@ function HomePageContent() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="w-full bg-white"
+            className="w-full"
           >
             {currentPage === 'home' && (
               <HomeView
@@ -233,6 +233,7 @@ function HomePageContent() {
 
       {/* 3. Corporate Footer with Kindev Official Backlink */}
       <Footer
+        currentPage={currentPage}
         onNavigate={handleNavigate}
         onOpenVisitModal={() => handleOpenVisitModal()}
       />

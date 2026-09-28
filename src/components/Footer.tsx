@@ -17,6 +17,7 @@ import { getGeneralWhatsAppUrl } from '@/src/data/lots';
 const kindevIcon = '/kindev_icon.webp';
 
 interface FooterProps {
+  currentPage?: PageView;
   onNavigate: (page: PageView) => void;
   onOpenVisitModal: () => void;
 }
@@ -75,13 +76,61 @@ function SocialIconsStrip({ size = 22 }: { size?: number }) {
   );
 }
 
-export function Footer({ onNavigate, onOpenVisitModal }: FooterProps) {
+export function Footer({ currentPage, onNavigate, onOpenVisitModal }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   const handleNavClick = (page: PageView) => {
     onNavigate(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  // Footer exclusivo minimalista para la sección de Administración (solo logo, marca y Desarrollado por Kindev)
+  if (currentPage === 'admin') {
+    return (
+      <footer
+        id="main-footer"
+        className="relative z-10 border-t border-white/10 py-5 px-4 sm:px-8 text-slate-200 bg-[#113d22] shadow-[0_-8px_30px_rgba(0,0,0,0.35)]"
+      >
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          {/* Logo y Marca */}
+          <div className="flex items-center">
+            <LogoMGM className="h-8 sm:h-9 w-auto" variant="compact" showSubtitle={true} isGhost={true} />
+          </div>
+
+          {/* Desarrollado por KINDEV */}
+          <div className="flex justify-center">
+            <a 
+              href="https://www.kindevsas.com/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:opacity-95 transition-all text-xs sm:text-sm flex items-center gap-2 group"
+              title="Desarrollado por KINDEV"
+              aria-label="Desarrollado por KINDEV"
+            >
+              <div className="relative inline-flex items-center justify-center shrink-0">
+                <div className="absolute inset-0 rounded-full bg-[#22A33D]/30 blur-md opacity-70 group-hover:opacity-100 group-hover:scale-125 transition-all duration-500 pointer-events-none" />
+                <img 
+                  src={kindevIcon} 
+                  alt="KINDEV Logo" 
+                  width="24" 
+                  height="24" 
+                  loading="lazy" 
+                  decoding="async" 
+                  className="relative z-10 w-5 h-5 sm:w-6 sm:h-6 object-contain drop-shadow-[0_2px_8px_rgba(34,163,61,0.5)] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 ease-out inline-block"
+                />
+              </div>
+              <span className="text-xs text-slate-400 group-hover:text-emerald-400 transition-colors font-semibold tracking-wide">
+                Desarrollado por{" "}
+                <span className="font-bold text-white group-hover:text-emerald-400 inline-block">
+                  KINDEV
+                </span>
+              </span>
+            </a>
+          </div>
+        </div>
+      </footer>
+    );
+  }
 
   return (
     <footer

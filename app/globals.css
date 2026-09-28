@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+html,
+body,
+#root {
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  border: none !important;
+  overflow-x: hidden;
+}
+
+header {
+  border-radius: 0 !important;
+}
+
 @layer utilities {
   .hero-mask-blend {
     -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.06) 6%, rgba(0, 0, 0, 0.45) 22%, black 48%);

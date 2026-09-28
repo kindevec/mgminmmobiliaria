@@ -108,8 +108,17 @@ export function MiravalleView({
   // Carousel state for amenities
   const [activeSlide, setActiveSlide] = useState(0);
 
-  // Gallery state for renders & obra
+  // Gallery state for renders & obra con transición automática
   const [activeGallery, setActiveGallery] = useState(0);
+  const [galleryHovered, setGalleryHovered] = useState(false);
+
+  useEffect(() => {
+    if (galleryHovered) return;
+    const interval = setInterval(() => {
+      setActiveGallery((prev) => (prev + 1) % GALLERY_RENDERS.length);
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [galleryHovered]);
 
   const prevSlide = () => {
     setActiveSlide((curr) =>
@@ -125,13 +134,13 @@ export function MiravalleView({
 
   const prevGallery = () => {
     setActiveGallery((curr) =>
-      curr === GALLERY_RENDERS.length - 1 ? 0 : curr - 1
+      curr === 0 ? GALLERY_RENDERS.length - 1 : curr - 1
     );
   };
 
   const nextGallery = () => {
     setActiveGallery((curr) =>
-      curr === GALLERY_RENDERS.length - 1 ? 0 : curr + 1
+      (curr + 1) % GALLERY_RENDERS.length
     );
   };
 
@@ -430,46 +439,67 @@ export function MiravalleView({
             <ChevronRight className="h-4 w-4 sm:h-6 sm:w-6 stroke-[2.2]" />
           </button>
 
-          {/* Tarjeta con ancho reducido y esquinas redondeadas */}
+          {/* Tarjeta con ancho reducido y esquinas redondeadas con transiciones automáticas */}
           <ScrollReveal direction="up" delay={0.18} className="relative w-full rounded-3xl overflow-hidden bg-slate-900 border border-slate-200/90 shadow-xl">
-            {/* Slide Content */}
-            <div className="relative aspect-[16/10] sm:aspect-[21/9] w-full">
-              <Image
-                src={currentRender.image}
-                alt={currentRender.title}
-                fill
-                sizes="(max-width: 1200px) 100vw, 1200px"
-                className="object-cover"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent pointer-events-none" />
+            {/* Slide Content con animación de transición */}
+            <div
+              className="relative aspect-[16/10] sm:aspect-[21/9] w-full overflow-hidden select-none"
+              onMouseEnter={() => setGalleryHovered(true)}
+              onMouseLeave={() => setGalleryHovered(false)}
+            >
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeGallery}
+                  initial={{ opacity: 0, scale: 1.03 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  transition={{ duration: 0.7, ease: [0.25, 1, 0.5, 1] }}
+                  className="absolute inset-0 w-full h-full"
+                >
+                  <Image
+                    src={currentRender.image}
+                    alt={currentRender.title}
+                    fill
+                    sizes="(max-width: 1200px) 100vw, 1200px"
+                    className="object-cover"
+                    referrerPolicy="no-referrer"
+                    priority
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/25 to-transparent pointer-events-none" />
 
-              <div className="absolute bottom-6 left-6 right-6 sm:bottom-8 sm:left-10 sm:right-10 text-white space-y-1 pointer-events-none">
-                <h3 className="text-xl sm:text-3xl font-black text-white">
-                  {currentRender.title}
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
-                  {currentRender.description}
-                </p>
+                  <motion.div
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                    className="absolute bottom-6 left-6 right-6 sm:bottom-8 sm:left-10 sm:right-10 text-white space-y-1.5 pointer-events-none"
+                  >
+                    <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#22A33D]/90 text-white uppercase tracking-wider backdrop-blur-xs mb-0.5">
+                      {currentRender.category}
+                    </span>
+                    <h3 className="text-xl sm:text-3xl font-black text-white leading-tight">
+                      {currentRender.title}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+                      {currentRender.description}
+                    </p>
+                  </motion.div>
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Indicadores de diapositiva (dots sutiles) */}
+              <div className="absolute bottom-4 right-5 sm:bottom-6 sm:right-8 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15">
+                {GALLERY_RENDERS.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveGallery(i)}
+                    aria-label={`Ver diapositiva ${i + 1}`}
+                    className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                      activeGallery === i ? 'w-5 bg-[#5be196]' : 'w-1.5 bg-white/50 hover:bg-white'
+                    }`}
+                  />
+                ))}
               </div>
             </div>
-          </ScrollReveal>
-
-          {/* Thumbnail Selector Pills Centrados */}
-          <ScrollReveal direction="up" delay={0.25} className="flex items-center justify-center gap-2 mt-4 overflow-x-auto pb-1">
-            {GALLERY_RENDERS.map((item, idx) => (
-              <button
-                key={idx}
-                onClick={() => setActiveGallery(idx)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
-                  activeGallery === idx
-                    ? 'bg-slate-900 text-white shadow-xs font-bold'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                {item.title}
-              </button>
-            ))}
           </ScrollReveal>
         </div>
       </section>

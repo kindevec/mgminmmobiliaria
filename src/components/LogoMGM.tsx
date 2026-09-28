@@ -130,18 +130,18 @@ export function LogoMGM({
       {variant === 'compact' && showSubtitle && (
         <div className="flex flex-col text-left">
           <span
-            className={`font-black text-base sm:text-lg md:text-xl tracking-tight leading-tight transition-colors ${
+            className={`font-black text-base sm:text-[17px] md:text-lg tracking-tight leading-tight transition-colors ${
               isGhost
-                ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]'
+                ? 'text-white'
                 : 'text-slate-900'
             }`}
           >
             MGM INMOBILIARIA
           </span>
           <span
-            className={`text-xs sm:text-[13px] tracking-wider font-bold uppercase transition-colors ${
+            className={`text-xs sm:text-[12px] tracking-wider font-semibold uppercase transition-colors ${
               isGhost
-                ? 'text-emerald-300 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]'
+                ? 'text-emerald-300'
                 : 'text-slate-500'
             }`}
           >
