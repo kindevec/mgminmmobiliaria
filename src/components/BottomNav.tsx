@@ -91,11 +91,6 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
       icon: Layers,
     },
     {
-      id: 'miravalle' as PageView,
-      label: 'Miravalle',
-      icon: Trees,
-    },
-    {
       id: 'contact' as PageView,
       label: 'Contacto',
       icon: MessageSquare,

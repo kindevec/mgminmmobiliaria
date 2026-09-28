@@ -37,8 +37,8 @@ export function PropertyCard({
           : 'bg-white border-slate-200/90 text-slate-900 shadow-md hover:shadow-2xl hover:border-[#22A33D]/50'
       }`}
     >
-      {/* 1. Imagen y Badges */}
-      <div className="relative w-full h-[220px] sm:h-[240px] overflow-hidden bg-slate-950">
+      {/* 1. Imagen */}
+      <div className="relative w-full h-[180px] sm:h-[195px] overflow-hidden bg-slate-950">
         <Image
           src={lot.image}
           alt={lot.name}
@@ -50,12 +50,12 @@ export function PropertyCard({
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent pointer-events-none" />
 
         {/* Badges superiores: Código a la izquierda, Estado a la derecha */}
-        <div className="absolute top-3.5 inset-x-3.5 flex items-center justify-between z-10">
-          <span className="text-xs font-mono font-black text-white bg-slate-950/85 px-3 py-1 rounded-full backdrop-blur-md border border-white/20 shadow-xs">
+        <div className="absolute top-3 inset-x-3 flex items-center justify-between z-10">
+          <span className="text-[11px] font-mono font-black text-white bg-slate-950/85 px-2.5 py-0.5 rounded-full backdrop-blur-md border border-white/20 shadow-xs">
             {lot.code}
           </span>
           <span
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide backdrop-blur-md shadow-xs ${
+            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide backdrop-blur-md shadow-xs ${
               isAvailable
                 ? 'bg-emerald-950/85 text-emerald-300 border border-emerald-500/30'
                 : isReserved
@@ -71,60 +71,41 @@ export function PropertyCard({
             {lot.status}
           </span>
         </div>
-
-        {/* Badges inferiores en la foto: Proyecto & Tipo */}
-        <div className="absolute bottom-3 left-3.5 right-3.5 z-10 flex items-center justify-between text-white text-[11px] font-medium drop-shadow-md">
-          <span className="flex items-center gap-1 bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-lg">
-            <MapPin className="h-3 w-3 text-[#5be196]" />
-            {lot.project}
-          </span>
-          <span className="bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-lg">
-            {lot.type}
-          </span>
-        </div>
       </div>
 
-      {/* 2. Cuerpo de la Tarjeta Luxury (Sin Box-in-Box, Información Abierta y Elegante con Padding Reducido) */}
-      <div className="p-3.5 sm:p-4 flex-1 flex flex-col justify-between space-y-3">
-        <div className="space-y-2.5">
+      {/* 2. Cuerpo de la Tarjeta Luxury */}
+      <div className="p-3 sm:p-3.5 flex-1 flex flex-col justify-between space-y-2.5">
+        <div className="space-y-2">
           <div className="space-y-0.5">
             <h3
-              className="text-base sm:text-lg font-black text-slate-900 leading-snug tracking-tight group-hover:text-emerald-700 transition-colors line-clamp-1"
+              className="text-sm sm:text-base font-black text-slate-900 leading-snug tracking-tight group-hover:text-emerald-700 transition-colors line-clamp-1"
               title={lot.name}
             >
               {lot.name}
             </h3>
-            <p className="text-xs text-slate-500 font-medium line-clamp-1 flex items-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+            <p className="text-[11px] text-slate-500 font-medium line-clamp-1 flex items-center gap-1.5">
+              <MapPin className="h-3 w-3 text-emerald-600 shrink-0" />
               <span>{lot.zone}</span>
               <span className="text-slate-300">•</span>
               <span>{lot.topography}</span>
             </p>
           </div>
 
-          {/* Ficha métrica abierta y arquitectónica (Cero cajitas) */}
-          <div className="py-2.5 border-y border-slate-100 grid grid-cols-3 divide-x divide-slate-100 text-slate-700">
-            <div className="pr-1.5 sm:pr-2">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Superficie</span>
+          {/* Ficha métrica abierta y arquitectónica */}
+          <div className="py-2 border-y border-slate-100 grid grid-cols-2 divide-x divide-slate-100 text-slate-700">
+            <div className="pr-2">
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Superficie</span>
               <div className="flex items-baseline gap-1 mt-0.5">
                 <span className="font-mono text-sm sm:text-base font-black text-slate-900 leading-none">{lot.areaM2}</span>
                 <span className="text-[11px] font-semibold text-slate-500">m²</span>
               </div>
             </div>
 
-            <div className="px-1.5 sm:px-2 text-center">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Financiamiento</span>
-              <div className="flex items-baseline justify-center gap-1 mt-0.5">
+            <div className="pl-2 text-right">
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Financiamiento</span>
+              <div className="flex items-baseline justify-end gap-1 mt-0.5">
                 <span className="font-mono text-sm sm:text-base font-black text-slate-900 leading-none">{lot.maxMonths}</span>
                 <span className="text-[11px] font-semibold text-slate-500">meses</span>
-              </div>
-            </div>
-
-            <div className="pl-1.5 sm:pl-2 text-right">
-              <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">Garantía</span>
-              <div className="flex items-center justify-end gap-1 mt-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                <span className="text-xs sm:text-sm font-black text-emerald-700 font-mono leading-none tracking-wide">0% Buró</span>
               </div>
             </div>
           </div>

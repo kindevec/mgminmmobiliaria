@@ -1,4 +1,4 @@
-export type PageView = 'home' | 'about' | 'properties' | 'miravalle' | 'contact' | 'admin' | 'property-detail';
+export type PageView = 'home' | 'about' | 'properties' | 'contact' | 'admin' | 'property-detail';
 
 export interface PageConfig {
   id: PageView;
@@ -33,14 +33,6 @@ export const PAGES_CONFIG: Record<PageView, PageConfig> = {
     fullTitle: 'Nosotros & Respaldo Jurídico Notarial | Sociedad Civil MGM Inmobiliaria',
     description: 'Conoce nuestra solidez institucional, trayectoria urbanística y escrituras notariales inmediatas.',
     aliases: ['nosotros', 'about', 'empresa', 'quienes-somos', 'legal'],
-  },
-  miravalle: {
-    id: 'miravalle',
-    hash: 'miravalle',
-    label: 'Miravalle',
-    fullTitle: 'Ciudadela Miravalle | Urbanización Planificada en Azuay | MGM Inmobiliaria',
-    description: 'Macroproyecto residencial exclusivo con obras de primer nivel, áreas verdes y alta plusvalía.',
-    aliases: ['miravalle', 'ciudadela-miravalle', 'ciudadela', 'urbanizacion-miravalle'],
   },
   contact: {
     id: 'contact',

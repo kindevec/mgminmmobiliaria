@@ -44,7 +44,6 @@ export function Header({
     { id: 'home', label: 'Inicio', hash: getPageCanonicalHash('home') },
     { id: 'properties', label: 'Lotes', hash: getPageCanonicalHash('properties') },
     { id: 'about', label: 'Nosotros', hash: getPageCanonicalHash('about') },
-    { id: 'miravalle', label: 'Miravalle', hash: getPageCanonicalHash('miravalle') },
     { id: 'contact', label: 'Contacto', hash: getPageCanonicalHash('contact') },
   ];
 

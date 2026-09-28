@@ -159,56 +159,7 @@ export function PropertiesView({
     }
   };
 
-  // Snap suave cuando el usuario hace scroll down desde el hero hacia el catálogo
-  useEffect(() => {
-    let snappedDown = false;
-    let snappedUp = false;
 
-    const getCatalogY = () => {
-      if (!searchBarRef.current) return 0;
-      return Math.max(0, searchBarRef.current.getBoundingClientRect().top + window.pageYOffset - 72);
-    };
-
-    const handleScroll = () => {
-      const scrollY = window.scrollY || document.documentElement.scrollTop;
-      const catalogY = getCatalogY();
-      if (catalogY <= 0) return;
-
-      // Si volvió al tope absoluto, resetear flags
-      if (scrollY <= 10) {
-        snappedDown = false;
-        snappedUp = true;
-      } else if (scrollY >= catalogY - 5) {
-        snappedDown = true;
-        snappedUp = false;
-      }
-    };
-
-    const handleWheel = (e: WheelEvent) => {
-      const scrollY = window.scrollY || document.documentElement.scrollTop;
-      const catalogY = getCatalogY();
-      if (catalogY <= 0) return;
-
-      // Solo si el usuario está en el Hero (arriba) y rueda hacia abajo
-      if (e.deltaY > 0 && scrollY < catalogY - 80 && !snappedDown) {
-        snappedDown = true;
-        window.scrollTo({ top: catalogY, behavior: 'smooth' });
-      }
-      // Solo si el usuario está en el tope exacto del catálogo y rueda hacia arriba
-      else if (e.deltaY < 0 && scrollY >= catalogY - 10 && scrollY <= catalogY + 40 && !snappedUp) {
-        snappedUp = true;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('wheel', handleWheel, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('wheel', handleWheel);
-    };
-  }, []);
 
   useEffect(() => {
     setMobilePage(1);

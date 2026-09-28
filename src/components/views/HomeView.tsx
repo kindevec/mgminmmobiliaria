@@ -250,25 +250,30 @@ export function HomeView({
   const showMiravalleArrows = isMiravalleInView;
 
   const scrollCatalog = (direction: 'left' | 'right') => {
-    if (catalogScrollRef.current) {
-      const el = catalogScrollRef.current;
-      // En móvil avanza el 100% del ancho (exactamente 1 tarjeta completa); en pantallas grandes por ancho de tarjeta
-      const scrollStep = el.clientWidth > 640 ? (el.clientWidth > 768 ? 420 : 380) : el.clientWidth;
-      const maxScroll = el.scrollWidth - el.clientWidth;
-      if (direction === 'right') {
-        if (el.scrollLeft >= maxScroll - 10) {
-          el.scrollTo({ left: 0, behavior: 'smooth' });
-        } else {
-          el.scrollBy({ left: scrollStep, behavior: 'smooth' });
-        }
-      } else {
-        if (el.scrollLeft <= 10) {
-          el.scrollTo({ left: maxScroll, behavior: 'smooth' });
-        } else {
-          el.scrollBy({ left: -scrollStep, behavior: 'smooth' });
-        }
+    if (!catalogScrollRef.current) return;
+    const el = catalogScrollRef.current;
+    const scrollStep = el.clientWidth > 640 ? (el.clientWidth > 768 ? 390 : 350) : el.clientWidth;
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    
+    let targetLeft = direction === 'right' ? el.scrollLeft + scrollStep : el.scrollLeft - scrollStep;
+    if (direction === 'right' && el.scrollLeft >= maxScroll - 15) targetLeft = 0;
+    if (direction === 'left' && el.scrollLeft <= 15) targetLeft = maxScroll;
+
+    const startLeft = el.scrollLeft;
+    const diff = targetLeft - startLeft;
+    const startTime = performance.now();
+    const duration = 500;
+
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    const step = (now: number) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      el.scrollLeft = startLeft + diff * easeOutCubic(progress);
+      if (progress < 1) {
+        requestAnimationFrame(step);
       }
-    }
+    };
+    requestAnimationFrame(step);
   };
 
   const handleCatalogArrowAction = (e: React.MouseEvent, direction: 'left' | 'right') => {
@@ -798,13 +803,13 @@ export function HomeView({
               onTouchEnd={() => {
                 setTimeout(() => setIsCatalogPaused(false), 3000);
               }}
-              className="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory py-4 scrollbar-none"
+              className="flex gap-3.5 sm:gap-5 overflow-x-auto py-3 scrollbar-none"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {properties.map((lot) => (
                 <div
                   key={lot.id}
-                  className="w-full min-w-full sm:min-w-[360px] md:min-w-[385px] lg:min-w-[410px] max-w-full sm:max-w-[425px] snap-center shrink-0 flex flex-col"
+                  className="w-full min-w-full sm:min-w-[300px] md:min-w-[325px] lg:min-w-[345px] max-w-full sm:max-w-[355px] snap-center shrink-0 flex flex-col"
                 >
                   <PropertyCard lot={lot} onSelectLot={onSelectLot} />
                 </div>
@@ -837,10 +842,10 @@ export function HomeView({
 
             <div className="pt-1 flex justify-center w-full">
               <button
-                onClick={() => onNavigate('miravalle')}
+                onClick={() => onNavigate('properties')}
                 className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-slate-950 hover:bg-[#22A33D] text-white font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap text-center shadow-md hover:scale-105 active:scale-95"
               >
-                <span>Ver Masterplan Miravalle</span>
+                <span>Ver Lotes Disponibles</span>
                 <ArrowRight className="h-4 w-4 shrink-0" />
               </button>
             </div>
@@ -895,8 +900,8 @@ export function HomeView({
                   primaryButtonText="Agendar Recorrido en Obra"
                   primaryButtonIcon={<MapPin className="h-4 w-4 text-white" />}
                   onPrimaryClick={() => onOpenVisitModal('Recorrido Ciudadela Miravalle')}
-                  secondaryLinkText="Ver Masterplan Miravalle"
-                  onSecondaryClick={() => onNavigate('miravalle')}
+                  secondaryLinkText="Ver Catálogo de Lotes"
+                  onSecondaryClick={() => onNavigate('properties')}
                 />
               </motion.div>
             </AnimatePresence>
