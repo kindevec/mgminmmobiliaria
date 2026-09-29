@@ -28,17 +28,20 @@ import { AdminPropertyModal } from './AdminPropertyModal';
 import type { LotProperty } from '@/src/data/lots';
 import { getLotWhatsAppUrl } from '@/src/data/lots';
 import { WhatsAppIcon } from '../SocialIcons';
+import type { PageView } from '@/src/data/navigation';
 
 interface AdminDashboardProps {
   onLogout: () => void;
   onViewCatalog: () => void;
   onSelectLotPreview?: (lot: LotProperty) => void;
+  onNavigate?: (page: PageView) => void;
 }
 
 export function AdminDashboard({
   onLogout,
   onViewCatalog,
   onSelectLotPreview,
+  onNavigate,
 }: AdminDashboardProps) {
   const {
     properties,
@@ -138,7 +141,7 @@ export function AdminDashboard({
             </button>
 
             <button
-              onClick={handleOpenCreate}
+              onClick={() => onNavigate ? onNavigate('new_property') : handleOpenCreate()}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-950 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer"
             >
               <Plus className="h-4 w-4" />

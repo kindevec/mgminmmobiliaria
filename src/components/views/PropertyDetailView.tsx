@@ -296,35 +296,6 @@ export function PropertyDetailView({
               {/* Degradado y Viñeta de Protección de Contraste */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/35 pointer-events-none" />
 
-              {/* Badges Flotantes Superiores */}
-              <div className="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-2">
-                <span className="font-mono text-xs font-extrabold px-3 py-1 rounded-full bg-slate-950/80 text-emerald-400 border border-emerald-500/40 backdrop-blur-md shadow-md">
-                  {lot.code}
-                </span>
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-black/60 text-white backdrop-blur-md border border-white/20">
-                  {lot.type}
-                </span>
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-700/80 text-white backdrop-blur-md">
-                  {lot.category}
-                </span>
-              </div>
-
-              {/* Badge de Disponibilidad Superior Derecho */}
-              <div className="absolute top-4 right-4 z-20">
-                <span
-                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md shadow-md ${
-                    lot.status === 'Disponible'
-                      ? 'bg-emerald-600/90 text-white border border-emerald-400/40'
-                      : lot.status === 'En Reserva'
-                      ? 'bg-amber-600/90 text-white border border-amber-400/40'
-                      : 'bg-rose-600/90 text-white border border-rose-400/40'
-                  }`}
-                >
-                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                  <span>{lot.status}</span>
-                </span>
-              </div>
-
               {/* Flechas de Navegación Flanqueadas */}
               {photos.length > 1 && (
                 <>
@@ -483,15 +454,20 @@ export function PropertyDetailView({
                   <span>Consultar por WhatsApp Oficial</span>
                 </a>
 
-                {/* 2. Botón Agendar Visita Presencial (Naranja MGM) */}
-                <button
-                  type="button"
-                  onClick={() => onOpenVisitModal(`${lot.code} - ${lot.name}`)}
-                  className="w-full flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-xl bg-slate-900 hover:bg-[#113d22] text-white font-bold text-xs sm:text-sm uppercase tracking-wider shadow-sm hover:shadow-md hover:scale-[1.01] active:scale-95 transition-all cursor-pointer text-center"
+                {/* 2. Enlace Google Maps sin box */}
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                    `${lot.project}, ${lot.zone}, Azuay, Ecuador`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full inline-flex items-center justify-center gap-2 py-1 text-xs sm:text-sm font-bold text-slate-700 hover:text-emerald-700 transition-colors hover:underline cursor-pointer text-center"
                 >
-                  <CalendarCheck2 className="h-4.5 w-4.5 shrink-0 text-emerald-400" />
-                  <span>Agendar Visita con Transporte</span>
-                </button>
+                  <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z" fill="#EA4335"/>
+                  </svg>
+                  <span>Google Maps</span>
+                </a>
 
               </div>
 
@@ -702,7 +678,7 @@ export function PropertyDetailView({
                         e.stopPropagation();
                         onSelectLot(item);
                       }}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#113d22] group-hover:bg-[#F58220] text-white text-xs font-bold transition-all shadow-xs"
+                      className="inline-flex items-center gap-1 text-[#113d22] hover:text-[#F58220] text-xs font-bold transition-colors cursor-pointer hover:underline"
                     >
                       <span>Ver Ficha</span>
                       <ArrowRight className="h-3 w-3" />

@@ -27,6 +27,7 @@ import { HeroNavArrows } from '../HeroNavArrows';
 
 interface ContactViewProps {
   onOpenVisitModal: (defaultInterest?: string) => void;
+  onOpenLegalModal?: (tab: 'privacy' | 'terms' | 'cookies') => void;
 }
 
 const CONTACT_HERO_IMAGES = [
@@ -56,7 +57,7 @@ const sanitizeInput = (text: string) => {
     .trim();
 };
 
-export function ContactView({ onOpenVisitModal }: ContactViewProps) {
+export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewProps) {
   // Banner Continuous Real Estate Slideshow
   const [heroImgIndex, setHeroImgIndex] = useState(0);
   const [heroHovered, setHeroHovered] = useState(false);
@@ -84,6 +85,7 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
     mensaje: '',
     honeypot: '',
   });
+  const [acceptedConsent, setAcceptedConsent] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [isSent, setIsSent] = useState(false);
 
@@ -114,6 +116,11 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
     const phoneRegex = /^[0-9+-\s()]{7,15}$/;
     if (!phoneRegex.test(cleanTelefono)) {
       setErrorMsg('Por favor, ingresa un número de teléfono válido.');
+      return;
+    }
+
+    if (!acceptedConsent) {
+      setErrorMsg('Debes aceptar la Política de Privacidad y el tratamiento de datos para continuar.');
       return;
     }
 
@@ -382,6 +389,33 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
                       className="w-full bg-transparent text-sm text-slate-900 placeholder:text-gray-400 focus:outline-none resize-none"
                       placeholder="¿En qué podemos asesorarte? *"
                     />
+                  </div>
+
+                  {/* Consentimiento LOPDP / RGPD */}
+                  <div className="pt-1 flex items-start gap-2.5">
+                    <input
+                      type="checkbox"
+                      id="consentimiento-privacidad"
+                      checked={acceptedConsent}
+                      onChange={(e) => {
+                        setAcceptedConsent(e.target.checked);
+                        if (errorMsg) setErrorMsg('');
+                      }}
+                      required
+                      aria-required="true"
+                      className="mt-1 h-4 w-4 rounded border-gray-300 text-[#22A33D] focus:ring-[#22A33D] cursor-pointer"
+                    />
+                    <label htmlFor="consentimiento-privacidad" className="text-xs text-slate-600 leading-snug cursor-pointer select-none">
+                      He leído y acepto la{' '}
+                      <button
+                        type="button"
+                        onClick={() => onOpenLegalModal ? onOpenLegalModal('privacy') : null}
+                        className="text-[#113d22] font-bold underline hover:text-[#22A33D] inline"
+                      >
+                        Política de Privacidad
+                      </button>{' '}
+                      y el tratamiento confidencial de mis datos personales para ser contactado.
+                    </label>
                   </div>
 
                   {/* Botón de Envío Pill con hover naranja MGM */}

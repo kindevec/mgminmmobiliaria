@@ -583,10 +583,11 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
 
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
-                  onClick={() => onOpenVisitModal('Asesoría Jurídica y Notarial')}
-                  className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-[#F58220] hover:bg-[#ea580c] text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap text-center active:scale-95"
+                  onClick={() => onNavigate('contact')}
+                  className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-[#F58220] hover:bg-[#ea580c] text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer whitespace-normal sm:whitespace-nowrap text-center active:scale-95 flex items-center justify-center gap-2"
                 >
-                  Agendar Asesoría Legal
+                  <span>Contáctanos</span>
+                  <ArrowRight className="h-4 w-4 shrink-0" />
                 </button>
                 <a
                   href={getGeneralWhatsAppUrl()}

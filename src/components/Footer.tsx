@@ -20,6 +20,7 @@ interface FooterProps {
   currentPage?: PageView;
   onNavigate: (page: PageView) => void;
   onOpenVisitModal: () => void;
+  onOpenLegalModal?: (tab: 'privacy' | 'terms' | 'cookies') => void;
 }
 
 function SocialIconsStrip({ size = 22 }: { size?: number }) {
@@ -76,7 +77,12 @@ function SocialIconsStrip({ size = 22 }: { size?: number }) {
   );
 }
 
-export function Footer({ currentPage, onNavigate, onOpenVisitModal }: FooterProps) {
+export function Footer({
+  currentPage,
+  onNavigate,
+  onOpenVisitModal,
+  onOpenLegalModal,
+}: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   const handleNavClick = (page: PageView) => {
@@ -267,21 +273,16 @@ export function Footer({ currentPage, onNavigate, onOpenVisitModal }: FooterProp
             </p>
             <div className="flex items-center gap-1.5">
               <span className="text-slate-500">•</span>
-              <button
-                type="button"
-                onClick={() => handleNavClick('contact')}
+              <a
+                href="/privacy"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('privacy');
+                }}
                 className="text-slate-400 hover:text-[#22A33D] transition-colors underline-offset-4 hover:underline cursor-pointer"
               >
-                Privacidad
-              </button>
-              <span className="text-slate-500">•</span>
-              <button
-                type="button"
-                onClick={() => handleNavClick('contact')}
-                className="text-slate-400 hover:text-[#22A33D] transition-colors underline-offset-4 hover:underline cursor-pointer"
-              >
-                Términos
-              </button>
+                Políticas, Términos & Cookies (/privacy)
+              </a>
             </div>
           </div>
 

@@ -7,6 +7,7 @@ import { BottomNav } from '@/src/components/BottomNav';
 import { Footer } from '@/src/components/Footer';
 import { WhatsAppFAB } from '@/src/components/WhatsAppFAB';
 import { VisitModal } from '@/src/components/VisitModal';
+import { LegalModal, type LegalTab } from '@/src/components/modals/LegalModal';
 import { PropertyDetailView } from '@/src/components/views/PropertyDetailView';
 import { InteractiveBackground } from '@/src/components/InteractiveBackground';
 import { HomeView } from '@/src/components/views/HomeView';
@@ -14,6 +15,8 @@ import { AboutView } from '@/src/components/views/AboutView';
 import { PropertiesView } from '@/src/components/views/PropertiesView';
 import { ContactView } from '@/src/components/views/ContactView';
 import { AdminView } from '@/src/components/views/AdminView';
+import { PrivacyView } from '@/src/components/views/PrivacyView';
+import { NewPropertyView } from '@/src/components/views/NewPropertyView';
 import { PropertyProvider, useProperties } from '@/src/context/PropertyContext';
 import { ScrollToTop } from '@/src/components/ScrollToTop';
 import { LOTS_DATA, type LotProperty } from '@/src/data/lots';
@@ -37,6 +40,8 @@ function HomePageContent() {
   const [selectedLot, setSelectedLot] = useState<LotProperty | null>(null);
   const [isVisitModalOpen, setIsVisitModalOpen] = useState(false);
   const [visitInterest, setVisitInterest] = useState('Ciudadela Miravalle');
+  const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
+  const [legalModalTab, setLegalModalTab] = useState<LegalTab>('privacy');
 
   // Filter state passed from Home search bar
   const [filterLocation, setFilterLocation] = useState('Todas');
@@ -55,10 +60,12 @@ function HomePageContent() {
         document.title = pageConfig.fullTitle;
       }
 
-      // 2. Comprobar si el hash incluye un lote específico (ej. #lote/vm-101 o #lotes/vm-101)
+      // 2. Comprobar si el hash o el pathname incluye un lote específico (ej. /lote/vm-101 o #lote/vm-101)
       const cleanHash = decodeURIComponent(rawHash).replace(/^#\/?/, '').trim();
-      if (cleanHash.includes('/')) {
-        const parts = cleanHash.split('/');
+      const pathname = typeof window !== 'undefined' ? window.location.pathname.replace(/^\/+|\/+$/g, '').trim() : '';
+      const urlTarget = cleanHash || pathname;
+      if (urlTarget.includes('/')) {
+        const parts = urlTarget.split('/');
         const lotIdentifier = parts[1]?.toLowerCase();
         if (lotIdentifier) {
           const matchedLot =
@@ -120,9 +127,13 @@ function HomePageContent() {
     // 4. Scroll suave hacia arriba
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // 5. Actualizar la URL si es diferente
-    if (currentHash !== targetHash && !(currentHash === '' && page === 'home')) {
-      window.location.hash = targetHash;
+    // 5. Actualizar la URL limpia sin '#' usando HTML5 History API
+    const targetPath = PAGES_CONFIG[page]?.path || '/inicio';
+    if (typeof window !== 'undefined') {
+      const currentPath = window.location.pathname;
+      if (currentPath !== targetPath && !(currentPath === '/' && page === 'home')) {
+        window.history.pushState({ page }, '', targetPath);
+      }
     }
   };
 
@@ -147,7 +158,14 @@ function HomePageContent() {
       document.title = `${lot.code} - ${lot.name} | MGM Inmobiliaria`;
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    window.location.hash = `lote/${encodeURIComponent(lot.code.toLowerCase())}`;
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ page: 'property-detail', code: lot.code }, '', `/lote/${encodeURIComponent(lot.code.toLowerCase())}`);
+    }
+  };
+
+  const handleOpenLegalModal = (tab: LegalTab = 'privacy') => {
+    setLegalModalTab(tab);
+    setIsLegalModalOpen(true);
   };
 
   return (
@@ -203,11 +221,22 @@ function HomePageContent() {
             )}
 
             {currentPage === 'contact' && (
-              <ContactView onOpenVisitModal={handleOpenVisitModal} />
+              <ContactView
+                onOpenVisitModal={handleOpenVisitModal}
+                onOpenLegalModal={handleOpenLegalModal}
+              />
             )}
 
             {currentPage === 'admin' && (
               <AdminView onNavigate={handleNavigate} />
+            )}
+
+            {currentPage === 'new_property' && (
+              <NewPropertyView onNavigate={handleNavigate} />
+            )}
+
+            {currentPage === 'privacy' && (
+              <PrivacyView onNavigate={handleNavigate} />
             )}
 
             {currentPage === 'property-detail' && (
@@ -228,6 +257,7 @@ function HomePageContent() {
         currentPage={currentPage}
         onNavigate={handleNavigate}
         onOpenVisitModal={() => handleOpenVisitModal()}
+        onOpenLegalModal={handleOpenLegalModal}
       />
 
       {/* 4. Mobile Ergonomic Bottom Navigation Bar (< 768px) */}
@@ -241,6 +271,13 @@ function HomePageContent() {
         isOpen={isVisitModalOpen}
         onClose={() => setIsVisitModalOpen(false)}
         defaultInterest={visitInterest}
+      />
+
+      {/* 7. Blindaje Legal (Privacidad, Términos, Cookies) */}
+      <LegalModal
+        isOpen={isLegalModalOpen}
+        onClose={() => setIsLegalModalOpen(false)}
+        initialTab={legalModalTab}
       />
     </div>
   );

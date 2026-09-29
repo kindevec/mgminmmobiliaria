@@ -35,6 +35,7 @@ export function VisitModal({
   const [timeSlot, setTimeSlot] = useState('09:00 - 12:00 (Mañana)');
   const [notes, setNotes] = useState('');
   const [honeypot, setHoneypot] = useState('');
+  const [acceptedLegal, setAcceptedLegal] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -46,6 +47,10 @@ export function VisitModal({
 
     if (!name.trim() || !phone.trim() || !date) {
       setErrorMsg('Por favor completa los campos obligatorios: Nombre, Celular y Fecha.');
+      return;
+    }
+    if (!acceptedLegal) {
+      setErrorMsg('Debes aceptar la Política de Privacidad para agendar tu cita.');
       return;
     }
     setErrorMsg('');
@@ -255,6 +260,25 @@ export function VisitModal({
                   placeholder="¿Deseas información sobre financiamiento directo o transporte para la visita?"
                   className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-base sm:text-sm text-slate-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
                 />
+              </div>
+
+              {/* Consentimiento LOPDP */}
+              <div className="pt-1 flex items-start gap-2.5">
+                <input
+                  type="checkbox"
+                  id="visit-privacy-consent"
+                  checked={acceptedLegal}
+                  onChange={(e) => {
+                    setAcceptedLegal(e.target.checked);
+                    if (errorMsg) setErrorMsg('');
+                  }}
+                  required
+                  aria-required="true"
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                />
+                <label htmlFor="visit-privacy-consent" className="text-xs text-slate-600 leading-snug cursor-pointer select-none">
+                  Acepto la Política de Privacidad y el tratamiento de mis datos de contacto para la coordinación de esta visita.
+                </label>
               </div>
 
               {/* Submit CTA with Official WhatsApp Icon */}

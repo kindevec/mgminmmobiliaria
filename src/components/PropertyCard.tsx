@@ -5,7 +5,6 @@ import Image from 'next/image';
 import {
   ArrowRight,
   Ruler,
-  MapPin,
   CreditCard,
 } from 'lucide-react';
 import type { LotProperty } from '@/src/data/lots';
@@ -25,9 +24,6 @@ export function PropertyCard({
   onOpenVisitModal,
   dark = false,
 }: PropertyCardProps) {
-  const isAvailable = lot.status === 'Disponible';
-  const isReserved = lot.status === 'En Reserva';
-
   return (
     <div
       onClick={() => onSelectLot(lot)}
@@ -48,29 +44,6 @@ export function PropertyCard({
           referrerPolicy="no-referrer"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent pointer-events-none" />
-
-        {/* Badges superiores: Código a la izquierda, Estado a la derecha */}
-        <div className="absolute top-3 inset-x-3 flex items-center justify-between z-10">
-          <span className="text-[11px] font-mono font-black text-white bg-slate-950/85 px-2.5 py-0.5 rounded-full backdrop-blur-md border border-white/20 shadow-xs">
-            {lot.code}
-          </span>
-          <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide backdrop-blur-md shadow-xs ${
-              isAvailable
-                ? 'bg-emerald-950/85 text-emerald-300 border border-emerald-500/30'
-                : isReserved
-                ? 'bg-amber-950/85 text-amber-300 border border-amber-500/30'
-                : 'bg-slate-900/85 text-slate-300 border border-white/20'
-            }`}
-          >
-            <span
-              className={`h-1.5 w-1.5 rounded-full ${
-                isAvailable ? 'bg-[#25D366]' : isReserved ? 'bg-amber-400' : 'bg-slate-400'
-              }`}
-            />
-            {lot.status}
-          </span>
-        </div>
       </div>
 
       {/* 2. Cuerpo de la Tarjeta Luxury */}
@@ -83,12 +56,6 @@ export function PropertyCard({
             >
               {lot.name}
             </h3>
-            <p className="text-[11px] text-slate-500 font-medium line-clamp-1 flex items-center gap-1.5">
-              <MapPin className="h-3 w-3 text-emerald-600 shrink-0" />
-              <span>{lot.zone}</span>
-              <span className="text-slate-300">•</span>
-              <span>{lot.topography}</span>
-            </p>
           </div>
 
           {/* Ficha métrica abierta y arquitectónica */}
@@ -147,7 +114,7 @@ export function PropertyCard({
                 e.stopPropagation();
                 onSelectLot(lot);
               }}
-              className="action-btn-ficha w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-[#113d22] text-white font-bold text-xs sm:text-sm transition-all hover:scale-[1.02] active:scale-95 cursor-pointer text-center shadow-xs flex items-center justify-center gap-1.5"
+              className="action-btn-ficha py-2.5 px-2 text-slate-800 hover:text-[#113d22] font-bold text-xs sm:text-sm transition-colors cursor-pointer flex items-center justify-center gap-1.5 hover:underline"
             >
               <span>Ver Ficha</span>
               <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
