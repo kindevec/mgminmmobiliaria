@@ -13,6 +13,7 @@ import {
   HandCoins,
   Award,
   Star,
+  CheckCircle2,
   ChevronRight,
   ChevronLeft,
   KeyRound,
@@ -22,6 +23,8 @@ import {
   SlidersHorizontal,
   Ruler,
   MapPin,
+  PenLine,
+  X,
 } from 'lucide-react';
 import type { PageView } from '../Header';
 import {
@@ -141,6 +144,47 @@ export function HomeView({
   // Carousel 1: Pillars
   const [aboutIndex, setAboutIndex] = useState(0);
 
+
+  // Testimonials and Review Modal State
+  const [testimonials, setTestimonials] = useState(TESTIMONIALS_DATA);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [newReview, setNewReview] = useState({
+    name: '',
+    role: 'Propietario Lote · Ciudadela Miravalle',
+    location: 'Cuenca, Ecuador',
+    text: '',
+    stars: 5,
+  });
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
+
+  const handleAddReview = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newReview.name.trim() || !newReview.text.trim()) return;
+
+    setTestimonials((prev) => [
+      {
+        name: newReview.name.trim(),
+        role: newReview.role.trim() || 'Propietario Lote · Ciudadela Miravalle',
+        text: newReview.text.trim(),
+        stars: newReview.stars,
+        location: newReview.location.trim() || 'Ecuador',
+      },
+      ...prev,
+    ]);
+
+    setReviewSubmitted(true);
+    setTimeout(() => {
+      setReviewSubmitted(false);
+      setIsReviewModalOpen(false);
+      setNewReview({
+        name: '',
+        role: 'Propietario Lote · Ciudadela Miravalle',
+        location: 'Cuenca, Ecuador',
+        text: '',
+        stars: 5,
+      });
+    }, 1200);
+  };
 
   // Carousel 3: Miravalle
   const [miravalleIndex, setMiravalleIndex] = useState(0);
@@ -397,26 +441,6 @@ export function HomeView({
             </p>
           </ScrollReveal>
 
-          {/* 4 Pilares del Banner (Ocultos en móvil, visibles en pantallas sm en adelante) */}
-          <ScrollReveal direction="up" delay={0.25} duration={0.65} className="hidden sm:block w-full max-w-4xl">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3.5 w-full pt-1">
-              {HERO_CONTAINER_FEATURES.map((item, idx) => {
-                const Icon = item.icon;
-                const isOrange = idx === 2; // Crédito Directo
-                return (
-                  <div
-                    key={idx}
-                    className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-2.5 text-center sm:text-left p-2.5 sm:p-3 rounded-2xl bg-black/30 backdrop-blur-xs border border-white/10 transition-transform duration-200 hover:scale-105 shadow-sm"
-                  >
-                    <Icon className={`w-5 h-5 sm:w-6 sm:h-6 shrink-0 stroke-[2.2] ${isOrange ? 'text-[#F58220]' : 'text-[#5be196]'}`} />
-                    <span className="text-xs sm:text-sm lg:text-sm font-bold tracking-wide text-white leading-snug drop-shadow-xs">
-                      {item.title}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </ScrollReveal>
 
           {/* Botones de Acción Inmobiliaria */}
           <ScrollReveal direction="zoom" delay={0.35} duration={0.6}>
@@ -427,12 +451,6 @@ export function HomeView({
               >
                 <span>Explorar Proyectos</span>
                 <ArrowRight className="h-4 w-4 stroke-[2.5]" />
-              </button>
-              <button
-                onClick={() => onOpenVisitModal()}
-                className="inline-flex items-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3.5 rounded-full bg-white/15 hover:bg-[#F58220] hover:border-[#F58220] text-white font-medium text-xs sm:text-base border border-white/30 backdrop-blur-md transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md"
-              >
-                <span>Agendar Visita</span>
               </button>
             </div>
           </ScrollReveal>
@@ -551,12 +569,12 @@ export function HomeView({
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-black/20 pointer-events-none" />
 
-                    {/* Caja Blanca Flotante con Título y Subtítulo */}
-                    <div className="absolute bottom-3 inset-x-3 z-10 bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl shadow-xl border border-white/80 text-center">
-                      <h4 className={`text-xs sm:text-sm font-black leading-snug tracking-tight ${isOrange ? 'text-[#F58220]' : 'text-[#22A33D]'}`}>
+                    {/* Texto Inferior sin box exterior, alineado a la izquierda */}
+                    <div className="absolute bottom-4 left-4 right-4 z-10 text-left">
+                      <h4 className={`text-sm sm:text-base font-black leading-snug tracking-tight ${isOrange ? 'text-[#F58220]' : 'text-white'}`}>
                         {item.title}
                       </h4>
-                      <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium line-clamp-1 mt-0.5">
+                      <p className="text-[11px] sm:text-xs text-slate-200 font-medium line-clamp-1 mt-0.5">
                         {item.subtitle}
                       </p>
                     </div>
@@ -629,12 +647,15 @@ export function HomeView({
                   className="object-cover object-center transform transition-transform duration-700 ease-out group-hover:scale-108"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/15 to-transparent pointer-events-none" />
-                {/* Box blanco redondeado con separación lateral ubicado más abajo en vertical con fuente más grande */}
-                <div className="absolute bottom-1.5 sm:bottom-2 left-3 right-3 sm:left-3.5 sm:right-3.5 z-10 bg-white/95 backdrop-blur-md px-4 py-3 sm:py-3.5 rounded-2xl shadow-xl border border-white/80 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-2xl text-center">
-                  <h4 className="text-base sm:text-lg lg:text-xl font-black text-[#22A33D] leading-snug tracking-tight">
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-black/20 pointer-events-none" />
+                {/* Texto Inferior sin box exterior, integrado sobre la imagen */}
+                <div className="absolute bottom-4 left-4 right-4 z-10 text-left">
+                  <h4 className="text-sm sm:text-base font-black leading-snug tracking-tight text-white">
                     {ABOUT_PILLARS[0].title}
                   </h4>
+                  <p className="text-[11px] sm:text-xs text-slate-200 font-medium line-clamp-1 mt-0.5">
+                    {ABOUT_PILLARS[0].subtitle}
+                  </p>
                 </div>
               </div>
             </ScrollReveal>
@@ -668,12 +689,15 @@ export function HomeView({
                       className="object-cover object-center transform transition-transform duration-700 ease-out group-hover:scale-108"
                       referrerPolicy="no-referrer"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/15 to-transparent pointer-events-none" />
-                    {/* Box blanco redondeado con separación lateral ubicado más abajo en vertical con fuente más grande */}
-                    <div className="absolute bottom-1.5 sm:bottom-2 left-3 right-3 sm:left-3.5 sm:right-3.5 z-10 bg-white/95 backdrop-blur-md px-4 py-3 sm:py-3.5 rounded-2xl shadow-xl border border-white/80 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-2xl text-center">
-                      <h4 className="text-base sm:text-lg lg:text-xl font-black text-[#22A33D] leading-snug tracking-tight">
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-black/20 pointer-events-none" />
+                    {/* Texto Inferior sin box exterior, integrado sobre la imagen */}
+                    <div className="absolute bottom-4 left-4 right-4 z-10 text-left">
+                      <h4 className="text-sm sm:text-base font-black leading-snug tracking-tight text-white">
                         {ABOUT_PILLARS[1].title}
                       </h4>
+                      <p className="text-[11px] sm:text-xs text-slate-200 font-medium line-clamp-1 mt-0.5">
+                        {ABOUT_PILLARS[1].subtitle}
+                      </p>
                     </div>
                   </div>
                 </ScrollReveal>
@@ -692,12 +716,15 @@ export function HomeView({
                       className="object-cover object-center transform transition-transform duration-700 ease-out group-hover:scale-108"
                       referrerPolicy="no-referrer"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/15 to-transparent pointer-events-none" />
-                    {/* Box blanco redondeado con título en naranja corporativo */}
-                    <div className="absolute bottom-1.5 sm:bottom-2 left-3 right-3 sm:left-3.5 sm:right-3.5 z-10 bg-white/95 backdrop-blur-md px-4 py-3 sm:py-3.5 rounded-2xl shadow-xl border border-white/80 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-2xl text-center">
-                      <h4 className="text-base sm:text-lg lg:text-xl font-black text-[#F58220] leading-snug tracking-tight">
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-black/20 pointer-events-none" />
+                    {/* Texto Inferior sin box exterior, integrado sobre la imagen con acento naranja */}
+                    <div className="absolute bottom-4 left-4 right-4 z-10 text-left">
+                      <h4 className="text-sm sm:text-base font-black leading-snug tracking-tight text-[#F58220]">
                         {ABOUT_PILLARS[2].title}
                       </h4>
+                      <p className="text-[11px] sm:text-xs text-slate-200 font-medium line-clamp-1 mt-0.5">
+                        {ABOUT_PILLARS[2].subtitle}
+                      </p>
                     </div>
                   </div>
                 </ScrollReveal>
@@ -718,12 +745,15 @@ export function HomeView({
                   className="object-cover object-center transform transition-transform duration-700 ease-out group-hover:scale-108"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/15 to-transparent pointer-events-none" />
-                {/* Box blanco redondeado con separación lateral ubicado más abajo en vertical con fuente más grande */}
-                <div className="absolute bottom-1.5 sm:bottom-2 left-3 right-3 sm:left-3.5 sm:right-3.5 z-10 bg-white/95 backdrop-blur-md px-4 py-3 sm:py-3.5 rounded-2xl shadow-xl border border-white/80 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-2xl text-center">
-                  <h4 className="text-base sm:text-lg lg:text-xl font-black text-[#22A33D] leading-snug tracking-tight">
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-black/20 pointer-events-none" />
+                {/* Texto Inferior sin box exterior, integrado sobre la imagen */}
+                <div className="absolute bottom-4 left-4 right-4 z-10 text-left">
+                  <h4 className="text-sm sm:text-base font-black leading-snug tracking-tight text-white">
                     {ABOUT_PILLARS[3].title}
                   </h4>
+                  <p className="text-[11px] sm:text-xs text-slate-200 font-medium line-clamp-1 mt-0.5">
+                    {ABOUT_PILLARS[3].subtitle}
+                  </p>
                 </div>
               </div>
             </ScrollReveal>
@@ -951,75 +981,288 @@ export function HomeView({
             </div>
           </ScrollReveal>
 
-          {/* Grilla 2x2 de Testimonios Reales (Diseño Ribbon acorde a la Paleta MGM) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 sm:gap-y-12 mt-2 sm:mt-4">
-            {TESTIMONIALS_DATA.slice(0, 4).map((item, idx) => (
-              <ScrollReveal
-                key={idx}
-                direction={idx % 2 === 0 ? 'left' : 'right'}
-                delay={0.1 + (idx * 0.08)}
-              >
-                <div
-                  className="bg-[#f4f7ee] rounded-br-[2.5rem] rounded-tr-[2.5rem] rounded-bl-[2.5rem] rounded-tl-lg border border-[#dce3d2] shadow-xl relative mt-4 sm:mt-6 p-6 sm:p-8 pt-18 sm:pt-22 min-h-[220px] transition-all hover:shadow-2xl"
-                >
-                  {/* Ribbon Superior Verde MGM (#113d22 con detalles #5be196 y pliegue lateral) */}
-                  <div className="absolute top-0 -left-3 sm:-left-4 bg-[#113d22] text-white py-3.5 sm:py-4 px-6 sm:px-8 rounded-tr-full rounded-br-full shadow-lg z-10 w-[90%] sm:w-[82%] border-y border-r border-[#22A33D]/30">
-                    {/* Pliegue 3D lateral inferior */}
-                    <div
-                      className="absolute top-full left-0 w-3 sm:w-4 h-3 sm:h-4 bg-[#0a2313]"
-                      style={{ clipPath: 'polygon(100% 0, 0 0, 100% 100%)' }}
-                    />
-                    <h4 className="font-bold text-base sm:text-lg leading-tight line-clamp-1 text-white">
-                      {item.name}
-                    </h4>
-                    <span className="text-xs sm:text-sm font-semibold text-[#5be196] line-clamp-1 block mt-0.5">
-                      {item.role}
+          {/* Contenedor Principal: Lado Izquierdo (Reseñas en Estrellas) y Lado Derecho (Lista de Reseñas de Clientes) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start mt-4">
+            
+            {/* LADO IZQUIERDO: Resumen y Desglose de Reseñas en Estrellas */}
+            <div className="lg:col-span-4 lg:sticky lg:top-28">
+              <ScrollReveal direction="left" delay={0.15}>
+                <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-xs space-y-5">
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-mono font-bold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200/60 inline-block">
+                      Valoración Global
                     </span>
+                    <h3 className="text-xl font-black text-slate-900">
+                      Reseñas en Estrellas
+                    </h3>
                   </div>
 
-                  {/* Área de Contenido con borde lateral verde corporativo #22A33D */}
-                  <div className="pl-4 border-l-2 border-[#22A33D] h-full flex flex-col justify-start space-y-2.5">
-                    <div className="flex text-[#F58220] gap-1">
-                      {[...Array(item.stars)].map((_, starIdx) => (
-                        <Star key={starIdx} className="h-4 w-4 sm:h-5 sm:w-5 fill-[#F58220] text-[#F58220]" />
-                      ))}
+                  {/* Puntuación destacada */}
+                  <div className="flex items-baseline gap-3 pt-1">
+                    <span className="text-5xl font-black text-slate-900 tracking-tight">5.0</span>
+                    <div>
+                      <div className="flex text-[#F58220] gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="h-5 w-5 fill-[#F58220] text-[#F58220]" />
+                        ))}
+                      </div>
+                      <span className="text-xs font-semibold text-slate-500 block mt-1">
+                        100% de clientes satisfechos
+                      </span>
                     </div>
-                    <p className="text-sm sm:text-base text-slate-800 leading-relaxed font-serif italic">
-                      &ldquo;{item.text}&rdquo;
+                  </div>
+
+                  {/* Desglose de barras de estrellas */}
+                  <div className="space-y-2.5 pt-3 border-t border-slate-100 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="w-16 font-bold text-slate-700">5 estrellas</span>
+                      <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                        <div className="h-full bg-[#22A33D] rounded-full w-full" />
+                      </div>
+                      <span className="font-mono font-bold text-slate-900 w-8 text-right">100%</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-slate-400">
+                      <span className="w-16 font-medium">4 estrellas</span>
+                      <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                        <div className="h-full bg-slate-200 rounded-full w-0" />
+                      </div>
+                      <span className="font-mono w-8 text-right">0%</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-slate-400">
+                      <span className="w-16 font-medium">3 estrellas</span>
+                      <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                        <div className="h-full bg-slate-200 rounded-full w-0" />
+                      </div>
+                      <span className="font-mono w-8 text-right">0%</span>
+                    </div>
+                  </div>
+
+                  {/* Certificación notarial de satisfacción */}
+                  <div className="p-3.5 rounded-2xl bg-[#f4f7ee] border border-[#dce3d2] flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-[#113d22] text-white shrink-0">
+                      <ShieldCheck className="h-5 w-5 text-emerald-400" />
+                    </div>
+                    <div className="text-xs">
+                      <p className="font-bold text-slate-900 leading-tight">Escrituras Verificadas</p>
+                      <p className="text-[11px] text-slate-600 mt-0.5">Testimonios de propietarios con minutas e inscripción notarial legalizada.</p>
+                    </div>
+                  </div>
+
+                  {/* Botón Añadir Reseña */}
+                  <button
+                    type="button"
+                    onClick={() => setIsReviewModalOpen(true)}
+                    className="w-full py-3.5 px-4 rounded-2xl bg-[#22A33D] hover:bg-[#1a8230] text-white font-bold text-xs sm:text-sm transition-all shadow-md hover:shadow-lg active:scale-95 flex items-center justify-center gap-2 cursor-pointer mt-1"
+                  >
+                    <PenLine className="h-4 w-4" />
+                    <span>Añadir Reseña</span>
+                  </button>
+                </div>
+              </ScrollReveal>
+            </div>
+
+            {/* LADO DERECHO: Reseñas de los Clientes (Formato Tipo Lista) */}
+            <div className="lg:col-span-8 space-y-4">
+              {testimonials.map((item, idx) => (
+                <ScrollReveal
+                  key={idx}
+                  direction="up"
+                  delay={0.1 + (idx * 0.08)}
+                >
+                  <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex flex-col md:flex-row md:items-start justify-between gap-4 md:gap-6">
+                    {/* Lado izquierdo de la fila: Estrellas y datos del cliente */}
+                    <div className="md:w-5/12 space-y-2 shrink-0 border-b md:border-b-0 md:border-r border-slate-100 pb-3 md:pb-0 md:pr-4">
+                      <div className="flex items-center gap-1.5 text-[#F58220]">
+                        {[...Array(item.stars)].map((_, starIdx) => (
+                          <Star key={starIdx} className="h-4 w-4 fill-[#F58220] text-[#F58220]" />
+                        ))}
+                        <span className="font-bold text-slate-900 text-xs font-mono ml-1">{item.stars}.0</span>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm sm:text-base text-slate-900 leading-snug">
+                          {item.name}
+                        </h4>
+                        <p className="text-xs text-[#22A33D] font-semibold mt-0.5">
+                          {item.role}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+                        <CheckCircle2 className="h-3 w-3 text-emerald-600 shrink-0" />
+                        <span>Comprador Verificado · {item.location}</span>
+                      </div>
+                    </div>
+
+                    {/* Lado derecho de la fila: Cita y testimonio del cliente */}
+                    <div className="md:w-7/12 flex items-center min-h-[70px]">
+                      <blockquote className="text-sm sm:text-base text-slate-700 font-serif italic leading-relaxed pl-3 border-l-2 border-[#22A33D]">
+                        &ldquo;{item.text}&rdquo;
+                      </blockquote>
+                    </div>
+                  </div>
+                </ScrollReveal>
+              ))}
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Modal para Añadir Reseña */}
+      <AnimatePresence>
+        {isReviewModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 12 }}
+              className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative overflow-hidden"
+            >
+              {/* Header del Modal */}
+              <div className="flex items-center justify-between pb-3.5 border-b border-slate-100">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-emerald-50 text-[#22A33D]">
+                    <Star className="h-5 w-5 fill-[#22A33D]" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-lg text-slate-900 leading-tight">
+                      Añadir tu Reseña
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      Comparte tu experiencia como propietario en MGM
                     </p>
                   </div>
                 </div>
-              </ScrollReveal>
-            ))}
-          </div>
-
-          {/* Quick Action Capsule to WhatsApp & Office */}
-          <ScrollReveal direction="zoom" delay={0.15} className="pt-6 sm:pt-10">
-            <div className="rounded-[2rem] bg-gradient-to-r from-[#eef8f0] via-[#fff7ed] to-slate-50 border border-[#22A33D]/25 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
-              <div className="space-y-1 text-center sm:text-left">
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900">
-                  ¿Deseas hablar directamente con un asesor notarial?
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600">
-                  Respondemos consultas en minutos con planimetrías y cotizaciones personalizadas.
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-                <a
-                  href={getGeneralWhatsAppUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-[#22A33D] hover:bg-[#1a8230] text-white font-black text-xs sm:text-sm transition-all shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2 cursor-pointer active:scale-95 text-center"
+                <button
+                  type="button"
+                  onClick={() => setIsReviewModalOpen(false)}
+                  className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
                 >
-                  <WhatsAppIcon size={18} className="text-white shrink-0" />
-                  <span>WhatsApp Oficial Inmediato</span>
-                </a>
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-            </div>
-          </ScrollReveal>
-        </div>
-      </section>
+
+              {reviewSubmitted ? (
+                <div className="py-10 text-center space-y-3">
+                  <div className="w-14 h-14 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-inner">
+                    <CheckCircle2 className="h-8 w-8" />
+                  </div>
+                  <h4 className="font-black text-xl text-slate-900">¡Muchas Gracias!</h4>
+                  <p className="text-sm text-slate-600 max-w-xs mx-auto">
+                    Tu reseña ha sido registrada exitosamente y ya se visualiza en la lista de opiniones.
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={handleAddReview} className="space-y-4 pt-4">
+                  {/* Calificación en estrellas interactiva */}
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1.5">
+                      Calificación General:
+                    </label>
+                    <div className="flex items-center gap-1.5">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setNewReview((prev) => ({ ...prev, stars: star }))}
+                          className="p-1 hover:scale-115 active:scale-95 transition-transform cursor-pointer"
+                        >
+                          <Star
+                            className={`h-7 w-7 transition-colors ${
+                              star <= newReview.stars
+                                ? 'fill-[#F58220] text-[#F58220]'
+                                : 'text-slate-300 hover:text-slate-400'
+                            }`}
+                          />
+                        </button>
+                      ))}
+                      <span className="text-xs font-bold text-slate-700 ml-2">
+                        {newReview.stars} de 5 estrellas
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Nombre */}
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                      Tu Nombre y Apellido *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newReview.name}
+                      onChange={(e) => setNewReview((prev) => ({ ...prev, name: e.target.value }))}
+                      placeholder="Ej. Ing. Carlos Mendoza & Familia"
+                      className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:border-emerald-600 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Proyecto / Rol */}
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 block mb-1">
+                        Proyecto / Tipo de Lote
+                      </label>
+                      <input
+                        type="text"
+                        value={newReview.role}
+                        onChange={(e) => setNewReview((prev) => ({ ...prev, role: e.target.value }))}
+                        placeholder="Ej. Propietario Lote Etapa 1"
+                        className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:border-emerald-600 focus:outline-none"
+                      />
+                    </div>
+
+                    {/* Ciudad */}
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 block mb-1">
+                        Ciudad / Ubicación
+                      </label>
+                      <input
+                        type="text"
+                        value={newReview.location}
+                        onChange={(e) => setNewReview((prev) => ({ ...prev, location: e.target.value }))}
+                        placeholder="Ej. Cuenca, Ecuador"
+                        className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:border-emerald-600 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Comentario */}
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                      Tu Opinión o Testimonio *
+                    </label>
+                    <textarea
+                      required
+                      rows={3}
+                      value={newReview.text}
+                      onChange={(e) => setNewReview((prev) => ({ ...prev, text: e.target.value }))}
+                      placeholder="Cuéntanos sobre las obras, el financiamiento o la entrega de tus escrituras notariales..."
+                      className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:border-emerald-600 focus:outline-none resize-none"
+                    />
+                  </div>
+
+                  {/* Botones de acción */}
+                  <div className="pt-2 flex items-center justify-end gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setIsReviewModalOpen(false)}
+                      className="px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-2.5 rounded-xl bg-[#22A33D] hover:bg-[#1a8230] text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer"
+                    >
+                      Publicar Reseña
+                    </button>
+                  </div>
+                </form>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
