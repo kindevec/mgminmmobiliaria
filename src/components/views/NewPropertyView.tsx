@@ -45,33 +45,6 @@ interface NewPropertyViewProps {
   onNavigate: (page: PageView) => void;
 }
 
-const PRESET_IMAGES = [
-  {
-    title: 'Lote Residencial Plano',
-    url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    title: 'Villa Moderna Fachada',
-    url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    title: 'Terreno Esquinero Urbanizado',
-    url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    title: 'Lote con Vista Panorámica',
-    url: 'https://images.unsplash.com/photo-1524813686514-a57563d77d61?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    title: 'Villa Familiar con Jardín',
-    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    title: 'Lote Campestre / Quinta',
-    url: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=80',
-  },
-];
-
 const AVAILABLE_SERVICES = [
   'Red eléctrica soterrada',
   'Agua potable garantizada',
@@ -134,8 +107,8 @@ export function NewPropertyView({ onNavigate }: NewPropertyViewProps) {
   const [zone, setZone] = useState('Etapa 1 · Sector Miravalle Central');
   const [orientation, setOrientation] = useState('Norte - Sur');
   const [registryStatus, setRegistryStatus] = useState('Escritura individual legalizada e inscrita');
-  const [imagesList, setImagesList] = useState(PRESET_IMAGES);
-  const [image, setImage] = useState(PRESET_IMAGES[0].url);
+  const [imagesList, setImagesList] = useState<{ title: string; url: string }[]>([]);
+  const [image, setImage] = useState('');
   const [customImageUrl, setCustomImageUrl] = useState('');
   const [description, setDescription] = useState(
     'Excelente lote residencial urbanizado con obras al 100% y financiamiento directo hasta 48 meses.'
@@ -226,9 +199,9 @@ export function NewPropertyView({ onNavigate }: NewPropertyViewProps) {
 
     setIsSubmitting(true);
 
-    const finalImage = customImageUrl.trim() || image.trim() || PRESET_IMAGES[0].url;
+    const finalImage = customImageUrl.trim() || image.trim() || (imagesList.length > 0 ? imagesList[0].url : '');
     const finalGallery =
-      imagesList.length > 0 ? imagesList.map((img) => img.url) : [finalImage];
+      imagesList.length > 0 ? imagesList.map((img) => img.url) : (finalImage ? [finalImage] : []);
 
     const data: Omit<LotProperty, 'id'> = {
       code: trimmedCode,
@@ -289,8 +262,8 @@ export function NewPropertyView({ onNavigate }: NewPropertyViewProps) {
     description: description.trim(),
     orientation: orientation.trim(),
     registryStatus: registryStatus.trim(),
-    image: (customImageUrl.trim() || image) || PRESET_IMAGES[0].url,
-    gallery: imagesList.length > 0 ? imagesList.map((img) => img.url) : [(customImageUrl.trim() || image) || PRESET_IMAGES[0].url],
+    image: (customImageUrl.trim() || image) || (imagesList.length > 0 ? imagesList[0].url : ''),
+    gallery: imagesList.length > 0 ? imagesList.map((img) => img.url) : ((customImageUrl.trim() || image) ? [(customImageUrl.trim() || image)] : []),
   };
 
   // Si no está autenticado, renderizar formulario de inicio de sesión administrativo
@@ -407,8 +380,8 @@ export function NewPropertyView({ onNavigate }: NewPropertyViewProps) {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Main Form Fields (8 Cols) */}
-            <div className={`lg:col-span-8 space-y-6 ${mobileTab === 'preview' ? 'hidden lg:block' : 'block'}`}>
+            {/* Main Form Fields (7 Cols) */}
+            <div className={`lg:col-span-7 xl:col-span-7 space-y-6 ${mobileTab === 'preview' ? 'hidden lg:block' : 'block'}`}>
             
             {/* 1. Identificación y Ubicación */}
             <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-xs border border-slate-200/90 space-y-4">
@@ -821,8 +794,8 @@ export function NewPropertyView({ onNavigate }: NewPropertyViewProps) {
               </button>
             </div>
 
-          {/* Right Sidebar: Live Preview & Action Buttons (4 Cols) */}
-          <div className={`lg:col-span-4 space-y-6 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto pr-1 ${mobileTab === 'form' ? 'hidden lg:block' : 'block'}`}>
+          {/* Right Sidebar: Live Preview & Action Buttons (5 Cols - Locked top-to-bottom) */}
+          <div className={`lg:col-span-5 xl:col-span-5 space-y-6 lg:sticky lg:top-4 lg:self-start lg:h-[calc(100vh-2rem)] flex flex-col justify-between overflow-y-auto pr-1 ${mobileTab === 'form' ? 'hidden lg:block' : 'block'}`}>
             {/* Live Preview Card */}
             <div className="bg-white rounded-3xl p-5 shadow-md border border-slate-200 space-y-4">
               <div className="flex items-center justify-between pb-2 border-b border-slate-100">

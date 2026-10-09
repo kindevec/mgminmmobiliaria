@@ -44,33 +44,6 @@ interface AdminPropertyModalProps {
   propertyToEdit?: LotProperty | null;
 }
 
-const PRESET_IMAGES = [
-  {
-    title: 'Lote Residencial Plano',
-    url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    title: 'Villa Moderna Fachada',
-    url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    title: 'Terreno Esquinero Urbanizado',
-    url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    title: 'Lote con Vista Panorámica',
-    url: 'https://images.unsplash.com/photo-1524813686514-a57563d77d61?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    title: 'Villa Familiar con Jardín',
-    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    title: 'Lote Campestre / Quinta',
-    url: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=80',
-  },
-];
-
 const AVAILABLE_SERVICES = [
   'Agua potable garantizada',
   'Energía eléctrica y alumbrado público',
@@ -225,8 +198,8 @@ export function AdminPropertyModal({
         setAddress('');
         setOrientation('Vías de primer orden y entorno residencial');
         setRegistryStatus('Escritura pública, certificado de gravámenes al día');
-        setImage(PRESET_IMAGES[0].url);
-        setGallery([PRESET_IMAGES[0].url]);
+        setImage('');
+        setGallery([]);
         setDescription('Excelente oportunidad de inversión con financiamiento directo y documentos en regla.');
         setSelectedServices([
           'Agua potable garantizada',
@@ -291,7 +264,7 @@ export function AdminPropertyModal({
         // Append to gallery
         const newGallery = [...gallery, ...uploadedUrls].filter(Boolean);
         setGallery(newGallery);
-        if (!image || image === PRESET_IMAGES[0].url) {
+        if (!image) {
           setImage(uploadedUrls[0]);
         }
       }
@@ -374,8 +347,8 @@ export function AdminPropertyModal({
       return;
     }
 
-    const finalImage = image.trim() || gallery[0] || PRESET_IMAGES[0].url;
-    const finalGallery = gallery.length > 0 ? gallery : [finalImage];
+    const finalImage = image.trim() || (gallery.length > 0 ? gallery[0] : '');
+    const finalGallery = gallery.length > 0 ? gallery : (finalImage ? [finalImage] : []);
 
     const data: Omit<LotProperty, 'id'> = {
       code: trimmedCode,
@@ -448,8 +421,8 @@ export function AdminPropertyModal({
     description: description.trim() || 'Excelente oportunidad de inversión con financiamiento directo.',
     orientation: orientation.trim(),
     registryStatus: registryStatus.trim(),
-    image: image.trim() || gallery[0] || PRESET_IMAGES[0].url,
-    gallery: gallery.length > 0 ? gallery : [image.trim() || PRESET_IMAGES[0].url],
+    image: image.trim() || (gallery.length > 0 ? gallery[0] : ''),
+    gallery: gallery.length > 0 ? gallery : (image.trim() ? [image.trim()] : []),
     beds: beds ? Number(beds) : undefined,
     baths: baths ? Number(baths) : undefined,
     parkingSpaces: parkingSpaces ? Number(parkingSpaces) : undefined,
@@ -474,7 +447,7 @@ export function AdminPropertyModal({
       className={
         isPageView
           ? 'w-full space-y-6 text-slate-800'
-          : 'relative w-full max-w-6xl xl:max-w-7xl bg-white rounded-3xl shadow-2xl border border-slate-200 max-h-[92dvh] overflow-hidden flex flex-col'
+          : 'relative w-full max-w-6xl xl:max-w-7xl bg-white rounded-3xl shadow-2xl border border-slate-200 h-[92dvh] max-h-[92dvh] overflow-hidden flex flex-col'
       }
     >
       {/* Header */}
@@ -560,15 +533,21 @@ export function AdminPropertyModal({
         </div>
       )}
 
-      {/* Form Body Scrollable if modal, natural without padding if page */}
+      {/* Form Body: In page view standard layout; in modal split full-height layout */}
       <form
         onSubmit={handleSubmit}
-        className={`${
-          isPageView ? 'space-y-6' : 'p-4 sm:p-6 lg:p-8 overflow-y-auto max-h-[calc(92dvh-130px)] space-y-6 flex-1'
-        } text-slate-800`}
+        className={
+          isPageView
+            ? 'space-y-6 text-slate-800'
+            : 'flex-1 min-h-0 flex flex-col overflow-hidden text-slate-800'
+        }
       >
         {/* Mobile View Switcher (Solo en pantallas móviles < lg) */}
-        <div className="lg:hidden flex items-center justify-between p-1 bg-slate-100 rounded-2xl border border-slate-200">
+        <div
+          className={`lg:hidden flex items-center justify-between p-1 bg-slate-100 rounded-2xl border border-slate-200 ${
+            isPageView ? 'mb-4' : 'm-3 shrink-0'
+          }`}
+        >
           <button
             type="button"
             onClick={() => setMobileTab('form')}
@@ -595,9 +574,21 @@ export function AdminPropertyModal({
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-          {/* Left Column: Formulario completo (7 cols en lg, 8 cols en xl) */}
-          <div className={`lg:col-span-7 xl:col-span-8 space-y-6 ${mobileTab === 'preview' ? 'hidden lg:block' : 'block'}`}>
+        <div
+          className={
+            isPageView
+              ? 'grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start'
+              : 'flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 overflow-hidden'
+          }
+        >
+          {/* Left Column: Formulario completo (7 cols en lg/xl) */}
+          <div
+            className={
+              isPageView
+                ? `lg:col-span-7 xl:col-span-7 space-y-6 ${mobileTab === 'preview' ? 'hidden lg:block' : 'block'}`
+                : `lg:col-span-7 xl:col-span-7 h-full overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6 ${mobileTab === 'preview' ? 'hidden lg:block' : 'block'}`
+            }
+          >
             {/* Group 1: Identificación y Proyecto */}
             <div className="space-y-4">
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-1 flex items-center justify-between">
@@ -1077,49 +1068,18 @@ export function AdminPropertyModal({
               </div>
             )}
 
-            {/* Quick preset selector */}
-            <div>
-              <span className="text-[11px] font-bold text-slate-700 block mb-1.5">
-                Fotos de ejemplo / Presets sugeridos:
-              </span>
-              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                {PRESET_IMAGES.map((preset, pIdx) => {
-                  const isCur = image === preset.url;
-                  return (
-                    <button
-                      key={pIdx}
-                      type="button"
-                      onClick={() => {
-                        setImage(preset.url);
-                        if (!gallery.includes(preset.url)) {
-                          setGallery([preset.url, ...gallery]);
-                        }
-                      }}
-                      className={`relative aspect-[4/3] rounded-xl overflow-hidden border-2 text-left transition-all group cursor-pointer ${
-                        isCur
-                          ? 'border-[#22A33D] ring-2 ring-emerald-500/30'
-                          : 'border-slate-200 hover:border-slate-400 opacity-80 hover:opacity-100'
-                      }`}
-                      title={preset.title}
-                    >
-                      <Image
-                        src={preset.url}
-                        alt={preset.title}
-                        fill
-                        sizes="100px"
-                        className="object-cover"
-                        referrerPolicy="no-referrer"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-1">
-                        <span className="text-[9px] font-bold text-white leading-tight truncate">
-                          {preset.title.split(' ')[0]}
-                        </span>
-                      </div>
-                    </button>
-                  );
-                })}
+
+            {gallery.length === 0 && !image && (
+              <div className="py-4 px-4 rounded-2xl bg-slate-50 border border-dashed border-slate-200 text-center">
+                <ImageIcon className="h-6 w-6 text-slate-400 mx-auto mb-1.5" />
+                <p className="text-xs font-semibold text-slate-600">
+                  Sin imágenes cargadas
+                </p>
+                <p className="text-[11px] text-slate-400">
+                  Sube fotos usando el botón superior o ingresa una URL manual abajo.
+                </p>
               </div>
-            </div>
+            )}
 
             <div>
               <label className="text-[11px] font-bold text-slate-700 block mb-1">
@@ -1127,7 +1087,6 @@ export function AdminPropertyModal({
               </label>
               <input
                 type="url"
-                required
                 value={image}
                 onChange={(e) => setImage(e.target.value)}
                 placeholder="https://... o /properties/MT24-023/foto-1.webp"
@@ -1398,11 +1357,25 @@ export function AdminPropertyModal({
           </div>
         </div>
 
-        {/* Right Column: Sticky Live Preview Column (5 cols en lg, 4 cols en xl) */}
-        <div className={`lg:col-span-5 xl:col-span-4 space-y-4 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto pr-1 ${mobileTab === 'form' ? 'hidden lg:block' : 'block'}`}>
-          <div className="bg-slate-50/80 border border-slate-200/90 rounded-3xl p-4 sm:p-5 shadow-xs space-y-4">
-            {/* Header with Dark Mode Toggle */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200/80">
+        {/* Right Column: Sticky Live Preview Column (de arriba a abajo, ocupando todo el alto vertical) */}
+        <div
+          className={`lg:col-span-5 xl:col-span-5 ${
+            mobileTab === 'form' ? 'hidden lg:flex' : 'flex'
+          } flex-col ${
+            isPageView
+              ? 'lg:sticky lg:top-4 lg:self-start lg:h-[calc(100vh-2rem)]'
+              : 'h-full border-t lg:border-t-0 lg:border-l border-slate-200 bg-slate-50/95 p-4 sm:p-5'
+          } min-h-0`}
+        >
+          <div
+            className={
+              isPageView
+                ? 'h-full flex flex-col justify-between bg-slate-50/90 border border-slate-200/90 rounded-3xl p-4 sm:p-5 shadow-xs min-h-0 overflow-hidden'
+                : 'h-full flex flex-col justify-between min-h-0 overflow-hidden'
+            }
+          >
+            {/* Header with Dark Mode Toggle (Pinned at top) */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 shrink-0">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
                   <Eye className="h-4 w-4" />
@@ -1437,103 +1410,106 @@ export function AdminPropertyModal({
               </div>
             </div>
 
-            {/* Real PropertyCard */}
-            <div className="relative w-full max-w-sm mx-auto shadow-sm rounded-3xl overflow-hidden group">
-              <PropertyCard
-                lot={previewLot}
-                dark={darkPreview}
-                onSelectLot={() => setShowFichaPreviewModal(true)}
-              />
-              {isUploadingImage && (
-                <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-xs flex flex-col items-center justify-center gap-2 text-white p-4 text-center z-10 animate-in fade-in">
-                  <Loader2 className="h-6 w-6 text-emerald-400 animate-spin" />
-                  <span className="text-xs font-bold">Optimizando foto a WebP...</span>
-                </div>
-              )}
-            </div>
-
-            {/* Live Inspection / Metadata Box */}
-            <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 space-y-3 text-xs">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    Código:
-                  </span>
-                  <span className="font-mono text-[11px] font-black text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
-                    {previewLot.code}
-                  </span>
-                </div>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
-                    status === 'Disponible'
-                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                      : status === 'En Reserva'
-                      ? 'bg-amber-50 text-amber-800 border-amber-200'
-                      : status === 'Vendido'
-                      ? 'bg-rose-50 text-rose-800 border-rose-200'
-                      : 'bg-slate-100 text-slate-700 border-slate-200'
-                  }`}
-                >
-                  {status}
-                </span>
+            {/* Scrollable Center: Card + Metadata */}
+            <div className="flex-1 overflow-y-auto min-h-0 space-y-4 py-3 pr-1">
+              {/* Real PropertyCard */}
+              <div className="relative w-full max-w-sm mx-auto shadow-sm rounded-3xl overflow-hidden group shrink-0">
+                <PropertyCard
+                  lot={previewLot}
+                  dark={darkPreview}
+                  onSelectLot={() => setShowFichaPreviewModal(true)}
+                />
+                {isUploadingImage && (
+                  <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-xs flex flex-col items-center justify-center gap-2 text-white p-4 text-center z-10 animate-in fade-in">
+                    <Loader2 className="h-6 w-6 text-emerald-400 animate-spin" />
+                    <span className="text-xs font-bold">Optimizando foto a WebP...</span>
+                  </div>
+                )}
               </div>
 
-              <div className="space-y-0.5">
-                <p className="font-bold text-slate-900 truncate">{name || 'Sin título aún'}</p>
-                <p className="text-[11px] text-slate-500 truncate">
-                  {project} · {zone || 'Ubicación sin definir'}
-                </p>
-              </div>
-
-              {/* Financial breakdown */}
-              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-[11px]">
-                <div>
-                  <span className="text-[9px] uppercase font-bold text-slate-400 block">Entrada Mínima</span>
-                  <span className="font-mono font-bold text-slate-800">
-                    ${minDownPaymentUSD.toLocaleString('es-EC')}
+              {/* Live Inspection / Metadata Box */}
+              <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 space-y-3 text-xs">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      Código:
+                    </span>
+                    <span className="font-mono text-[11px] font-black text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+                      {previewLot.code}
+                    </span>
+                  </div>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                      status === 'Disponible'
+                        ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                        : status === 'En Reserva'
+                        ? 'bg-amber-50 text-amber-800 border-amber-200'
+                        : status === 'Vendido'
+                        ? 'bg-rose-50 text-rose-800 border-rose-200'
+                        : 'bg-slate-100 text-slate-700 border-slate-200'
+                    }`}
+                  >
+                    {status}
                   </span>
                 </div>
-                <div className="text-right">
-                  <span className="text-[9px] uppercase font-bold text-slate-400 block">Saldo a Financiar</span>
-                  <span className="font-mono font-bold text-slate-800">
-                    ${Math.max(0, priceUSD - minDownPaymentUSD).toLocaleString('es-EC')}
-                  </span>
-                </div>
-              </div>
 
-              {/* Amenities / Services tags preview */}
-              {selectedServices.length > 0 && (
-                <div className="pt-2 border-t border-slate-100">
-                  <span className="text-[9px] uppercase font-bold text-slate-400 block mb-1.5">
-                    Servicios activos ({selectedServices.length})
-                  </span>
-                  <div className="flex flex-wrap gap-1">
-                    {selectedServices.slice(0, 4).map((srv, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[10px] font-medium truncate max-w-[160px]"
-                      >
-                        ✓ {srv}
-                      </span>
-                    ))}
-                    {selectedServices.length > 4 && (
-                      <span className="px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-bold">
-                        +{selectedServices.length - 4} más
-                      </span>
-                    )}
+                <div className="space-y-0.5">
+                  <p className="font-bold text-slate-900 truncate">{name || 'Sin título aún'}</p>
+                  <p className="text-[11px] text-slate-500 truncate">
+                    {project} · {zone || 'Ubicación sin definir'}
+                  </p>
+                </div>
+
+                {/* Financial breakdown */}
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-[11px]">
+                  <div>
+                    <span className="text-[9px] uppercase font-bold text-slate-400 block">Entrada Mínima</span>
+                    <span className="font-mono font-bold text-slate-800">
+                      ${minDownPaymentUSD.toLocaleString('es-EC')}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[9px] uppercase font-bold text-slate-400 block">Saldo a Financiar</span>
+                    <span className="font-mono font-bold text-slate-800">
+                      ${Math.max(0, priceUSD - minDownPaymentUSD).toLocaleString('es-EC')}
+                    </span>
                   </div>
                 </div>
-              )}
 
-              {/* Gallery and Documents count */}
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-                <span>📷 {gallery.length} foto{gallery.length !== 1 ? 's' : ''}</span>
-                <span>📄 {documents.length} documento{documents.length !== 1 ? 's' : ''}</span>
+                {/* Amenities / Services tags preview */}
+                {selectedServices.length > 0 && (
+                  <div className="pt-2 border-t border-slate-100">
+                    <span className="text-[9px] uppercase font-bold text-slate-400 block mb-1.5">
+                      Servicios activos ({selectedServices.length})
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {selectedServices.slice(0, 4).map((srv, idx) => (
+                        <span
+                          key={idx}
+                          className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[10px] font-medium truncate max-w-[160px]"
+                        >
+                          ✓ {srv}
+                        </span>
+                      ))}
+                      {selectedServices.length > 4 && (
+                        <span className="px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-bold">
+                          +{selectedServices.length - 4} más
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Gallery and Documents count */}
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                  <span>📷 {gallery.length} foto{gallery.length !== 1 ? 's' : ''}</span>
+                  <span>📄 {documents.length} documento{documents.length !== 1 ? 's' : ''}</span>
+                </div>
               </div>
             </div>
 
-            {/* Quick Actions in Preview Panel */}
-            <div className="space-y-2 pt-1">
+            {/* Bottom Pinned Actions */}
+            <div className="pt-3 border-t border-slate-200/80 space-y-2 shrink-0">
               <button
                 type="submit"
                 disabled={isUploadingImage || isUploadingDoc}

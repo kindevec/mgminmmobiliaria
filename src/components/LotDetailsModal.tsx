@@ -44,14 +44,16 @@ export function LotDetailsModal({
 
   if (!isOpen || !lot) return null;
 
-  const photos = lot.gallery && lot.gallery.length > 0 ? lot.gallery : [lot.image];
+  const photos = (lot.gallery && lot.gallery.length > 0 ? lot.gallery : [lot.image]).filter(Boolean);
   const isHouse = lot.type === 'Vivienda';
 
   const nextPhoto = () => {
+    if (photos.length <= 1) return;
     setActivePhotoIdx((prev) => (prev + 1) % photos.length);
   };
 
   const prevPhoto = () => {
+    if (photos.length <= 1) return;
     setActivePhotoIdx((prev) => (prev - 1 + photos.length) % photos.length);
   };
 
@@ -60,22 +62,32 @@ export function LotDetailsModal({
       <div className="relative w-full max-w-3xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 overflow-hidden max-h-[94dvh] flex flex-col">
         {/* Modal Header Media Viewer */}
         <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] bg-slate-950 overflow-hidden shrink-0">
-          <Image
-            src={photos[activePhotoIdx]}
-            alt=""
-            fill
-            aria-hidden="true"
-            className="object-cover blur-2xl opacity-40 scale-110 pointer-events-none"
-            referrerPolicy="no-referrer"
-          />
-          <Image
-            src={photos[activePhotoIdx]}
-            alt={lot.name}
-            fill
-            sizes="(max-width: 1024px) 100vw, 800px"
-            className="object-contain object-center z-10"
-            referrerPolicy="no-referrer"
-          />
+          {photos.length > 0 && photos[activePhotoIdx] ? (
+            <>
+              <Image
+                src={photos[activePhotoIdx]}
+                alt=""
+                fill
+                aria-hidden="true"
+                className="object-cover blur-2xl opacity-40 scale-110 pointer-events-none"
+                referrerPolicy="no-referrer"
+              />
+              <Image
+                src={photos[activePhotoIdx]}
+                alt={lot.name}
+                fill
+                sizes="(max-width: 1024px) 100vw, 800px"
+                className="object-contain object-center z-10"
+                referrerPolicy="no-referrer"
+              />
+            </>
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900 text-slate-400 gap-2 p-6 text-center">
+              <FileText className="h-10 w-10 text-slate-600" />
+              <span className="text-sm font-semibold text-slate-300">Sin fotos registradas</span>
+              <span className="text-xs text-slate-500">Sube fotos en el formulario para visualizarlas aquí</span>
+            </div>
+          )}
 
           {/* Vignette Gradient */}
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-black/40 pointer-events-none" />

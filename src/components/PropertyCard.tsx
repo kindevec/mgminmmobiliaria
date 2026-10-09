@@ -6,6 +6,7 @@ import {
   ArrowRight,
   Ruler,
   CreditCard,
+  ImageIcon,
 } from 'lucide-react';
 import type { LotProperty } from '@/src/data/lots';
 import { getLotWhatsAppUrl } from '@/src/data/lots';
@@ -35,15 +36,25 @@ export function PropertyCard({
     >
       {/* 1. Imagen */}
       <div className="relative w-full h-[180px] sm:h-[195px] overflow-hidden bg-slate-950">
-        <Image
-          src={lot.image}
-          alt={lot.name}
-          fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-          referrerPolicy="no-referrer"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent pointer-events-none" />
+        {lot.image ? (
+          <>
+            <Image
+              src={lot.image}
+              alt={lot.name}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              referrerPolicy="no-referrer"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent pointer-events-none" />
+          </>
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900/95 text-slate-400 gap-1.5 p-4 text-center">
+            <ImageIcon className="h-8 w-8 text-slate-600" />
+            <span className="text-[11px] font-semibold text-slate-300">Sin foto de portada</span>
+            <span className="text-[9px] text-slate-500 font-medium">Sube una imagen para ver la previsualización</span>
+          </div>
+        )}
       </div>
 
       {/* 2. Cuerpo de la Tarjeta Luxury */}
