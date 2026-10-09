@@ -12,7 +12,6 @@ import { InteractiveBackground } from '@/src/components/InteractiveBackground';
 import { HomeView } from '@/src/components/views/HomeView';
 import { AboutView } from '@/src/components/views/AboutView';
 import { PropertiesView } from '@/src/components/views/PropertiesView';
-import { MiravalleView } from '@/src/components/views/MiravalleView';
 import { ContactView } from '@/src/components/views/ContactView';
 import { AdminView } from '@/src/components/views/AdminView';
 import { PropertyProvider, useProperties } from '@/src/context/PropertyContext';
@@ -200,13 +199,6 @@ function HomePageContent() {
                 initialLocation={filterLocation}
                 initialType={filterType}
                 initialMaxPrice={filterMaxPrice}
-              />
-            )}
-
-            {currentPage === 'miravalle' && (
-              <MiravalleView
-                onNavigate={handleNavigate}
-                onOpenVisitModal={handleOpenVisitModal}
               />
             )}
 

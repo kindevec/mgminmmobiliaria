@@ -7,7 +7,7 @@ import type { LotProperty } from '@/src/data/lots';
 
 interface AdminViewProps {
   onNavigateToCatalog?: () => void;
-  onNavigate?: (page: 'home' | 'about' | 'properties' | 'miravalle' | 'contact' | 'admin') => void;
+  onNavigate?: (page: 'home' | 'about' | 'properties' | 'contact' | 'admin') => void;
   onSelectLotPreview?: (lot: LotProperty) => void;
 }
 
