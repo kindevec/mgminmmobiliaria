@@ -26,6 +26,8 @@ yarn-error.log*
 .env*.local
 .env
 !.env.example
+credenciales.txt
+*credenciales*.txt
 
 # vercel & firebase
 .vercel

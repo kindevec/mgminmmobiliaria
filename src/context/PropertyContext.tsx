@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
 import { LOTS_DATA, type LotProperty } from '@/src/data/lots';
 
-const STORAGE_KEY = 'mgm_inmobiliaria_inventory_v4';
+const STORAGE_KEY = 'mgm_inmobiliaria_inventory_v5';
 
 interface PropertyMetrics {
   totalCount: number;
@@ -36,7 +36,19 @@ export function PropertyProvider({ children }: { children: ReactNode }) {
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            return parsed;
+            // Sincronizar documentos de LOTS_DATA con el inventario almacenado
+            return parsed.map((item: LotProperty) => {
+              const defaultLot = LOTS_DATA.find((l) => l.id === item.id || l.code === item.code);
+              if (defaultLot && !item.pdfUrl && defaultLot.pdfUrl) {
+                return {
+                  ...item,
+                  pdfUrl: defaultLot.pdfUrl,
+                  pdfTitle: defaultLot.pdfTitle,
+                  documents: defaultLot.documents,
+                };
+              }
+              return item;
+            });
           }
         }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(LOTS_DATA));

@@ -23,6 +23,14 @@ export interface LotProperty {
   beds?: number;
   baths?: number;
   featured?: boolean;
+  pdfUrl?: string;
+  pdfTitle?: string;
+  documents?: {
+    title: string;
+    url: string;
+    size?: string;
+    description?: string;
+  }[];
 }
 
 export const LOTS_DATA: LotProperty[] = [
@@ -77,6 +85,22 @@ export const LOTS_DATA: LotProperty[] = [
     beds: 4,
     baths: 4,
     featured: true,
+    pdfUrl: '/properties/MT24-023/ficha-tecnica-MT24-023.pdf',
+    pdfTitle: 'Ficha Técnica Oficial MT24-023 (PDF)',
+    documents: [
+      {
+        title: 'Ficha Técnica Oficial de Inmueble MT24-023',
+        url: '/properties/MT24-023/ficha-tecnica-MT24-023.pdf',
+        size: '199 KB',
+        description: 'Levantamiento de especificaciones técnicas, avalúo y datos de construcción.',
+      },
+      {
+        title: 'Dossier Institucional MGM Inmobiliaria',
+        url: '/docs/MGM_Inmobiliaria_Dossier_Institucional_Completo.pdf',
+        size: '36 KB',
+        description: 'Respaldo jurídico, garantías notariales y trayectoria empresarial.',
+      },
+    ],
   },
   {
     id: 'lote-c24-279',
@@ -125,6 +149,22 @@ export const LOTS_DATA: LotProperty[] = [
       '/properties/C24-279/afiche-publicidad.jpeg',
     ],
     featured: true,
+    pdfUrl: '/properties/C24-279/ficha-tecnica-C24-279.pdf',
+    pdfTitle: 'Ficha Técnica Oficial C24-279 (PDF)',
+    documents: [
+      {
+        title: 'Ficha Técnica de Terreno en Remate C24-279',
+        url: '/properties/C24-279/ficha-tecnica-C24-279.pdf',
+        size: '191 KB',
+        description: 'Levantamiento de linderos, uso de suelo residencial/comercial y servicios.',
+      },
+      {
+        title: 'Dossier Institucional MGM Inmobiliaria',
+        url: '/docs/MGM_Inmobiliaria_Dossier_Institucional_Completo.pdf',
+        size: '36 KB',
+        description: 'Respaldo jurídico, garantías notariales y trayectoria empresarial.',
+      },
+    ],
   },
   {
     id: 'prop-mv-101',

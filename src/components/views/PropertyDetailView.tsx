@@ -27,6 +27,8 @@ import {
   Layers,
   Calculator,
   ExternalLink,
+  FileDown,
+  Download,
 } from 'lucide-react';
 import type { LotProperty } from '@/src/data/lots';
 import { getLotWhatsAppUrl, WHATSAPP_PHONE } from '@/src/data/lots';
@@ -86,6 +88,96 @@ function PropertyExtendedSpecs({ lot }: { lot: LotProperty }) {
           </p>
         </div>
       </div>
+
+      {/* Documentación Oficial y Fichas Técnicas en PDF */}
+      {(() => {
+        const availableDocs =
+          lot.documents && lot.documents.length > 0
+            ? lot.documents
+            : lot.pdfUrl
+            ? [
+                {
+                  title: lot.pdfTitle || `Ficha Técnica Oficial ${lot.code}`,
+                  url: lot.pdfUrl,
+                  size: 'PDF',
+                  description: 'Formulario oficial con especificaciones técnicas, coordenadas y linderos.',
+                },
+              ]
+            : [
+                {
+                  title: 'Dossier Institucional MGM Inmobiliaria',
+                  url: '/docs/MGM_Inmobiliaria_Dossier_Institucional_Completo.pdf',
+                  size: '36 KB',
+                  description: 'Respaldo jurídico, garantías notariales y trayectoria empresarial.',
+                },
+              ];
+
+        return (
+          <div className="pt-6 sm:pt-8 border-t border-slate-200/90 space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                <FileDown className="h-5 w-5 text-emerald-700 shrink-0" />
+                <span>Documentos Oficiales y Fichas Técnicas (PDF)</span>
+              </h3>
+              <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200/60">
+                Información Oficial Verificada
+              </span>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Descarga o visualiza directamente los documentos oficiales, fichas técnicas y el respaldo jurídico de esta propiedad:
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              {availableDocs.map((doc, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 rounded-2xl bg-white border border-slate-200 hover:border-emerald-500/50 hover:shadow-md transition-all flex flex-col justify-between gap-3 group"
+                >
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <FileText className="h-4 w-4" />
+                      </div>
+                      <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-50/80 px-2 py-0.5 rounded border border-emerald-200/60">
+                        {doc.size || 'PDF'}
+                      </span>
+                    </div>
+                    <h4 className="text-sm font-black text-slate-900 group-hover:text-emerald-800 transition-colors leading-snug">
+                      {doc.title}
+                    </h4>
+                    {doc.description && (
+                      <p className="text-xs text-slate-600 leading-relaxed font-normal">
+                        {doc.description}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                    <a
+                      href={doc.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-slate-950 hover:bg-emerald-700 text-white font-bold text-xs transition-colors cursor-pointer text-center"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      <span>Abrir PDF</span>
+                    </a>
+                    <a
+                      href={doc.url}
+                      download
+                      className="inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 hover:text-slate-900 font-bold text-xs transition-colors cursor-pointer text-center"
+                      title="Descargar archivo PDF"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      <span className="sr-only sm:not-sr-only">Descargar</span>
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
@@ -476,6 +568,29 @@ export function PropertyDetailView({
                   </svg>
                   <span>Google Maps</span>
                 </a>
+
+                {/* 3. Acceso Directo a Ficha Técnica Oficial (PDF) */}
+                {(() => {
+                  const pdfTarget =
+                    lot.pdfUrl ||
+                    (lot.documents && lot.documents.length > 0 ? lot.documents[0].url : '/docs/MGM_Inmobiliaria_Dossier_Institucional_Completo.pdf');
+                  const pdfLabel =
+                    lot.pdfTitle ||
+                    (lot.documents && lot.documents.length > 0 ? lot.documents[0].title : 'Dossier Institucional MGM');
+
+                  return (
+                    <a
+                      href={pdfTarget}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-emerald-600/30 bg-emerald-50/60 hover:bg-emerald-100/90 text-emerald-950 font-bold text-xs sm:text-sm transition-all cursor-pointer text-center group shadow-xs active:scale-98"
+                    >
+                      <FileDown className="h-4 w-4 text-emerald-700 group-hover:scale-110 transition-transform shrink-0" />
+                      <span className="truncate">Ver {pdfLabel} (PDF)</span>
+                      <ExternalLink className="h-3.5 w-3.5 text-emerald-600 ml-0.5 opacity-70 shrink-0" />
+                    </a>
+                  );
+                })()}
 
               </div>
 

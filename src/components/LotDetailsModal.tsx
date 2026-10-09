@@ -19,6 +19,9 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowRight,
+  FileDown,
+  Download,
+  ExternalLink,
 } from 'lucide-react';
 import type { LotProperty } from '@/src/data/lots';
 import { getLotWhatsAppUrl } from '@/src/data/lots';
@@ -206,6 +209,63 @@ export function LotDetailsModal({
               propiedad con solvencia municipal al día y libre de gravamen hipotecario.
             </p>
           </div>
+
+          {/* Documentación Oficial y Ficha Técnica PDF */}
+          {(() => {
+            const availableDocs =
+              lot.documents && lot.documents.length > 0
+                ? lot.documents
+                : lot.pdfUrl
+                ? [
+                    {
+                      title: lot.pdfTitle || `Ficha Técnica Oficial ${lot.code}`,
+                      url: lot.pdfUrl,
+                      size: 'PDF',
+                      description: 'Levantamiento de especificaciones técnicas y documentación oficial.',
+                    },
+                  ]
+                : [
+                    {
+                      title: 'Dossier Institucional MGM Inmobiliaria',
+                      url: '/docs/MGM_Inmobiliaria_Dossier_Institucional_Completo.pdf',
+                      size: '36 KB',
+                      description: 'Respaldo jurídico, garantías notariales y trayectoria empresarial.',
+                    },
+                  ];
+
+            return (
+              <div className="space-y-2 pt-1">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                    <FileDown className="h-4 w-4 text-emerald-700 shrink-0" />
+                    <span>Documentación Técnica Oficial (PDF)</span>
+                  </h4>
+                  <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    Descarga directa
+                  </span>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  {availableDocs.map((doc, idx) => (
+                    <a
+                      key={idx}
+                      href={doc.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 inline-flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100 text-slate-900 font-semibold text-xs transition-all active:scale-98 group cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2 overflow-hidden">
+                        <FileText className="h-4 w-4 text-emerald-700 shrink-0 group-hover:scale-110 transition-transform" />
+                        <span className="truncate text-xs text-slate-800 font-bold">{doc.title}</span>
+                      </div>
+                      <span className="shrink-0 text-[10px] font-mono font-bold text-emerald-700 bg-white px-1.5 py-0.5 rounded border border-emerald-200">
+                        {doc.size || 'PDF'}
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Pricing & Financing Options */}
           <div className="p-6 rounded-2xl bg-slate-950 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
