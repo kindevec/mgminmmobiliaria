@@ -36,23 +36,23 @@ const ABOUT_HERO_IMAGE = {
 
 const ACQUISITION_BG_PROPERTIES = [
   {
-    url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80',
-    alt: 'Lotes de terreno y topografía Miravalle',
+    url: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Suscripción notarial y firma de promesas de compraventa',
     className: 'sm:-translate-y-4',
   },
   {
-    url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80',
-    alt: 'Villa residencial de lujo',
+    url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Certeza jurídica y legislación notarial inmobiliaria',
     className: 'sm:translate-y-6',
   },
   {
-    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
-    alt: 'Residencia en desarrollo urbanizado',
+    url: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Revisión planimétrica, linderos y levantamiento topográfico',
     className: 'sm:-translate-y-6',
   },
   {
-    url: 'https://images.unsplash.com/photo-1524813686514-a57563d77d66?auto=format&fit=crop&w=1200&q=80',
-    alt: 'Parcelas campestres y entorno natural',
+    url: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Entrega formal de posesión y títulos de propiedad',
     className: 'sm:translate-y-4',
   },
 ];
@@ -106,14 +106,6 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
                 Somos una entidad inmobiliaria ecuatoriana constituida para transformar terrenos de alta vocación residencial en comunidades planificadas con obras concluidas, saneamiento legal definitivo y crédito directo.
               </p>
             </ScrollReveal>
-          </div>
-        </div>
-
-        {/* Pastilla informativa inferior */}
-        <div className="absolute bottom-6 right-4 sm:bottom-8 sm:right-8 lg:right-12 z-20 pointer-events-none hidden sm:block">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white text-xs font-medium shadow-lg">
-            <span className="w-2 h-2 rounded-full bg-[#5be196] animate-pulse" />
-            <span>Certeza Jurídica &amp; Transparencia en Cada Metro Cuadrado</span>
           </div>
         </div>
       </section>
@@ -420,71 +412,110 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
               </div>
             </ScrollReveal>
 
-            {/* Right Column: Light Green Container with the 4 steps */}
+            {/* Right Column: Protocolo Notarial Solemne (Línea de Tiempo Editorial Humana, Sin Cajas Artificiales de IA) */}
             <ScrollReveal
               direction="right"
               delay={0.15}
               className="lg:col-span-6 w-full flex justify-center"
             >
-              <div className="w-full max-w-[560px] bg-[#eaf8ee] text-[#113d22] rounded-[2.5rem] p-7 sm:p-9 lg:p-10 shadow-2xl space-y-6 border border-[#22A33D]/30">
-                {/* Step 01 */}
-                <div className="flex items-center gap-4 sm:gap-5">
-                  <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-white shadow-md flex items-center justify-center shrink-0 text-[#22A33D] border border-[#22A33D]/20">
-                    <MapPin className="w-6 h-6 stroke-[2.2]" />
+              <div className="w-full max-w-[560px] space-y-5">
+                {/* Cabecera Editorial Notarial */}
+                <div className="flex items-center justify-between pb-3.5 border-b border-white/15">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#5be196] animate-pulse" />
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#5be196]">
+                      Protocolo Notarial Continuo
+                    </span>
                   </div>
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-black text-[#113d22] tracking-tight leading-tight">
-                      Elección & Visita en Terreno
-                    </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium mt-1">
-                      Verificamos linderos, coordenadas georreferenciadas y servicios in situ.
-                    </p>
-                  </div>
+                  <span className="text-[11px] font-semibold text-slate-300">
+                    4 Fases de Certeza Jurídica
+                  </span>
                 </div>
 
-                {/* Step 02 - Highlighted with Warm Orange Accent */}
-                <div className="flex items-center gap-4 sm:gap-5 pt-5 border-t border-[#22A33D]/15">
-                  <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-white shadow-md flex items-center justify-center shrink-0 text-[#F58220] border border-orange-200">
-                    <FileText className="w-6 h-6 stroke-[2.2]" />
+                {/* Línea de Tiempo Continua */}
+                <div className="relative pl-7 sm:pl-9 space-y-6 before:absolute before:left-3 sm:before:left-3.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-gradient-to-b before:from-emerald-400 before:via-[#F58220] before:to-emerald-400">
+                  {/* Hito 1 */}
+                  <div className="relative group">
+                    <div className="absolute -left-7 sm:-left-9 top-0.5 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-950 border-2 border-emerald-400 flex items-center justify-center text-[10px] sm:text-xs font-mono font-bold text-emerald-400 shadow-md group-hover:scale-110 group-hover:bg-emerald-950 transition-all">
+                      1
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30">
+                          Inspección In Situ
+                        </span>
+                        <span className="text-xs text-slate-400 font-medium">Hitos Georreferenciados UTM</span>
+                      </div>
+                      <h4 className="text-sm sm:text-base font-bold text-white tracking-tight">
+                        Elección & Replanteo en Terreno
+                      </h4>
+                      <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal mt-0.5">
+                        Inspección física de hitos georreferenciados UTM, delimitación de linderos y verificación de servicios básicos in situ.
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-black text-[#113d22] tracking-tight leading-tight flex items-center gap-2">
-                      <span>Reserva & Plan Directo</span>
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-orange-100 text-[#ea580c]">Directo</span>
-                    </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium mt-1">
-                      Bloqueamos tu lote y acordamos cuotas mensuales fijas sin bancos.
-                    </p>
-                  </div>
-                </div>
 
-                {/* Step 03 */}
-                <div className="flex items-center gap-4 sm:gap-5 pt-5 border-t border-[#22A33D]/15">
-                  <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-white shadow-md flex items-center justify-center shrink-0 text-[#22A33D] border border-[#22A33D]/20">
-                    <Scale className="w-6 h-6 stroke-[2.2]" />
+                  {/* Hito 2 */}
+                  <div className="relative group">
+                    <div className="absolute -left-7 sm:-left-9 top-0.5 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-950 border-2 border-[#F58220] flex items-center justify-center text-[10px] sm:text-xs font-mono font-bold text-[#F58220] shadow-md group-hover:scale-110 group-hover:bg-orange-950 transition-all">
+                      2
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-orange-300 bg-orange-950/80 px-2 py-0.5 rounded border border-orange-500/30">
+                          Crédito Directo 48M
+                        </span>
+                        <span className="text-xs text-slate-400 font-medium">Sin Bancos ni Intermediarios</span>
+                      </div>
+                      <h4 className="text-sm sm:text-base font-bold text-white tracking-tight">
+                        Reserva & Cronograma sin Bancos
+                      </h4>
+                      <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal mt-0.5">
+                        Bloqueo formal del predio seleccionado y estructuración de cuotas fijas directas solo con tu documento de identidad.
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-black text-[#113d22] tracking-tight leading-tight">
-                      Promesa Notarial & Posesión
-                    </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium mt-1">
-                      Firma notariada formal con entrega de posesión física inmediata.
-                    </p>
-                  </div>
-                </div>
 
-                {/* Step 04 */}
-                <div className="flex items-center gap-4 sm:gap-5 pt-5 border-t border-[#22A33D]/15">
-                  <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-white shadow-md flex items-center justify-center shrink-0 text-[#22A33D] border border-[#22A33D]/20">
-                    <BadgeCheck className="w-6 h-6 stroke-[2.2]" />
+                  {/* Hito 3 */}
+                  <div className="relative group">
+                    <div className="absolute -left-7 sm:-left-9 top-0.5 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-950 border-2 border-emerald-400 flex items-center justify-center text-[10px] sm:text-xs font-mono font-bold text-emerald-400 shadow-md group-hover:scale-110 group-hover:bg-emerald-950 transition-all">
+                      3
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30">
+                          Notaría Pública
+                        </span>
+                        <span className="text-xs text-slate-400 font-medium">Entrega Material del Predio</span>
+                      </div>
+                      <h4 className="text-sm sm:text-base font-bold text-white tracking-tight">
+                        Promesa Notarial & Posesión Física
+                      </h4>
+                      <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal mt-0.5">
+                        Suscripción solemne de contrato de promesa ante Notario Público con entrega formal de posesión material de tu lote.
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-black text-[#113d22] tracking-tight leading-tight">
-                      Escritura Definitiva
-                    </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium mt-1">
-                      Protocolización notarial e inscripción en el Registro de la Propiedad.
-                    </p>
+
+                  {/* Hito 4 */}
+                  <div className="relative group">
+                    <div className="absolute -left-7 sm:-left-9 top-0.5 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-950 border-2 border-emerald-400 flex items-center justify-center text-[10px] sm:text-xs font-mono font-bold text-emerald-400 shadow-md group-hover:scale-110 group-hover:bg-emerald-950 transition-all">
+                      4
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30">
+                          Registro de la Propiedad
+                        </span>
+                        <span className="text-xs text-slate-400 font-medium">Título de Dominio Individual</span>
+                      </div>
+                      <h4 className="text-sm sm:text-base font-bold text-white tracking-tight">
+                        Protocolización & Escritura Definitiva
+                      </h4>
+                      <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal mt-0.5">
+                        Minuta solemne, protocolización en el protocolo notarial e inscripción registral definitiva a tu nombre.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -124,20 +124,72 @@ export function PropertiesView({
   }
 
   useEffect(() => {
-    // Scroll automático al catálogo al entrar a la vista de Lotes
-    const timer = setTimeout(() => {
-      if (searchBarRef.current) {
-        searchBarRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 250);
+    let animationFrameId: number;
+    let isCancelled = false;
 
-    return () => clearTimeout(timer);
+    // Cancelar el auto-scroll si el usuario interactúa manualmente (rueda, touch o teclado)
+    const cancelScroll = () => {
+      isCancelled = true;
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    };
+
+    window.addEventListener('wheel', cancelScroll, { passive: true, once: true });
+    window.addEventListener('touchmove', cancelScroll, { passive: true, once: true });
+    window.addEventListener('keydown', cancelScroll, { passive: true, once: true });
+
+    // Asegurar que al entrar a Lotes la vista se posicione en el hero para apreciarlo centrado primero
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+
+    // Permitir centrar la vista en el hero primero, luego animar el scroll suavemente hacia el catálogo
+    const timer = setTimeout(() => {
+      if (isCancelled || !searchBarRef.current) return;
+
+      const headerOffset = 90;
+      const targetY = searchBarRef.current.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+      const startY = window.pageYOffset;
+      const distance = targetY - startY;
+
+      if (Math.abs(distance) < 25) return;
+
+      const duration = 1150;
+      let startTime: number | null = null;
+
+      // Easing suave (easeInOutCubic) para movimiento natural y cinemático
+      const easeInOutCubic = (t: number) =>
+        t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+      const step = (timestamp: number) => {
+        if (isCancelled) return;
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = easeInOutCubic(progress);
+
+        window.scrollTo(0, startY + distance * ease);
+
+        if (progress < 1) {
+          animationFrameId = requestAnimationFrame(step);
+        }
+      };
+
+      animationFrameId = requestAnimationFrame(step);
+    }, 700);
+
+    return () => {
+      isCancelled = true;
+      clearTimeout(timer);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('wheel', cancelScroll);
+      window.removeEventListener('touchmove', cancelScroll);
+      window.removeEventListener('keydown', cancelScroll);
+    };
   }, []);
 
   const scrollToSearchBar = () => {
-    if (searchBarRef.current) {
-      searchBarRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    if (!searchBarRef.current) return;
+    const headerOffset = 90;
+    const targetY = searchBarRef.current.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+    window.scrollTo({ top: targetY, behavior: 'smooth' });
   };
 
   const toggleType = (val: string) => {
@@ -257,14 +309,6 @@ export function PropertiesView({
                 Propiedades legalizadas con vías concluidas, alcantarillado, acometidas soterradas y crédito directo de hasta 48 meses. Elige tu terreno con planos topográficos y asesoría técnica directa.
               </p>
             </ScrollReveal>
-          </div>
-        </div>
-
-        {/* Pastilla informativa flotante en esquina inferior */}
-        <div className="absolute bottom-6 right-4 sm:bottom-8 sm:right-8 lg:right-12 z-20 pointer-events-none hidden sm:block">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white text-xs font-medium shadow-lg">
-            <span className="w-2 h-2 rounded-full bg-[#5be196] animate-pulse" />
-            <span>Disponibilidad Inmediata · Crédito Directo 48 Meses con Cédula</span>
           </div>
         </div>
       </section>

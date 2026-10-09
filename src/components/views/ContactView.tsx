@@ -167,14 +167,6 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
             </ScrollReveal>
           </div>
         </div>
-
-        {/* Pastilla informativa inferior */}
-        <div className="absolute bottom-6 right-4 sm:bottom-8 sm:right-8 lg:right-12 z-20 pointer-events-none hidden sm:block">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white text-xs font-medium shadow-lg">
-            <span className="w-2 h-2 rounded-full bg-[#5be196] animate-pulse" />
-            <span>Atención Continua · Respuesta Inmediata por Asesores Legales</span>
-          </div>
-        </div>
       </section>
 
       {/* =========================================================================

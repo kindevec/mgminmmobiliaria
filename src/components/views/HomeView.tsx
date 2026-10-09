@@ -21,6 +21,10 @@ import {
   Sparkles,
   Trees,
   Award,
+  Droplets,
+  Leaf,
+  Trophy,
+  Compass,
 } from 'lucide-react';
 import type { PageView } from '../Header';
 import {
@@ -128,15 +132,24 @@ const PURCHASE_PROCESS_STEPS = [
   },
 ];
 
-// 4. Beneficios Urbanos & Infraestructura Real de MGM (Especificaciones de Ingeniería Civil)
+// 4. Beneficios Urbanos & Infraestructura Real de MGM (Especificaciones de Ingeniería Civil con Color y Vida)
 const URBAN_BENEFIT_ITEMS = [
   {
-    code: '01 / INFRA-VIAL',
+    category: 'Vialidad & Acceso Urbano',
     status: 'CONCLUIDO IN SITU',
     title: 'Vías Adoquinadas 10 a 12m',
-    desc: 'Calzadas vehiculares amplias de alto tránsito con bordillos de hormigón armado y aceras peatonales integradas.',
+    desc: 'Calzadas vehiculares amplias de alto tránsito con bordillos de hormigón armado, cunetas y aceras peatonales integradas.',
     icon: Building,
-    tag: 'Vialidad & Acceso',
+    tag: 'Infraestructura Vial',
+    palette: {
+      cardGradient: 'from-amber-500/[0.08] via-amber-500/[0.02] to-white',
+      border: 'border-amber-200/90 hover:border-amber-400',
+      iconGradient: 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-amber-500/25',
+      tagColor: 'text-amber-800 bg-amber-100/90 border-amber-300/80',
+      statusColor: 'text-amber-800 bg-amber-50 border-amber-200',
+      accentDot: 'bg-amber-500',
+      specsBg: 'bg-amber-50/50 border-amber-100/80',
+    },
     specs: [
       { label: 'Sección', val: '10.00m a 12.00m' },
       { label: 'Capa Rodadura', val: 'Adoquín 400 kg/cm²' },
@@ -144,12 +157,21 @@ const URBAN_BENEFIT_ITEMS = [
     ],
   },
   {
-    code: '02 / SERV-SOTERRADOS',
+    category: 'Ingeniería Subterránea',
     status: '100% SUBTERRÁNEO',
     title: 'Redes de Servicios Soterradas',
-    desc: 'Distribución técnica subterránea sin cableado aéreo visible: agua presurizada, alcantarillado sanitario y ductos para fibra óptica.',
-    icon: KeyRound,
-    tag: 'Servicios Básicos',
+    desc: 'Distribución técnica subterránea sin cableado aéreo visible: agua presurizada, acometida sanitaria y ductos para fibra óptica.',
+    icon: Droplets,
+    tag: 'Agua & Telecomunicaciones',
+    palette: {
+      cardGradient: 'from-sky-500/[0.08] via-sky-500/[0.02] to-white',
+      border: 'border-sky-200/90 hover:border-sky-400',
+      iconGradient: 'bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-sky-500/25',
+      tagColor: 'text-sky-800 bg-sky-100/90 border-sky-300/80',
+      statusColor: 'text-sky-800 bg-sky-50 border-sky-200',
+      accentDot: 'bg-sky-500',
+      specsBg: 'bg-sky-50/50 border-sky-100/80',
+    },
     specs: [
       { label: 'Red Hídrica', val: 'Presurizada con acometida' },
       { label: 'Sanitario', val: 'Alcantarillado conectado' },
@@ -157,12 +179,21 @@ const URBAN_BENEFIT_ITEMS = [
     ],
   },
   {
-    code: '03 / ECO-RESERVA',
+    category: 'Reserva Ecológica & Paisaje',
     status: 'ÁREA PROTEGIDA',
     title: '+8.000 m² de Áreas Verdes',
     desc: 'Espacios recreativos integrados a la trama urbana con caminerías ecológicas, parques familiares y reforestación de especies nativas.',
-    icon: Trees,
-    tag: 'Naturaleza & Bienestar',
+    icon: Leaf,
+    tag: 'Naturaleza & Pulmón Verde',
+    palette: {
+      cardGradient: 'from-emerald-500/[0.09] via-emerald-500/[0.02] to-white',
+      border: 'border-emerald-200/90 hover:border-emerald-400',
+      iconGradient: 'bg-gradient-to-br from-emerald-500 to-green-700 text-white shadow-emerald-500/25',
+      tagColor: 'text-emerald-800 bg-emerald-100/90 border-emerald-300/80',
+      statusColor: 'text-emerald-800 bg-emerald-50 border-emerald-200',
+      accentDot: 'bg-emerald-500',
+      specsBg: 'bg-emerald-50/50 border-emerald-100/80',
+    },
     specs: [
       { label: 'Superficie', val: '+8.000 m² comunales' },
       { label: 'Equipamiento', val: 'Senderos & arborización' },
@@ -170,12 +201,21 @@ const URBAN_BENEFIT_ITEMS = [
     ],
   },
   {
-    code: '04 / CMPLX-DEP',
+    category: 'Deporte & Salud Familiar',
     status: 'ILUMINADO LED',
     title: 'Complejo Deportivo Multiuso',
     desc: 'Infraestructura deportiva polivalente con cerramiento técnico perimetral para fútbol, básquetbol y actividades físicas comunitarias.',
-    icon: Sparkles,
-    tag: 'Deporte & Salud',
+    icon: Trophy,
+    tag: 'Canchas & Vida Sana',
+    palette: {
+      cardGradient: 'from-violet-500/[0.08] via-violet-500/[0.02] to-white',
+      border: 'border-violet-200/90 hover:border-violet-400',
+      iconGradient: 'bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-violet-500/25',
+      tagColor: 'text-violet-800 bg-violet-100/90 border-violet-300/80',
+      statusColor: 'text-violet-800 bg-violet-50 border-violet-200',
+      accentDot: 'bg-violet-500',
+      specsBg: 'bg-violet-50/50 border-violet-100/80',
+    },
     specs: [
       { label: 'Canchas', val: 'Fútbol y básquetbol' },
       { label: 'Iluminación', val: 'Reflectores LED nocturnos' },
@@ -183,12 +223,21 @@ const URBAN_BENEFIT_ITEMS = [
     ],
   },
   {
-    code: '05 / CTRL-ACCESO',
+    category: 'Seguridad & Tranquilidad',
     status: 'OPERATIVO 24/7',
-    title: 'Garita & Seguridad Integral',
+    title: 'Garita & Pórtico de Acceso',
     desc: 'Diseño urbanístico concebido con pórtico de control de ingreso, monitoreo perimetral y barreras vehiculares para tranquilidad familiar.',
     icon: ShieldCheck,
-    tag: 'Seguridad 24/7',
+    tag: 'Protección Residencial',
+    palette: {
+      cardGradient: 'from-rose-500/[0.08] via-rose-500/[0.02] to-white',
+      border: 'border-rose-200/90 hover:border-rose-400',
+      iconGradient: 'bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-rose-500/25',
+      tagColor: 'text-rose-800 bg-rose-100/90 border-rose-300/80',
+      statusColor: 'text-rose-800 bg-rose-50 border-rose-200',
+      accentDot: 'bg-rose-500',
+      specsBg: 'bg-rose-50/50 border-rose-100/80',
+    },
     specs: [
       { label: 'Acceso', val: 'Garita de control y pluma' },
       { label: 'Perímetro', val: 'Cierre perimetral definido' },
@@ -196,12 +245,21 @@ const URBAN_BENEFIT_ITEMS = [
     ],
   },
   {
-    code: '06 / GEOTEC-TOPOG',
+    category: 'Topografía & Geotecnia',
     status: 'APTO EDIFICACIÓN',
     title: 'Topografía Plana Calificada',
     desc: 'Lotes con rasantes niveladas y estudio de mecánica de suelos aptos para cimentación inmediata, eliminando sobrecostos de movimiento de tierras.',
-    icon: Award,
-    tag: 'Certeza Constructiva',
+    icon: Compass,
+    tag: 'Suelo Firme Certificado',
+    palette: {
+      cardGradient: 'from-teal-500/[0.08] via-teal-500/[0.02] to-white',
+      border: 'border-teal-200/90 hover:border-teal-400',
+      iconGradient: 'bg-gradient-to-br from-teal-500 to-emerald-600 text-white shadow-teal-500/25',
+      tagColor: 'text-teal-800 bg-teal-100/90 border-teal-300/80',
+      statusColor: 'text-teal-800 bg-teal-50 border-teal-200',
+      accentDot: 'bg-teal-500',
+      specsBg: 'bg-teal-50/50 border-teal-100/80',
+    },
     specs: [
       { label: 'Pendiente', val: 'Plana (< 2% inclinación)' },
       { label: 'Cimentación', val: 'Apta para obra directa' },
@@ -458,10 +516,12 @@ export function HomeView({
       </section>
 
       {/* =========================================================================
-          2. FRANJA COMPACTA DE CONFIANZA (TRUST STRIP)
+          2. FRANJA COMPACTA DE CONFIANZA (TRUST STRIP) — FUSIÓN SUAVE DESDE EL GIRO
           ========================================================================= */}
-      <section className="relative w-full bg-[#0b2817] text-white py-10 sm:py-14 border-t border-emerald-500/15 border-b border-emerald-950/60 shadow-inner">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative w-full bg-gradient-to-b from-slate-950 via-[#062414] to-[#092b18] text-white py-10 sm:py-14 border-b border-emerald-950/60 shadow-inner overflow-hidden">
+        {/* Difuminado continuo: el color oscuro del borde inferior del giro se prolonga e integra gradualmente al verde institucional */}
+        <div className="absolute inset-x-0 top-0 h-24 sm:h-32 bg-gradient-to-b from-slate-950 via-slate-950/80 to-transparent pointer-events-none z-0" />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {TRUST_ITEMS.map((item, idx) => {
               const IconComponent = item.icon;
@@ -730,7 +790,7 @@ export function HomeView({
             </p>
           </ScrollReveal>
 
-          {/* Grilla Arquitectónica de Expedientes Técnicos */}
+          {/* Grilla Arquitectónica de Expedientes Técnicos (Diseño Vivo con Color & Identidad Real) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
             {URBAN_BENEFIT_ITEMS.map((item, idx) => {
               const IconComp = item.icon;
@@ -739,29 +799,32 @@ export function HomeView({
                   key={idx}
                   direction="up"
                   delay={0.06 * idx}
-                  className="group relative bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 hover:border-[#15803d]/60 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                  className={`group relative bg-gradient-to-b ${item.palette.cardGradient} rounded-2xl p-6 sm:p-7 border ${item.palette.border} shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden`}
                 >
                   <div>
-                    {/* Encabezado del módulo: Código técnico y estatus de obra */}
-                    <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 mb-4">
-                      <span className="font-mono text-[10px] font-bold text-slate-400 group-hover:text-[#15803d] tracking-widest transition-colors">
-                        {item.code}
-                      </span>
-                      <span className="font-mono text-[9px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200/70 px-2 py-0.5 rounded">
+                    {/* Encabezado del módulo: Categoría descriptiva real y estatus de obra */}
+                    <div className="flex items-center justify-between pb-3.5 border-b border-slate-200/60 mb-4">
+                      <div className="flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full ${item.palette.accentDot} animate-pulse`} />
+                        <span className="font-bold text-xs text-slate-700 tracking-tight">
+                          {item.category}
+                        </span>
+                      </div>
+                      <span className={`font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${item.palette.statusColor}`}>
                         {item.status}
                       </span>
                     </div>
 
-                    {/* Ícono y Título */}
+                    {/* Ícono con contenedor vibrante y Título */}
                     <div className="flex items-start gap-3.5 mb-3">
-                      <div className="p-2.5 rounded-xl bg-slate-900 text-white group-hover:bg-[#15803d] transition-colors shrink-0 shadow-xs">
-                        <IconComp className="h-5 w-5" strokeWidth={2} />
+                      <div className={`p-3 rounded-2xl ${item.palette.iconGradient} shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300`}>
+                        <IconComp className="h-5 w-5" strokeWidth={2.2} />
                       </div>
                       <div>
-                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#15803d] block mb-0.5">
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md inline-block mb-1 border ${item.palette.tagColor}`}>
                           {item.tag}
                         </span>
-                        <h3 className="font-black text-base sm:text-lg text-slate-900 leading-snug group-hover:text-emerald-800 transition-colors">
+                        <h3 className="font-black text-base sm:text-lg text-slate-900 leading-snug group-hover:text-slate-950 transition-colors">
                           {item.title}
                         </h3>
                       </div>
@@ -773,13 +836,13 @@ export function HomeView({
                     </p>
                   </div>
 
-                  {/* Ficha Técnica de Parámetros Constructivos */}
-                  <div className="pt-3 border-t border-slate-100 bg-slate-50/70 -mx-6 -mb-6 sm:-mx-7 sm:-mb-7 px-6 sm:px-7 py-3.5 rounded-b-2xl">
+                  {/* Ficha Técnica de Parámetros Constructivos con matiz temático */}
+                  <div className={`pt-3 border-t ${item.palette.specsBg} -mx-6 -mb-6 sm:-mx-7 sm:-mb-7 px-6 sm:px-7 py-3.5 rounded-b-2xl`}>
                     <div className="space-y-1.5">
                       {item.specs.map((sp, sIdx) => (
                         <div key={sIdx} className="flex items-center justify-between text-[11px]">
-                          <span className="font-mono text-slate-500">{sp.label}:</span>
-                          <span className="font-semibold text-slate-800 text-right">{sp.val}</span>
+                          <span className="font-medium text-slate-500">{sp.label}:</span>
+                          <span className="font-bold text-slate-800 text-right">{sp.val}</span>
                         </div>
                       ))}
                     </div>
