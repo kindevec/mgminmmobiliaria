@@ -16,8 +16,6 @@ import {
   MapPin,
   FileText,
   BadgeCheck,
-  ChevronLeft,
-  ChevronRight,
 } from 'lucide-react';
 import type { PageView } from '../Header';
 import { getGeneralWhatsAppUrl } from '@/src/data/lots';
@@ -25,31 +23,16 @@ import { WhatsAppIcon } from '../SocialIcons';
 import { WaveCreamToDark, TopographicContours } from '../WaveDividers';
 import { ScrollReveal } from '../common/ScrollReveal';
 import { AnimatedInsignia } from '../common/AnimatedInsignia';
-import { HeroNavArrows } from '../HeroNavArrows';
 
 interface AboutViewProps {
   onNavigate: (page: PageView) => void;
   onOpenVisitModal: (defaultInterest?: string) => void;
 }
 
-const ABOUT_HERO_IMAGES = [
-  {
-    url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1600&q=85',
-    alt: 'Solidez Notarial y Urbanismo MGM Inmobiliaria',
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85',
-    alt: 'Villas y Desarrollos Residenciales',
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1600&q=85',
-    alt: 'Obras y Equipamiento de Primera Calidad',
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1600&q=85',
-    alt: 'Planificación Urbana y Certeza Notarial',
-  },
-];
+const ABOUT_HERO_IMAGE = {
+  url: '/nosotros-banner.jpg',
+  alt: 'Solidez Institucional, Transparencia y Certeza Notarial - Sociedad Civil MGM Inmobiliaria',
+};
 
 const ACQUISITION_BG_PROPERTIES = [
   {
@@ -76,102 +59,94 @@ const ACQUISITION_BG_PROPERTIES = [
 
 export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
 
-  // Banner Continuous Real Estate Slideshow
-  const [heroImgIndex, setHeroImgIndex] = useState(0);
-  const [heroHovered, setHeroHovered] = useState(false);
-
-  useEffect(() => {
-    if (heroHovered) return;
-    const interval = setInterval(() => {
-      setHeroImgIndex((prev) => (prev + 1) % ABOUT_HERO_IMAGES.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [heroHovered]);
-
-  const nextHeroImage = () => {
-    setHeroImgIndex((prev) => (prev + 1) % ABOUT_HERO_IMAGES.length);
-  };
-
-  const prevHeroImage = () => {
-    setHeroImgIndex((prev) => (prev - 1 < 0 ? ABOUT_HERO_IMAGES.length - 1 : prev - 1));
-  };
-
   return (
     <div className="w-full overflow-hidden bg-white text-slate-900">
       {/* =========================================================================
           1. BANNER CINEMÁTICO — PANORÁMICO INTEGRAL (SIN PARTICIONES VERTICALES)
           ========================================================================= */}
-      <section className="group/hero relative w-full bg-[#113d22] text-white overflow-hidden min-h-[500px] sm:min-h-[540px] lg:min-h-[580px] flex items-center justify-center select-none">
-        {/* Fondo fotográfico panorámico continuo (100% de la pantalla) */}
-        <div
-          className="absolute inset-0 w-full h-full overflow-hidden select-none"
-          onMouseEnter={() => setHeroHovered(true)}
-          onMouseLeave={() => setHeroHovered(false)}
-        >
-          {ABOUT_HERO_IMAGES.map((img, idx) => (
-            <div
-              key={idx}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                heroImgIndex === idx ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none'
-              }`}
-            >
-              <Image
-                src={img.url}
-                alt={img.alt}
-                fill
-                priority={idx === 0}
-                sizes="100vw"
-                className="object-cover object-center transform transition-transform duration-7000 ease-out hover:scale-105"
-                referrerPolicy="no-referrer"
-              />
+      <section className="group/hero relative w-full bg-[#0a2315] text-white overflow-hidden min-h-[580px] sm:min-h-[620px] lg:min-h-[640px] flex flex-col justify-center select-none pt-20 sm:pt-24 lg:pt-20 pb-12 sm:pb-14 lg:pb-12">
+        {/* Sutil halo ambiental corporativo de fondo */}
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_80%_80%_at_20%_40%,rgba(21,128,61,0.2),transparent_70%)]" />
+
+        <div className="relative z-10 w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-center w-full">
+            
+            {/* =========================================================================
+                ZONA IZQUIERDA: Insignia, Título y Descripción Institucional
+                ========================================================================= */}
+            <div className="lg:col-span-6 xl:col-span-5 flex flex-col items-start text-left space-y-4 sm:space-y-5 select-text cursor-default">
+              <ScrollReveal direction="down" delay={0.05} duration={0.65}>
+                <div className="flex items-center gap-3">
+                  <AnimatedInsignia className="scale-85 sm:scale-95" size={42} />
+                  <div className="flex flex-col">
+                    <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-[0.22em] uppercase text-[#5be196]">
+                      Nuestra Identidad Institucional
+                    </span>
+                    <span className="text-[10px] sm:text-[11px] font-sans font-semibold tracking-wider uppercase text-emerald-300/80">
+                      Sociedad Civil MGM Inmobiliaria · Ecuador
+                    </span>
+                  </div>
+                </div>
+              </ScrollReveal>
+
+              <ScrollReveal direction="down" delay={0.15} duration={0.7}>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-black text-white leading-[1.08] tracking-tight [text-wrap:balance]">
+                  Solidez, transparencia y
+                  <br />
+                  <span className="text-[#5be196]">certeza jurídica</span> en cada metro cuadrado.
+                </h1>
+              </ScrollReveal>
+
+              <ScrollReveal direction="up" delay={0.25} duration={0.65}>
+                <p className="text-sm sm:text-base lg:text-lg text-emerald-50/85 leading-relaxed font-normal max-w-xl">
+                  Somos una entidad inmobiliaria ecuatoriana constituida para transformar terrenos de alta vocación residencial en comunidades planificadas con obras concluidas, saneamiento legal definitivo y crédito directo.
+                </p>
+              </ScrollReveal>
             </div>
-          ))}
 
-          {/* Degradado corporativo idéntico al banner de Contacto — Luminoso, limpio y continuo */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#113d22]/85 via-black/55 to-[#113d22]/90 pointer-events-none" />
+            {/* =========================================================================
+                ZONA DERECHA: Fotografía Institucional Protagonista (Nítida, Banner Estático)
+                ========================================================================= */}
+            <div className="lg:col-span-6 xl:col-span-7 w-full">
+              <ScrollReveal direction="up" delay={0.2} duration={0.7}>
+                <div className="relative w-full h-[360px] sm:h-[440px] md:h-[500px] lg:h-[540px] xl:h-[600px] rounded-2xl sm:rounded-3xl overflow-hidden border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.45)] bg-[#0f2e1c]">
+                  <Image
+                    src={ABOUT_HERO_IMAGE.url}
+                    alt={ABOUT_HERO_IMAGE.alt}
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 60vw"
+                    className="object-cover object-center transform transition-transform duration-1000 ease-out hover:scale-105"
+                    referrerPolicy="no-referrer"
+                  />
 
-          {/* Indicadores de diapositiva */}
-          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15">
-            {ABOUT_HERO_IMAGES.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setHeroImgIndex(i)}
-                aria-label={`Ver imagen ${i + 1}`}
-                className={`h-2 rounded-full transition-all cursor-pointer ${
-                  heroImgIndex === i ? 'w-6 bg-[#5be196]' : 'w-2 bg-white/50 hover:bg-white'
-                }`}
-              />
-            ))}
+                  {/* Sutil viñeta inferior para proteger nitidez */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/20 pointer-events-none" />
+
+                  {/* Pastilla flotante superior de atributos */}
+                  <div className="absolute top-4 left-4 sm:top-5 sm:left-5 z-20 pointer-events-none">
+                    <div className="px-3.5 py-2 rounded-xl bg-black/60 backdrop-blur-md border border-white/15 flex flex-col shadow-lg">
+                      <span className="text-[10px] font-mono tracking-widest uppercase text-emerald-300 font-bold">
+                        SOLIDEZ INSTITUCIONAL
+                      </span>
+                      <span className="text-[12px] text-white font-semibold">
+                        Sociedad Civil MGM Inmobiliaria · Garantía Notarial
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Pastilla informativa inferior */}
+                  <div className="absolute bottom-4 left-4 sm:bottom-5 sm:left-5 z-20 pointer-events-none">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white text-xs font-medium shadow-md">
+                      <span className="w-2 h-2 rounded-full bg-[#5be196] animate-pulse" />
+                      <span>Certeza Jurídica &amp; Transparencia en Cada Metro Cuadrado</span>
+                    </div>
+                  </div>
+                </div>
+              </ScrollReveal>
+            </div>
+
           </div>
-        </div>
-
-        {/* Controles de navegación manual translúcidos con materialización al hover */}
-        <HeroNavArrows onPrev={prevHeroImage} onNext={nextHeroImage} />
-
-        {/* Contenido Central: Título y Párrafo */}
-        <div className="relative z-10 max-w-4xl mx-auto px-8 sm:px-10 lg:px-8 w-full flex flex-col justify-center items-center text-center pt-24 sm:pt-28 lg:pt-32 pb-14 sm:pb-16 lg:pb-18 space-y-4 sm:space-y-6 select-text cursor-default">
-          {/* Insignia arquitectónica animada en SVG */}
-          <AnimatedInsignia className="mb-0 sm:mb-1" size={60} />
-
-          <ScrollReveal direction="down" delay={0.05}>
-            <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#5be196] drop-shadow-xs">
-              Nuestra Identidad Institucional
-            </span>
-          </ScrollReveal>
-
-          <ScrollReveal direction="down" delay={0.15}>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black text-white leading-[1.1] tracking-tight [text-wrap:balance] drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
-              Solidez, transparencia y
-              <br />
-              <span className="text-[#5be196]">certeza jurídica</span> en cada metro cuadrado.
-            </h1>
-          </ScrollReveal>
-
-          <ScrollReveal direction="up" delay={0.25}>
-            <p className="text-sm sm:text-base lg:text-lg text-slate-100 leading-relaxed font-normal max-w-3xl drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">
-              Somos una entidad inmobiliaria ecuatoriana constituida para transformar terrenos de alta vocación residencial en comunidades planificadas con obras concluidas, saneamiento legal definitivo y crédito directo.
-            </p>
-          </ScrollReveal>
         </div>
       </section>
 

@@ -23,31 +23,16 @@ import { WHATSAPP_PHONE, getGeneralWhatsAppUrl } from '@/src/data/lots';
 import { WhatsAppIcon, FacebookIcon, InstagramIcon, TikTokIcon } from '../SocialIcons';
 import { ScrollReveal } from '../common/ScrollReveal';
 import { AnimatedInsignia } from '../common/AnimatedInsignia';
-import { HeroNavArrows } from '../HeroNavArrows';
 
 interface ContactViewProps {
   onOpenVisitModal: (defaultInterest?: string) => void;
   onOpenLegalModal?: (tab: 'privacy' | 'terms' | 'cookies') => void;
 }
 
-const CONTACT_HERO_IMAGES = [
-  {
-    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85',
-    alt: 'Atención Personalizada y Asesoría Notarial MGM Inmobiliaria',
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1600&q=85',
-    alt: 'Urbanismo y Visitas de Campo Guiadas',
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1600&q=85',
-    alt: 'Topografía Urbanizada y Terrenos en Venta',
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1600&q=85',
-    alt: 'Oficinas y Atención al Cliente MGM Inmobiliaria',
-  },
-];
+const CONTACT_HERO_IMAGE = {
+  url: '/contacto-banner.jpg',
+  alt: 'Centro de Atención y Asesoría Notarial - Sociedad Civil MGM Inmobiliaria',
+};
 
 const sanitizeInput = (text: string) => {
   if (typeof text !== 'string') return '';
@@ -58,25 +43,6 @@ const sanitizeInput = (text: string) => {
 };
 
 export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewProps) {
-  // Banner Continuous Real Estate Slideshow
-  const [heroImgIndex, setHeroImgIndex] = useState(0);
-  const [heroHovered, setHeroHovered] = useState(false);
-
-  useEffect(() => {
-    if (heroHovered) return;
-    const interval = setInterval(() => {
-      setHeroImgIndex((prev) => (prev + 1) % CONTACT_HERO_IMAGES.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [heroHovered]);
-
-  const nextHeroImage = () => {
-    setHeroImgIndex((prev) => (prev + 1) % CONTACT_HERO_IMAGES.length);
-  };
-
-  const prevHeroImage = () => {
-    setHeroImgIndex((prev) => (prev - 1 < 0 ? CONTACT_HERO_IMAGES.length - 1 : prev - 1));
-  };
 
   const [formData, setFormData] = useState({
     nombre: '',
@@ -139,113 +105,108 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
       {/* =========================================================================
           HERO BANNER DE CONTACTO (ESTILO AOVET ADAPTADO A PALETA MGM)
           ========================================================================= */}
-      <section className="group/hero relative flex flex-col justify-center bg-[#113d22] overflow-hidden min-h-[500px] sm:min-h-[540px] lg:min-h-[580px] select-none">
-        {/* Fondo fotográfico panorámico continuo (100% de la pantalla) */}
-        <div
-          className="absolute inset-0 w-full h-full overflow-hidden select-none"
-          onMouseEnter={() => setHeroHovered(true)}
-          onMouseLeave={() => setHeroHovered(false)}
-        >
-          {CONTACT_HERO_IMAGES.map((img, idx) => (
-            <div
-              key={idx}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                heroImgIndex === idx ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none'
-              }`}
-            >
-              <Image
-                src={img.url}
-                alt={img.alt}
-                fill
-                priority={idx === 0}
-                sizes="100vw"
-                className="object-cover object-center transform transition-transform duration-7000 ease-out hover:scale-105"
-                referrerPolicy="no-referrer"
-              />
+      <section className="group/hero relative w-full bg-[#0a2315] text-white overflow-hidden min-h-[580px] sm:min-h-[620px] lg:min-h-[640px] flex flex-col justify-center select-none pt-20 sm:pt-24 lg:pt-20 pb-12 sm:pb-14 lg:pb-12">
+        {/* Sutil halo ambiental corporativo de fondo */}
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_80%_80%_at_20%_40%,rgba(21,128,61,0.2),transparent_70%)]" />
+
+        <div className="relative z-10 w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-center w-full">
+            
+            {/* =========================================================================
+                ZONA IZQUIERDA: Insignia, Título, Descripción y Botón WhatsApp Directo
+                ========================================================================= */}
+            <div className="lg:col-span-6 xl:col-span-5 flex flex-col items-start text-left space-y-4 sm:space-y-5 select-text cursor-default">
+              <ScrollReveal direction="down" delay={0.05} duration={0.65}>
+                <div className="flex items-center gap-3">
+                  <AnimatedInsignia className="scale-85 sm:scale-95" size={42} />
+                  <div className="flex flex-col">
+                    <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-[0.22em] uppercase text-[#F58220]">
+                      Canal de Atención Oficial
+                    </span>
+                    <span className="text-[10px] sm:text-[11px] font-sans font-semibold tracking-wider uppercase text-emerald-300/80">
+                      Asesoría Legal / Visitas / Cotizaciones
+                    </span>
+                  </div>
+                </div>
+              </ScrollReveal>
+
+              <ScrollReveal direction="down" delay={0.15} duration={0.7}>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-black text-white leading-[1.08] tracking-tight [text-wrap:balance]">
+                  Ponte en{' '}
+                  <span className="text-[#F58220] inline-block">
+                    Contacto
+                  </span>{' '}
+                  con MGM
+                </h1>
+              </ScrollReveal>
+
+              <ScrollReveal direction="up" delay={0.25} duration={0.65}>
+                <p className="text-sm sm:text-base lg:text-lg text-emerald-50/85 leading-relaxed font-normal max-w-xl">
+                  Estamos listos para atenderte. Comunícate con nuestro equipo técnico, legal y comercial para agendamiento de visitas a obra, cotizaciones de lotes y asesoría notarial personalizada.
+                </p>
+              </ScrollReveal>
+
+              {/* Botón CTA: WhatsApp directo */}
+              <ScrollReveal direction="zoom" delay={0.35} duration={0.6}>
+                <div className="pt-2">
+                  <a
+                    href={`https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(
+                      'Hola Sociedad Civil MGM Inmobiliaria, deseo información y asesoría sobre los lotes disponibles.'
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-bold text-xs sm:text-sm uppercase tracking-wider shadow-lg hover:shadow-[#25D366]/30 hover:scale-[1.02] active:scale-98 transition-all cursor-pointer"
+                  >
+                    <WhatsAppIcon size={20} className="text-slate-950" />
+                    <span>Conversar por WhatsApp</span>
+                  </a>
+                </div>
+              </ScrollReveal>
             </div>
-          ))}
 
-          {/* Degradado corporativo idéntico al banner de Contacto — Luminoso, limpio y continuo */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#113d22]/85 via-black/55 to-[#113d22]/90 pointer-events-none" />
+            {/* =========================================================================
+                ZONA DERECHA: Fotografía Inmobiliaria Protagonista (Nítida, Banner Estático)
+                ========================================================================= */}
+            <div className="lg:col-span-6 xl:col-span-7 w-full">
+              <ScrollReveal direction="up" delay={0.2} duration={0.7}>
+                <div className="relative w-full h-[360px] sm:h-[440px] md:h-[500px] lg:h-[540px] xl:h-[600px] rounded-2xl sm:rounded-3xl overflow-hidden border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.45)] bg-[#0f2e1c]">
+                  <Image
+                    src={CONTACT_HERO_IMAGE.url}
+                    alt={CONTACT_HERO_IMAGE.alt}
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 60vw"
+                    className="object-cover object-center transform transition-transform duration-1000 ease-out hover:scale-105"
+                    referrerPolicy="no-referrer"
+                  />
 
-          {/* Indicadores de diapositiva */}
-          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15">
-            {CONTACT_HERO_IMAGES.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setHeroImgIndex(i)}
-                aria-label={`Ver imagen ${i + 1}`}
-                className={`h-2 rounded-full transition-all cursor-pointer ${
-                  heroImgIndex === i ? 'w-6 bg-[#5be196]' : 'w-2 bg-white/50 hover:bg-white'
-                }`}
-              />
-            ))}
+                  {/* Sutil viñeta inferior para proteger nitidez */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/20 pointer-events-none" />
+
+                  {/* Pastilla flotante superior de atributos */}
+                  <div className="absolute top-4 left-4 sm:top-5 sm:left-5 z-20 pointer-events-none">
+                    <div className="px-3.5 py-2 rounded-xl bg-black/60 backdrop-blur-md border border-white/15 flex flex-col shadow-lg">
+                      <span className="text-[10px] font-mono tracking-widest uppercase text-[#F58220] font-bold">
+                        CANAL DE ATENCIÓN DIRECTA
+                      </span>
+                      <span className="text-[12px] text-white font-semibold">
+                        Asesoría Personalizada · Agendamiento de Recorridos
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Pastilla informativa inferior */}
+                  <div className="absolute bottom-4 left-4 sm:bottom-5 sm:left-5 z-20 pointer-events-none">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white text-xs font-medium shadow-md">
+                      <span className="w-2 h-2 rounded-full bg-[#5be196] animate-pulse" />
+                      <span>Atención Continua · Respuesta Inmediata por Asesores Legales</span>
+                    </div>
+                  </div>
+                </div>
+              </ScrollReveal>
+            </div>
+
           </div>
-        </div>
-
-        {/* Controles de navegación manual translúcidos con materialización al hover */}
-        <HeroNavArrows onPrev={prevHeroImage} onNext={nextHeroImage} />
-
-        <div className="relative z-10 max-w-7xl mx-auto px-8 sm:px-10 lg:px-8 w-full flex-grow flex flex-col justify-center items-center text-center pt-24 sm:pt-28 lg:pt-32 pb-14 sm:pb-16 lg:pb-18">
-          {/* Insignia arquitectónica animada en SVG (Paleta Logo MGM: Naranja #F58220 y Verde #22A33D) */}
-          <AnimatedInsignia className="mb-3 sm:mb-4" size={64} />
-
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={{ visible: { transition: { staggerChildren: 0.15, delayChildren: 0.2 } } }}
-            className="w-full"
-          >
-            <motion.h1
-              variants={{
-                hidden: { opacity: 0, y: 35, scale: 0.95 },
-                visible: {
-                  opacity: 1,
-                  y: 0,
-                  scale: 1,
-                  transition: { type: 'spring', stiffness: 110, damping: 12, duration: 0.8 },
-                },
-              }}
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold font-sans text-center leading-[1.12] tracking-tight mb-3 sm:mb-4 antialiased cursor-default select-none mx-auto max-w-5xl drop-shadow-2xl"
-            >
-              <span className="text-white">Ponte en </span>
-              <motion.span className="text-[#F58220] inline-block drop-shadow-[0_4px_20px_rgba(245,130,32,0.65)] [text-shadow:_0_2px_14px_rgba(245,130,32,0.85)]">
-                Contacto
-              </motion.span>
-            </motion.h1>
-
-            <motion.p
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-              }}
-              className="text-sm sm:text-base md:text-lg text-white/95 font-medium max-w-2xl mx-auto text-center mb-6 sm:mb-8 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] [text-shadow:_0_1px_8px_rgba(0,0,0,0.85)]"
-            >
-              Estamos listos para atenderte. Comunícate con nuestro equipo técnico, legal y comercial
-              para agendamiento de visitas, cotizaciones de lotes y asesoría notarial personalizada.
-            </motion.p>
-
-            {/* Botón CTA: WhatsApp directo */}
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, scale: 0.9 },
-                visible: { opacity: 1, scale: 1, transition: { type: 'spring', damping: 12, stiffness: 100 } },
-              }}
-              className="flex justify-center items-center w-full sm:w-auto mx-auto"
-            >
-              <a
-                href={`https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(
-                  'Hola Sociedad Civil MGM Inmobiliaria, deseo información y asesoría sobre los lotes disponibles.'
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 sm:py-4 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-bold text-xs sm:text-sm uppercase tracking-wider shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
-              >
-                <WhatsAppIcon size={20} className="text-slate-950" />
-                <span>Conversar por WhatsApp</span>
-              </a>
-            </motion.div>
-          </motion.div>
         </div>
       </section>
 

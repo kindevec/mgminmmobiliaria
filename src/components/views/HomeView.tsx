@@ -33,7 +33,6 @@ import { PropertyCard } from '../PropertyCard';
 import { WhatsAppIcon } from '../SocialIcons';
 import { ScrollReveal } from '../common/ScrollReveal';
 import { AnimatedInsignia } from '../common/AnimatedInsignia';
-import { HeroNavArrows } from '../HeroNavArrows';
 
 interface HomeViewProps {
   onNavigate: (page: PageView) => void;
@@ -45,28 +44,32 @@ interface HomeViewProps {
 // 1. Imágenes continuas de alta resolución para el Hero panorámico
 const HERO_REAL_ESTATE_IMAGES = [
   {
-    url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1600&q=85',
+    url: '/inicio-banner.jpg',
+    alt: 'Residencia Arquitectónica Contemporánea de Lujo - MGM Inmobiliaria',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=2000&q=85',
     alt: 'Residencia Moderna con Piscina y Áreas Verdes - MGM Inmobiliaria',
   },
   {
-    url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1600&q=85',
-    alt: 'Sala Contemporánea y Arquitectura de Vanguardia - Sociedad Civil MGM Inmobiliaria',
+    url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2000&q=85',
+    alt: 'Arquitectura Residencial Contemporánea de Vanguardia con Fachada Iluminada',
   },
   {
-    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85',
+    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2000&q=85',
     alt: 'Fachada Residencial Contemporánea con Obras Civiles Concluidas',
   },
   {
-    url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1600&q=85',
+    url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=2000&q=85',
     alt: 'Villa Exclusiva con Vistas Panorámicas y Terrazas Iluminadas',
   },
   {
-    url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1600&q=85',
-    alt: 'Casas y Terrenos Residenciales con Servicios Básicos Garantizados',
+    url: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=2000&q=85',
+    alt: 'Residencia Exclusiva y Urbanización con Servicios Básicos Garantizados',
   },
   {
-    url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1600&q=85',
-    alt: 'Urbanización Planificada y Vialidad de Primer Orden',
+    url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=2000&q=85',
+    alt: 'Arquitectura de Lujo y Vialidad Planificada de Primer Orden',
   },
 ];
 
@@ -219,9 +222,11 @@ export function HomeView({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isReviewModalOpen]);
 
-  // Rotación suave del Hero cada 6 segundos
+  // Rotación suave del Hero cada 6 segundos (respetando prefers-reduced-motion)
   useEffect(() => {
     if (heroHovered) return;
+    const mediaQuery = typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+    if (mediaQuery?.matches) return;
     const interval = setInterval(() => {
       setHeroImgIndex((prev) => (prev + 1 >= HERO_REAL_ESTATE_IMAGES.length ? 0 : prev + 1));
     }, 6000);
@@ -303,115 +308,189 @@ export function HomeView({
       {/* =========================================================================
           1. HERO INMOBILIARIO AMPLIO CON FOTOGRAFÍA PANORÁMICA & DOS ACCIONES
           ========================================================================= */}
-      <section className="group/hero relative w-full bg-[#113d22] text-white overflow-hidden min-h-[580px] sm:min-h-[640px] lg:min-h-[720px] flex items-center justify-center select-none">
-        {/* Fondo fotográfico panorámico continuo con soporte táctil */}
-        <div
-          className="absolute inset-0 w-full h-full overflow-hidden select-none"
-          onMouseEnter={() => setHeroHovered(true)}
-          onMouseLeave={() => setHeroHovered(false)}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-        >
-          {HERO_REAL_ESTATE_IMAGES.map((img, idx) => (
-            <div
-              key={idx}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                heroImgIndex === idx ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none'
-              }`}
-            >
-              <Image
-                src={img.url}
-                alt={img.alt}
-                fill
-                priority={idx === 0}
-                sizes="100vw"
-                className="object-cover object-center transform transition-transform duration-7000 ease-out hover:scale-105"
-                referrerPolicy="no-referrer"
-              />
+      <section className="group/hero relative w-full bg-[#0a2315] text-white overflow-hidden min-h-[620px] sm:min-h-[680px] lg:min-h-[720px] flex flex-col justify-center select-none pt-20 sm:pt-24 lg:pt-20 pb-12 sm:pb-16 lg:pb-12">
+        {/* Sutil halo ambiental corporativo de fondo */}
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_80%_80%_at_20%_40%,rgba(21,128,61,0.22),transparent_70%)]" />
+
+        <div className="relative z-10 w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-center w-full">
+            
+            {/* =========================================================================
+                ZONA IZQUIERDA: Identidad Editorial, Título, Párrafo y Botones de Acción
+                ========================================================================= */}
+            <div className="lg:col-span-6 xl:col-span-5 flex flex-col items-start text-left space-y-5 sm:space-y-6 select-text cursor-default">
+              {/* Eyebrow / Insignia editorial superior */}
+              <ScrollReveal direction="down" delay={0.05} duration={0.65}>
+                <div className="flex items-center gap-3">
+                  <AnimatedInsignia className="scale-85 sm:scale-95" size={42} />
+                  <div className="flex flex-col">
+                    <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-[0.22em] uppercase text-[#F58220]">
+                      Sociedad Civil MGM Inmobiliaria · Ecuador
+                    </span>
+                    <span className="text-[10px] sm:text-[11px] font-sans font-semibold tracking-wider uppercase text-emerald-400/80">
+                      Certeza Notarial / Obra Civil / Crédito Directo
+                    </span>
+                  </div>
+                </div>
+              </ScrollReveal>
+
+              {/* Título Principal de Estilo Editorial */}
+              <ScrollReveal direction="down" delay={0.15} duration={0.7}>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-black text-white leading-[1.08] tracking-tight [text-wrap:balance]">
+                  Tierra Firme, Certeza Jurídica
+                  <br />
+                  <span className="text-[#5be196]">y el Hogar </span>
+                  <span className="text-[#F58220]">de tu Familia</span>
+                </h1>
+              </ScrollReveal>
+
+              {/* Párrafo Descriptivo con ancho controlado */}
+              <ScrollReveal direction="up" delay={0.25} duration={0.65}>
+                <p className="text-sm sm:text-base lg:text-lg text-emerald-50/85 leading-relaxed font-normal max-w-xl">
+                  Desarrollamos comunidades residenciales y comerciales con obras civiles concluidas, servicios básicos garantizados in situ y crédito directo hasta 48 meses sin bancos ni buró de crédito.
+                </p>
+              </ScrollReveal>
+
+              {/* Acciones Principales con flechas y contraste */}
+              <ScrollReveal direction="zoom" delay={0.35} duration={0.6}>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2 w-full max-w-md">
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('properties')}
+                    className="inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3.5 rounded-full bg-[#15803d] hover:bg-[#166534] text-white font-bold text-sm tracking-wide transition-all shadow-xl hover:shadow-[#15803d]/30 hover:scale-[1.02] active:scale-98 cursor-pointer border border-[#5be196]/40 text-center"
+                  >
+                    <span>Explorar Propiedades</span>
+                    <ArrowRight className="h-4 w-4 stroke-[2.5]" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => onOpenVisitModal('Visita Guiada en Terreno')}
+                    className="inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3.5 rounded-full bg-white/95 hover:bg-white text-slate-900 font-bold text-sm tracking-wide transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-98 cursor-pointer border border-white/50 text-center"
+                  >
+                    <Calendar className="h-4 w-4 text-[#113d22]" />
+                    <span>Agendar Visita a Obra</span>
+                  </button>
+                </div>
+              </ScrollReveal>
             </div>
-          ))}
 
-          {/* Degradado corporativo oscuro/verde para legibilidad y elegancia */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#113d22]/90 via-slate-950/70 via-80% to-[#0b2817] pointer-events-none" />
+            {/* =========================================================================
+                ZONA DERECHA: Fotografía Inmobiliaria Protagonista (Nítida, sin blur)
+                ========================================================================= */}
+            <div className="lg:col-span-6 xl:col-span-7 w-full">
+              <ScrollReveal direction="up" delay={0.2} duration={0.7}>
+                <div
+                  className="relative w-full h-[360px] sm:h-[440px] md:h-[500px] lg:h-[540px] xl:h-[600px] rounded-2xl sm:rounded-3xl overflow-hidden border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.45)] bg-[#0f2e1c]"
+                  onMouseEnter={() => setHeroHovered(true)}
+                  onMouseLeave={() => setHeroHovered(false)}
+                  onTouchStart={handleTouchStart}
+                  onTouchEnd={handleTouchEnd}
+                >
+                  {/* Diapositivas de fotografía arquitectónica de alta nitidez */}
+                  {HERO_REAL_ESTATE_IMAGES.map((img, idx) => (
+                    <div
+                      key={idx}
+                      className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                        heroImgIndex === idx ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none'
+                      }`}
+                    >
+                      <Image
+                        src={img.url}
+                        alt={img.alt}
+                        fill
+                        priority={idx === 0}
+                        sizes="(max-width: 1024px) 100vw, 50vw"
+                        className="object-cover object-center transform transition-transform duration-7000 ease-out hover:scale-105"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
+                  ))}
 
-          {/* Indicadores de diapositiva */}
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/45 backdrop-blur-md border border-white/15 cursor-default"
-          >
-            {HERO_REAL_ESTATE_IMAGES.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setHeroImgIndex(i);
-                }}
-                aria-label={`Ver diapositiva ${i + 1}`}
-                className="p-1.5 flex items-center justify-center cursor-pointer"
-              >
-                <span
-                  className={`h-2 rounded-full transition-all block ${
-                    heroImgIndex === i ? 'w-6 bg-[#5be196]' : 'w-2 bg-white/50 hover:bg-white'
-                  }`}
-                />
-              </button>
-            ))}
+                  {/* Sutil viñeta degradada perimetral para proteger la nitidez de la foto sin oscurecerla */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/20 pointer-events-none" />
+
+                  {/* Pastilla flotante editorial de atributos (estilo referencia) */}
+                  <div className="absolute top-4 left-4 sm:top-5 sm:left-5 z-20 pointer-events-none">
+                    <div className="px-3 py-1.5 rounded-lg bg-black/50 backdrop-blur-md border border-white/15 flex flex-col">
+                      <span className="text-[10px] font-mono tracking-widest uppercase text-emerald-300 font-bold">
+                        PROPIEDAD RESIDENCIAL
+                      </span>
+                      <span className="text-[11px] text-white font-medium">
+                        Obras Concluidas &amp; Lotes Listos
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Barra inferior integrada: Paginador numérico estilo editorial ("01 / 06") y flechas */}
+                  <div className="absolute bottom-4 left-4 right-4 sm:bottom-5 sm:left-5 sm:right-5 z-20 flex items-center justify-between">
+                    {/* Contador de slides */}
+                    <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white text-xs sm:text-sm font-mono font-medium shadow-md">
+                      <span className="text-[#5be196] font-bold">
+                        {String(heroImgIndex + 1).padStart(2, '0')}
+                      </span>
+                      <span className="text-white/40">/</span>
+                      <span className="text-white/70">
+                        {String(HERO_REAL_ESTATE_IMAGES.length).padStart(2, '0')}
+                      </span>
+                    </div>
+
+                    {/* Indicadores lineales y controles de flechas */}
+                    <div className="flex items-center gap-2">
+                      {/* Dots táctiles / clicables */}
+                      <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/15">
+                        {HERO_REAL_ESTATE_IMAGES.map((_, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setHeroImgIndex(i);
+                            }}
+                            aria-label={`Ver diapositiva ${i + 1}`}
+                            className="p-1 flex items-center justify-center cursor-pointer"
+                          >
+                            <span
+                              className={`h-1.5 rounded-full transition-all block ${
+                                heroImgIndex === i ? 'w-5 bg-[#5be196]' : 'w-1.5 bg-white/40 hover:bg-white'
+                              }`}
+                            />
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Flechas compactas integradas */}
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            prevHeroImage();
+                          }}
+                          aria-label="Diapositiva anterior"
+                          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-black/60 hover:bg-black/85 text-white/90 hover:text-white border border-white/25 hover:border-white/60 backdrop-blur-md transition-all active:scale-95 cursor-pointer shadow-md"
+                        >
+                          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            nextHeroImage();
+                          }}
+                          aria-label="Siguiente diapositiva"
+                          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-black/60 hover:bg-black/85 text-white/90 hover:text-white border border-white/25 hover:border-white/60 backdrop-blur-md transition-all active:scale-95 cursor-pointer shadow-md"
+                        >
+                          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ScrollReveal>
+            </div>
+
           </div>
-        </div>
-
-        {/* Controles de navegación manual translúcidos (optimizados para pantallas táctiles) */}
-        <HeroNavArrows onPrev={prevHeroImage} onNext={nextHeroImage} className="hidden sm:block" />
-
-        {/* Contenido Central del Hero: Insignia, Título, Párrafo y Botones de Acción */}
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-center items-center text-center pt-24 sm:pt-28 lg:pt-32 pb-16 sm:pb-20 space-y-4 sm:space-y-6 select-text cursor-default">
-          {/* Insignia arquitectónica y subtítulo dorado */}
-          <ScrollReveal direction="down" delay={0.05} duration={0.65} className="flex flex-col items-center">
-            <AnimatedInsignia className="mb-2 scale-90 sm:scale-100" size={50} />
-            <span className="text-[11px] sm:text-xs font-mono font-bold tracking-widest uppercase text-[#F58220] bg-black/35 px-3 py-1 rounded-full border border-[#F58220]/30 backdrop-blur-xs">
-              Sociedad Civil MGM Inmobiliaria · Ecuador
-            </span>
-          </ScrollReveal>
-
-          {/* Título Principal de Alto Impacto */}
-          <ScrollReveal direction="down" delay={0.15} duration={0.7}>
-            <h1 className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-black text-white leading-tight sm:leading-[1.1] tracking-tight [text-wrap:balance] drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]">
-              Tierra Firme, Certeza Jurídica
-              <br className="hidden sm:inline" />{' '}
-              <span className="text-[#5be196]">y el Hogar </span>
-              <span className="text-[#F58220]">de tu Familia</span>
-            </h1>
-          </ScrollReveal>
-
-          {/* Párrafo Descriptivo con respaldo tangible */}
-          <ScrollReveal direction="up" delay={0.25} duration={0.65}>
-            <p className="text-sm sm:text-base lg:text-lg text-slate-100 leading-relaxed font-normal max-w-2xl drop-shadow-[0_1px_6px_rgba(0,0,0,0.7)] mx-auto">
-              Desarrollamos comunidades residenciales y comerciales con obras civiles concluidas, servicios básicos garantizados in situ y crédito directo hasta 48 meses sin bancos ni buró de crédito.
-            </p>
-          </ScrollReveal>
-
-          {/* Dos Acciones Principales */}
-          <ScrollReveal direction="zoom" delay={0.35} duration={0.6}>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-2 w-full max-w-md sm:max-w-none">
-              <button
-                type="button"
-                onClick={() => onNavigate('properties')}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 sm:px-8 py-3.5 rounded-full bg-[#15803d] hover:bg-[#166534] text-white font-bold text-sm tracking-wide transition-all shadow-xl hover:shadow-[#15803d]/30 hover:scale-105 active:scale-95 cursor-pointer border border-[#5be196]/30 text-center"
-              >
-                <span>Explorar Propiedades</span>
-                <ArrowRight className="h-4 w-4 stroke-[2.5]" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => onOpenVisitModal('Visita Guiada en Terreno')}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3.5 rounded-full bg-white/95 hover:bg-white text-slate-900 font-bold text-sm tracking-wide transition-all shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 cursor-pointer border border-white/40 text-center"
-              >
-                <Calendar className="h-4 w-4 text-[#113d22]" />
-                <span>Agendar Visita a Obra</span>
-              </button>
-            </div>
-          </ScrollReveal>
         </div>
       </section>
 
