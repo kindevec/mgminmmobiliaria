@@ -17,6 +17,7 @@ import {
   MessageSquare,
   CalendarCheck2,
   CheckCircle2,
+  ChevronDown,
 } from 'lucide-react';
 import { WHATSAPP_PHONE, getGeneralWhatsAppUrl } from '@/src/data/lots';
 import { WhatsAppIcon, FacebookIcon, InstagramIcon, TikTokIcon } from '../SocialIcons';
@@ -308,8 +309,8 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
                     />
                   </div>
 
-                  {/* Input Nombre (Pill) */}
-                  <div className="relative flex items-center bg-white rounded-full border border-gray-200 shadow-sm px-4 sm:px-5 py-3 sm:py-3.5 focus-within:ring-2 focus-within:ring-[#22A33D] focus-within:border-transparent transition-all">
+                  {/* Input Nombre (Línea abajo / Underline) */}
+                  <div className="relative flex items-center bg-transparent border-b-2 border-gray-300 hover:border-gray-400 focus-within:border-[#22A33D] transition-colors px-1 py-3">
                     <div className="text-[#22A33D] mr-3 flex-shrink-0">
                       <User size={18} />
                     </div>
@@ -321,13 +322,13 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
                       onChange={handleChange}
                       required
                       maxLength={100}
-                      className="w-full bg-transparent text-xs sm:text-sm text-slate-900 placeholder:text-gray-400 focus:outline-none"
+                      className="w-full bg-transparent text-sm text-slate-900 placeholder:text-gray-400 focus:outline-none"
                       placeholder="Nombre completo *"
                     />
                   </div>
 
-                  {/* Input Teléfono / WhatsApp (Pill) */}
-                  <div className="relative flex items-center bg-white rounded-full border border-gray-200 shadow-sm px-4 sm:px-5 py-3 sm:py-3.5 focus-within:ring-2 focus-within:ring-[#22A33D] focus-within:border-transparent transition-all">
+                  {/* Input Teléfono / WhatsApp (Línea abajo / Underline) */}
+                  <div className="relative flex items-center bg-transparent border-b-2 border-gray-300 hover:border-gray-400 focus-within:border-[#22A33D] transition-colors px-1 py-3">
                     <div className="text-[#22A33D] mr-3 flex-shrink-0">
                       <Phone size={18} />
                     </div>
@@ -339,13 +340,13 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
                       onChange={handleChange}
                       required
                       maxLength={20}
-                      className="w-full bg-transparent text-xs sm:text-sm text-slate-900 placeholder:text-gray-400 focus:outline-none"
+                      className="w-full bg-transparent text-sm text-slate-900 placeholder:text-gray-400 focus:outline-none"
                       placeholder="Teléfono / WhatsApp *"
                     />
                   </div>
 
-                  {/* Select Línea de Interés / Proyecto (Pill) */}
-                  <div className="relative flex items-center bg-white rounded-full border border-gray-200 shadow-sm px-4 sm:px-5 py-3 sm:py-3.5 focus-within:ring-2 focus-within:ring-[#22A33D] focus-within:border-transparent transition-all">
+                  {/* Select Línea de Interés / Proyecto (Línea abajo / Underline) */}
+                  <div className="relative flex items-center bg-transparent border-b-2 border-gray-300 hover:border-gray-400 focus-within:border-[#22A33D] transition-colors px-1 py-3">
                     <div className="text-[#22A33D] mr-3 flex-shrink-0">
                       <Layers size={18} />
                     </div>
@@ -354,7 +355,7 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
                       name="categoria"
                       value={formData.categoria}
                       onChange={handleChange}
-                      className="w-full bg-transparent text-xs sm:text-sm text-slate-900 focus:outline-none appearance-none cursor-pointer pr-4"
+                      className="w-full bg-transparent text-sm text-slate-900 focus:outline-none appearance-none cursor-pointer pr-8"
                     >
                       <option value="Ciudadela Miravalle">Ciudadela Miravalle (Lotes Residenciales) 🏡</option>
                       <option value="Lotes Comerciales">Lotes Comerciales & Esquineros 🏢</option>
@@ -362,10 +363,11 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
                       <option value="Revisión Notarial">Revisión Notarial de Escrituras 📜</option>
                       <option value="Visita a Obra">Visita Guiada en Terreno con Transporte 🚗</option>
                     </select>
+                    <ChevronDown size={16} className="text-gray-400 pointer-events-none absolute right-1" />
                   </div>
 
-                  {/* Textarea Mensaje (Rounded 3xl Pill) */}
-                  <div className="relative flex items-start bg-white rounded-3xl border border-gray-200 shadow-sm px-4 sm:px-5 py-3.5 focus-within:ring-2 focus-within:ring-[#22A33D] focus-within:border-transparent transition-all">
+                  {/* Textarea Mensaje (Línea abajo / Underline) */}
+                  <div className="relative flex items-start bg-transparent border-b-2 border-gray-300 hover:border-gray-400 focus-within:border-[#22A33D] transition-colors px-1 py-3">
                     <div className="text-[#22A33D] mr-3 mt-1 flex-shrink-0">
                       <MessageSquare size={18} />
                     </div>
@@ -377,7 +379,7 @@ export function ContactView({ onOpenVisitModal }: ContactViewProps) {
                       required
                       maxLength={1000}
                       rows={3}
-                      className="w-full bg-transparent text-xs sm:text-sm text-slate-900 placeholder:text-gray-400 focus:outline-none resize-none"
+                      className="w-full bg-transparent text-sm text-slate-900 placeholder:text-gray-400 focus:outline-none resize-none"
                       placeholder="¿En qué podemos asesorarte? *"
                     />
                   </div>

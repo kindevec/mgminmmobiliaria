@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { LogoMGM } from './LogoMGM';
-import { CalendarCheck2, Lock } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import { WhatsAppIcon } from './SocialIcons';
 import { getGeneralWhatsAppUrl } from '@/src/data/lots';
 
@@ -37,7 +37,8 @@ export function Header({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const isGreenHeader = isScrolled || currentPage === 'property-detail';
+  const isGreenHeader =
+    isScrolled || currentPage === 'property-detail' || currentPage === 'admin';
 
   const navLinks: { id: PageView; label: string; hash: string }[] = [
     { id: 'home', label: 'Inicio', hash: getPageCanonicalHash('home') },
@@ -49,10 +50,10 @@ export function Header({
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out rounded-none m-0 ${
         isGreenHeader
-          ? 'bg-[#113d22] border-b border-white/10 shadow-2xl py-2.5 sm:py-3'
-          : 'bg-transparent border-b border-transparent shadow-none py-3 sm:py-4.5'
+          ? 'bg-[#113d22] border-b border-white/10 shadow-2xl py-2.5 sm:py-2.5'
+          : 'bg-[#113d22]/90 backdrop-blur-md border-b border-white/10 shadow-md py-3 sm:py-3.5'
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 w-full">
@@ -64,12 +65,12 @@ export function Header({
               e.preventDefault();
               onNavigate('home');
             }}
-            className="flex items-center gap-2 sm:gap-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-xl p-1 transition-transform hover:scale-[1.02] active:scale-98 cursor-pointer drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]"
+            className="flex items-center gap-2 sm:gap-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-xl p-0.5 transition-transform hover:scale-[1.02] active:scale-98 cursor-pointer"
             aria-label="Ir a Inicio - Sociedad Civil MGM Inmobiliaria"
           >
-            <div className="h-10 sm:h-12 lg:h-14 w-auto flex items-center">
+            <div className="h-10 sm:h-11 lg:h-12 w-auto flex items-center">
               <LogoMGM
-                className="h-10 sm:h-12 lg:h-13 w-auto"
+                className="h-10 sm:h-11 lg:h-12 w-auto"
                 variant="compact"
                 showSubtitle={true}
                 isGhost={true}
@@ -80,7 +81,7 @@ export function Header({
 
         {/* Zona Central: Enlaces de Navegación con Alto Contraste y Fondo 100% Transparente */}
         <nav
-          className="hidden md:flex items-center gap-1.5 lg:gap-2.5 xl:gap-3"
+          className="hidden md:flex items-center gap-1.5 lg:gap-2.5"
           aria-label="Navegación principal"
         >
           {navLinks.map((link) => {
@@ -94,21 +95,21 @@ export function Header({
                   e.preventDefault();
                   onNavigate(link.id);
                 }}
-                className={`relative px-3.5 sm:px-4 py-1.5 text-sm lg:text-[15px] font-bold tracking-wide transition-all rounded-full cursor-pointer whitespace-nowrap ${
+                className={`relative px-3.5 py-1.5 text-xs sm:text-sm lg:text-[14px] font-medium tracking-wide transition-all rounded-full cursor-pointer whitespace-nowrap ${
                   isActive
                     ? isGreenHeader
                       ? 'text-white bg-white/15 backdrop-blur-xs border border-white/20 shadow-xs'
                       : 'text-white bg-black/35 backdrop-blur-xs border border-white/30 shadow-md'
                     : isGreenHeader
                     ? 'text-white/80 hover:text-white hover:bg-white/10'
-                    : 'text-white hover:text-white hover:bg-black/25 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]'
+                    : 'text-white hover:text-white hover:bg-black/25'
                 }`}
               >
-                <span className={!isGreenHeader ? 'drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]' : ''}>
+                <span>
                   {link.label}
                 </span>
                 {isActive && (
-                  <span className="absolute -bottom-1 left-3 right-3 h-[2.5px] bg-[#25D366] rounded-full shadow-[0_0_8px_#25D366]" />
+                  <span className="absolute -bottom-1 left-2.5 right-2.5 h-[2px] bg-[#25D366] rounded-full shadow-[0_0_6px_#25D366]" />
                 )}
               </a>
             );
@@ -117,26 +118,15 @@ export function Header({
 
         {/* Zona Derecha: Acciones Principales */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          {/* CTA Agendar Visita en Desktop Grande */}
-          {onOpenVisitModal && (
-            <button
-              onClick={() => onOpenVisitModal()}
-              className="hidden xl:inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs sm:text-sm font-bold bg-[#F58220] hover:bg-[#e07316] text-white shadow-[0_2px_10px_rgba(0,0,0,0.35)] transition-all hover:scale-105 active:scale-95 cursor-pointer whitespace-nowrap"
-            >
-              <CalendarCheck2 className="h-4 w-4" />
-              <span>Agendar Visita</span>
-            </button>
-          )}
-
-          {/* Botón WhatsApp - Ahora toma el lugar que tenía el Administrador */}
+          {/* Botón WhatsApp */}
           <a
             href={getGeneralWhatsAppUrl()}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Contactar por WhatsApp Oficial"
-            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-xs sm:text-sm transition-all shadow-[0_2px_10px_rgba(0,0,0,0.35)] hover:shadow-lg hover:scale-105 active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-xs sm:text-sm transition-all shadow-[0_2px_10px_rgba(0,0,0,0.35)] hover:shadow-lg hover:scale-105 active:scale-95 cursor-pointer"
           >
-            <WhatsAppIcon size={17} className="text-white shrink-0 drop-shadow-xs" />
+            <WhatsAppIcon size={16} className="text-white shrink-0 drop-shadow-xs" />
             <span className="hidden sm:inline">WhatsApp</span>
           </a>
 
@@ -148,12 +138,12 @@ export function Header({
               onNavigate('admin');
             }}
             title="Panel Administrativo CMS"
-            className={`h-9 w-9 sm:h-10 sm:w-10 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+            className={`h-9 w-9 sm:h-9 sm:w-9 rounded-full flex items-center justify-center transition-all cursor-pointer ${
               currentPage === 'admin'
                 ? 'bg-white text-slate-900 shadow-xs'
                 : isGreenHeader
                 ? 'text-white/80 hover:text-white bg-white/10 hover:bg-white/20'
-                : 'text-white bg-black/30 hover:bg-black/45 border border-white/25 drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]'
+                : 'text-white bg-black/30 hover:bg-black/45 border border-white/25'
             }`}
             aria-label="Panel CMS de Administración"
           >
