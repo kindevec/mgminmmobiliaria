@@ -123,11 +123,20 @@ export function PropertiesView({
     setMobilePage(1);
   }
 
+  useEffect(() => {
+    // Scroll automático al catálogo al entrar a la vista de Lotes
+    const timer = setTimeout(() => {
+      if (searchBarRef.current) {
+        searchBarRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const scrollToSearchBar = () => {
     if (searchBarRef.current) {
-      const yOffset = -75;
-      const y = searchBarRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      window.scrollTo({ top: y, behavior: 'smooth' });
+      searchBarRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
@@ -208,7 +217,7 @@ export function PropertiesView({
       {/* =========================================================================
           1. BANNER CINEMÁTICO — FULL BLEED EDGE-TO-EDGE (TEXTO SOBRE IMAGEN, SIN BOXES)
           ========================================================================= */}
-      <section ref={heroRef} className="group/hero relative w-full bg-[#07190f] text-white overflow-hidden min-h-[580px] sm:min-h-[620px] lg:min-h-[660px] flex flex-col justify-center select-none pt-24 sm:pt-28 pb-16 sm:pb-20">
+      <section ref={heroRef} className="group/hero relative w-full bg-slate-950 text-white overflow-hidden min-h-[580px] sm:min-h-[620px] lg:min-h-[660px] flex flex-col justify-center select-none pt-24 sm:pt-28 pb-16 sm:pb-20">
         {/* Fotografía Panorámica Protagonista de Ancho Completo */}
         <div className="absolute inset-0 w-full h-full">
           <Image
@@ -221,39 +230,30 @@ export function PropertiesView({
             referrerPolicy="no-referrer"
           />
 
-          {/* Degradados cinematográficos para proteger contraste editorial directamente sobre la foto */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#07190f]/95 via-[#07190f]/80 sm:via-[#07190f]/60 to-[#07190f]/25 pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#07190f] via-transparent to-black/35 pointer-events-none" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_75%_at_25%_45%,rgba(21,128,61,0.2),transparent_75%)] pointer-events-none" />
+          {/* Degradados cinematográficos neutros para proteger contraste editorial directamente sobre la foto */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 sm:via-black/50 to-black/20 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/35 pointer-events-none" />
         </div>
 
         {/* CONTENIDO EDITORIAL: Directamente sobre la foto, sin cajas envolventes */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="max-w-2xl lg:max-w-3xl flex flex-col items-start text-left select-text cursor-default">
+          <div className="max-w-3xl lg:max-w-4xl flex flex-col items-start text-left select-text cursor-default">
             <ScrollReveal direction="down" delay={0.05} duration={0.65}>
-              <div className="flex items-center gap-3">
-                <AnimatedInsignia className="scale-85 sm:scale-95" size={42} />
-                <div className="flex flex-col">
-                  <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-[0.22em] uppercase text-[#5be196]">
-                    Catálogo Oficial de Propiedades
-                  </span>
-                  <span className="text-[10px] sm:text-[11px] font-sans font-semibold tracking-wider uppercase text-emerald-300/80">
-                    Lotes Urbanizados / Certeza Jurídica
-                  </span>
-                </div>
-              </div>
+              <AnimatedInsignia className="scale-85 sm:scale-95" size={42} />
             </ScrollReveal>
 
             <ScrollReveal direction="down" delay={0.15} duration={0.7}>
-              <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.06] tracking-tight [text-wrap:balance] mt-4 sm:mt-5 drop-shadow-md">
-                Lotes urbanizados y proyectos con{' '}
-                <span className="text-[#5be196]">escrituras inmediatas</span>{' '}
-                <span className="text-[#F58220]">&amp; crédito directo</span>.
+              <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.12] tracking-tight mt-4 sm:mt-5 drop-shadow-md">
+                <span className="block">Lotes urbanizados y proyectos</span>
+                <span className="block mt-1">
+                  con <span className="text-[#5be196]">escrituras inmediatas</span>{' '}
+                  <span className="text-[#F58220]">&amp; crédito directo</span>.
+                </span>
               </h1>
             </ScrollReveal>
 
             <ScrollReveal direction="up" delay={0.25} duration={0.65}>
-              <p className="text-sm sm:text-base lg:text-xl text-emerald-50/90 leading-relaxed font-normal max-w-2xl mt-4 sm:mt-6 drop-shadow-xs">
+              <p className="text-sm sm:text-base lg:text-xl text-slate-200 leading-relaxed font-normal max-w-2xl mt-4 sm:mt-6 drop-shadow-xs">
                 Propiedades legalizadas con vías concluidas, alcantarillado, acometidas soterradas y crédito directo de hasta 48 meses. Elige tu terreno con planos topográficos y asesoría técnica directa.
               </p>
             </ScrollReveal>
@@ -276,7 +276,7 @@ export function PropertiesView({
         <div className="relative z-10 mx-auto max-w-[1440px] px-1 sm:px-4 lg:px-8 space-y-3.5 sm:space-y-6">
           
           {/* BARRA SUPERIOR: SOLO BARRA DE BÚSQUEDA */}
-          <div ref={searchBarRef} className="scroll-mt-20 sm:scroll-mt-24" />
+          <div ref={searchBarRef} id="catalog-search-section" className="scroll-mt-20 sm:scroll-mt-24" />
           <ScrollReveal direction="down" delay={0.1} className="w-full">
             <div className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-full border border-slate-200/90 p-1 sm:p-2.5 shadow-xs hover:shadow-md transition-shadow flex items-center gap-2 sm:gap-3">
               <div className="relative flex-1">

@@ -51,7 +51,7 @@ export function Header({
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out ${
         isGreenHeader
           ? 'bg-[#113d22] border-b border-white/10 shadow-2xl py-2.5 sm:py-2.5'
-          : 'bg-gradient-to-b from-[#113d22]/90 via-[#113d22]/50 to-transparent py-3 sm:py-4.5'
+          : 'bg-gradient-to-b from-black/80 via-black/35 to-transparent py-3 sm:py-4.5'
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 w-full">

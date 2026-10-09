@@ -12,7 +12,7 @@ export function AnimatedInsignia({ className = '', size = 80 }: AnimatedInsignia
   const height = (size * 90) / 80;
 
   return (
-    <div className={`flex justify-center w-full select-none pointer-events-none ${className}`}>
+    <div className={`inline-flex items-center select-none pointer-events-none ${className}`}>
       <motion.svg
         width={size}
         height={height}

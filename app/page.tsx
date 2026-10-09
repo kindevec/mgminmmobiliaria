@@ -137,8 +137,19 @@ function HomePageContent() {
       document.title = PAGES_CONFIG[page]?.fullTitle || 'MGM Inmobiliaria';
     }
 
-    // 4. Scroll suave hacia arriba
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // 4. Gestión de scroll: si ya está en 'properties', desplaza al catálogo; si navega desde otra vista, inicia en el top para permitir la animación suave al catálogo
+    if (page === 'properties') {
+      if (currentPage === 'properties') {
+        const catalogEl = document.getElementById('catalog-search-section');
+        if (catalogEl) {
+          catalogEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } else {
+        window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+      }
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
     // 5. Actualizar la URL limpia sin '#' usando HTML5 History API
     const targetPath = PAGES_CONFIG[page]?.path || '/';

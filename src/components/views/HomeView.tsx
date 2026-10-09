@@ -32,7 +32,6 @@ import { useProperties } from '@/src/context/PropertyContext';
 import { PropertyCard } from '../PropertyCard';
 import { WhatsAppIcon } from '../SocialIcons';
 import { ScrollReveal } from '../common/ScrollReveal';
-import { AnimatedInsignia } from '../common/AnimatedInsignia';
 
 interface HomeViewProps {
   onNavigate: (page: PageView) => void;
@@ -351,7 +350,7 @@ export function HomeView({
           1. HERO INMOBILIARIO PANORÁMICO EDGE-TO-EDGE (FULL BLEED, TEXTO SOBRE IMAGEN)
           ========================================================================= */}
       <section
-        className="group/hero relative w-full bg-[#07190f] text-white overflow-hidden min-h-[640px] sm:min-h-[700px] lg:min-h-[760px] flex flex-col justify-center select-none pt-24 sm:pt-28 pb-16 sm:pb-20"
+        className="group/hero relative w-full bg-slate-950 text-white overflow-hidden min-h-[640px] sm:min-h-[700px] lg:min-h-[760px] flex flex-col justify-center select-none pt-24 sm:pt-28 pb-16 sm:pb-20"
         onMouseEnter={() => setHeroHovered(true)}
         onMouseLeave={() => setHeroHovered(false)}
         onTouchStart={handleTouchStart}
@@ -378,28 +377,28 @@ export function HomeView({
             </div>
           ))}
 
-          {/* Degradados cinematográficos para máxima legibilidad editorial del texto directamente sobre la foto */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#07190f]/95 via-[#07190f]/80 sm:via-[#07190f]/60 to-[#07190f]/25 pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#07190f] via-transparent to-black/35 pointer-events-none" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_75%_at_25%_45%,rgba(21,128,61,0.22),transparent_75%)] pointer-events-none" />
+          {/* Degradados cinematográficos neutros para máxima legibilidad editorial del texto directamente sobre la foto */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 sm:via-black/50 to-black/20 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/35 pointer-events-none" />
         </div>
 
         {/* CONTENIDO EDITORIAL: Directamente sobre la foto, sin estar encerrado en ningún box */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="max-w-2xl lg:max-w-3xl flex flex-col items-start text-left select-text cursor-default">
-            {/* Título Principal de Estilo Editorial */}
+          <div className="max-w-3xl lg:max-w-4xl flex flex-col items-start text-left select-text cursor-default">
+            {/* Título Principal de Estilo Editorial (máx 2 líneas) */}
             <ScrollReveal direction="down" delay={0.1} duration={0.7}>
-              <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.06] tracking-tight [text-wrap:balance] drop-shadow-md">
-                Tierra Firme, Certeza Jurídica
-                <br />
-                <span className="text-[#5be196]">y el Hogar </span>
-                <span className="text-[#F58220]">de tu Familia</span>
+              <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.12] tracking-tight drop-shadow-md">
+                <span className="block">Tierra Firme, Certeza Jurídica</span>
+                <span className="block mt-1">
+                  <span className="text-[#5be196]">y el Hogar </span>
+                  <span className="text-[#F58220]">de tu Familia</span>
+                </span>
               </h1>
             </ScrollReveal>
 
             {/* Párrafo Descriptivo con tipografía limpia */}
             <ScrollReveal direction="up" delay={0.2} duration={0.65}>
-              <p className="text-sm sm:text-base lg:text-xl text-emerald-50/90 leading-relaxed font-normal max-w-2xl mt-4 sm:mt-6 drop-shadow-xs">
+              <p className="text-sm sm:text-base lg:text-xl text-slate-200 leading-relaxed font-normal max-w-2xl mt-4 sm:mt-6 drop-shadow-xs">
                 Desarrollamos comunidades residenciales y comerciales con obras civiles concluidas, servicios básicos garantizados in situ y crédito directo hasta 48 meses sin bancos ni buró de crédito.
               </p>
             </ScrollReveal>
@@ -940,9 +939,9 @@ export function HomeView({
           ========================================================================= */}
       <section className="relative w-full py-14 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <ScrollReveal direction="up" delay={0.1}>
-          <div className="relative rounded-3xl sm:rounded-[2.5rem] bg-gradient-to-br from-[#113d22] via-[#17522e] to-[#0d2f1a] text-white p-8 sm:p-12 lg:p-16 shadow-2xl border border-emerald-500/30 overflow-hidden">
+          <div className="relative rounded-3xl sm:rounded-[2.5rem] bg-gradient-to-br from-slate-900 via-slate-950 to-black text-white p-8 sm:p-12 lg:p-16 shadow-2xl border border-slate-800 overflow-hidden">
             {/* Elemento gráfico de fondo */}
-            <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-[#22A33D]/20 blur-3xl pointer-events-none" />
+            <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-slate-800/40 blur-3xl pointer-events-none" />
 
             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               {/* Texto y Llamado a la Acción */}

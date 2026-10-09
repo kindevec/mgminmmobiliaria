@@ -67,7 +67,7 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
       {/* =========================================================================
           1. BANNER CINEMÁTICO — FULL BLEED EDGE-TO-EDGE (TEXTO SOBRE IMAGEN, SIN BOXES)
           ========================================================================= */}
-      <section className="group/hero relative w-full bg-[#07190f] text-white overflow-hidden min-h-[580px] sm:min-h-[620px] lg:min-h-[660px] flex flex-col justify-center select-none pt-24 sm:pt-28 pb-16 sm:pb-20">
+      <section className="group/hero relative w-full bg-slate-950 text-white overflow-hidden min-h-[580px] sm:min-h-[620px] lg:min-h-[660px] flex flex-col justify-center select-none pt-24 sm:pt-28 pb-16 sm:pb-20">
         {/* Fotografía Institucional Panorámica de Ancho Completo */}
         <div className="absolute inset-0 w-full h-full">
           <Image
@@ -80,39 +80,29 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
             referrerPolicy="no-referrer"
           />
 
-          {/* Degradados cinematográficos para máxima legibilidad editorial del texto */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#07190f]/95 via-[#07190f]/80 sm:via-[#07190f]/60 to-[#07190f]/25 pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#07190f] via-transparent to-black/35 pointer-events-none" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_75%_at_25%_45%,rgba(21,128,61,0.2),transparent_75%)] pointer-events-none" />
+          {/* Degradados cinematográficos neutros para máxima legibilidad editorial del texto */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 sm:via-black/50 to-black/20 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/35 pointer-events-none" />
         </div>
 
         {/* CONTENIDO EDITORIAL: Directamente sobre la foto, sin cajas envolventes */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="max-w-2xl lg:max-w-3xl flex flex-col items-start text-left select-text cursor-default">
+          <div className="max-w-3xl lg:max-w-4xl flex flex-col items-start text-left select-text cursor-default">
             <ScrollReveal direction="down" delay={0.05} duration={0.65}>
-              <div className="flex items-center gap-3">
-                <AnimatedInsignia className="scale-85 sm:scale-95" size={42} />
-                <div className="flex flex-col">
-                  <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-[0.22em] uppercase text-[#5be196]">
-                    Nuestra Identidad Institucional
-                  </span>
-                  <span className="text-[10px] sm:text-[11px] font-sans font-semibold tracking-wider uppercase text-emerald-300/80">
-                    Sociedad Civil MGM Inmobiliaria · Ecuador
-                  </span>
-                </div>
-              </div>
+              <AnimatedInsignia className="scale-85 sm:scale-95" size={42} />
             </ScrollReveal>
 
             <ScrollReveal direction="down" delay={0.15} duration={0.7}>
-              <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.06] tracking-tight [text-wrap:balance] mt-4 sm:mt-5 drop-shadow-md">
-                Solidez, transparencia y
-                <br />
-                <span className="text-[#5be196]">certeza jurídica</span> en cada metro cuadrado.
+              <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.12] tracking-tight mt-4 sm:mt-5 drop-shadow-md">
+                <span className="block">Solidez, transparencia</span>
+                <span className="block mt-1">
+                  y <span className="text-[#5be196]">certeza jurídica</span>.
+                </span>
               </h1>
             </ScrollReveal>
 
             <ScrollReveal direction="up" delay={0.25} duration={0.65}>
-              <p className="text-sm sm:text-base lg:text-xl text-emerald-50/90 leading-relaxed font-normal max-w-2xl mt-4 sm:mt-6 drop-shadow-xs">
+              <p className="text-sm sm:text-base lg:text-xl text-slate-200 leading-relaxed font-normal max-w-2xl mt-4 sm:mt-6 drop-shadow-xs">
                 Somos una entidad inmobiliaria ecuatoriana constituida para transformar terrenos de alta vocación residencial en comunidades planificadas con obras concluidas, saneamiento legal definitivo y crédito directo.
               </p>
             </ScrollReveal>
@@ -373,46 +363,31 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
       {/* =========================================================================
           4. PROCESO DE ADQUISICIÓN — DISEÑO CUADRO VERDE CLARO & PALETA CORPORATIVA MGM
           ========================================================================= */}
-      <section className="relative w-full bg-[#113d22] text-white py-16 sm:py-24 overflow-hidden border-b border-emerald-950/40">
-        {/* Fondo con máscara de imágenes de propiedades y sombreado verde corporativo */}
+      <section className="relative w-full bg-slate-950 text-white py-16 sm:py-24 overflow-hidden border-b border-slate-800">
+        {/* Fondo nítido de imágenes de propiedades sin difuminado ni degradados verdes */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
-          {/* Mosaico de propiedades con máscara radial suave */}
-          <div
-            className="absolute inset-0 opacity-45"
-            style={{
-              WebkitMaskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0) 98%)',
-              maskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0) 98%)',
-            }}
-          >
+          {/* Mosaico de propiedades nítido sin difuminado */}
+          <div className="absolute inset-0 opacity-85 sm:opacity-90">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 h-full w-full p-3 sm:p-6 scale-105">
               {ACQUISITION_BG_PROPERTIES.map((prop, idx) => (
                 <div
                   key={idx}
-                  className={`relative w-full h-full overflow-hidden rounded-3xl sm:rounded-[2.5rem] shadow-2xl border border-white/10 ${prop.className}`}
+                  className={`relative w-full h-full overflow-hidden rounded-3xl sm:rounded-[2.5rem] shadow-xl border border-white/15 ${prop.className}`}
                 >
                   <Image
                     src={prop.url}
                     alt={prop.alt}
                     fill
                     sizes="(max-width: 640px) 50vw, 25vw"
-                    className="object-cover object-center filter saturate-110 brightness-95"
+                    className="object-cover object-center filter saturate-105 brightness-100"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/25" />
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Sombreado y degradado corporativo idéntico al banner de inicio (verdecito sombreado de Contacto) */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#113d22]/85 via-black/55 to-[#113d22]/90 pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#113d22]/85 via-transparent to-[#113d22]/80 pointer-events-none" />
-
-          {/* Resplandores ambientales y textura topográfica */}
-          <div className="absolute -top-32 -left-32 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#F58220]/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute inset-0 opacity-15 [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_80%)]">
-            <TopographicContours className="text-[#5be196]/30" />
-          </div>
+          {/* Sombreado sutil neutro para legibilidad de textos sin opacar las fotos */}
+          <div className="absolute inset-0 bg-slate-950/45 pointer-events-none" />
         </div>
 
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
