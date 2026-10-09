@@ -730,7 +730,8 @@ export function PropertyDetailView({
           <div
             ref={carouselRef}
             onScroll={checkScroll}
-            className="flex items-stretch gap-5 overflow-x-auto pb-6 pt-2 scrollbar-none snap-x snap-mandatory"
+            className="flex items-stretch gap-5 overflow-x-auto pb-6 pt-2 scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory select-none"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {recommendedLots.map((item) => (
               <div

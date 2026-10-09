@@ -91,7 +91,7 @@ function MobileCarouselSection({
         </span>
       </div>
 
-      <div className="flex gap-3.5 overflow-x-auto pb-3 pt-1 -mx-2 px-2 snap-x snap-mandatory scrollbar-none touch-pan-x">
+      <div className="flex gap-3.5 overflow-x-auto pb-3 pt-1 -mx-2 px-2 snap-x snap-mandatory scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden touch-pan-x">
         {lots.map((lot) => (
           <div key={lot.id} className="w-[84vw] sm:w-[350px] max-w-[370px] shrink-0 snap-start">
             <PropertyCard
