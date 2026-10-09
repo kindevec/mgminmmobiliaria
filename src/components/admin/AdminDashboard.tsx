@@ -465,14 +465,14 @@ export function AdminDashboard({
                 isSidebarCollapsed ? 'justify-center p-3' : 'justify-start gap-3 px-3.5 py-2.5'
               } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
                 isCreatingProperty
-                  ? 'bg-[#25D366] text-slate-950 shadow-md font-black translate-x-0.5'
-                  : 'bg-emerald-800/60 text-emerald-100 hover:bg-emerald-700/70 hover:text-white border border-emerald-700/40'
+                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
+                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
               }`}
               title="Registrar Nueva Propiedad"
             >
               <Plus
                 className={`h-4 w-4 shrink-0 ${
-                  isCreatingProperty ? 'text-slate-950 font-black' : 'text-emerald-300'
+                  isCreatingProperty ? 'text-emerald-800' : 'opacity-70'
                 }`}
               />
               {!isSidebarCollapsed && <span className="truncate"> Nueva Propiedad</span>}
@@ -688,24 +688,22 @@ export function AdminDashboard({
             <span className="text-[11px] tracking-tight leading-none">Propiedades</span>
           </button>
 
-          {/* 2. + Nueva Propiedad (Acción destacada al pulgar) */}
+          {/* 2. Nueva Propiedad */}
           <button
             type="button"
             onClick={handleOpenCreate}
-            className={`flex flex-col items-center justify-center py-1 px-2 rounded-2xl transition-all cursor-pointer min-h-[50px] active:scale-95 ${
+            className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all cursor-pointer min-h-[50px] ${
               isCreatingProperty
-                ? 'bg-[#25D366] text-slate-950 font-black shadow-md shadow-emerald-500/20'
-                : 'bg-emerald-800/80 hover:bg-emerald-700/80 text-emerald-100 hover:text-white border border-emerald-700/50 shadow-xs font-bold'
+                ? 'text-white bg-white/15 font-black shadow-xs'
+                : 'text-emerald-200/70 hover:text-white hover:bg-white/5 font-semibold'
             }`}
             title="Publicar Nueva Propiedad"
           >
-            <div
-              className={`h-6 w-6 rounded-full flex items-center justify-center mb-0.5 ${
-                isCreatingProperty ? 'bg-slate-950 text-[#25D366]' : 'bg-white/15 text-white'
+            <Plus
+              className={`h-5 w-5 mb-1 ${
+                isCreatingProperty ? 'text-emerald-300' : 'text-emerald-400/80'
               }`}
-            >
-              <Plus className="h-4 w-4 stroke-[2.5]" />
-            </div>
+            />
             <span className="text-[11px] tracking-tight leading-none">Nueva</span>
           </button>
 
