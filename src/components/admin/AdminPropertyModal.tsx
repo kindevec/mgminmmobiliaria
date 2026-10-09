@@ -289,7 +289,7 @@ export function AdminPropertyModal({
       setUploadMessage('¡Imágenes WebP subidas con éxito!');
     } catch (err) {
       console.error('Error al subir imágenes:', err);
-      alert('Hubo un error al optimizar o subir la imagen a Supabase Storage.');
+      alert('Hubo un error al optimizar o subir la imagen. Por favor, intenta nuevamente.');
     } finally {
       setIsUploadingImage(false);
       setTimeout(() => setUploadMessage(''), 3000);
@@ -317,7 +317,7 @@ export function AdminPropertyModal({
       setUploadMessage('¡Documento PDF subido con éxito!');
     } catch (err) {
       console.error('Error al subir documento:', err);
-      alert('Hubo un error al subir el documento PDF a Supabase Storage.');
+      alert('Hubo un error al subir el documento PDF. Por favor, intenta nuevamente.');
     } finally {
       setIsUploadingDoc(false);
       setTimeout(() => setUploadMessage(''), 3000);
@@ -428,7 +428,7 @@ export function AdminPropertyModal({
                 : 'Publicar Nuevo Inmueble Real'}
             </h1>
             <p className="text-xs text-slate-400 mt-0.5 font-medium">
-              Sincronización en tiempo real con Supabase Postgres y compresión automática WebP.
+              Sincronización en tiempo real y optimización automática WebP.
             </p>
           </div>
 
@@ -462,13 +462,13 @@ export function AdminPropertyModal({
           </button>
           <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">
             <Sparkles className="h-4 w-4" />
-            <span>Panel CMS Directo · Supabase Database Sync</span>
+            <span>Panel CMS Directo · Catálogo Inmobiliario</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
             {isEditing ? `Editar Propiedad ${propertyToEdit?.code}` : 'Publicar Nuevo Inmueble Real'}
           </h2>
           <p className="text-xs text-slate-300 mt-0.5">
-            Sincronización en tiempo real con Supabase Postgres y compresión automática WebP.
+            Sincronización en tiempo real y optimización automática WebP.
           </p>
         </div>
       )}
@@ -885,7 +885,7 @@ export function AdminPropertyModal({
                   Subir fotos desde dispositivo (Móvil / PC)
                 </p>
                 <p className="text-[11px] text-slate-500">
-                  Se optimizarán automáticamente a WebP antes de subirse a Supabase Storage.
+                  Se optimizarán automáticamente a formato WebP de alto rendimiento.
                 </p>
               </div>
 
@@ -1007,7 +1007,7 @@ export function AdminPropertyModal({
                 </div>
                 <div>
                   <p className="text-xs font-bold text-slate-800">
-                    Subir Ficha Técnica en PDF a Supabase Storage
+                    Subir Ficha Técnica en PDF
                   </p>
                   <p className="text-[11px] text-slate-500">
                     Aparecerá en los botones oficiales de descarga en el detalle de la propiedad.

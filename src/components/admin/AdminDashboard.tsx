@@ -25,7 +25,6 @@ import {
   Copy,
   Check,
   AlertTriangle,
-  ShieldCheck,
   MapPin,
   ChevronRight,
   ChevronLeft,
@@ -49,14 +48,8 @@ import {
 import { useProperties } from '@/src/context/PropertyContext';
 import { useAdminData } from '@/src/context/AdminDataContext';
 import { AdminPropertyModal } from './AdminPropertyModal';
-import { AdminDashboardOverview } from './AdminDashboardOverview';
 import { AdminPropertiesList } from './AdminPropertiesList';
-import { AdminClientsView } from './AdminClientsView';
-import { AdminAppointmentsView } from './AdminAppointmentsView';
-import { AdminLegalFilesView } from './AdminLegalFilesView';
-import { AdminDocumentsView } from './AdminDocumentsView';
-import { AdminReportsView } from './AdminReportsView';
-import { AdminSettingsView } from './AdminSettingsView';
+import { AdminProfileView } from './AdminProfileView';
 import { AdminGlobalSearchModal } from './AdminGlobalSearchModal';
 import { AdminNotificationsDropdown } from './AdminNotificationsDropdown';
 import type { LotProperty } from '@/src/data/lots';
@@ -106,8 +99,8 @@ export function AdminDashboard({
 
   const { clients, appointments, legalFiles, documents } = useAdminData();
 
-  // Navigation tab state (default to 'overview' - Dashboard as requested in Section 1)
-  const [activeTab, setActiveTab] = useState<AdminTab>('overview');
+  // Navigation tab state (default to 'inventory' - Propiedades)
+  const [activeTab, setActiveTab] = useState<AdminTab>('inventory');
 
   // Global search modal state
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -130,14 +123,6 @@ export function AdminDashboard({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [propertyToEdit, setPropertyToEdit] = useState<LotProperty | null>(null);
   const [propertyToDelete, setPropertyToDelete] = useState<LotProperty | null>(null);
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
-
-  // Profile & Password State
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordLoading, setPasswordLoading] = useState(false);
-  const [passwordError, setPasswordError] = useState('');
-  const [passwordSuccess, setPasswordSuccess] = useState('');
 
   // Status updating feedback
   const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
@@ -313,44 +298,7 @@ export function AdminDashboard({
     }
   };
 
-  // Change Password Handler via Supabase Auth
-  const handleChangePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setPasswordError('');
-    setPasswordSuccess('');
 
-    if (newPassword.length < 6) {
-      setPasswordError('La nueva contraseña debe tener al menos 6 caracteres.');
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setPasswordError('Las contraseñas no coinciden.');
-      return;
-    }
-
-    setPasswordLoading(true);
-
-    try {
-      const { data, error } = await supabase.auth.updateUser({
-        password: newPassword,
-      });
-
-      if (error) {
-        setPasswordError(`Error de Supabase: ${error.message}`);
-      } else {
-        setPasswordSuccess('¡Contraseña actualizada con éxito en Supabase!');
-        setNewPassword('');
-        setConfirmPassword('');
-      }
-    } catch (err: unknown) {
-      setPasswordError(
-        err instanceof Error ? err.message : 'Error al conectar con el servicio de autenticación.'
-      );
-    } finally {
-      setPasswordLoading(false);
-    }
-  };
 
   return (
     <div className="w-full min-h-screen bg-slate-50 flex flex-col lg:flex-row">
@@ -415,39 +363,8 @@ export function AdminDashboard({
             </div>
           )}
 
-          {/* Sidebar Navigation Items with Clean Active Indicators */}
           <nav className="space-y-1" aria-label="Navegación del panel">
-            {/* 1. Dashboard */}
-            <button
-              type="button"
-              onClick={() => {
-                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
-                setEditingProperty(null);
-                setIsCreatingProperty(false);
-                setActiveTab('overview');
-              }}
-              className={`relative w-full flex items-center ${
-                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
-              } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                !editingProperty && !isCreatingProperty && activeTab === 'overview'
-                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
-                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
-              }`}
-              title="Dashboard"
-            >
-              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
-                <LayoutDashboard
-                  className={`h-4 w-4 shrink-0 ${
-                    !editingProperty && !isCreatingProperty && activeTab === 'overview'
-                      ? 'text-emerald-800'
-                      : 'opacity-70'
-                  }`}
-                />
-                {!isSidebarCollapsed && <span className="truncate">Dashboard</span>}
-              </div>
-            </button>
-
-            {/* 2. Propiedades */}
+            {/* 1. Propiedades */}
             <button
               type="button"
               onClick={() => {
@@ -463,7 +380,7 @@ export function AdminDashboard({
                   ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
                   : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
               }`}
-              title="Propiedades"
+              title="Catálogo de Propiedades"
             >
               <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
                 <Building2
@@ -488,195 +405,33 @@ export function AdminDashboard({
               )}
             </button>
 
-            {/* 3. Clientes */}
+            {/* 2. + Nueva Propiedad */}
             <button
               type="button"
-              onClick={() => {
-                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
-                setEditingProperty(null);
-                setIsCreatingProperty(false);
-                setActiveTab('clients');
-              }}
+              onClick={handleOpenCreate}
               className={`relative w-full flex items-center ${
-                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
+                isSidebarCollapsed ? 'justify-center p-3' : 'justify-start gap-3 px-3.5 py-2.5'
               } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                !editingProperty && !isCreatingProperty && activeTab === 'clients'
-                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
-                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
+                isCreatingProperty
+                  ? 'bg-[#25D366] text-slate-950 shadow-md font-black translate-x-0.5'
+                  : 'bg-emerald-800/60 text-emerald-100 hover:bg-emerald-700/70 hover:text-white border border-emerald-700/40'
               }`}
-              title="Clientes"
+              title="Registrar Nueva Propiedad"
             >
-              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
-                <Users
-                  className={`h-4 w-4 shrink-0 ${
-                    !editingProperty && !isCreatingProperty && activeTab === 'clients'
-                      ? 'text-emerald-800'
-                      : 'opacity-70'
-                  }`}
-                />
-                {!isSidebarCollapsed && <span className="truncate">Clientes</span>}
-              </div>
-              {!isSidebarCollapsed && (
-                <span
-                  className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${
-                    !editingProperty && !isCreatingProperty && activeTab === 'clients'
-                      ? 'bg-emerald-100 text-emerald-900'
-                      : 'bg-emerald-900/60 text-emerald-300'
-                  }`}
-                >
-                  {clients.length}
-                </span>
-              )}
+              <Plus
+                className={`h-4 w-4 shrink-0 ${
+                  isCreatingProperty ? 'text-slate-950 font-black' : 'text-emerald-300'
+                }`}
+              />
+              {!isSidebarCollapsed && <span className="truncate">+ Nueva Propiedad</span>}
             </button>
 
-            {/* 4. Citas y visitas */}
-            <button
-              type="button"
-              onClick={() => {
-                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
-                setEditingProperty(null);
-                setIsCreatingProperty(false);
-                setActiveTab('appointments');
-              }}
-              className={`relative w-full flex items-center ${
-                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
-              } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                !editingProperty && !isCreatingProperty && activeTab === 'appointments'
-                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
-                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
-              }`}
-              title="Citas y visitas"
-            >
-              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
-                <Calendar
-                  className={`h-4 w-4 shrink-0 ${
-                    !editingProperty && !isCreatingProperty && activeTab === 'appointments'
-                      ? 'text-emerald-800'
-                      : 'opacity-70'
-                  }`}
-                />
-                {!isSidebarCollapsed && <span className="truncate">Citas y visitas</span>}
-              </div>
-              {!isSidebarCollapsed && (
-                <span
-                  className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${
-                    !editingProperty && !isCreatingProperty && activeTab === 'appointments'
-                      ? 'bg-emerald-100 text-emerald-900'
-                      : 'bg-emerald-900/60 text-emerald-300'
-                  }`}
-                >
-                  {appointments.length}
-                </span>
-              )}
-            </button>
-
-            {/* 5. Expedientes legales */}
-            <button
-              type="button"
-              onClick={() => {
-                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
-                setEditingProperty(null);
-                setIsCreatingProperty(false);
-                setActiveTab('legalFiles');
-              }}
-              className={`relative w-full flex items-center ${
-                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
-              } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                !editingProperty && !isCreatingProperty && activeTab === 'legalFiles'
-                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
-                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
-              }`}
-              title="Expedientes legales"
-            >
-              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
-                <FileCheck
-                  className={`h-4 w-4 shrink-0 ${
-                    !editingProperty && !isCreatingProperty && activeTab === 'legalFiles'
-                      ? 'text-emerald-800'
-                      : 'opacity-70'
-                  }`}
-                />
-                {!isSidebarCollapsed && <span className="truncate">Expedientes legales</span>}
-              </div>
-            </button>
-
-            {/* 6. Documentos */}
-            <button
-              type="button"
-              onClick={() => {
-                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
-                setEditingProperty(null);
-                setIsCreatingProperty(false);
-                setActiveTab('documentsManager');
-              }}
-              className={`relative w-full flex items-center ${
-                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
-              } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                !editingProperty && !isCreatingProperty && activeTab === 'documentsManager'
-                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
-                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
-              }`}
-              title="Documentos"
-            >
-              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
-                <FileText
-                  className={`h-4 w-4 shrink-0 ${
-                    !editingProperty && !isCreatingProperty && activeTab === 'documentsManager'
-                      ? 'text-emerald-800'
-                      : 'opacity-70'
-                  }`}
-                />
-                {!isSidebarCollapsed && <span className="truncate">Documentos</span>}
-              </div>
-              {!isSidebarCollapsed && (
-                <span
-                  className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${
-                    !editingProperty && !isCreatingProperty && activeTab === 'documentsManager'
-                      ? 'bg-emerald-100 text-emerald-900'
-                      : 'bg-emerald-900/60 text-emerald-300'
-                  }`}
-                >
-                  {documents.length}
-                </span>
-              )}
-            </button>
-
-            {/* 7. Reportes */}
-            <button
-              type="button"
-              onClick={() => {
-                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
-                setEditingProperty(null);
-                setIsCreatingProperty(false);
-                setActiveTab('reports');
-              }}
-              className={`relative w-full flex items-center ${
-                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
-              } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                !editingProperty && !isCreatingProperty && activeTab === 'reports'
-                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
-                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
-              }`}
-              title="Reportes"
-            >
-              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
-                <TrendingUp
-                  className={`h-4 w-4 shrink-0 ${
-                    !editingProperty && !isCreatingProperty && activeTab === 'reports'
-                      ? 'text-emerald-800'
-                      : 'opacity-70'
-                  }`}
-                />
-                {!isSidebarCollapsed && <span className="truncate">Reportes</span>}
-              </div>
-            </button>
-
-            {/* Separador visual */}
-            <div className="py-1.5">
+            {/* Separador visual sutil */}
+            <div className="py-2">
               <div className="border-t border-emerald-900/60" />
             </div>
 
-            {/* Perfil */}
+            {/* 3. Perfil & Configuración */}
             <button
               type="button"
               onClick={() => {
@@ -692,7 +447,7 @@ export function AdminDashboard({
                   ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
                   : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
               }`}
-              title="Perfil"
+              title="Perfil de Administrador y Configuración"
             >
               <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
                 <User
@@ -703,36 +458,6 @@ export function AdminDashboard({
                   }`}
                 />
                 {!isSidebarCollapsed && <span className="truncate">Perfil</span>}
-              </div>
-            </button>
-
-            {/* Configuración */}
-            <button
-              type="button"
-              onClick={() => {
-                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
-                setEditingProperty(null);
-                setIsCreatingProperty(false);
-                setActiveTab('settings');
-              }}
-              className={`relative w-full flex items-center ${
-                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
-              } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                !editingProperty && !isCreatingProperty && activeTab === 'settings'
-                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
-                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
-              }`}
-              title="Configuración"
-            >
-              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
-                <Settings
-                  className={`h-4 w-4 shrink-0 ${
-                    !editingProperty && !isCreatingProperty && activeTab === 'settings'
-                      ? 'text-emerald-800'
-                      : 'opacity-70'
-                  }`}
-                />
-                {!isSidebarCollapsed && <span className="truncate">Configuración</span>}
               </div>
             </button>
           </nav>
@@ -857,30 +582,12 @@ export function AdminDashboard({
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
                 <div>
                   <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                    {activeTab === 'overview' && 'Dashboard General'}
                     {activeTab === 'inventory' && 'Propiedades en Cartera'}
-                    {activeTab === 'clients' && 'Clientes e Interesados'}
-                    {activeTab === 'appointments' && 'Agenda de Citas y Visitas'}
-                    {activeTab === 'legalFiles' && 'Expedientes Legales Notariales'}
-                    {activeTab === 'documentsManager' && 'Gestor Central de Documentos'}
-                    {activeTab === 'reports' && 'Reportes & Métricas Operativas'}
-                    {activeTab === 'profile' && 'Mi Perfil & Seguridad de Acceso'}
-                    {activeTab === 'settings' && 'Configuración del Sistema'}
-                    {activeTab === 'simulator' && 'Cotizador de Crédito Directo'}
-                    {activeTab === 'system' && 'Supabase & Optimización de Medios'}
+                    {activeTab === 'profile' && 'Perfil & Configuración'}
                   </h1>
                   <p className="text-xs text-slate-400 mt-0.5 font-medium">
-                    {activeTab === 'overview' && 'Visión global, KPIs de venta y actividades comerciales en tiempo real'}
                     {activeTab === 'inventory' && `${properties.length} propiedades reales en catálogo activo`}
-                    {activeTab === 'clients' && `${clients.length} clientes e interesados registrados`}
-                    {activeTab === 'appointments' && `${appointments.length} citas programadas en agenda`}
-                    {activeTab === 'legalFiles' && `${legalFiles.length} expedientes de propiedad bajo supervisión`}
-                    {activeTab === 'documentsManager' && `${documents.length} archivos y fichas técnicas indexadas`}
-                    {activeTab === 'reports' && 'Estadísticas ejecutivas del portafolio inmobiliario'}
-                    {activeTab === 'profile' && 'Gestión de credenciales, seguridad de sesión y cambio de contraseña'}
-                    {activeTab === 'settings' && 'Parámetros institucionales y financiamiento comercial'}
-                    {activeTab === 'simulator' && 'Cálculo de entrada, cuotas mensuales y proyecciones'}
-                    {activeTab === 'system' && 'Conexión a base de datos y optimizador de medios'}
+                    {activeTab === 'profile' && 'Gestión de cuenta de administrador y parámetros de la inmobiliaria'}
                   </p>
                 </div>
 
@@ -914,31 +621,10 @@ export function AdminDashboard({
 
                   {/* Notification Dropdown */}
                   <AdminNotificationsDropdown onNavigateTab={setActiveTab} />
-
-                  {/* Botón de Citas (Visible en sección Clientes, al lado de notificaciones) */}
-                  {activeTab === 'clients' && (
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('appointments')}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer animate-in fade-in"
-                      title="Ver Agenda de Citas y Visitas"
-                    >
-                      <Calendar className="h-3.5 w-3.5 text-emerald-300" />
-                      <span>Citas</span>
-                    </button>
-                  )}
                 </div>
               </div>
 
-            {/* ======================================================== */}
-            {/* TAB CONTENT: DASHBOARD OVERVIEW (SECTION 1) */}
-            {/* ======================================================== */}
-            {activeTab === 'overview' && (
-              <AdminDashboardOverview
-                onNavigateTab={setActiveTab}
-                onOpenCreateProperty={handleOpenCreate}
-              />
-            )}
+
 
             {/* ======================================================== */}
             {/* TAB CONTENT: PROPIEDADES (SECTION 2) */}
@@ -950,330 +636,16 @@ export function AdminDashboard({
               />
             )}
 
-            {/* ======================================================== */}
-            {/* TAB CONTENT: CLIENTES E INTERESADOS (SECTION 3) */}
-            {/* ======================================================== */}
-            {activeTab === 'clients' && <AdminClientsView />}
-
-            {/* ======================================================== */}
-            {/* TAB CONTENT: CITAS Y VISITAS (SECTION 4) */}
-            {/* ======================================================== */}
-            {activeTab === 'appointments' && <AdminAppointmentsView />}
-
-            {/* ======================================================== */}
-            {/* TAB CONTENT: EXPEDIENTES LEGALES (SECTION 5) */}
-            {/* ======================================================== */}
-            {activeTab === 'legalFiles' && <AdminLegalFilesView />}
-
-            {/* ======================================================== */}
-            {/* TAB CONTENT: GESTOR DE DOCUMENTOS (SECTION 6) */}
-            {/* ======================================================== */}
-            {activeTab === 'documentsManager' && <AdminDocumentsView />}
-
-            {/* ======================================================== */}
-            {/* TAB CONTENT: REPORTES (SECTION 7) */}
-            {/* ======================================================== */}
-            {activeTab === 'reports' && <AdminReportsView />}
-
-            {/* ======================================================== */}
-            {/* TAB CONTENT: CONFIGURACIÓN (SECTION 8) */}
-            {/* ======================================================== */}
-            {activeTab === 'settings' && <AdminSettingsView />}
-
-            {/* ======================================================== */}
-            {/* TAB CONTENT: COTIZADOR */}
-            {/* ======================================================== */}
-            {activeTab === 'simulator' && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-in fade-in duration-200">
-                <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-4">
-                  <h3 className="text-sm font-bold text-slate-900">Simulador de Financiamiento</h3>
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-600 block mb-1">Inmueble</label>
-                    <select
-                      value={simLotId}
-                      onChange={(e) => setSimLotId(e.target.value)}
-                      className="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-900"
-                    >
-                      {properties.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.code} - {p.name} (${p.priceUSD.toLocaleString()} USD)
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-xs">
-                      <span>Entrada ({simDownPercent}%)</span>
-                      <span className="font-mono font-bold">${simDownAmount.toLocaleString()} USD</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="20"
-                      max="60"
-                      step="5"
-                      value={simDownPercent}
-                      onChange={(e) => setSimDownPercent(Number(e.target.value))}
-                      className="w-full accent-emerald-600"
-                    />
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-emerald-100/70 border border-emerald-300">
-                    <span className="text-[10px] font-bold uppercase text-emerald-800 block">Cuota Mensual Fija</span>
-                    <div className="text-2xl font-black font-mono text-emerald-950">
-                      ${simMonthly.toLocaleString()} <span className="text-xs font-normal">USD / mes</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between space-y-4">
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-400 block mb-1">Mensaje para WhatsApp</span>
-                    <div className="p-3 bg-white rounded-xl border border-slate-200 text-xs font-mono text-slate-700 whitespace-pre-line leading-relaxed max-h-56 overflow-y-auto">
-                      {simQuoteMessage}
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleCopyQuote}
-                    className="w-full py-2.5 rounded-xl bg-slate-950 hover:bg-emerald-700 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
-                  >
-                    {copiedSim ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
-                    <span>{copiedSim ? '¡Copiado!' : 'Copiar Cotización para WhatsApp'}</span>
-                  </button>
-                </div>
-              </div>
-            )}
 
 
             {/* ======================================================== */}
-            {/* TAB CONTENT: SUPABASE & TESTBENCH */}
-            {/* ======================================================== */}
-            {activeTab === 'system' && (
-              <div className="space-y-5 animate-in fade-in duration-200">
-                <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900">Supabase Cloud PostgreSQL 17</h3>
-                    <p className="text-xs text-slate-500 font-mono">ospsnohsrhmqtnyfndhh.supabase.co</p>
-                  </div>
-                  <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full border border-emerald-200">
-                    🟢 Conectado & Sincronizado
-                  </span>
-                </div>
-
-                {/* Batch File Compressor Tool */}
-                <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                        Probador de Conversión a WebP en Vivo
-                      </h4>
-                      <p className="text-[11px] text-slate-400">
-                        Prueba la compresión instantánea de cualquier imagen sin subirla a la base de datos.
-                      </p>
-                    </div>
-                    <label className="px-3.5 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all cursor-pointer">
-                      <span>Probar Archivos</span>
-                      <input
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={handleTestOptimizerUpload}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
-
-                  {isConvertingBatch && (
-                    <div className="text-center py-2 text-xs text-emerald-700 animate-pulse">
-                      ⚡ Convirtiendo imágenes a WebP en tu navegador...
-                    </div>
-                  )}
-
-                  {testedFiles.length > 0 && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
-                      {testedFiles.map((tf, i) => (
-                        <div key={i} className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                          <span className="truncate max-w-[150px] font-semibold text-slate-700">{tf.name}</span>
-                          <span className="font-mono text-emerald-700 font-bold">
-                            {tf.originalKB}KB ➔ {tf.webpKB}KB (-{tf.savings}%)
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* ======================================================== */}
-            {/* TAB CONTENT: MI PERFIL & SEGURIDAD (FULL PAGE VIEW) */}
+            {/* TAB CONTENT: PERFIL & CONFIGURACIÓN UNIFICADO */}
             {/* ======================================================== */}
             {activeTab === 'profile' && (
-              <div className="space-y-6 max-w-4xl animate-in fade-in duration-200">
-                {/* Banner de Cabecera de Cuenta */}
-                <div className="bg-gradient-to-r from-[#0d2e1a] via-[#124225] to-[#1a5b33] rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
-                  <div className="absolute right-0 top-0 translate-x-8 -translate-y-8 w-64 h-64 bg-white/5 rounded-full pointer-events-none blur-2xl" />
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
-                    <div className="flex items-center gap-4">
-                      <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md text-white font-black text-xl sm:text-2xl flex items-center justify-center shadow-inner">
-                        {adminEmail.slice(0, 2).toUpperCase()}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white">
-                            Perfil de Administrador
-                          </h3>
-                          <span className="text-[10px] font-bold text-emerald-300 bg-emerald-950/70 border border-emerald-500/30 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                            Super Admin
-                          </span>
-                        </div>
-                        <p className="text-sm text-emerald-200/90 font-mono mt-1">{adminEmail}</p>
-                        <p className="text-xs text-emerald-300/70 mt-0.5">
-                          Sociedad Civil MGM Inmobiliaria · Acceso Cifrado
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={onLogout}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600/90 hover:bg-rose-600 text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
-                      >
-                        <LogOut className="h-3.5 w-3.5" />
-                        <span>Cerrar Sesión</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Formulario y Detalles de Seguridad en Rejilla */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                  {/* Formulario de Cambio de Contraseña */}
-                  <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs">
-                    <div className="flex items-center gap-2.5 pb-4 border-b border-slate-100 mb-5">
-                      <div className="h-9 w-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
-                        <KeyRound className="h-4 w-4" />
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-black text-slate-900">
-                          Cambiar Contraseña de Acceso
-                        </h4>
-                        <p className="text-xs text-slate-500">
-                          Actualización criptográfica directa en Supabase Auth
-                        </p>
-                      </div>
-                    </div>
-
-                    <form onSubmit={handleChangePassword} className="space-y-4">
-                      {passwordError && (
-                        <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-700 font-semibold flex items-center gap-2.5">
-                          <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600" />
-                          <span>{passwordError}</span>
-                        </div>
-                      )}
-
-                      {passwordSuccess && (
-                        <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-semibold flex items-center gap-2.5">
-                          <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
-                          <span>{passwordSuccess}</span>
-                        </div>
-                      )}
-
-                      <div>
-                        <label className="text-xs font-bold text-slate-700 block mb-1.5">
-                          Nueva Contraseña
-                        </label>
-                        <input
-                          type="password"
-                          required
-                          value={newPassword}
-                          onChange={(e) => setNewPassword(e.target.value)}
-                          placeholder="Mínimo 6 caracteres..."
-                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:border-emerald-600 focus:outline-none transition-all"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-xs font-bold text-slate-700 block mb-1.5">
-                          Confirmar Nueva Contraseña
-                        </label>
-                        <input
-                          type="password"
-                          required
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          placeholder="Repite la contraseña..."
-                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:border-emerald-600 focus:outline-none transition-all"
-                        />
-                      </div>
-
-                      <div className="pt-2">
-                        <button
-                          type="submit"
-                          disabled={passwordLoading}
-                          className="w-full py-3 rounded-xl bg-slate-900 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
-                        >
-                          <Lock className="h-3.5 w-3.5" />
-                          <span>{passwordLoading ? 'Guardando en Supabase...' : 'Actualizar Contraseña'}</span>
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-
-                  {/* Panel Lateral: Parámetros de Seguridad de Sesión */}
-                  <div className="lg:col-span-5 space-y-4">
-                    <div className="bg-slate-50/80 rounded-3xl border border-slate-200 p-6 space-y-4">
-                      <div className="flex items-center gap-2">
-                        <ShieldCheck className="h-4 w-4 text-emerald-700" />
-                        <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
-                          Seguridad de Sesión
-                        </h4>
-                      </div>
-
-                      <div className="space-y-3 text-xs">
-                        <div className="p-3 bg-white rounded-2xl border border-slate-200/80">
-                          <span className="text-[11px] font-bold text-slate-400 block uppercase">
-                            Proveedor de Identidad
-                          </span>
-                          <span className="font-semibold text-slate-800">
-                            Supabase Cloud Auth (JWT 256-bit)
-                          </span>
-                        </div>
-
-                        <div className="p-3 bg-white rounded-2xl border border-slate-200/80">
-                          <span className="text-[11px] font-bold text-slate-400 block uppercase">
-                            Protección de Canal
-                          </span>
-                          <span className="font-semibold text-emerald-700 flex items-center gap-1.5">
-                            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                            TLS 1.3 / HTTPS Cifrado
-                          </span>
-                        </div>
-
-                        <div className="p-3 bg-white rounded-2xl border border-slate-200/80">
-                          <span className="text-[11px] font-bold text-slate-400 block uppercase">
-                            Nivel de Privilegios
-                          </span>
-                          <span className="font-semibold text-slate-800">
-                            Lectura y Escritura Total (CRUD Lotes)
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200 text-[11px] text-amber-800 space-y-1">
-                      <p className="font-bold flex items-center gap-1.5">
-                        <AlertTriangle className="h-3.5 w-3.5 text-amber-600 shrink-0" />
-                        <span>Recomendación de Seguridad</span>
-                      </p>
-                      <p className="text-amber-700/90 leading-relaxed">
-                        Usa una clave de al menos 8 caracteres con números y símbolos para mantener protegidos los datos y catálogos de MGM Inmobiliaria.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <AdminProfileView
+                adminEmail={adminEmail}
+                onLogout={onLogout}
+              />
             )}
           </div>
         )}
@@ -1283,111 +655,81 @@ export function AdminDashboard({
       {/* MOBILE BOTTOM NAVIGATION BAR (Fixed at bottom on < lg) */}
       {/* ======================================================== */}
       <nav
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0d2e1a]/95 backdrop-blur-md border-t border-emerald-900/80 px-2 py-1.5 flex items-center justify-between overflow-x-auto no-scrollbar gap-1 shadow-2xl"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0d2e1a]/95 backdrop-blur-md border-t border-emerald-900/80 px-3 pt-2 shadow-2xl"
+        style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0.75rem))' }}
         aria-label="Navegación móvil del panel de administración"
       >
-        <button
-          type="button"
-          onClick={() => {
-            setEditingProperty(null);
-            setIsCreatingProperty(false);
-            setActiveTab('overview');
-          }}
-          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold shrink-0 transition-all cursor-pointer ${
-            !editingProperty && !isCreatingProperty && activeTab === 'overview'
-              ? 'text-white bg-white/15'
-              : 'text-emerald-200/70 hover:text-white'
-          }`}
-        >
-          <LayoutDashboard className="h-4 w-4 mb-0.5" />
-          <span>Dashboard</span>
-        </button>
+        <div className="max-w-md mx-auto grid grid-cols-3 items-center gap-2">
+          {/* 1. Propiedades */}
+          <button
+            type="button"
+            onClick={() => {
+              setEditingProperty(null);
+              setIsCreatingProperty(false);
+              setActiveTab('inventory');
+            }}
+            className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all cursor-pointer min-h-[50px] ${
+              !editingProperty && !isCreatingProperty && activeTab === 'inventory'
+                ? 'text-white bg-white/15 font-black shadow-xs'
+                : 'text-emerald-200/70 hover:text-white hover:bg-white/5 font-semibold'
+            }`}
+          >
+            <Building2
+              className={`h-5 w-5 mb-1 ${
+                !editingProperty && !isCreatingProperty && activeTab === 'inventory'
+                  ? 'text-emerald-300'
+                  : 'text-emerald-400/80'
+              }`}
+            />
+            <span className="text-[11px] tracking-tight leading-none">Propiedades</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => {
-            setEditingProperty(null);
-            setIsCreatingProperty(false);
-            setActiveTab('inventory');
-          }}
-          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold shrink-0 transition-all cursor-pointer ${
-            !editingProperty && !isCreatingProperty && activeTab === 'inventory'
-              ? 'text-white bg-white/15'
-              : 'text-emerald-200/70 hover:text-white'
-          }`}
-        >
-          <Building2 className="h-4 w-4 mb-0.5" />
-          <span>Propiedades</span>
-        </button>
+          {/* 2. + Nueva Propiedad (Acción destacada al pulgar) */}
+          <button
+            type="button"
+            onClick={handleOpenCreate}
+            className={`flex flex-col items-center justify-center py-1 px-2 rounded-2xl transition-all cursor-pointer min-h-[50px] active:scale-95 ${
+              isCreatingProperty
+                ? 'bg-[#25D366] text-slate-950 font-black shadow-md shadow-emerald-500/20'
+                : 'bg-emerald-800/80 hover:bg-emerald-700/80 text-emerald-100 hover:text-white border border-emerald-700/50 shadow-xs font-bold'
+            }`}
+            title="Publicar Nueva Propiedad"
+          >
+            <div
+              className={`h-6 w-6 rounded-full flex items-center justify-center mb-0.5 ${
+                isCreatingProperty ? 'bg-slate-950 text-[#25D366]' : 'bg-white/15 text-white'
+              }`}
+            >
+              <Plus className="h-4 w-4 stroke-[2.5]" />
+            </div>
+            <span className="text-[11px] tracking-tight leading-none">+ Nueva</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => {
-            setEditingProperty(null);
-            setIsCreatingProperty(false);
-            setActiveTab('clients');
-          }}
-          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold shrink-0 transition-all cursor-pointer ${
-            !editingProperty && !isCreatingProperty && activeTab === 'clients'
-              ? 'text-white bg-white/15'
-              : 'text-emerald-200/70 hover:text-white'
-          }`}
-        >
-          <Users className="h-4 w-4 mb-0.5" />
-          <span>Clientes</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            setEditingProperty(null);
-            setIsCreatingProperty(false);
-            setActiveTab('legalFiles');
-          }}
-          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold shrink-0 transition-all cursor-pointer ${
-            !editingProperty && !isCreatingProperty && activeTab === 'legalFiles'
-              ? 'text-white bg-white/15'
-              : 'text-emerald-200/70 hover:text-white'
-          }`}
-        >
-          <FileCheck className="h-4 w-4 mb-0.5" />
-          <span>Legal</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            setEditingProperty(null);
-            setIsCreatingProperty(false);
-            setActiveTab('documentsManager');
-          }}
-          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold shrink-0 transition-all cursor-pointer ${
-            !editingProperty && !isCreatingProperty && activeTab === 'documentsManager'
-              ? 'text-white bg-white/15'
-              : 'text-emerald-200/70 hover:text-white'
-          }`}
-        >
-          <FileText className="h-4 w-4 mb-0.5" />
-          <span>Docs</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            setEditingProperty(null);
-            setIsCreatingProperty(false);
-            setActiveTab('profile');
-          }}
-          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold shrink-0 transition-all cursor-pointer ${
-            !editingProperty && !isCreatingProperty && activeTab === 'profile'
-              ? 'text-white bg-white/15'
-              : 'text-emerald-200/70 hover:text-white'
-          }`}
-          title="Credenciales y Perfil de Administrador"
-        >
-          <User className="h-4 w-4 mb-0.5" />
-          <span>Perfil</span>
-        </button>
+          {/* 3. Perfil */}
+          <button
+            type="button"
+            onClick={() => {
+              setEditingProperty(null);
+              setIsCreatingProperty(false);
+              setActiveTab('profile');
+            }}
+            className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all cursor-pointer min-h-[50px] ${
+              !editingProperty && !isCreatingProperty && activeTab === 'profile'
+                ? 'text-white bg-white/15 font-black shadow-xs'
+                : 'text-emerald-200/70 hover:text-white hover:bg-white/5 font-semibold'
+            }`}
+            title="Perfil y Configuración"
+          >
+            <User
+              className={`h-5 w-5 mb-1 ${
+                !editingProperty && !isCreatingProperty && activeTab === 'profile'
+                  ? 'text-emerald-300'
+                  : 'text-emerald-400/80'
+              }`}
+            />
+            <span className="text-[11px] tracking-tight leading-none">Perfil</span>
+          </button>
+        </div>
       </nav>
 
       {/* ======================================================== */}

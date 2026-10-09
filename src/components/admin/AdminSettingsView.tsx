@@ -1,30 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-  Settings,
-  Building,
-  Phone,
-  Mail,
-  DollarSign,
-  Save,
-  CheckCircle2,
-  RefreshCw,
-  Database,
-  ShieldAlert,
-} from 'lucide-react';
-import { useProperties } from '@/src/context/PropertyContext';
+import { Save, CheckCircle2 } from 'lucide-react';
 
 export function AdminSettingsView() {
-  const { resetToDefaults } = useProperties();
-
   const [companyName, setCompanyName] = useState('Sociedad Civil MGM Inmobiliaria');
   const [supportPhone, setSupportPhone] = useState('+593 99 195 2889');
   const [supportEmail, setSupportEmail] = useState('contacto@mgminmobiliaria.ec');
   const [defaultDownPercent, setDefaultDownPercent] = useState(20);
   const [defaultMaxMonths, setDefaultMaxMonths] = useState(48);
   const [savedSuccess, setSavedSuccess] = useState(false);
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,49 +136,6 @@ export function AdminSettingsView() {
               <Save className="h-4 w-4" />
               <span>Guardar Preferencias</span>
             </button>
-          </div>
-        </div>
-
-        {/* Zona de Mantenimiento de Datos */}
-        <div className="bg-red-50/50 rounded-3xl border border-red-200/80 p-5 sm:p-6 space-y-3">
-          <div className="flex items-center gap-2 text-red-800">
-            <ShieldAlert className="h-5 w-5" />
-            <h2 className="text-xs font-black uppercase tracking-wider">Zona de Mantenimiento</h2>
-          </div>
-          <p className="text-xs text-red-900/80">
-            Si deseas restaurar los lotes iniciales predeterminados (San Antonio · Manta y Miravalle), puedes usar esta opción.
-          </p>
-          <div className="pt-2">
-            {!showResetConfirm ? (
-              <button
-                type="button"
-                onClick={() => setShowResetConfirm(true)}
-                className="px-4 py-2 rounded-xl bg-red-100 hover:bg-red-200 text-red-900 font-bold text-xs transition-all cursor-pointer"
-              >
-                Restablecer Catálogo a Valores Predeterminados
-              </button>
-            ) : (
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={async () => {
-                    await resetToDefaults();
-                    setShowResetConfirm(false);
-                    alert('Catálogo restablecido correctamente.');
-                  }}
-                  className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition-all cursor-pointer"
-                >
-                  Confirmar Restablecimiento
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowResetConfirm(false)}
-                  className="px-3 py-2 rounded-xl border border-slate-300 text-slate-600 text-xs font-bold hover:bg-white transition-all cursor-pointer"
-                >
-                  Cancelar
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </form>
