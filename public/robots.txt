@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /admin
+Disallow: /panel
+Disallow: /administracion
+Disallow: /new_property
+Allow: /
+
+Sitemap: https://sociedadmgminmobiliaria.web.app/sitemap.xml

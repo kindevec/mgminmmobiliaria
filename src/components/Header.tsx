@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { LogoMGM } from './LogoMGM';
-import { Lock } from 'lucide-react';
 import { WhatsAppIcon } from './SocialIcons';
 import { getGeneralWhatsAppUrl } from '@/src/data/lots';
 
@@ -127,26 +126,6 @@ export function Header({
           >
             <WhatsAppIcon size={16} className="text-white shrink-0 drop-shadow-xs" />
             <span className="hidden sm:inline">WhatsApp</span>
-          </a>
-
-          {/* Acceso CMS Admin - Ahora en el lugar donde estaba el botón hamburguesa */}
-          <a
-            href={getPageCanonicalHash('admin')}
-            onClick={(e) => {
-              e.preventDefault();
-              onNavigate('admin');
-            }}
-            title="Panel Administrativo CMS"
-            className={`h-9 w-9 sm:h-9 sm:w-9 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-              currentPage === 'admin'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : isGreenHeader
-                ? 'text-white/80 hover:text-white bg-white/10 hover:bg-white/20'
-                : 'text-white bg-black/30 hover:bg-black/45 border border-white/25'
-            }`}
-            aria-label="Panel CMS de Administración"
-          >
-            <Lock className="h-4 w-4" />
           </a>
         </div>
       </div>

@@ -36,7 +36,12 @@ export default function HomePage() {
 
 function HomePageContent() {
   const { properties } = useProperties();
-  const [currentPage, setCurrentPage] = useState<PageView>('home');
+  const [currentPage, setCurrentPage] = useState<PageView>(() => {
+    if (typeof window !== 'undefined') {
+      return resolvePageFromHash(window.location.hash);
+    }
+    return 'home';
+  });
   const [selectedLot, setSelectedLot] = useState<LotProperty | null>(null);
   const [isVisitModalOpen, setIsVisitModalOpen] = useState(false);
   const [visitInterest, setVisitInterest] = useState('Ciudadela Miravalle');
@@ -91,6 +96,14 @@ function HomePageContent() {
         }
         return targetPage;
       });
+
+      // 4. Normalizar URL si se ingresó con hash a una ruta canónica (ej. /#admin -> /admin)
+      if (typeof window !== 'undefined' && window.location.hash) {
+        const canonical = pageConfig?.path;
+        if (canonical && canonical !== window.location.pathname && !urlTarget.includes('/')) {
+          window.history.replaceState({ page: targetPage }, '', canonical);
+        }
+      }
     };
 
     // Sincronizar en carga inicial
@@ -128,10 +141,10 @@ function HomePageContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     // 5. Actualizar la URL limpia sin '#' usando HTML5 History API
-    const targetPath = PAGES_CONFIG[page]?.path || '/inicio';
+    const targetPath = PAGES_CONFIG[page]?.path || '/';
     if (typeof window !== 'undefined') {
       const currentPath = window.location.pathname;
-      if (currentPath !== targetPath && !(currentPath === '/' && page === 'home')) {
+      if (currentPath !== targetPath || window.location.hash) {
         window.history.pushState({ page }, '', targetPath);
       }
     }

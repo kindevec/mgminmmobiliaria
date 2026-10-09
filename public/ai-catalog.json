@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Sociedad Civil MGM Inmobiliaria",
+  "description": "Catálogo de proyectos y lotes de terreno con crédito directo propio en Ecuador.",
+  "url": "https://sociedadmgminmobiliaria.web.app",
+  "projects": [
+    {
+      "id": "ciudadela-miravalle",
+      "name": "Ciudadela Miravalle",
+      "type": "Urbanización Residencial",
+      "location": "Daule, Guayas, Ecuador",
+      "financingMonths": 48
+    }
+  ]
+}

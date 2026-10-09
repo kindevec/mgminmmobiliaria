@@ -43,6 +43,7 @@ import {
   SlidersHorizontal,
   Users,
   BarChart3,
+  Globe,
 } from 'lucide-react';
 import { useProperties } from '@/src/context/PropertyContext';
 import { useAdminData } from '@/src/context/AdminDataContext';
@@ -126,15 +127,18 @@ export function AdminDashboard({
   const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
 
   // Admin user details
-  const [adminEmail, setAdminEmail] = useState<string>('noemaliza01@gmail.com');
+  const [adminEmail, setAdminEmail] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return (
+        localStorage.getItem('mgm_admin_user_email') ||
+        sessionStorage.getItem('mgm_admin_user_email') ||
+        'noemaliza01@gmail.com'
+      );
+    }
+    return 'noemaliza01@gmail.com';
+  });
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const stored =
-        localStorage.getItem('mgm_admin_user_email') ||
-        sessionStorage.getItem('mgm_admin_user_email');
-      if (stored) setAdminEmail(stored);
-    }
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user?.email) setAdminEmail(user.email);
     });
@@ -261,7 +265,7 @@ export function AdminDashboard({
     if (onNavigate) {
       onNavigate('home');
     } else {
-      window.location.hash = '';
+      window.location.href = '/';
     }
   };
 
@@ -610,7 +614,18 @@ export function AdminDashboard({
                 </div>
 
                 {/* Right Controls: Búsqueda Global, Web Button, Notificaciones */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
+                  {/* Botón para regresar al sitio web público */}
+                  <button
+                    type="button"
+                    onClick={handleGoHome}
+                    className="flex items-center gap-1.5 px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full text-xs text-slate-600 hover:text-slate-900 transition-all cursor-pointer shadow-2xs font-semibold group"
+                    title="Ver sitio web público"
+                  >
+                    <Globe className="h-3.5 w-3.5 text-emerald-600 group-hover:scale-110 transition-transform" />
+                    <span className="hidden sm:inline">Ver Sitio Web</span>
+                  </button>
+
                   {/* Búsqueda Global Trigger */}
                   <button
                     type="button"

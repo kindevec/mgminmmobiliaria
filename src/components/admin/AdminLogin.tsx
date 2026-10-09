@@ -95,7 +95,7 @@ export function AdminLogin({ onSuccess, onNavigate }: AdminLoginProps) {
                 if (onNavigate) {
                   onNavigate('home');
                 } else {
-                  window.location.hash = '';
+                  window.location.href = '/';
                 }
               }}
               className="cursor-pointer hover:scale-105 active:scale-95 transition-transform p-1 rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
@@ -267,7 +267,22 @@ export function AdminLogin({ onSuccess, onNavigate }: AdminLoginProps) {
           </form>
         )}
 
-        <div className="mt-6 pt-5 border-t border-slate-100 text-center">
+        <div className="mt-6 pt-5 border-t border-slate-100 text-center space-y-2.5">
+          <div>
+            <button
+              type="button"
+              onClick={() => {
+                if (onNavigate) {
+                  onNavigate('home');
+                } else {
+                  window.location.href = '/';
+                }
+              }}
+              className="text-xs text-emerald-700 hover:text-emerald-900 font-semibold hover:underline cursor-pointer inline-flex items-center gap-1.5 transition-colors"
+            >
+              <span>← Volver al sitio web principal</span>
+            </button>
+          </div>
           <p className="text-[11px] text-slate-400">
             Sociedad Civil MGM Inmobiliaria · Acceso restringido para el equipo de ventas y gerencia.
           </p>

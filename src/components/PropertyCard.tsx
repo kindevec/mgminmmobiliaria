@@ -61,7 +61,7 @@ export function PropertyCard({
           {/* Ficha métrica abierta y arquitectónica */}
           <div className="py-2 border-y border-slate-100 grid grid-cols-2 divide-x divide-slate-100 text-slate-700">
             <div className="pr-2">
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Superficie</span>
+              <span className="text-[9px] font-bold text-slate-600 uppercase tracking-wider block">Superficie</span>
               <div className="flex items-baseline gap-1 mt-0.5">
                 <span className="font-mono text-sm sm:text-base font-black text-slate-900 leading-none">{lot.areaM2}</span>
                 <span className="text-[11px] font-semibold text-slate-500">m²</span>
@@ -69,7 +69,7 @@ export function PropertyCard({
             </div>
 
             <div className="pl-2 text-right">
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Financiamiento</span>
+              <span className="text-[9px] font-bold text-slate-600 uppercase tracking-wider block">Financiamiento</span>
               <div className="flex items-baseline justify-end gap-1 mt-0.5">
                 <span className="font-mono text-sm sm:text-base font-black text-slate-900 leading-none">{lot.maxMonths}</span>
                 <span className="text-[11px] font-semibold text-slate-500">meses</span>
@@ -82,14 +82,14 @@ export function PropertyCard({
         <div className="space-y-3 pt-0.5">
           <div className="flex items-end justify-between">
             <div className="space-y-0.5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">
                 Precio de Lista
               </span>
               <div className="flex items-baseline gap-1">
                 <span className="text-xl sm:text-2xl font-black text-slate-900 font-mono tracking-tight leading-none">
                   ${lot.priceUSD.toLocaleString('es-EC')}
                 </span>
-                <span className="text-xs font-bold text-slate-400 font-sans">USD</span>
+                <span className="text-xs font-bold text-slate-600 font-sans">USD</span>
               </div>
             </div>
 

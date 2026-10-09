@@ -125,7 +125,7 @@ export function Footer({
                   className="relative z-10 w-5 h-5 sm:w-6 sm:h-6 object-contain drop-shadow-[0_2px_8px_rgba(34,163,61,0.5)] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 ease-out inline-block"
                 />
               </div>
-              <span className="text-xs text-slate-400 group-hover:text-emerald-400 transition-colors font-semibold tracking-wide">
+              <span className="text-xs text-slate-300 group-hover:text-emerald-400 transition-colors font-semibold tracking-wide">
                 Desarrollado por{" "}
                 <span className="font-bold text-white group-hover:text-emerald-400 inline-block">
                   KINDEV
@@ -309,7 +309,7 @@ export function Footer({
                   className="relative z-10 w-5 h-5 sm:w-7 sm:h-7 object-contain drop-shadow-[0_2px_8px_rgba(34,163,61,0.5)] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 ease-out inline-block"
                 />
               </div>
-              <span className="text-[10px] sm:text-xs text-slate-400 group-hover:text-emerald-400 transition-colors font-semibold tracking-wide">
+              <span className="text-[10px] sm:text-xs text-slate-300 group-hover:text-emerald-400 transition-colors font-semibold tracking-wide">
                 Desarrollado por{" "}
                 <span className="font-bold text-white group-hover:text-emerald-400 inline-block">
                   KINDEV

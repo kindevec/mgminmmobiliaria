@@ -14,7 +14,7 @@ export const PAGES_CONFIG: Record<PageView, PageConfig> = {
   home: {
     id: 'home',
     hash: 'inicio',
-    path: '/inicio',
+    path: '/',
     label: 'Inicio',
     fullTitle: 'Inicio | Sociedad Civil MGM Inmobiliaria · Lotes y Viviendas con Crédito Directo en Ecuador',
     description: 'Proyectos urbanizados planificados en Azuay, Ecuador con crédito directo hasta 48 meses y certeza notarial.',
@@ -89,14 +89,54 @@ export const PAGES_CONFIG: Record<PageView, PageConfig> = {
  * Resuelve la vista correspondiente a partir de pathname o hash de URL
  */
 export function resolvePageFromHash(rawHash: string): PageView {
-  // Primero revisar si la ruta viene por pathname en HTML5 History (/new_property, /lotes, etc.)
+  const clean = decodeURIComponent(rawHash || '')
+    .replace(/^#\/?/, '')
+    .toLowerCase()
+    .trim();
+
+  // 1. Si se provee un hash explícito, resolverlo con prioridad
+  if (clean) {
+    if (clean.includes('/')) {
+      const prefix = clean.split('/')[0];
+      if (prefix === 'lotes' || prefix === 'lote' || prefix === 'propiedad' || prefix === 'propiedades') {
+        return 'property-detail';
+      }
+      if (prefix === 'admin' || prefix === 'panel' || prefix === 'administracion') {
+        return 'admin';
+      }
+      if (prefix === 'new_property') {
+        return 'new_property';
+      }
+      for (const pageKey of Object.keys(PAGES_CONFIG) as PageView[]) {
+        const config = PAGES_CONFIG[pageKey];
+        if (config.hash === prefix || config.aliases.includes(prefix)) {
+          return pageKey;
+        }
+      }
+    }
+
+    for (const pageKey of Object.keys(PAGES_CONFIG) as PageView[]) {
+      const config = PAGES_CONFIG[pageKey];
+      if (config.hash === clean || config.id === clean || config.aliases.includes(clean)) {
+        return pageKey;
+      }
+    }
+  }
+
+  // 2. Si no hay hash o no coincidió, resolver la ruta vía HTML5 History pathname (/admin, /panel, /lotes, etc.)
   if (typeof window !== 'undefined') {
     const pathname = window.location.pathname.toLowerCase().replace(/^\/+|\/+$/g, '').trim();
     if (pathname) {
       if (pathname.includes('/')) {
         const pParts = pathname.split('/');
-        if (pParts[0] === 'lotes' || pParts[0] === 'lote' || pParts[0] === 'propiedad') {
+        if (pParts[0] === 'lotes' || pParts[0] === 'lote' || pParts[0] === 'propiedad' || pParts[0] === 'propiedades') {
           return 'property-detail';
+        }
+        if (pParts[0] === 'admin' || pParts[0] === 'panel' || pParts[0] === 'administracion') {
+          return 'admin';
+        }
+        if (pParts[0] === 'new_property') {
+          return 'new_property';
         }
       }
       for (const pageKey of Object.keys(PAGES_CONFIG) as PageView[]) {
@@ -108,33 +148,6 @@ export function resolvePageFromHash(rawHash: string): PageView {
     }
   }
 
-  const clean = decodeURIComponent(rawHash || '')
-    .replace(/^#\/?/, '')
-    .toLowerCase()
-    .trim();
-
-  // En caso de hashes anidados como lotes/VM-101 o lote/MV-102
-  if (clean.includes('/')) {
-    const prefix = clean.split('/')[0];
-    if (prefix === 'lotes' || prefix === 'lote' || prefix === 'propiedad' || prefix === 'propiedades') {
-      return 'property-detail';
-    }
-    for (const pageKey of Object.keys(PAGES_CONFIG) as PageView[]) {
-      const config = PAGES_CONFIG[pageKey];
-      if (config.hash === prefix || config.aliases.includes(prefix)) {
-        return pageKey;
-      }
-    }
-  }
-
-  // Coincidencia directa o por alias
-  for (const pageKey of Object.keys(PAGES_CONFIG) as PageView[]) {
-    const config = PAGES_CONFIG[pageKey];
-    if (config.hash === clean || config.aliases.includes(clean)) {
-      return pageKey;
-    }
-  }
-
   return 'home';
 }
 
@@ -142,6 +155,6 @@ export function resolvePageFromHash(rawHash: string): PageView {
  * Devuelve el path canónico oficial sin '#' (ej: '/inicio', '/lotes', '/new_property')
  */
 export function getPageCanonicalHash(page: PageView): string {
-  return PAGES_CONFIG[page]?.path || '/inicio';
+  return PAGES_CONFIG[page]?.path || '/';
 }
 
