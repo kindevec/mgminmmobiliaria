@@ -199,7 +199,7 @@ function HomePageContent() {
       )}
 
       {/* 2. Main Content Container with Strict Anti-Overflow */}
-      <main className={`flex-1 w-full overflow-x-hidden ${currentPage === 'admin' ? 'p-0 pb-0' : 'pb-24 md:pb-12 pt-0'}`}>
+      <main className={`flex-1 w-full overflow-x-clip ${currentPage === 'admin' ? 'p-0 pb-0' : 'pb-24 md:pb-12 pt-0'}`}>
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={currentPage}

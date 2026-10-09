@@ -572,7 +572,7 @@ export function AdminDashboard({
       <main
         className={`flex-1 ${
           isSidebarCollapsed ? 'lg:ml-20' : 'lg:ml-64'
-        } transition-all duration-300 ease-in-out p-4 sm:p-6 lg:p-8 flex flex-col justify-between overflow-x-hidden bg-white min-h-screen pb-24 lg:pb-8`}
+        } transition-all duration-300 ease-in-out p-4 sm:p-6 lg:p-8 flex flex-col justify-between overflow-x-clip bg-white min-h-screen pb-24 lg:pb-8`}
       >
         {editingProperty || isCreatingProperty ? (
           <AdminPropertyModal

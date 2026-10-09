@@ -21,8 +21,13 @@ import {
   ExternalLink,
   Info,
   ArrowLeft,
+  Eye,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import type { LotProperty } from '@/src/data/lots';
+import { PropertyCard } from '../PropertyCard';
+import { LotDetailsModal } from '../LotDetailsModal';
 import { useProperties } from '@/src/context/PropertyContext';
 import {
   convertImageToWebP,
@@ -101,6 +106,9 @@ export function AdminPropertyModal({
   const isEditing = Boolean(propertyToEdit);
   const { deleteProperty } = useProperties();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [mobileTab, setMobileTab] = useState<'form' | 'preview'>('form');
+  const [darkPreview, setDarkPreview] = useState(false);
+  const [showFichaPreviewModal, setShowFichaPreviewModal] = useState(false);
 
   // Form States
   const [code, setCode] = useState('');
@@ -158,6 +166,7 @@ export function AdminPropertyModal({
   useEffect(() => {
     if (isEffectiveOpen) {
       if (propertyToEdit) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCode(propertyToEdit.code);
         setName(propertyToEdit.name);
         setProject(propertyToEdit.project);
@@ -350,12 +359,27 @@ export function AdminPropertyModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const trimmedCode = code.trim().toUpperCase();
+    const trimmedName = name.trim();
+
+    if (!trimmedCode) {
+      alert('Por favor ingresa un código único para la propiedad (ej: MT24-001).');
+      setMobileTab('form');
+      return;
+    }
+
+    if (!trimmedName) {
+      alert('Por favor ingresa un título o nombre para la propiedad.');
+      setMobileTab('form');
+      return;
+    }
+
     const finalImage = image.trim() || gallery[0] || PRESET_IMAGES[0].url;
     const finalGallery = gallery.length > 0 ? gallery : [finalImage];
 
     const data: Omit<LotProperty, 'id'> = {
-      code: code.trim().toUpperCase(),
-      name: name.trim(),
+      code: trimmedCode,
+      name: trimmedName,
       project,
       type,
       category,
@@ -402,6 +426,47 @@ export function AdminPropertyModal({
     }
   };
 
+  const previewLot: LotProperty = {
+    id: propertyToEdit?.id || 'preview-temp-id',
+    code: code.trim().toUpperCase() || 'PROP-000',
+    name: name.trim() || 'Nuevo Inmueble MGM',
+    project,
+    type,
+    category,
+    areaM2: Number(areaM2) || 0,
+    dimensions: dimensions.trim() || '10.0m × 20.0m',
+    priceUSD: Number(priceUSD) || 0,
+    minDownPaymentUSD: Number(minDownPaymentUSD) || 0,
+    estimatedMonthlyUSD: estimatedMonthly || 0,
+    maxMonths: Number(maxMonths) || 48,
+    topography: topography.trim() || '100% Plano',
+    status,
+    zone: zone.trim() || 'Sector por definir',
+    address: address.trim() || undefined,
+    features: selectedServices,
+    services: selectedServices,
+    description: description.trim() || 'Excelente oportunidad de inversión con financiamiento directo.',
+    orientation: orientation.trim(),
+    registryStatus: registryStatus.trim(),
+    image: image.trim() || gallery[0] || PRESET_IMAGES[0].url,
+    gallery: gallery.length > 0 ? gallery : [image.trim() || PRESET_IMAGES[0].url],
+    beds: beds ? Number(beds) : undefined,
+    baths: baths ? Number(baths) : undefined,
+    parkingSpaces: parkingSpaces ? Number(parkingSpaces) : undefined,
+    floors: floors ? Number(floors) : undefined,
+    ageYears: ageYears ? Number(ageYears) : undefined,
+    terrainFront: terrainFront ? Number(terrainFront) : undefined,
+    terrainDepth: terrainDepth ? Number(terrainDepth) : undefined,
+    terrainType: terrainType ? terrainType.trim() : undefined,
+    landUse: landUse ? landUse.trim() : undefined,
+    accessibility: accessibility ? accessibility.trim() : undefined,
+    additionalTerrainInfo: additionalTerrainInfo ? additionalTerrainInfo.trim() : undefined,
+    featured,
+    pdfUrl: pdfUrl.trim() || undefined,
+    pdfTitle: pdfTitle.trim() || undefined,
+    documents,
+  };
+
   if (!isOpen && !isPageView) return null;
 
   const modalBody = (
@@ -409,7 +474,7 @@ export function AdminPropertyModal({
       className={
         isPageView
           ? 'w-full space-y-6 text-slate-800'
-          : 'relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-slate-200 max-h-[92dvh] overflow-hidden flex flex-col'
+          : 'relative w-full max-w-6xl xl:max-w-7xl bg-white rounded-3xl shadow-2xl border border-slate-200 max-h-[92dvh] overflow-hidden flex flex-col'
       }
     >
       {/* Header */}
@@ -499,17 +564,48 @@ export function AdminPropertyModal({
       <form
         onSubmit={handleSubmit}
         className={`${
-          isPageView ? 'space-y-6' : 'p-6 sm:p-8 overflow-y-auto max-h-[calc(92dvh-150px)] space-y-6 flex-1'
+          isPageView ? 'space-y-6' : 'p-4 sm:p-6 lg:p-8 overflow-y-auto max-h-[calc(92dvh-130px)] space-y-6 flex-1'
         } text-slate-800`}
       >
-          {/* Group 1: Identificación y Proyecto */}
-          <div className="space-y-4">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-1 flex items-center justify-between">
-              <span>1. Identificación y Ubicación</span>
-              <span className="text-[10px] text-emerald-600 font-semibold lowercase">
-                * Campos requeridos
-              </span>
-            </h3>
+        {/* Mobile View Switcher (Solo en pantallas móviles < lg) */}
+        <div className="lg:hidden flex items-center justify-between p-1 bg-slate-100 rounded-2xl border border-slate-200">
+          <button
+            type="button"
+            onClick={() => setMobileTab('form')}
+            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              mobileTab === 'form'
+                ? 'bg-white text-slate-900 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <FileText className="h-3.5 w-3.5" />
+            <span>Formulario</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab('preview')}
+            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              mobileTab === 'preview'
+                ? 'bg-[#22A33D] text-white shadow-xs font-black'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Eye className="h-3.5 w-3.5" />
+            <span>Vista Previa en Vivo</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+          {/* Left Column: Formulario completo (7 cols en lg, 8 cols en xl) */}
+          <div className={`lg:col-span-7 xl:col-span-8 space-y-6 ${mobileTab === 'preview' ? 'hidden lg:block' : 'block'}`}>
+            {/* Group 1: Identificación y Proyecto */}
+            <div className="space-y-4">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-1 flex items-center justify-between">
+                <span>1. Identificación y Ubicación</span>
+                <span className="text-[10px] text-emerald-600 font-semibold lowercase">
+                  * Campos requeridos
+                </span>
+              </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
@@ -981,6 +1077,50 @@ export function AdminPropertyModal({
               </div>
             )}
 
+            {/* Quick preset selector */}
+            <div>
+              <span className="text-[11px] font-bold text-slate-700 block mb-1.5">
+                Fotos de ejemplo / Presets sugeridos:
+              </span>
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                {PRESET_IMAGES.map((preset, pIdx) => {
+                  const isCur = image === preset.url;
+                  return (
+                    <button
+                      key={pIdx}
+                      type="button"
+                      onClick={() => {
+                        setImage(preset.url);
+                        if (!gallery.includes(preset.url)) {
+                          setGallery([preset.url, ...gallery]);
+                        }
+                      }}
+                      className={`relative aspect-[4/3] rounded-xl overflow-hidden border-2 text-left transition-all group cursor-pointer ${
+                        isCur
+                          ? 'border-[#22A33D] ring-2 ring-emerald-500/30'
+                          : 'border-slate-200 hover:border-slate-400 opacity-80 hover:opacity-100'
+                      }`}
+                      title={preset.title}
+                    >
+                      <Image
+                        src={preset.url}
+                        alt={preset.title}
+                        fill
+                        sizes="100px"
+                        className="object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-1">
+                        <span className="text-[9px] font-bold text-white leading-tight truncate">
+                          {preset.title.split(' ')[0]}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <div>
               <label className="text-[11px] font-bold text-slate-700 block mb-1">
                 URL de Portada Principal Manual (o selecciona de la galería):
@@ -1230,6 +1370,16 @@ export function AdminPropertyModal({
               </>
             )}
 
+            {/* Mobile preview quick toggle button */}
+            <button
+              type="button"
+              onClick={() => setMobileTab('preview')}
+              className="lg:hidden px-4 py-2.5 rounded-xl border border-emerald-300 bg-emerald-50 text-xs font-bold text-emerald-800 hover:bg-emerald-100 transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              <Eye className="h-4 w-4 text-emerald-600" />
+              <span>Ver Vista Previa</span>
+            </button>
+
             <button
               type="button"
               onClick={onClose}
@@ -1246,8 +1396,185 @@ export function AdminPropertyModal({
               <span>{isEditing ? 'Guardar Cambios' : 'Publicar Inmueble'}</span>
             </button>
           </div>
-        </form>
+        </div>
+
+        {/* Right Column: Sticky Live Preview Column (5 cols en lg, 4 cols en xl) */}
+        <div className={`lg:col-span-5 xl:col-span-4 space-y-4 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto pr-1 ${mobileTab === 'form' ? 'hidden lg:block' : 'block'}`}>
+          <div className="bg-slate-50/80 border border-slate-200/90 rounded-3xl p-4 sm:p-5 shadow-xs space-y-4">
+            {/* Header with Dark Mode Toggle */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200/80">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                  <Eye className="h-4 w-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 leading-tight">
+                    Vista Previa en Vivo
+                  </h4>
+                  <p className="text-[10px] text-slate-400 font-medium">
+                    Simulación en catálogo público
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setDarkPreview(!darkPreview)}
+                  className={`px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all border cursor-pointer ${
+                    darkPreview
+                      ? 'bg-slate-900 text-amber-300 border-slate-700 shadow-xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 shadow-xs'
+                  }`}
+                  title={darkPreview ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+                >
+                  {darkPreview ? <Moon className="h-3 w-3 text-amber-300" /> : <Sun className="h-3 w-3 text-amber-500" />}
+                  <span>{darkPreview ? 'Oscuro' : 'Claro'}</span>
+                </button>
+                <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>En vivo</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Real PropertyCard */}
+            <div className="relative w-full max-w-sm mx-auto shadow-sm rounded-3xl overflow-hidden group">
+              <PropertyCard
+                lot={previewLot}
+                dark={darkPreview}
+                onSelectLot={() => setShowFichaPreviewModal(true)}
+              />
+              {isUploadingImage && (
+                <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-xs flex flex-col items-center justify-center gap-2 text-white p-4 text-center z-10 animate-in fade-in">
+                  <Loader2 className="h-6 w-6 text-emerald-400 animate-spin" />
+                  <span className="text-xs font-bold">Optimizando foto a WebP...</span>
+                </div>
+              )}
+            </div>
+
+            {/* Live Inspection / Metadata Box */}
+            <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 space-y-3 text-xs">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Código:
+                  </span>
+                  <span className="font-mono text-[11px] font-black text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+                    {previewLot.code}
+                  </span>
+                </div>
+                <span
+                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                    status === 'Disponible'
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                      : status === 'En Reserva'
+                      ? 'bg-amber-50 text-amber-800 border-amber-200'
+                      : status === 'Vendido'
+                      ? 'bg-rose-50 text-rose-800 border-rose-200'
+                      : 'bg-slate-100 text-slate-700 border-slate-200'
+                  }`}
+                >
+                  {status}
+                </span>
+              </div>
+
+              <div className="space-y-0.5">
+                <p className="font-bold text-slate-900 truncate">{name || 'Sin título aún'}</p>
+                <p className="text-[11px] text-slate-500 truncate">
+                  {project} · {zone || 'Ubicación sin definir'}
+                </p>
+              </div>
+
+              {/* Financial breakdown */}
+              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-[11px]">
+                <div>
+                  <span className="text-[9px] uppercase font-bold text-slate-400 block">Entrada Mínima</span>
+                  <span className="font-mono font-bold text-slate-800">
+                    ${minDownPaymentUSD.toLocaleString('es-EC')}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[9px] uppercase font-bold text-slate-400 block">Saldo a Financiar</span>
+                  <span className="font-mono font-bold text-slate-800">
+                    ${Math.max(0, priceUSD - minDownPaymentUSD).toLocaleString('es-EC')}
+                  </span>
+                </div>
+              </div>
+
+              {/* Amenities / Services tags preview */}
+              {selectedServices.length > 0 && (
+                <div className="pt-2 border-t border-slate-100">
+                  <span className="text-[9px] uppercase font-bold text-slate-400 block mb-1.5">
+                    Servicios activos ({selectedServices.length})
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {selectedServices.slice(0, 4).map((srv, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[10px] font-medium truncate max-w-[160px]"
+                      >
+                        ✓ {srv}
+                      </span>
+                    ))}
+                    {selectedServices.length > 4 && (
+                      <span className="px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-bold">
+                        +{selectedServices.length - 4} más
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Gallery and Documents count */}
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                <span>📷 {gallery.length} foto{gallery.length !== 1 ? 's' : ''}</span>
+                <span>📄 {documents.length} documento{documents.length !== 1 ? 's' : ''}</span>
+              </div>
+            </div>
+
+            {/* Quick Actions in Preview Panel */}
+            <div className="space-y-2 pt-1">
+              <button
+                type="submit"
+                disabled={isUploadingImage || isUploadingDoc}
+                className="w-full py-3 px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                <Save className="h-4 w-4" />
+                <span>{isEditing ? 'Guardar Cambios' : 'Publicar Inmueble'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowFichaPreviewModal(true)}
+                className="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+              >
+                <Eye className="h-3.5 w-3.5 text-emerald-600" />
+                <span>Ver Ficha Técnica Completa</span>
+              </button>
+
+              {mobileTab === 'preview' && (
+                <button
+                  type="button"
+                  onClick={() => setMobileTab('form')}
+                  className="w-full py-2.5 px-4 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer lg:hidden"
+                >
+                  Volver a Editar Formulario
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
+    </form>
+
+    {/* Interactive Ficha Modal Preview */}
+    <LotDetailsModal
+      lot={previewLot}
+      isOpen={showFichaPreviewModal}
+      onClose={() => setShowFichaPreviewModal(false)}
+      onOpenVisitModal={() => {}}
+    />
+  </div>
   );
 
   if (isPageView) {
