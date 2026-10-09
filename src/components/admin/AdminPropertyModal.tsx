@@ -312,8 +312,8 @@ export function AdminPropertyModal({
   const handleRemovePhoto = (photoUrl: string) => {
     const updated = gallery.filter((p) => p !== photoUrl);
     setGallery(updated);
-    if (image === photoUrl && updated.length > 0) {
-      setImage(updated[0]);
+    if (image === photoUrl) {
+      setImage(updated.length > 0 ? updated[0] : '');
     }
   };
 
@@ -446,8 +446,8 @@ export function AdminPropertyModal({
     <div
       className={
         isPageView
-          ? 'w-full space-y-6 text-slate-800'
-          : 'relative w-full max-w-6xl xl:max-w-7xl bg-white rounded-3xl shadow-2xl border border-slate-200 h-[92dvh] max-h-[92dvh] overflow-hidden flex flex-col'
+          ? 'w-full space-y-6 text-slate-800 lg:pr-[420px] xl:pr-[460px] 2xl:pr-[500px]'
+          : 'relative w-full max-w-7xl bg-white rounded-3xl shadow-2xl border border-slate-200 h-[96dvh] max-h-[96dvh] overflow-hidden flex flex-col'
       }
     >
       {/* Header */}
@@ -577,15 +577,15 @@ export function AdminPropertyModal({
         <div
           className={
             isPageView
-              ? 'grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start'
+              ? 'w-full'
               : 'flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 overflow-hidden'
           }
         >
-          {/* Left Column: Formulario completo (7 cols en lg/xl) */}
+          {/* Left Column: Formulario completo */}
           <div
             className={
               isPageView
-                ? `lg:col-span-7 xl:col-span-7 space-y-6 ${mobileTab === 'preview' ? 'hidden lg:block' : 'block'}`
+                ? `w-full space-y-6 ${mobileTab === 'preview' ? 'hidden lg:block' : 'block'}`
                 : `lg:col-span-7 xl:col-span-7 h-full overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6 ${mobileTab === 'preview' ? 'hidden lg:block' : 'block'}`
             }
           >
@@ -1357,23 +1357,19 @@ export function AdminPropertyModal({
           </div>
         </div>
 
-        {/* Right Column: Sticky Live Preview Column (de arriba a abajo, ocupando todo el alto vertical) */}
+        {/* Right Column: Fixed Live Preview Column (de arriba a abajo, ocupando todo el alto vertical) */}
         <div
-          className={`lg:col-span-5 xl:col-span-5 ${
-            mobileTab === 'form' ? 'hidden lg:flex' : 'flex'
-          } flex-col ${
+          className={
             isPageView
-              ? 'lg:sticky lg:top-4 lg:self-start lg:h-[calc(100vh-2rem)]'
-              : 'h-full border-t lg:border-t-0 lg:border-l border-slate-200 bg-slate-50/95 p-4 sm:p-5'
-          } min-h-0`}
+              ? `lg:fixed lg:top-0 lg:bottom-0 lg:right-0 lg:w-[400px] xl:w-[440px] 2xl:w-[480px] lg:h-screen lg:z-30 ${
+                  mobileTab === 'form' ? 'hidden lg:flex' : 'flex'
+                } flex-col bg-slate-50 border-t lg:border-t-0 lg:border-l border-slate-200 p-4 sm:p-5 shadow-xl min-h-0`
+              : `lg:col-span-5 xl:col-span-5 ${
+                  mobileTab === 'form' ? 'hidden lg:flex' : 'flex'
+                } flex-col h-full border-t lg:border-t-0 lg:border-l border-slate-200 bg-slate-50/95 p-4 sm:p-5 min-h-0`
+          }
         >
-          <div
-            className={
-              isPageView
-                ? 'h-full flex flex-col justify-between bg-slate-50/90 border border-slate-200/90 rounded-3xl p-4 sm:p-5 shadow-xs min-h-0 overflow-hidden'
-                : 'h-full flex flex-col justify-between min-h-0 overflow-hidden'
-            }
-          >
+          <div className="h-full flex flex-col justify-between min-h-0 overflow-hidden">
             {/* Header with Dark Mode Toggle (Pinned at top) */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 shrink-0">
               <div className="flex items-center gap-2">
@@ -1428,13 +1424,25 @@ export function AdminPropertyModal({
               </div>
 
               {/* Live Inspection / Metadata Box */}
-              <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 space-y-3 text-xs">
+              <div
+                className={`rounded-2xl p-3.5 border space-y-3 text-xs transition-colors ${
+                  darkPreview
+                    ? 'bg-slate-900 border-slate-800 text-slate-200'
+                    : 'bg-white border-slate-200/80 text-slate-800'
+                }`}
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                       Código:
                     </span>
-                    <span className="font-mono text-[11px] font-black text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+                    <span
+                      className={`font-mono text-[11px] font-black px-1.5 py-0.5 rounded border ${
+                        darkPreview
+                          ? 'text-white bg-slate-800 border-slate-700'
+                          : 'text-slate-800 bg-slate-100 border-slate-200'
+                      }`}
+                    >
                       {previewLot.code}
                     </span>
                   </div>
@@ -1454,23 +1462,29 @@ export function AdminPropertyModal({
                 </div>
 
                 <div className="space-y-0.5">
-                  <p className="font-bold text-slate-900 truncate">{name || 'Sin título aún'}</p>
-                  <p className="text-[11px] text-slate-500 truncate">
+                  <p className={`font-bold truncate ${darkPreview ? 'text-white' : 'text-slate-900'}`}>
+                    {name || 'Sin título aún'}
+                  </p>
+                  <p className={`text-[11px] truncate ${darkPreview ? 'text-slate-400' : 'text-slate-500'}`}>
                     {project} · {zone || 'Ubicación sin definir'}
                   </p>
                 </div>
 
                 {/* Financial breakdown */}
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-[11px]">
+                <div
+                  className={`grid grid-cols-2 gap-2 pt-2 border-t text-[11px] ${
+                    darkPreview ? 'border-slate-800' : 'border-slate-100'
+                  }`}
+                >
                   <div>
                     <span className="text-[9px] uppercase font-bold text-slate-400 block">Entrada Mínima</span>
-                    <span className="font-mono font-bold text-slate-800">
+                    <span className={`font-mono font-bold ${darkPreview ? 'text-white' : 'text-slate-800'}`}>
                       ${minDownPaymentUSD.toLocaleString('es-EC')}
                     </span>
                   </div>
                   <div className="text-right">
                     <span className="text-[9px] uppercase font-bold text-slate-400 block">Saldo a Financiar</span>
-                    <span className="font-mono font-bold text-slate-800">
+                    <span className={`font-mono font-bold ${darkPreview ? 'text-white' : 'text-slate-800'}`}>
                       ${Math.max(0, priceUSD - minDownPaymentUSD).toLocaleString('es-EC')}
                     </span>
                   </div>
@@ -1478,7 +1492,7 @@ export function AdminPropertyModal({
 
                 {/* Amenities / Services tags preview */}
                 {selectedServices.length > 0 && (
-                  <div className="pt-2 border-t border-slate-100">
+                  <div className={`pt-2 border-t ${darkPreview ? 'border-slate-800' : 'border-slate-100'}`}>
                     <span className="text-[9px] uppercase font-bold text-slate-400 block mb-1.5">
                       Servicios activos ({selectedServices.length})
                     </span>
@@ -1501,7 +1515,11 @@ export function AdminPropertyModal({
                 )}
 
                 {/* Gallery and Documents count */}
-                <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                <div
+                  className={`pt-2 border-t flex items-center justify-between text-[11px] ${
+                    darkPreview ? 'border-slate-800 text-slate-400' : 'border-slate-100 text-slate-500'
+                  }`}
+                >
                   <span>📷 {gallery.length} foto{gallery.length !== 1 ? 's' : ''}</span>
                   <span>📄 {documents.length} documento{documents.length !== 1 ? 's' : ''}</span>
                 </div>

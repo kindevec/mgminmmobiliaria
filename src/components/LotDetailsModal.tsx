@@ -11,6 +11,7 @@ import {
   MapPin,
   TrendingUp,
   FileText,
+  ImageIcon,
   BadgeCheck,
   BedDouble,
   Bath,
@@ -83,7 +84,7 @@ export function LotDetailsModal({
             </>
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900 text-slate-400 gap-2 p-6 text-center">
-              <FileText className="h-10 w-10 text-slate-600" />
+              <ImageIcon className="h-10 w-10 text-slate-600" />
               <span className="text-sm font-semibold text-slate-300">Sin fotos registradas</span>
               <span className="text-xs text-slate-500">Sube fotos en el formulario para visualizarlas aquí</span>
             </div>

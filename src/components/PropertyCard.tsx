@@ -62,7 +62,9 @@ export function PropertyCard({
         <div className="space-y-2">
           <div className="space-y-0.5">
             <h3
-              className="text-sm sm:text-base font-black text-slate-900 leading-snug tracking-tight group-hover:text-emerald-700 transition-colors line-clamp-1"
+              className={`text-sm sm:text-base font-black leading-snug tracking-tight group-hover:text-emerald-400 transition-colors line-clamp-1 ${
+                dark ? 'text-white' : 'text-slate-900'
+              }`}
               title={lot.name}
             >
               {lot.name}
@@ -70,20 +72,54 @@ export function PropertyCard({
           </div>
 
           {/* Ficha métrica abierta y arquitectónica */}
-          <div className="py-2 border-y border-slate-100 grid grid-cols-2 divide-x divide-slate-100 text-slate-700">
+          <div
+            className={`py-2 border-y grid grid-cols-2 divide-x ${
+              dark
+                ? 'border-slate-800 divide-slate-800 text-slate-300'
+                : 'border-slate-100 divide-slate-100 text-slate-700'
+            }`}
+          >
             <div className="pr-2">
-              <span className="text-[9px] font-bold text-slate-600 uppercase tracking-wider block">Superficie</span>
+              <span
+                className={`text-[9px] font-bold uppercase tracking-wider block ${
+                  dark ? 'text-slate-400' : 'text-slate-600'
+                }`}
+              >
+                Superficie
+              </span>
               <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="font-mono text-sm sm:text-base font-black text-slate-900 leading-none">{lot.areaM2}</span>
-                <span className="text-[11px] font-semibold text-slate-500">m²</span>
+                <span
+                  className={`font-mono text-sm sm:text-base font-black leading-none ${
+                    dark ? 'text-white' : 'text-slate-900'
+                  }`}
+                >
+                  {lot.areaM2}
+                </span>
+                <span className={`text-[11px] font-semibold ${dark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  m²
+                </span>
               </div>
             </div>
 
             <div className="pl-2 text-right">
-              <span className="text-[9px] font-bold text-slate-600 uppercase tracking-wider block">Financiamiento</span>
+              <span
+                className={`text-[9px] font-bold uppercase tracking-wider block ${
+                  dark ? 'text-slate-400' : 'text-slate-600'
+                }`}
+              >
+                Financiamiento
+              </span>
               <div className="flex items-baseline justify-end gap-1 mt-0.5">
-                <span className="font-mono text-sm sm:text-base font-black text-slate-900 leading-none">{lot.maxMonths}</span>
-                <span className="text-[11px] font-semibold text-slate-500">meses</span>
+                <span
+                  className={`font-mono text-sm sm:text-base font-black leading-none ${
+                    dark ? 'text-white' : 'text-slate-900'
+                  }`}
+                >
+                  {lot.maxMonths}
+                </span>
+                <span className={`text-[11px] font-semibold ${dark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  meses
+                </span>
               </div>
             </div>
           </div>
@@ -93,26 +129,50 @@ export function PropertyCard({
         <div className="space-y-3 pt-0.5">
           <div className="flex items-end justify-between">
             <div className="space-y-0.5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">
+              <span
+                className={`text-[10px] font-bold uppercase tracking-wider block ${
+                  dark ? 'text-slate-400' : 'text-slate-600'
+                }`}
+              >
                 Precio de Lista
               </span>
               <div className="flex items-baseline gap-1">
-                <span className="text-xl sm:text-2xl font-black text-slate-900 font-mono tracking-tight leading-none">
+                <span
+                  className={`text-xl sm:text-2xl font-black font-mono tracking-tight leading-none ${
+                    dark ? 'text-white' : 'text-slate-900'
+                  }`}
+                >
                   ${lot.priceUSD.toLocaleString('es-EC')}
                 </span>
-                <span className="text-xs font-bold text-slate-600 font-sans">USD</span>
+                <span className={`text-xs font-bold font-sans ${dark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  USD
+                </span>
               </div>
             </div>
 
             <div className="text-right space-y-0.5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 block">
+              <span
+                className={`text-[10px] font-bold uppercase tracking-wider block ${
+                  dark ? 'text-emerald-400' : 'text-emerald-800'
+                }`}
+              >
                 Cuota Mensual
               </span>
               <div className="flex items-baseline justify-end gap-0.5">
-                <span className="text-sm sm:text-base font-black text-emerald-700 font-mono leading-none">
+                <span
+                  className={`text-sm sm:text-base font-black font-mono leading-none ${
+                    dark ? 'text-emerald-400' : 'text-emerald-700'
+                  }`}
+                >
                   ${lot.estimatedMonthlyUSD}
                 </span>
-                <span className="text-xs font-bold text-emerald-800/80 font-sans">/mes</span>
+                <span
+                  className={`text-xs font-bold font-sans ${
+                    dark ? 'text-emerald-400/80' : 'text-emerald-800/80'
+                  }`}
+                >
+                  /mes
+                </span>
               </div>
             </div>
           </div>
@@ -125,7 +185,9 @@ export function PropertyCard({
                 e.stopPropagation();
                 onSelectLot(lot);
               }}
-              className="action-btn-ficha py-2.5 px-2 text-slate-800 hover:text-[#113d22] font-bold text-xs sm:text-sm transition-colors cursor-pointer flex items-center justify-center gap-1.5 hover:underline"
+              className={`action-btn-ficha py-2.5 px-2 font-bold text-xs sm:text-sm transition-colors cursor-pointer flex items-center justify-center gap-1.5 hover:underline ${
+                dark ? 'text-slate-200 hover:text-white' : 'text-slate-800 hover:text-[#113d22]'
+              }`}
             >
               <span>Ver Ficha</span>
               <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
