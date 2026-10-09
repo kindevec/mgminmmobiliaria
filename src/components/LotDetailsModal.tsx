@@ -59,10 +59,18 @@ export function LotDetailsModal({
         <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] bg-slate-950 overflow-hidden shrink-0">
           <Image
             src={photos[activePhotoIdx]}
+            alt=""
+            fill
+            aria-hidden="true"
+            className="object-cover blur-2xl opacity-40 scale-110 pointer-events-none"
+            referrerPolicy="no-referrer"
+          />
+          <Image
+            src={photos[activePhotoIdx]}
             alt={lot.name}
             fill
             sizes="(max-width: 1024px) 100vw, 800px"
-            className="object-cover"
+            className="object-contain object-center z-10"
             referrerPolicy="no-referrer"
           />
 

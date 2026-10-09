@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import {
   ArrowLeft,
   Building,
@@ -25,7 +26,11 @@ import {
 import type { LotProperty } from '@/src/data/lots';
 import type { PageView } from '@/src/data/navigation';
 import { useProperties } from '@/src/context/PropertyContext';
-import { InteractiveMapPicker } from '@/src/components/common/InteractiveMapPicker';
+
+const InteractiveMapPicker = dynamic(
+  () => import('@/src/components/common/InteractiveMapPicker').then((m) => m.InteractiveMapPicker),
+  { ssr: false }
+);
 
 interface NewPropertyViewProps {
   onNavigate: (page: PageView) => void;

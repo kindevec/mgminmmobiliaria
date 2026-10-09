@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
 import { LOTS_DATA, type LotProperty } from '@/src/data/lots';
 
-const STORAGE_KEY = 'mgm_inmobiliaria_inventory_v2';
+const STORAGE_KEY = 'mgm_inmobiliaria_inventory_v4';
 
 interface PropertyMetrics {
   totalCount: number;

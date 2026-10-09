@@ -283,11 +283,19 @@ export function PropertyDetailView({
                 >
                   <Image
                     src={photos[activePhotoIdx]}
+                    alt=""
+                    fill
+                    aria-hidden="true"
+                    className="object-cover blur-2xl opacity-40 scale-110 pointer-events-none"
+                    referrerPolicy="no-referrer"
+                  />
+                  <Image
+                    src={photos[activePhotoIdx]}
                     alt={`${lot.name} - Foto ${activePhotoIdx + 1}`}
                     fill
                     priority
                     sizes="(max-width: 1024px) 100vw, 60vw"
-                    className="object-cover object-center"
+                    className="object-contain object-center z-10"
                     referrerPolicy="no-referrer"
                   />
                 </motion.div>
