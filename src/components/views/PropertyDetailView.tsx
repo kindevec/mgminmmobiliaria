@@ -206,14 +206,6 @@ export function PropertyDetailView({
   const photos = lot.gallery && lot.gallery.length > 0 ? lot.gallery : [lot.image];
   const isHouse = lot.type === 'Vivienda';
 
-  // Desplazamiento manual suave para la tira de miniaturas
-  const scrollThumbnails = (direction: 'left' | 'right') => {
-    if (thumbnailsRef.current) {
-      const scrollAmount = direction === 'left' ? -220 : 220;
-      thumbnailsRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-  };
-
   // Filtrar propiedades recomendadas (excluyendo la actual)
   const recommendedLots = allLots.filter((item) => item.id !== lot.id);
 
@@ -452,37 +444,14 @@ export function PropertyDetailView({
             {/* Galería de Miniaturas Clicables (Sin scrollbar, con controles ergonómicos) */}
             {photos.length > 1 && (
               <div className="space-y-2.5 pt-1">
-                {/* Cabecera y Controles de la Galería */}
-                <div className="flex items-center justify-between px-1">
-                  <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <ImageIcon className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                    <span className="font-semibold text-slate-700">Explorar fotos</span>
-                    <span className="w-1 h-1 rounded-full bg-slate-300" />
-                    <span className="font-mono text-slate-600 font-medium">
-                      <strong className="text-emerald-700 font-bold">{activePhotoIdx + 1}</strong> de {photos.length}
-                    </span>
-                  </div>
-
-                  {photos.length > 4 && (
-                    <div className="hidden sm:flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => scrollThumbnails('left')}
-                        aria-label="Desplazar miniaturas a la izquierda"
-                        className="w-7 h-7 rounded-lg border border-slate-200 bg-white hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 text-slate-600 flex items-center justify-center transition-all cursor-pointer shadow-2xs active:scale-95"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => scrollThumbnails('right')}
-                        aria-label="Desplazar miniaturas a la derecha"
-                        className="w-7 h-7 rounded-lg border border-slate-200 bg-white hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 text-slate-600 flex items-center justify-center transition-all cursor-pointer shadow-2xs active:scale-95"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </button>
-                    </div>
-                  )}
+                {/* Indicador de fotos */}
+                <div className="flex items-center gap-2 px-1 text-xs text-slate-500">
+                  <ImageIcon className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                  <span className="font-semibold text-slate-700">Galería</span>
+                  <span className="w-1 h-1 rounded-full bg-slate-300" />
+                  <span className="font-mono text-slate-600 font-medium">
+                    <strong className="text-emerald-700 font-bold">{activePhotoIdx + 1}</strong> de {photos.length}
+                  </span>
                 </div>
 
                 {/* Contenedor Deslizable con Gradientes de Desvanecimiento Lateral */}
@@ -516,15 +485,6 @@ export function PropertyDetailView({
                           className="object-cover"
                           referrerPolicy="no-referrer"
                         />
-                        <span
-                          className={`absolute bottom-1 right-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold leading-none backdrop-blur-xs transition-colors ${
-                            activePhotoIdx === idx
-                              ? 'bg-emerald-600 text-white shadow-2xs'
-                              : 'bg-black/60 text-white/90'
-                          }`}
-                        >
-                          {idx + 1}
-                        </span>
                       </button>
                     ))}
                   </div>
