@@ -129,43 +129,85 @@ const PURCHASE_PROCESS_STEPS = [
   },
 ];
 
-// 4. Beneficios Urbanos & Infraestructura Real de MGM
+// 4. Beneficios Urbanos & Infraestructura Real de MGM (Especificaciones de Ingeniería Civil)
 const URBAN_BENEFIT_ITEMS = [
   {
+    code: '01 / INFRA-VIAL',
+    status: 'CONCLUIDO IN SITU',
     title: 'Vías Adoquinadas 10 a 12m',
-    desc: 'Calzadas vehiculares amplias de alto tránsito con bordillos de hormigón y aceras peatonales.',
+    desc: 'Calzadas vehiculares amplias de alto tránsito con bordillos de hormigón armado y aceras peatonales integradas.',
     icon: Building,
     tag: 'Vialidad & Acceso',
+    specs: [
+      { label: 'Sección', val: '10.00m a 12.00m' },
+      { label: 'Capa Rodadura', val: 'Adoquín 400 kg/cm²' },
+      { label: 'Confinamiento', val: 'Bordillos Hormigón' },
+    ],
   },
   {
+    code: '02 / SERV-SOTERRADOS',
+    status: '100% SUBTERRÁNEO',
     title: 'Redes de Servicios Soterradas',
-    desc: 'Agua potable presurizada, alcantarillado sanitario y ductería subterránea eléctrica y fibra óptica.',
+    desc: 'Distribución técnica subterránea sin cableado aéreo visible: agua presurizada, alcantarillado sanitario y ductos para fibra óptica.',
     icon: KeyRound,
     tag: 'Servicios Básicos',
+    specs: [
+      { label: 'Red Hídrica', val: 'Presurizada con acometida' },
+      { label: 'Sanitario', val: 'Alcantarillado conectado' },
+      { label: 'Telecom', val: 'Ductería FTTH subterránea' },
+    ],
   },
   {
+    code: '03 / ECO-RESERVA',
+    status: 'ÁREA PROTEGIDA',
     title: '+8.000 m² de Áreas Verdes',
-    desc: 'Parques recreativos familiares, caminerías arboladas y áreas de esparcimiento al aire libre.',
+    desc: 'Espacios recreativos integrados a la trama urbana con caminerías ecológicas, parques familiares y reforestación de especies nativas.',
     icon: Trees,
     tag: 'Naturaleza & Bienestar',
+    specs: [
+      { label: 'Superficie', val: '+8.000 m² comunales' },
+      { label: 'Equipamiento', val: 'Senderos & arborización' },
+      { label: 'Entorno', val: 'Microclima residencial' },
+    ],
   },
   {
+    code: '04 / CMPLX-DEP',
+    status: 'ILUMINADO LED',
     title: 'Complejo Deportivo Multiuso',
-    desc: 'Canchas iluminadas para fútbol, básquetbol y actividades deportivas comunitarias.',
+    desc: 'Infraestructura deportiva polivalente con cerramiento técnico perimetral para fútbol, básquetbol y actividades físicas comunitarias.',
     icon: Sparkles,
     tag: 'Deporte & Salud',
+    specs: [
+      { label: 'Canchas', val: 'Fútbol y básquetbol' },
+      { label: 'Iluminación', val: 'Reflectores LED nocturnos' },
+      { label: 'Uso', val: 'Exclusivo residentes' },
+    ],
   },
   {
+    code: '05 / CTRL-ACCESO',
+    status: 'OPERATIVO 24/7',
     title: 'Garita & Seguridad Integral',
-    desc: 'Comunidades planificadas con control perimetral y vigilancia para tranquilidad de tu familia.',
+    desc: 'Diseño urbanístico concebido con pórtico de control de ingreso, monitoreo perimetral y barreras vehiculares para tranquilidad familiar.',
     icon: ShieldCheck,
     tag: 'Seguridad 24/7',
+    specs: [
+      { label: 'Acceso', val: 'Garita de control y pluma' },
+      { label: 'Perímetro', val: 'Cierre perimetral definido' },
+      { label: 'Régimen', val: 'Seguridad comunitaria' },
+    ],
   },
   {
+    code: '06 / GEOTEC-TOPOG',
+    status: 'APTO EDIFICACIÓN',
     title: 'Topografía Plana Calificada',
-    desc: 'Lotes 100% delimitados y planos, aptos para cimentación y construcción habitacional inmediata.',
+    desc: 'Lotes con rasantes niveladas y estudio de mecánica de suelos aptos para cimentación inmediata, eliminando sobrecostos de movimiento de tierras.',
     icon: Award,
     tag: 'Certeza Constructiva',
+    specs: [
+      { label: 'Pendiente', val: 'Plana (< 2% inclinación)' },
+      { label: 'Cimentación', val: 'Apta para obra directa' },
+      { label: 'Linderación', val: 'Hitos georreferenciados UTM' },
+    ],
   },
 ];
 
@@ -306,190 +348,112 @@ export function HomeView({
   return (
     <div className="w-full overflow-hidden bg-white text-slate-900 selection:bg-emerald-600 selection:text-white">
       {/* =========================================================================
-          1. HERO INMOBILIARIO AMPLIO CON FOTOGRAFÍA PANORÁMICA & DOS ACCIONES
+          1. HERO INMOBILIARIO PANORÁMICO EDGE-TO-EDGE (FULL BLEED, TEXTO SOBRE IMAGEN)
           ========================================================================= */}
-      <section className="group/hero relative w-full bg-[#0a2315] text-white overflow-hidden min-h-[620px] sm:min-h-[680px] lg:min-h-[720px] flex flex-col justify-center select-none pt-20 sm:pt-24 lg:pt-20 pb-12 sm:pb-16 lg:pb-12">
-        {/* Sutil halo ambiental corporativo de fondo */}
-        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_80%_80%_at_20%_40%,rgba(21,128,61,0.22),transparent_70%)]" />
-
-        <div className="relative z-10 w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-center w-full">
-            
-            {/* =========================================================================
-                ZONA IZQUIERDA: Identidad Editorial, Título, Párrafo y Botones de Acción
-                ========================================================================= */}
-            <div className="lg:col-span-6 xl:col-span-5 flex flex-col items-start text-left space-y-5 sm:space-y-6 select-text cursor-default">
-              {/* Eyebrow / Insignia editorial superior */}
-              <ScrollReveal direction="down" delay={0.05} duration={0.65}>
-                <div className="flex items-center gap-3">
-                  <AnimatedInsignia className="scale-85 sm:scale-95" size={42} />
-                  <div className="flex flex-col">
-                    <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-[0.22em] uppercase text-[#F58220]">
-                      Sociedad Civil MGM Inmobiliaria · Ecuador
-                    </span>
-                    <span className="text-[10px] sm:text-[11px] font-sans font-semibold tracking-wider uppercase text-emerald-400/80">
-                      Certeza Notarial / Obra Civil / Crédito Directo
-                    </span>
-                  </div>
-                </div>
-              </ScrollReveal>
-
-              {/* Título Principal de Estilo Editorial */}
-              <ScrollReveal direction="down" delay={0.15} duration={0.7}>
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-black text-white leading-[1.08] tracking-tight [text-wrap:balance]">
-                  Tierra Firme, Certeza Jurídica
-                  <br />
-                  <span className="text-[#5be196]">y el Hogar </span>
-                  <span className="text-[#F58220]">de tu Familia</span>
-                </h1>
-              </ScrollReveal>
-
-              {/* Párrafo Descriptivo con ancho controlado */}
-              <ScrollReveal direction="up" delay={0.25} duration={0.65}>
-                <p className="text-sm sm:text-base lg:text-lg text-emerald-50/85 leading-relaxed font-normal max-w-xl">
-                  Desarrollamos comunidades residenciales y comerciales con obras civiles concluidas, servicios básicos garantizados in situ y crédito directo hasta 48 meses sin bancos ni buró de crédito.
-                </p>
-              </ScrollReveal>
-
-              {/* Acciones Principales con flechas y contraste */}
-              <ScrollReveal direction="zoom" delay={0.35} duration={0.6}>
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2 w-full max-w-md">
-                  <button
-                    type="button"
-                    onClick={() => onNavigate('properties')}
-                    className="inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3.5 rounded-full bg-[#15803d] hover:bg-[#166534] text-white font-bold text-sm tracking-wide transition-all shadow-xl hover:shadow-[#15803d]/30 hover:scale-[1.02] active:scale-98 cursor-pointer border border-[#5be196]/40 text-center"
-                  >
-                    <span>Explorar Propiedades</span>
-                    <ArrowRight className="h-4 w-4 stroke-[2.5]" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => onOpenVisitModal('Visita Guiada en Terreno')}
-                    className="inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3.5 rounded-full bg-white/95 hover:bg-white text-slate-900 font-bold text-sm tracking-wide transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-98 cursor-pointer border border-white/50 text-center"
-                  >
-                    <Calendar className="h-4 w-4 text-[#113d22]" />
-                    <span>Agendar Visita a Obra</span>
-                  </button>
-                </div>
-              </ScrollReveal>
+      <section
+        className="group/hero relative w-full bg-[#07190f] text-white overflow-hidden min-h-[640px] sm:min-h-[700px] lg:min-h-[760px] flex flex-col justify-center select-none pt-24 sm:pt-28 pb-16 sm:pb-20"
+        onMouseEnter={() => setHeroHovered(true)}
+        onMouseLeave={() => setHeroHovered(false)}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* Fotografía Inmobiliaria Panorámica Protagonista: Ocupa todo el ancho y alto de pantalla (edge-to-edge) */}
+        <div className="absolute inset-0 w-full h-full">
+          {HERO_REAL_ESTATE_IMAGES.map((img, idx) => (
+            <div
+              key={idx}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                heroImgIndex === idx ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <Image
+                src={img.url}
+                alt={img.alt}
+                fill
+                priority={idx === 0}
+                sizes="100vw"
+                className="object-cover object-center transform transition-transform duration-7000 ease-out hover:scale-105"
+                referrerPolicy="no-referrer"
+              />
             </div>
+          ))}
 
-            {/* =========================================================================
-                ZONA DERECHA: Fotografía Inmobiliaria Protagonista (Nítida, sin blur)
-                ========================================================================= */}
-            <div className="lg:col-span-6 xl:col-span-7 w-full">
-              <ScrollReveal direction="up" delay={0.2} duration={0.7}>
-                <div
-                  className="relative w-full h-[360px] sm:h-[440px] md:h-[500px] lg:h-[540px] xl:h-[600px] rounded-2xl sm:rounded-3xl overflow-hidden border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.45)] bg-[#0f2e1c]"
-                  onMouseEnter={() => setHeroHovered(true)}
-                  onMouseLeave={() => setHeroHovered(false)}
-                  onTouchStart={handleTouchStart}
-                  onTouchEnd={handleTouchEnd}
-                >
-                  {/* Diapositivas de fotografía arquitectónica de alta nitidez */}
-                  {HERO_REAL_ESTATE_IMAGES.map((img, idx) => (
-                    <div
-                      key={idx}
-                      className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                        heroImgIndex === idx ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none'
-                      }`}
-                    >
-                      <Image
-                        src={img.url}
-                        alt={img.alt}
-                        fill
-                        priority={idx === 0}
-                        sizes="(max-width: 1024px) 100vw, 50vw"
-                        className="object-cover object-center transform transition-transform duration-7000 ease-out hover:scale-105"
-                        referrerPolicy="no-referrer"
-                      />
-                    </div>
-                  ))}
+          {/* Degradados cinematográficos para máxima legibilidad editorial del texto directamente sobre la foto */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#07190f]/95 via-[#07190f]/80 sm:via-[#07190f]/60 to-[#07190f]/25 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#07190f] via-transparent to-black/35 pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_75%_at_25%_45%,rgba(21,128,61,0.22),transparent_75%)] pointer-events-none" />
+        </div>
 
-                  {/* Sutil viñeta degradada perimetral para proteger la nitidez de la foto sin oscurecerla */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/20 pointer-events-none" />
+        {/* CONTENIDO EDITORIAL: Directamente sobre la foto, sin estar encerrado en ningún box */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+          <div className="max-w-2xl lg:max-w-3xl flex flex-col items-start text-left select-text cursor-default">
+            {/* Título Principal de Estilo Editorial */}
+            <ScrollReveal direction="down" delay={0.1} duration={0.7}>
+              <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.06] tracking-tight [text-wrap:balance] drop-shadow-md">
+                Tierra Firme, Certeza Jurídica
+                <br />
+                <span className="text-[#5be196]">y el Hogar </span>
+                <span className="text-[#F58220]">de tu Familia</span>
+              </h1>
+            </ScrollReveal>
 
-                  {/* Pastilla flotante editorial de atributos (estilo referencia) */}
-                  <div className="absolute top-4 left-4 sm:top-5 sm:left-5 z-20 pointer-events-none">
-                    <div className="px-3 py-1.5 rounded-lg bg-black/50 backdrop-blur-md border border-white/15 flex flex-col">
-                      <span className="text-[10px] font-mono tracking-widest uppercase text-emerald-300 font-bold">
-                        PROPIEDAD RESIDENCIAL
-                      </span>
-                      <span className="text-[11px] text-white font-medium">
-                        Obras Concluidas &amp; Lotes Listos
-                      </span>
-                    </div>
-                  </div>
+            {/* Párrafo Descriptivo con tipografía limpia */}
+            <ScrollReveal direction="up" delay={0.2} duration={0.65}>
+              <p className="text-sm sm:text-base lg:text-xl text-emerald-50/90 leading-relaxed font-normal max-w-2xl mt-4 sm:mt-6 drop-shadow-xs">
+                Desarrollamos comunidades residenciales y comerciales con obras civiles concluidas, servicios básicos garantizados in situ y crédito directo hasta 48 meses sin bancos ni buró de crédito.
+              </p>
+            </ScrollReveal>
+          </div>
+        </div>
 
-                  {/* Barra inferior integrada: Paginador numérico estilo editorial ("01 / 06") y flechas */}
-                  <div className="absolute bottom-4 left-4 right-4 sm:bottom-5 sm:left-5 sm:right-5 z-20 flex items-center justify-between">
-                    {/* Contador de slides */}
-                    <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white text-xs sm:text-sm font-mono font-medium shadow-md">
-                      <span className="text-[#5be196] font-bold">
-                        {String(heroImgIndex + 1).padStart(2, '0')}
-                      </span>
-                      <span className="text-white/40">/</span>
-                      <span className="text-white/70">
-                        {String(HERO_REAL_ESTATE_IMAGES.length).padStart(2, '0')}
-                      </span>
-                    </div>
+        {/* Controles de diapositivas en esquina inferior (sin contador numérico "01/07") */}
+        <div className="absolute bottom-6 right-4 sm:bottom-8 sm:right-8 lg:right-12 z-20 flex items-center gap-3">
+          {/* Indicadores lineales / dots */}
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/15">
+            {HERO_REAL_ESTATE_IMAGES.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setHeroImgIndex(i);
+                }}
+                aria-label={`Ver diapositiva ${i + 1}`}
+                className="p-1 flex items-center justify-center cursor-pointer"
+              >
+                <span
+                  className={`h-1.5 rounded-full transition-all block ${
+                    heroImgIndex === i ? 'w-5 bg-[#5be196]' : 'w-1.5 bg-white/40 hover:bg-white'
+                  }`}
+                />
+              </button>
+            ))}
+          </div>
 
-                    {/* Indicadores lineales y controles de flechas */}
-                    <div className="flex items-center gap-2">
-                      {/* Dots táctiles / clicables */}
-                      <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/15">
-                        {HERO_REAL_ESTATE_IMAGES.map((_, i) => (
-                          <button
-                            key={i}
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setHeroImgIndex(i);
-                            }}
-                            aria-label={`Ver diapositiva ${i + 1}`}
-                            className="p-1 flex items-center justify-center cursor-pointer"
-                          >
-                            <span
-                              className={`h-1.5 rounded-full transition-all block ${
-                                heroImgIndex === i ? 'w-5 bg-[#5be196]' : 'w-1.5 bg-white/40 hover:bg-white'
-                              }`}
-                            />
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* Flechas compactas integradas */}
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            prevHeroImage();
-                          }}
-                          aria-label="Diapositiva anterior"
-                          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-black/60 hover:bg-black/85 text-white/90 hover:text-white border border-white/25 hover:border-white/60 backdrop-blur-md transition-all active:scale-95 cursor-pointer shadow-md"
-                        >
-                          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            nextHeroImage();
-                          }}
-                          aria-label="Siguiente diapositiva"
-                          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-black/60 hover:bg-black/85 text-white/90 hover:text-white border border-white/25 hover:border-white/60 backdrop-blur-md transition-all active:scale-95 cursor-pointer shadow-md"
-                        >
-                          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </ScrollReveal>
-            </div>
-
+          {/* Flechas compactas */}
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                prevHeroImage();
+              }}
+              aria-label="Diapositiva anterior"
+              className="w-10 h-10 rounded-full flex items-center justify-center bg-black/60 hover:bg-black/85 text-white/90 hover:text-white border border-white/25 hover:border-white/60 backdrop-blur-md transition-all active:scale-95 cursor-pointer shadow-md"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                nextHeroImage();
+              }}
+              aria-label="Siguiente diapositiva"
+              className="w-10 h-10 rounded-full flex items-center justify-center bg-black/60 hover:bg-black/85 text-white/90 hover:text-white border border-white/25 hover:border-white/60 backdrop-blur-md transition-all active:scale-95 cursor-pointer shadow-md"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </section>
@@ -666,17 +630,6 @@ export function HomeView({
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent pointer-events-none" />
 
-                {/* Badge Flotante Superior: Recorrido en Terreno */}
-                <div className="absolute top-4 left-4 z-10">
-                  <button
-                    type="button"
-                    onClick={() => onOpenVisitModal('Recorrido en Terreno')}
-                    className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 hover:bg-[#22A33D] text-white text-xs font-bold backdrop-blur-md border border-white/25 transition-all shadow-md cursor-pointer"
-                  >
-                    <Calendar className="h-3.5 w-3.5 text-emerald-400" />
-                    <span>Visitas Guiadas a Obra</span>
-                  </button>
-                </div>
 
                 {/* Badge Flotante Inferior: Garantía de Obras */}
                 <div className="absolute bottom-5 left-5 right-5 z-10 p-4 rounded-2xl bg-white/95 backdrop-blur-md border border-white/40 shadow-xl flex items-center justify-between gap-4">
@@ -761,24 +714,25 @@ export function HomeView({
       </section>
 
       {/* =========================================================================
-          7. BENEFICIOS Y URBANISMO EN COMPOSICIÓN VISUAL CLARA
+          7. BENEFICIOS Y URBANISMO: EXPEDIENTE TÉCNICO EDITORIAL (ESTUDIO ARQUITECTÓNICO)
           ========================================================================= */}
-      <section className="relative w-full bg-[#f4f7ee] text-slate-900 py-14 sm:py-20 border-b border-[#dce3d2]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
-          <ScrollReveal direction="down" delay={0.1} className="text-center max-w-2xl mx-auto space-y-2">
-            <span className="text-xs font-mono font-bold tracking-widest uppercase text-[#15803d]">
-              Infraestructura & Urbanismo
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
+      <section className="relative w-full bg-[#f8faf8] text-slate-900 py-16 sm:py-24 border-b border-slate-200/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-12">
+          {/* Encabezado Editorial Técnico */}
+          <ScrollReveal direction="down" delay={0.1} className="text-center max-w-3xl mx-auto space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-100/70 border border-emerald-300/60 text-[#15803d] font-mono text-[11px] font-bold tracking-[0.2em] uppercase">
+              <span>Ingeniería Civil &amp; Urbanismo</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-tight [text-wrap:balance]">
               Beneficios Tangibles en Cada Urbanización
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+            <p className="text-xs sm:text-base text-slate-600 leading-relaxed font-normal max-w-2xl mx-auto">
               Ciudadelas planificadas con obras civiles concluidas in situ, garantizando plusvalía, seguridad y bienestar familiar integral.
             </p>
           </ScrollReveal>
 
-          {/* Grilla de 6 Beneficios Urbanos */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {/* Grilla Arquitectónica de Expedientes Técnicos */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
             {URBAN_BENEFIT_ITEMS.map((item, idx) => {
               const IconComp = item.icon;
               return (
@@ -786,25 +740,50 @@ export function HomeView({
                   key={idx}
                   direction="up"
                   delay={0.06 * idx}
-                  className="group bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-xs hover:shadow-lg hover:border-[#22A33D]/60 transition-all flex flex-col justify-between space-y-3"
+                  className="group relative bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 hover:border-[#15803d]/60 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
                 >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="p-2.5 rounded-xl bg-emerald-50 text-[#22A33D] group-hover:bg-[#22A33D] group-hover:text-white transition-colors">
-                        <IconComp className="h-5 w-5" />
-                      </div>
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50/80 border border-emerald-200/60 px-2.5 py-0.5 rounded-full">
-                        {item.tag}
+                  <div>
+                    {/* Encabezado del módulo: Código técnico y estatus de obra */}
+                    <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 mb-4">
+                      <span className="font-mono text-[10px] font-bold text-slate-400 group-hover:text-[#15803d] tracking-widest transition-colors">
+                        {item.code}
+                      </span>
+                      <span className="font-mono text-[9px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200/70 px-2 py-0.5 rounded">
+                        {item.status}
                       </span>
                     </div>
 
-                    <h3 className="font-bold text-sm sm:text-base text-slate-900 leading-snug group-hover:text-emerald-800 transition-colors">
-                      {item.title}
-                    </h3>
+                    {/* Ícono y Título */}
+                    <div className="flex items-start gap-3.5 mb-3">
+                      <div className="p-2.5 rounded-xl bg-slate-900 text-white group-hover:bg-[#15803d] transition-colors shrink-0 shadow-xs">
+                        <IconComp className="h-5 w-5" strokeWidth={2} />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#15803d] block mb-0.5">
+                          {item.tag}
+                        </span>
+                        <h3 className="font-black text-base sm:text-lg text-slate-900 leading-snug group-hover:text-emerald-800 transition-colors">
+                          {item.title}
+                        </h3>
+                      </div>
+                    </div>
 
-                    <p className="text-xs text-slate-600 leading-relaxed font-normal">
+                    {/* Descripción de Obra */}
+                    <p className="text-xs sm:text-[13px] text-slate-600 leading-relaxed font-normal mb-5">
                       {item.desc}
                     </p>
+                  </div>
+
+                  {/* Ficha Técnica de Parámetros Constructivos */}
+                  <div className="pt-3 border-t border-slate-100 bg-slate-50/70 -mx-6 -mb-6 sm:-mx-7 sm:-mb-7 px-6 sm:px-7 py-3.5 rounded-b-2xl">
+                    <div className="space-y-1.5">
+                      {item.specs.map((sp, sIdx) => (
+                        <div key={sIdx} className="flex items-center justify-between text-[11px]">
+                          <span className="font-mono text-slate-500">{sp.label}:</span>
+                          <span className="font-semibold text-slate-800 text-right">{sp.val}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </ScrollReveal>
               );
@@ -812,20 +791,20 @@ export function HomeView({
           </div>
 
           {/* Botones de Exploración al pie de Beneficios */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
             <a
               href={getGeneralWhatsAppUrl()}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#113d22] hover:bg-[#1a8230] text-white text-xs sm:text-sm font-bold transition-all shadow-md hover:scale-105 active:scale-95 cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[#113d22] hover:bg-[#1a8230] text-white text-xs sm:text-sm font-bold transition-all shadow-md hover:scale-105 active:scale-95 cursor-pointer"
             >
               <WhatsAppIcon size={16} className="text-white shrink-0" />
-              <span>Cotizar por WhatsApp</span>
+              <span>Cotizar</span>
             </a>
             <button
               type="button"
               onClick={() => handleCatalogExplore()}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white hover:bg-slate-100 text-slate-900 border border-slate-300 text-xs sm:text-sm font-bold transition-all shadow-xs hover:scale-105 active:scale-95 cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-white hover:bg-slate-100 text-slate-900 border border-slate-300 text-xs sm:text-sm font-bold transition-all shadow-xs hover:scale-105 active:scale-95 cursor-pointer"
             >
               <span>Explorar Catálogo de Lotes</span>
               <ArrowRight className="h-4 w-4" />
@@ -975,32 +954,21 @@ export function HomeView({
                   ¿Listo para consolidar el patrimonio de tu familia?
                 </h2>
                 <p className="text-xs sm:text-base text-slate-200 leading-relaxed font-normal max-w-2xl">
-                  Agenda un recorrido presencial en obra con transporte corporativo gratuito de la empresa o solicita una cotización personalizada por WhatsApp con crédito directo hasta 48 meses.
+                  Solicita una cotización personalizada con crédito directo hasta 48 meses sin bancos ni buró de crédito para el lote o proyecto de tu elección.
                 </p>
               </div>
 
               {/* Botones de Acción Inmobiliaria */}
               <div className="lg:col-span-4 flex flex-col gap-3 justify-center sm:max-w-md sm:mx-auto lg:max-w-none">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => onOpenVisitModal('Recorrido en Terreno')}
-                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-[#15803d] hover:bg-[#166534] text-white font-bold text-xs sm:text-sm tracking-wide transition-all shadow-lg hover:scale-105 active:scale-95 cursor-pointer border border-[#5be196]/30 text-center"
-                  >
-                    <Calendar className="h-4 w-4 shrink-0" />
-                    <span>Agendar Visita a Obra</span>
-                  </button>
-
-                  <a
-                    href={getGeneralWhatsAppUrl()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-slate-950 font-black text-xs sm:text-sm tracking-wide transition-all shadow-md hover:scale-105 active:scale-95 cursor-pointer text-center"
-                  >
-                    <WhatsAppIcon size={18} className="text-slate-950 shrink-0" />
-                    <span>Hablar por WhatsApp</span>
-                  </a>
-                </div>
+                <a
+                  href={getGeneralWhatsAppUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-slate-950 font-black text-sm tracking-wide transition-all shadow-xl hover:scale-105 active:scale-95 cursor-pointer text-center"
+                >
+                  <WhatsAppIcon size={20} className="text-slate-950 shrink-0" />
+                  <span>Cotizar</span>
+                </a>
 
                 <button
                   type="button"

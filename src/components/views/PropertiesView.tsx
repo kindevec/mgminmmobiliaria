@@ -206,90 +206,65 @@ export function PropertiesView({
   return (
     <div className="w-full bg-white text-slate-900">
       {/* =========================================================================
-          1. BANNER CINEMÁTICO — PANORÁMICO INTEGRAL (SIN PARTICIONES VERTICALES)
+          1. BANNER CINEMÁTICO — FULL BLEED EDGE-TO-EDGE (TEXTO SOBRE IMAGEN, SIN BOXES)
           ========================================================================= */}
-      <section ref={heroRef} className="group/hero relative w-full bg-[#0a2315] text-white overflow-hidden min-h-[580px] sm:min-h-[620px] lg:min-h-[640px] flex flex-col justify-center select-none pt-20 sm:pt-24 lg:pt-20 pb-12 sm:pb-14 lg:pb-12">
-        {/* Sutil halo ambiental corporativo de fondo */}
-        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_80%_80%_at_20%_40%,rgba(21,128,61,0.2),transparent_70%)]" />
+      <section ref={heroRef} className="group/hero relative w-full bg-[#07190f] text-white overflow-hidden min-h-[580px] sm:min-h-[620px] lg:min-h-[660px] flex flex-col justify-center select-none pt-24 sm:pt-28 pb-16 sm:pb-20">
+        {/* Fotografía Panorámica Protagonista de Ancho Completo */}
+        <div className="absolute inset-0 w-full h-full">
+          <Image
+            src={PROPERTIES_HERO_IMAGE.url}
+            alt={PROPERTIES_HERO_IMAGE.alt}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center transform transition-transform duration-1000 ease-out hover:scale-105"
+            referrerPolicy="no-referrer"
+          />
 
-        <div className="relative z-10 w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-center w-full">
-            
-            {/* =========================================================================
-                ZONA IZQUIERDA: Insignia, Título y Descripción Editorial
-                ========================================================================= */}
-            <div className="lg:col-span-6 xl:col-span-5 flex flex-col items-start text-left space-y-4 sm:space-y-5 select-text cursor-default">
-              <ScrollReveal direction="down" delay={0.05} duration={0.65}>
-                <div className="flex items-center gap-3">
-                  <AnimatedInsignia className="scale-85 sm:scale-95" size={42} />
-                  <div className="flex flex-col">
-                    <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-[0.22em] uppercase text-[#5be196]">
-                      Catálogo Oficial de Propiedades
-                    </span>
-                    <span className="text-[10px] sm:text-[11px] font-sans font-semibold tracking-wider uppercase text-emerald-300/80">
-                      Lotes Urbanizados / Certeza Jurídica
-                    </span>
-                  </div>
+          {/* Degradados cinematográficos para proteger contraste editorial directamente sobre la foto */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#07190f]/95 via-[#07190f]/80 sm:via-[#07190f]/60 to-[#07190f]/25 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#07190f] via-transparent to-black/35 pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_75%_at_25%_45%,rgba(21,128,61,0.2),transparent_75%)] pointer-events-none" />
+        </div>
+
+        {/* CONTENIDO EDITORIAL: Directamente sobre la foto, sin cajas envolventes */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+          <div className="max-w-2xl lg:max-w-3xl flex flex-col items-start text-left select-text cursor-default">
+            <ScrollReveal direction="down" delay={0.05} duration={0.65}>
+              <div className="flex items-center gap-3">
+                <AnimatedInsignia className="scale-85 sm:scale-95" size={42} />
+                <div className="flex flex-col">
+                  <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-[0.22em] uppercase text-[#5be196]">
+                    Catálogo Oficial de Propiedades
+                  </span>
+                  <span className="text-[10px] sm:text-[11px] font-sans font-semibold tracking-wider uppercase text-emerald-300/80">
+                    Lotes Urbanizados / Certeza Jurídica
+                  </span>
                 </div>
-              </ScrollReveal>
+              </div>
+            </ScrollReveal>
 
-              <ScrollReveal direction="down" delay={0.15} duration={0.7}>
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-black text-white leading-[1.08] tracking-tight [text-wrap:balance]">
-                  Lotes urbanizados y proyectos con{' '}
-                  <span className="text-[#5be196]">escrituras inmediatas</span>{' '}
-                  <span className="text-[#F58220]">&amp; crédito directo</span>.
-                </h1>
-              </ScrollReveal>
+            <ScrollReveal direction="down" delay={0.15} duration={0.7}>
+              <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.06] tracking-tight [text-wrap:balance] mt-4 sm:mt-5 drop-shadow-md">
+                Lotes urbanizados y proyectos con{' '}
+                <span className="text-[#5be196]">escrituras inmediatas</span>{' '}
+                <span className="text-[#F58220]">&amp; crédito directo</span>.
+              </h1>
+            </ScrollReveal>
 
-              <ScrollReveal direction="up" delay={0.25} duration={0.65}>
-                <p className="text-sm sm:text-base lg:text-lg text-emerald-50/85 leading-relaxed font-normal max-w-xl">
-                  Propiedades legalizadas con vías concluidas, alcantarillado, acometidas soterradas y crédito directo de hasta 48 meses. Elige tu terreno y agenda tu visita guiada en obra.
-                </p>
-              </ScrollReveal>
-            </div>
+            <ScrollReveal direction="up" delay={0.25} duration={0.65}>
+              <p className="text-sm sm:text-base lg:text-xl text-emerald-50/90 leading-relaxed font-normal max-w-2xl mt-4 sm:mt-6 drop-shadow-xs">
+                Propiedades legalizadas con vías concluidas, alcantarillado, acometidas soterradas y crédito directo de hasta 48 meses. Elige tu terreno con planos topográficos y asesoría técnica directa.
+              </p>
+            </ScrollReveal>
+          </div>
+        </div>
 
-            {/* =========================================================================
-                ZONA DERECHA: Fotografía Inmobiliaria Protagonista (Nítida, Banner Estático)
-                ========================================================================= */}
-            <div className="lg:col-span-6 xl:col-span-7 w-full">
-              <ScrollReveal direction="up" delay={0.2} duration={0.7}>
-                <div className="relative w-full h-[360px] sm:h-[440px] md:h-[500px] lg:h-[540px] xl:h-[600px] rounded-2xl sm:rounded-3xl overflow-hidden border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.45)] bg-[#0f2e1c]">
-                  <Image
-                    src={PROPERTIES_HERO_IMAGE.url}
-                    alt={PROPERTIES_HERO_IMAGE.alt}
-                    fill
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 60vw"
-                    className="object-cover object-center transform transition-transform duration-1000 ease-out hover:scale-105"
-                    referrerPolicy="no-referrer"
-                  />
-
-                  {/* Sutil viñeta inferior para proteger nitidez de la foto */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/20 pointer-events-none" />
-
-                  {/* Pastilla flotante superior de atributos */}
-                  <div className="absolute top-4 left-4 sm:top-5 sm:left-5 z-20 pointer-events-none">
-                    <div className="px-3.5 py-2 rounded-xl bg-black/60 backdrop-blur-md border border-white/15 flex flex-col shadow-lg">
-                      <span className="text-[10px] font-mono tracking-widest uppercase text-emerald-300 font-bold">
-                        CATÁLOGO DE LOTES &amp; PROYECTOS
-                      </span>
-                      <span className="text-[12px] text-white font-semibold">
-                        Obras Concluidas · Terrenos Listos para Construir
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Pastilla informativa inferior */}
-                  <div className="absolute bottom-4 left-4 sm:bottom-5 sm:left-5 z-20 pointer-events-none">
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white text-xs font-medium shadow-md">
-                      <span className="w-2 h-2 rounded-full bg-[#5be196] animate-pulse" />
-                      <span>Disponibilidad Inmediata · Crédito Directo 48 Meses con Cédula</span>
-                    </div>
-                  </div>
-                </div>
-              </ScrollReveal>
-            </div>
-
+        {/* Pastilla informativa flotante en esquina inferior */}
+        <div className="absolute bottom-6 right-4 sm:bottom-8 sm:right-8 lg:right-12 z-20 pointer-events-none hidden sm:block">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white text-xs font-medium shadow-lg">
+            <span className="w-2 h-2 rounded-full bg-[#5be196] animate-pulse" />
+            <span>Disponibilidad Inmediata · Crédito Directo 48 Meses con Cédula</span>
           </div>
         </div>
       </section>

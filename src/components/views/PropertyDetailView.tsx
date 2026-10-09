@@ -539,7 +539,7 @@ export function PropertyDetailView({
                   className="w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider shadow-md hover:shadow-lg hover:scale-[1.01] active:scale-95 transition-all cursor-pointer text-center"
                 >
                   <WhatsAppIcon size={20} className="text-slate-950 shrink-0" />
-                  <span>Consultar por WhatsApp Oficial</span>
+                  <span>Cotizar</span>
                 </a>
 
                 {/* 2. Enlace Google Maps sin box */}

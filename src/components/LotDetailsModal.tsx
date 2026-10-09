@@ -327,7 +327,7 @@ export function LotDetailsModal({
             className="flex-1 inline-flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-[#25D366] text-slate-950 font-black text-xs sm:text-sm hover:bg-[#20bd5a] shadow-md active:scale-95 transition-all cursor-pointer text-center"
           >
             <WhatsAppIcon size={18} className="text-slate-950 shrink-0" />
-            <span>Consultar por WhatsApp Oficial</span>
+            <span>Cotizar</span>
           </a>
         </div>
       </div>

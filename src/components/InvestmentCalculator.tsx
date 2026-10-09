@@ -231,7 +231,7 @@ export function InvestmentCalculator() {
               className="w-full flex items-center justify-center gap-2 sm:gap-2.5 py-3.5 sm:py-4 px-4 sm:px-6 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm shadow-md hover:scale-102 active:scale-95 transition-all cursor-pointer text-center"
             >
               <WhatsAppIcon size={20} className="text-slate-950 shrink-0" />
-              <span>Solicitar Plan en WhatsApp Oficial</span>
+              <span>Cotizar</span>
               <ArrowRight className="h-4 w-4 shrink-0" />
             </a>
           </div>

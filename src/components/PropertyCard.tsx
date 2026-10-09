@@ -201,7 +201,7 @@ export function PropertyCard({
               className="w-full py-2.5 px-3 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-slate-950 font-black text-xs sm:text-sm transition-all hover:scale-[1.02] active:scale-95 cursor-pointer text-center shadow-xs flex items-center justify-center gap-1.5"
             >
               <WhatsAppIcon size={16} className="text-slate-950 shrink-0" />
-              <span>WhatsApp</span>
+              <span>Cotizar</span>
             </a>
           </div>
         </div>
