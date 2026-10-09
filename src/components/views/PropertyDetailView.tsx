@@ -29,6 +29,7 @@ import {
   ExternalLink,
   FileDown,
   Download,
+  ImageIcon,
 } from 'lucide-react';
 import type { LotProperty } from '@/src/data/lots';
 import { getLotWhatsAppUrl, WHATSAPP_PHONE } from '@/src/data/lots';
@@ -198,11 +199,20 @@ export function PropertyDetailView({
   const [customDownPayment, setCustomDownPayment] = useState(lot.minDownPaymentUSD);
 
   const carouselRef = useRef<HTMLDivElement>(null);
+  const thumbnailsRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
   const photos = lot.gallery && lot.gallery.length > 0 ? lot.gallery : [lot.image];
   const isHouse = lot.type === 'Vivienda';
+
+  // Desplazamiento manual suave para la tira de miniaturas
+  const scrollThumbnails = (direction: 'left' | 'right') => {
+    if (thumbnailsRef.current) {
+      const scrollAmount = direction === 'left' ? -220 : 220;
+      thumbnailsRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   // Filtrar propiedades recomendadas (excluyendo la actual)
   const recommendedLots = allLots.filter((item) => item.id !== lot.id);
@@ -215,6 +225,20 @@ export function PropertyDetailView({
     setIsMobileDetailsOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [lot.id]);
+
+  // Centrar miniatura activa automáticamente al cambiar de foto
+  useEffect(() => {
+    if (thumbnailsRef.current) {
+      const activeThumb = thumbnailsRef.current.children[activePhotoIdx] as HTMLElement;
+      if (activeThumb) {
+        activeThumb.scrollIntoView({
+          behavior: 'smooth',
+          inline: 'center',
+          block: 'nearest',
+        });
+      }
+    }
+  }, [activePhotoIdx]);
 
   const nextPhoto = () => {
     setActivePhotoIdx((prev) => (prev + 1) % photos.length);
@@ -425,30 +449,86 @@ export function PropertyDetailView({
               </div>
             </div>
 
-            {/* Galería de Miniaturas Clicables */}
+            {/* Galería de Miniaturas Clicables (Sin scrollbar, con controles ergonómicos) */}
             {photos.length > 1 && (
-              <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-thin">
-                {photos.map((photoUrl, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setActivePhotoIdx(idx)}
-                    className={`relative w-20 h-16 sm:w-24 sm:h-18 rounded-2xl overflow-hidden shrink-0 transition-all cursor-pointer border-2 ${
-                      activePhotoIdx === idx
-                        ? 'border-[#22A33D] ring-2 ring-emerald-400/50 scale-105 shadow-md'
-                        : 'border-transparent opacity-70 hover:opacity-100 hover:border-slate-300'
-                    }`}
+              <div className="space-y-2.5 pt-1">
+                {/* Cabecera y Controles de la Galería */}
+                <div className="flex items-center justify-between px-1">
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <ImageIcon className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                    <span className="font-semibold text-slate-700">Explorar fotos</span>
+                    <span className="w-1 h-1 rounded-full bg-slate-300" />
+                    <span className="font-mono text-slate-600 font-medium">
+                      <strong className="text-emerald-700 font-bold">{activePhotoIdx + 1}</strong> de {photos.length}
+                    </span>
+                  </div>
+
+                  {photos.length > 4 && (
+                    <div className="hidden sm:flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => scrollThumbnails('left')}
+                        aria-label="Desplazar miniaturas a la izquierda"
+                        className="w-7 h-7 rounded-lg border border-slate-200 bg-white hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 text-slate-600 flex items-center justify-center transition-all cursor-pointer shadow-2xs active:scale-95"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => scrollThumbnails('right')}
+                        aria-label="Desplazar miniaturas a la derecha"
+                        className="w-7 h-7 rounded-lg border border-slate-200 bg-white hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 text-slate-600 flex items-center justify-center transition-all cursor-pointer shadow-2xs active:scale-95"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Contenedor Deslizable con Gradientes de Desvanecimiento Lateral */}
+                <div className="relative group/thumbnails">
+                  {/* Gradiente izquierdo para indicar desborde suave */}
+                  <div className="absolute left-0 inset-y-0 w-6 bg-gradient-to-r from-white via-white/80 to-transparent z-10 pointer-events-none rounded-l-2xl" />
+                  {/* Gradiente derecho para indicar desborde suave */}
+                  <div className="absolute right-0 inset-y-0 w-6 bg-gradient-to-l from-white via-white/80 to-transparent z-10 pointer-events-none rounded-r-2xl" />
+
+                  <div
+                    ref={thumbnailsRef}
+                    className="flex items-center gap-2.5 sm:gap-3 overflow-x-auto py-2 px-1 scroll-smooth select-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
                   >
-                    <Image
-                      src={photoUrl}
-                      alt={`Miniatura ${idx + 1}`}
-                      fill
-                      sizes="96px"
-                      className="object-cover"
-                      referrerPolicy="no-referrer"
-                    />
-                  </button>
-                ))}
+                    {photos.map((photoUrl, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setActivePhotoIdx(idx)}
+                        aria-label={`Ver foto ${idx + 1}`}
+                        className={`relative w-20 h-14 sm:w-24 sm:h-16 rounded-xl sm:rounded-2xl overflow-hidden shrink-0 transition-all duration-200 cursor-pointer ${
+                          activePhotoIdx === idx
+                            ? 'ring-2 ring-emerald-600 ring-offset-2 ring-offset-white scale-[1.03] shadow-md z-1 opacity-100'
+                            : 'border border-slate-200/90 opacity-60 hover:opacity-100 hover:scale-[1.02] hover:border-emerald-500/50 shadow-2xs'
+                        }`}
+                      >
+                        <Image
+                          src={photoUrl}
+                          alt={`Miniatura ${idx + 1}`}
+                          fill
+                          sizes="96px"
+                          className="object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                        <span
+                          className={`absolute bottom-1 right-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold leading-none backdrop-blur-xs transition-colors ${
+                            activePhotoIdx === idx
+                              ? 'bg-emerald-600 text-white shadow-2xs'
+                              : 'bg-black/60 text-white/90'
+                          }`}
+                        >
+                          {idx + 1}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
