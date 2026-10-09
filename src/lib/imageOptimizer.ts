@@ -102,6 +102,79 @@ export async function convertImageToWebP(
   });
 }
 
+export const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB límite estricto
+export const MAX_DOCUMENT_SIZE_BYTES = 15 * 1024 * 1024; // 15 MB límite estricto
+
+/**
+ * Valida la firma binaria real (magic bytes) de un archivo para mitigar
+ * falsificación de extensiones o ataques de suplantación de MIME type.
+ */
+export async function validateFileMagicBytes(
+  file: File,
+  expectedKind: 'image' | 'pdf'
+): Promise<{ valid: boolean; detectedMime?: string; error?: string }> {
+  try {
+    const buffer = await file.slice(0, 16).arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+
+    if (expectedKind === 'pdf') {
+      // PDF debe iniciar obligatoriamente con %PDF (0x25, 0x50, 0x44, 0x46)
+      const isPdf =
+        bytes[0] === 0x25 &&
+        bytes[1] === 0x50 &&
+        bytes[2] === 0x44 &&
+        bytes[3] === 0x46;
+
+      if (!isPdf) {
+        return {
+          valid: false,
+          error: 'El archivo no es un documento PDF auténtico (la firma binaria no coincide con %PDF).',
+        };
+      }
+      return { valid: true, detectedMime: 'application/pdf' };
+    }
+
+    if (expectedKind === 'image') {
+      // JPEG: 0xFF, 0xD8, 0xFF
+      const isJpeg = bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+      // PNG: 0x89, 0x50, 0x4E, 0x47
+      const isPng =
+        bytes[0] === 0x89 &&
+        bytes[1] === 0x50 &&
+        bytes[2] === 0x4e &&
+        bytes[3] === 0x47;
+      // GIF: 0x47, 0x49, 0x46
+      const isGif = bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46;
+      // WebP: RIFF (bytes 0-3) y WEBP (bytes 8-11)
+      const isWebP =
+        bytes[0] === 0x52 &&
+        bytes[1] === 0x49 &&
+        bytes[2] === 0x46 &&
+        bytes[3] === 0x46 &&
+        bytes[8] === 0x57 &&
+        bytes[9] === 0x45 &&
+        bytes[10] === 0x42 &&
+        bytes[11] === 0x50;
+
+      if (!isJpeg && !isPng && !isGif && !isWebP) {
+        return {
+          valid: false,
+          error: 'El archivo no es una imagen válida admitida (solo se aceptan JPEG, PNG y WebP con firma válida).',
+        };
+      }
+      const detectedMime = isJpeg ? 'image/jpeg' : isPng ? 'image/png' : isGif ? 'image/gif' : 'image/webp';
+      return { valid: true, detectedMime };
+    }
+
+    return { valid: false, error: 'Tipo de validación no admitido.' };
+  } catch (err) {
+    return {
+      valid: false,
+      error: `Error al inspeccionar la cabecera binaria del archivo: ${err instanceof Error ? err.message : 'Error desconocido'}`,
+    };
+  }
+}
+
 /**
  * Optimiza una imagen a WebP y la sube al bucket 'properties' de Supabase Storage.
  * Retorna la URL pública directa para guardar en la base de datos Postgres.
@@ -110,6 +183,23 @@ export async function uploadOptimizedImage(
   file: File,
   propertyCode: string = 'general'
 ): Promise<string> {
+  if (!file) {
+    throw new Error('No se proporcionó ningún archivo para subir.');
+  }
+
+  // 1. Límite de tamaño en cliente
+  if (file.size > MAX_IMAGE_SIZE_BYTES) {
+    throw new Error(
+      `La imagen excede el límite máximo permitido de 10 MB (pesa ${(file.size / (1024 * 1024)).toFixed(1)} MB).`
+    );
+  }
+
+  // 2. Validación de firma binaria real (magic bytes)
+  const validation = await validateFileMagicBytes(file, 'image');
+  if (!validation.valid) {
+    throw new Error(validation.error || 'Formato de imagen inválido o manipulado.');
+  }
+
   const optimizedWebpFile = await convertImageToWebP(file);
   const cleanCode = propertyCode.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '-');
   const timestamp = Date.now();
@@ -126,7 +216,7 @@ export async function uploadOptimizedImage(
 
   if (error) {
     console.error('Error subiendo imagen a Supabase Storage:', error);
-    throw error;
+    throw new Error(`Error en almacenamiento Supabase: ${error.message || 'Fallo de subida'}`);
   }
 
   const { data: publicUrlData } = supabase.storage
@@ -145,15 +235,43 @@ export async function uploadPropertyDocument(
   propertyCode: string = 'general',
   customTitle?: string
 ): Promise<{ title: string; url: string; size: string; description: string }> {
+  if (!file) {
+    throw new Error('No se proporcionó ningún archivo de documento.');
+  }
+
+  // 1. Límite de tamaño estricto
+  if (file.size > MAX_DOCUMENT_SIZE_BYTES) {
+    throw new Error(
+      `El documento excede el límite máximo permitido de 15 MB (pesa ${(file.size / (1024 * 1024)).toFixed(1)} MB).`
+    );
+  }
+
+  // 2. Validación de firma binaria real (PDF o Imagen de respaldo)
+  const pdfCheck = await validateFileMagicBytes(file, 'pdf');
+  let isRealPdf = pdfCheck.valid;
+  let isRealImage = false;
+
+  if (!isRealPdf) {
+    const imgCheck = await validateFileMagicBytes(file, 'image');
+    if (imgCheck.valid) {
+      isRealImage = true;
+    }
+  }
+
+  if (!isRealPdf && !isRealImage) {
+    throw new Error(
+      'Archivo no admitido: Solo se permiten documentos PDF auténticos o imágenes escaneadas válidas (JPEG, PNG, WebP).'
+    );
+  }
+
   const cleanCode = propertyCode.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '-');
   const timestamp = Date.now();
   
-  // Si el archivo es una imagen, comprimirla a WebP
   let fileToUpload = file;
-  let contentType = file.type || 'application/pdf';
-  let extension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+  let contentType = 'application/pdf';
+  let extension = '.pdf';
 
-  if (file.type.startsWith('image/')) {
+  if (isRealImage) {
     fileToUpload = await convertImageToWebP(file);
     contentType = 'image/webp';
     extension = '.webp';
@@ -162,7 +280,7 @@ export async function uploadPropertyDocument(
   const safeBase = file.name
     .substring(0, file.name.lastIndexOf('.'))
     .replace(/[^a-zA-Z0-9._-]/g, '_');
-  const filePath = `documents/${cleanCode}/${timestamp}-${safeBase}${extension}`;
+  const filePath = `documents/${cleanCode}/${timestamp}-${safeBase || 'doc'}${extension}`;
 
   const { error } = await supabase.storage
     .from('properties')
@@ -174,7 +292,7 @@ export async function uploadPropertyDocument(
 
   if (error) {
     console.error('Error subiendo documento a Supabase Storage:', error);
-    throw error;
+    throw new Error(`Error en almacenamiento Supabase: ${error.message || 'Fallo al guardar archivo'}`);
   }
 
   const { data: publicUrlData } = supabase.storage

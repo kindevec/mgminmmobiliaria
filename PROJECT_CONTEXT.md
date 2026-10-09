@@ -14,7 +14,7 @@
 - **Usuarios principales**:
   1. *Compradores / Inversionistas*: Consulta de catálogo, simulación de cuotas de financiamiento directo, agendamiento de visitas a campo y contacto vía WhatsApp.
   2. *Propietario / Administradores de MGM*: Control del catálogo inmobiliario, estado de lotes, registro de clientes interesados, agenda de visitas, control de expedientes notariales y descarga de reportes.
-- **Estado actual del proyecto**: 100% funcional y operativo. Compilación limpia sin errores de tipos (`tsc --noEmit` y `vite build` en 5.8s). Servidor local en `http://localhost:3005/`.
+- **Estado actual del proyecto**: En desarrollo activo y fase de estabilización arquitectónica. El empaquetado de producción compila con Vite (`npm run build`). Afirmaciones previas de "100% funcional" y tiempos fijos de build se catalogan como **no verificadas / no garantizadas**. Servidor local en `http://localhost:3005/`.
 
 ---
 
@@ -31,9 +31,9 @@
 | **Animaciones** | `motion` (Framer Motion) | `^12.23.24` | Transiciones fluidas, animaciones de entrada y modales |
 | **Iconografía** | `lucide-react` | `^0.553.0` | Iconos vectoriales del sistema |
 | **Cartografía** | `leaflet` + `@types/leaflet` | `^1.9.4` | Mapas interactivos para localización y coordenadas |
-| **Base de Datos** | [Supabase](https://supabase.com/) (PostgreSQL 17) | `^2.116.0` | Persistencia en nube de propiedades con sincronización Realtime |
+| **Base de Datos** | [Supabase](https://supabase.com/) (PostgreSQL - versión exacta no verificada) | `^2.116.0` | Persistencia en nube de propiedades con sincronización Realtime |
 | **Almacenamiento** | Supabase Storage (Bucket `properties`) | N/A | Repositorio de imágenes y documentos |
-| **Optimización Medios** | Compresión Canvas a WebP | Nativo TS | Conversión en caliente de imágenes a WebP (ahorro 70-85%) |
+| **Optimización Medios** | Compresión Canvas a WebP + Magic Bytes | Nativo TS | Validación binaria y conversión en caliente de imágenes a WebP |
 | **Despliegue** | Firebase Hosting | CLI v15 | Despliegue estático SPA con cabeceras de caché y seguridad |
 
 ---
@@ -98,7 +98,8 @@ d:\Codespace\Trabajos\MGM\
 │   │   │   ├── AdminLegalFilesView.tsx        # Expedientes legales y verificación notarial
 │   │   │   ├── AdminLogin.tsx                 # Formulario de login (Supabase / PIN)
 │   │   │   ├── AdminNotificationsDropdown.tsx # Campana de notificaciones con badges
-│   │   │   ├── AdminPropertiesList.tsx        # Catálogo admin con filtros y botón destacado
+│   │   │   ├── AdminProfileView.tsx           # Vista modular e independiente de perfil de usuario
+│   │   │   ├── AdminPropertiesList.tsx        # Catálogo admin con filtros y badge compacto
 │   │   │   ├── AdminPropertyModal.tsx         # Formulario modal/pantalla de propiedad
 │   │   │   ├── AdminReportsView.tsx           # Estadísticas operativas y exportación CSV
 │   │   │   └── AdminSettingsView.tsx          # Parámetros comerciales y de crédito
@@ -156,7 +157,7 @@ La navegación principal utiliza el resolver `resolvePageFromHash` (`src/data/na
 | `/#lote/:id` o `/lote/:id` | `PropertyDetailView` | Público | Ficha técnica completa, medidas, fotos y cotización |
 | `/#privacidad` o `/privacy` | `PrivacyView` | Público | Políticas de privacidad LOPDP, términos y cookies |
 | `/#admin` | `AdminView` -> `AdminDashboard` | Protegido | Panel administrativo integral de 9 secciones |
-| `/#new_property` | `NewPropertyView` | Protegido | Formulario independiente de publicación de lote |
+| `/#new_property` | `NewPropertyView` | Protegido | Formulario de publicación (previamente montado sin protección; ahora resguardado con Auth Guard y sesión Supabase) |
 
 ---
 
@@ -305,23 +306,27 @@ export interface LotProperty {
 
 1. **Dualidad de Formularios de Propiedad**:
    - Existen dos implementaciones casi gemelas para registrar propiedades: `AdminPropertyModal.tsx` (888 líneas) y `NewPropertyView.tsx` (775 líneas). La ruta `new_property` debería redirigir al panel o unificar su lógica.
-2. **Dependencias Fantasma en `package.json`**:
-   - `@google/genai`, `@hookform/resolvers`, `class-variance-authority`, `tailwind-merge` están declaradas en `dependencies` pero no se importan en ningún archivo del código activo.
+2. **Dependencias sin Uso / Estado de Gemini**:
+   - `@google/genai`, `@hookform/resolvers`, `class-variance-authority`, `tailwind-merge` están declaradas en `dependencies` de `package.json`.
+   - **Confirmación Gemini**: Se auditó exhaustivamente el código fuente y se confirma que **Gemini NO está integrado**. No existen llamadas activas ni módulos importando `@google/genai`.
 3. **Persistencia Híbrida Asimétrica**:
    - Las propiedades se sincronizan con Supabase PostgreSQL, pero los clientes, citas, expedientes y bitácora administrativa se guardan únicamente en el `localStorage` del navegador. Si el administrador abre el panel desde otro equipo o borra la caché, estos datos no estarán disponibles.
 4. **Tamaño del Bundle de Producción**:
-   - `out/assets/index-*.js` pesa ~1,040 kB debido a que vistas completas (`HomeView`, `PropertiesView`, `AdminDashboard`) no están divididas con `React.lazy()` / code-splitting.
+   - `out/assets/index-*.js` pesa ~950-1,040 kB debido a que vistas completas (`HomeView`, `PropertiesView`, `AdminDashboard`) no están divididas con `React.lazy()` / code-splitting.
 
 ---
 
-## 12. Riesgos de Seguridad Detectados
+## 12. Riesgos de Seguridad Detectados & Hallazgos Verificados
 
 1. **Bypass de Autenticación en Cliente**:
-   - En `src/components/admin/AdminLogin.tsx`, existen PINs hardcodeados en texto plano (`DEFAULT_PIN = 'mgm2026'`, `BACKUP_PIN = 'admin1234'`). Cualquier usuario con conocimientos básicos de inspección de código puede descubrir estas cadenas o manipular `localStorage.setItem('mgm_admin_authenticated', 'true')` para acceder a la interfaz.
+   - En `src/components/admin/AdminLogin.tsx`, existen PINs de respaldo en cliente (`DEFAULT_PIN = 'mgm2026'`, `BACKUP_PIN = 'admin1234'`). Cualquier usuario con conocimientos básicos de inspección de código puede descubrir estas cadenas o manipular `localStorage.setItem('mgm_admin_authenticated', 'true')` para acceder a la interfaz.
 2. **Claves de Supabase en Código Fuente**:
-   - En `src/lib/supabase.ts`, la clave anónima (`anon key`) está incrustada como valor por defecto de respaldo. Aunque las anon keys están diseñadas para ser públicas, deben estar protegidas mediante políticas de seguridad a nivel de fila (Row Level Security - RLS).
-3. **Validación de Políticas RLS**:
-   - Se debe verificar que la tabla `properties` y el bucket de Storage tengan políticas RLS que impidan a usuarios sin sesión válida de Supabase Auth ejecutar sentencias `INSERT`, `UPDATE` o `DELETE`.
+   - En `src/lib/supabase.ts`, la clave anónima (`anon key`) está incrustada como valor por defecto de respaldo. Aunque las anon keys están diseñadas para ser públicas en clientes web, requieren que la base de datos proteja rigurosamente sus tablas mediante políticas RLS.
+3. **Auditoría en Vivo de Políticas RLS y Storage (Detención Formal según Regla 11)**:
+   - **Comportamiento comercial de lectura**: Se verificó mediante sonda real en la tabla `properties` que las consultas `SELECT` públicas operan correctamente (`status: 200`), permitiendo a clientes consultar el catálogo.
+   - **Falla de RLS en escrituras**: Se ejecutó una prueba controlada con la clave anónima sin autenticación y Supabase **aceptó** `INSERT` (201 Created) y `DELETE` sin rechazo por políticas de seguridad.
+   - **Falla en Storage**: El bucket `properties` permitió subida y borrado de objetos sin sesión de usuario.
+   - **Detención por Regla 11**: El entorno local **no cuenta con la llave `service_role`** ni acceso superusuario a la base de datos para alterar tablas de sistema de forma remota. No se inventaron parches temporales. Se definió y documentó la migración SQL necesaria para que el administrador la aplique en el editor SQL de Supabase.
 
 ---
 
@@ -333,7 +338,7 @@ export interface LotProperty {
 | `VITE_SUPABASE_ANON_KEY` | String | Sí | Llave anónima pública JWT de Supabase |
 | `NEXT_PUBLIC_SUPABASE_URL` | String | Opcional | URL para runtime Next.js |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY`| String | Opcional | Anon key para runtime Next.js |
-| `GEMINI_API_KEY` | String | No | Solo si se activa la integración con `@google/genai` |
+| `GEMINI_API_KEY` | String | No | Declarada en `.env.example`, sin uso activo en el frontend actual |
 | `APP_URL` | String | No | URL pública del despliegue en producción |
 
 ---
@@ -370,6 +375,16 @@ export interface LotProperty {
 
 ## 16. Última Actualización
 
-- **Fecha**: 2026-10-07
-- **Autor**: Antigravity Software Architect
-- **Resumen**: Diagnóstico arquitectónico integral exhaustivo del proyecto completado sin alteración de código funcional. Generación de documentación viva de contexto técnico.
+- **Fecha**: 2026-10-08
+- **Autor**: Antigravity Software Architect & Full Stack Engineer
+- **Resumen de Cambios Recientes**:
+  1. **Blindaje de Ruta `/new_property`**: Integración de Auth Guard que exige sesión de Supabase Auth o credencial administrativa antes de renderizar el formulario.
+  2. **Persistencia Real sin Falso Optimismo**: Refactorización de `PropertyContext.tsx` para ejecutar mutaciones en Supabase DB primero, propagar excepciones reales a la interfaz y revertir el estado local ante rechazos.
+  3. **Seguridad en Carga de Archivos**: Implementación de verificación binaria de Magic Bytes (`%PDF`, JPEG, PNG, WebP) y límites de tamaño (10 MB fotos, 15 MB documentos) en `imageOptimizer.ts` para mitigar suplantación de extensiones.
+  4. **Content Security Policy (CSP)**: Incorporación de directiva CSP en `index.html` validada para Supabase REST/WSS, OpenStreetMap Nominatim, Google Maps tiles, Unsplash y WebSockets.
+  5. **Ergonomía UI del Panel Administrativo**:
+     - Posicionamiento del botón **Perfil** en la primera posición de la barra lateral.
+     - Eliminación de la duplicación del signo `+` en el botón "Nueva Propiedad".
+     - Transformación del botón "Cerrar Sesión" en un botón destacado de caja roja (`bg-rose-600`).
+     - Remoción de botones secundarios en cabecera ("Ver Web", campana de notificaciones).
+     - Compactación del badge de inventario en `AdminPropertiesList.tsx` a formato mono-línea `X/Y`.

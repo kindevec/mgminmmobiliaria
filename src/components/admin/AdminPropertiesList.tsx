@@ -142,27 +142,14 @@ export function AdminPropertiesList({
         <div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
             <span>Catálogo de Propiedades</span>
-            <span className="text-xs font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 rounded-full">
-              {filteredAndSorted.length} de {properties.length}
+            <span className="text-xs font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full whitespace-nowrap shrink-0">
+              {filteredAndSorted.length}/{properties.length}
             </span>
           </h1>
           <p className="text-xs text-slate-400 mt-0.5">
             Gestión completa de inmuebles, estado comercial, características y documentación técnica.
           </p>
         </div>
-
-        {/* BOTÓN DESTACADO "NUEVA PROPIEDAD" (Alta presencia visual) */}
-        <button
-          type="button"
-          onClick={onOpenCreate}
-          className="relative group overflow-hidden px-5 py-3 rounded-2xl bg-linear-to-r from-emerald-600 via-emerald-700 to-teal-800 hover:from-emerald-500 hover:via-emerald-600 hover:to-teal-700 text-white font-black text-xs sm:text-sm shadow-lg shadow-emerald-700/25 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2.5 cursor-pointer border border-emerald-400/30"
-        >
-          <div className="absolute inset-0 bg-white/15 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none" />
-          <div className="w-6 h-6 rounded-xl bg-white/20 flex items-center justify-center shrink-0 shadow-inner">
-            <Plus className="h-4 w-4 text-white stroke-[3]" />
-          </div>
-          <span className="tracking-wide">Nueva Propiedad</span>
-        </button>
       </div>
 
       {/* Barra de Filtros, Búsqueda y Ordenamiento */}

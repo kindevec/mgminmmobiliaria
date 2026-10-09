@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import {
@@ -22,11 +22,14 @@ import {
   AlertCircle,
   X,
   Upload,
+  Loader2,
 } from 'lucide-react';
 import type { LotProperty } from '@/src/data/lots';
 import type { PageView } from '@/src/data/navigation';
 import { useProperties } from '@/src/context/PropertyContext';
 import { uploadOptimizedImage } from '@/src/lib/imageOptimizer';
+import { supabase } from '@/src/lib/supabase';
+import { AdminLogin } from '../admin/AdminLogin';
 
 const InteractiveMapPicker = dynamic(
   () => import('@/src/components/common/InteractiveMapPicker').then((m) => m.InteractiveMapPicker),
@@ -78,6 +81,37 @@ const AVAILABLE_SERVICES = [
 export function NewPropertyView({ onNavigate }: NewPropertyViewProps) {
   const { addProperty } = useProperties();
 
+  // 1. Protección de ruta: Solo accesible para administradores autenticados (equivalente a AdminView)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const local = localStorage.getItem('mgm_admin_authenticated');
+      const session = sessionStorage.getItem('mgm_admin_authenticated');
+      return local === 'true' || session === 'true';
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    // Sincronizar estado real con Supabase Auth
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setIsAuthenticated(true);
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        setIsAuthenticated(true);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
   const [code, setCode] = useState(() => `MV-${Math.floor(100 + Math.random() * 900)}`);
   const [name, setName] = useState('Lote Residencial Miravalle');
   const [project, setProject] = useState<LotProperty['project']>('Ciudadela Miravalle');
@@ -108,6 +142,9 @@ export function NewPropertyView({ onNavigate }: NewPropertyViewProps) {
     'Vías adoquinadas de alto tonelaje',
   ]);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [uploadError, setUploadError] = useState('');
 
   const handlePriceChange = (val: number) => {
     setPriceUSD(val);
@@ -141,6 +178,7 @@ export function NewPropertyView({ onNavigate }: NewPropertyViewProps) {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    setUploadError('');
     try {
       const publicUrl = await uploadOptimizedImage(file, code || 'new-prop');
       const newImg = {
@@ -150,30 +188,19 @@ export function NewPropertyView({ onNavigate }: NewPropertyViewProps) {
       setImagesList((prev) => [newImg, ...prev]);
       setImage(publicUrl);
       setCustomImageUrl('');
-    } catch (err) {
-      console.error('Error al optimizar/subir imagen WebP:', err);
-      // Fallback a DataURL si no hay conexión
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const dataUrl = event.target?.result as string;
-        if (dataUrl) {
-          const newImg = {
-            title: file.name.replace(/\.[^/.]+$/, ''),
-            url: dataUrl,
-          };
-          setImagesList((prev) => [newImg, ...prev]);
-          setImage(dataUrl);
-          setCustomImageUrl('');
-        }
-      };
-      reader.readAsDataURL(file);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Error al procesar o subir la imagen.';
+      setUploadError(msg);
+      console.error('Error al subir imagen:', err);
     } finally {
       e.target.value = '';
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError('');
+    setIsSubmitting(true);
 
     const finalImage = customImageUrl.trim() || image.trim();
 
@@ -200,12 +227,32 @@ export function NewPropertyView({ onNavigate }: NewPropertyViewProps) {
       gallery: [finalImage],
     };
 
-    addProperty(data);
-    setIsSuccess(true);
-    setTimeout(() => {
-      onNavigate('admin');
-    }, 1200);
+    try {
+      await addProperty(data);
+      setIsSuccess(true);
+      setTimeout(() => {
+        onNavigate('admin');
+      }, 1200);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Error desconocido al guardar en Supabase.';
+      setSubmitError(message);
+      setIsSuccess(false);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  // Si no está autenticado, renderizar formulario de inicio de sesión administrativo
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <AdminLogin
+          onSuccess={() => setIsAuthenticated(true)}
+          onNavigate={onNavigate}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 pb-20 pt-8 sm:pt-10">
@@ -255,6 +302,26 @@ export function NewPropertyView({ onNavigate }: NewPropertyViewProps) {
           <div className="mb-6 p-4 rounded-2xl bg-emerald-100 border border-emerald-300 text-emerald-950 flex items-center gap-3 animate-in fade-in">
             <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
             <span className="text-sm font-bold">¡Propiedad publicada con éxito! Redirigiendo al panel de administración...</span>
+          </div>
+        )}
+
+        {submitError && (
+          <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-900 flex items-start gap-3 animate-in fade-in">
+            <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-bold">Error al registrar propiedad en Supabase</p>
+              <p className="text-xs text-red-700 mt-0.5">{submitError}</p>
+            </div>
+          </div>
+        )}
+
+        {uploadError && (
+          <div className="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3 animate-in fade-in">
+            <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-bold">Error en la carga de archivo</p>
+              <p className="text-xs text-amber-800 mt-0.5">{uploadError}</p>
+            </div>
           </div>
         )}
 
@@ -752,10 +819,20 @@ export function NewPropertyView({ onNavigate }: NewPropertyViewProps) {
             <div className="bg-white rounded-3xl p-5 shadow-md border border-slate-200 space-y-3">
               <button
                 type="submit"
-                className="w-full py-3.5 px-4 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-sm shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                disabled={isSubmitting}
+                className="w-full py-3.5 px-4 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-black text-sm shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Save className="h-4 w-4" />
-                <span>Publicar Nueva Propiedad</span>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Guardando en Base de Datos...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4" />
+                    <span>Publicar Nueva Propiedad</span>
+                  </>
+                )}
               </button>
 
               <button

@@ -102,6 +102,12 @@ Cuando recibas una nueva tarea en este proyecto:
 
 ## 5. Control de Cambios
 
+- **Fecha**: 2026-10-08
+- **Cambios**:
+  - Incorporación de directivas de validación binaria de archivos (Magic Bytes) y límites estrictos de tamaño para mitigar cargas maliciosas en Storage.
+  - Requisito obligatorio de propagación de excepciones reales en mutaciones de datos (prohibición de éxito optimista cuando Supabase rechaza operaciones).
+  - Protección obligatoria de rutas administrativas y formularios de gestión mediante Auth Guards de Supabase Auth.
+  - Directrices de Content Security Policy (CSP) compatible con recursos externos (Supabase, Leaflet tiles, Unsplash).
 - **Fecha**: 2026-10-07
 - **Cambios**:
   - Creación de las reglas de desarrollo oficiales para el proyecto Sociedad Civil MGM Inmobiliaria.

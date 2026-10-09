@@ -20,7 +20,6 @@ import {
   Trash2,
   ExternalLink,
   LogOut,
-  Eye,
   Star,
   Copy,
   Check,
@@ -51,7 +50,6 @@ import { AdminPropertyModal } from './AdminPropertyModal';
 import { AdminPropertiesList } from './AdminPropertiesList';
 import { AdminProfileView } from './AdminProfileView';
 import { AdminGlobalSearchModal } from './AdminGlobalSearchModal';
-import { AdminNotificationsDropdown } from './AdminNotificationsDropdown';
 import type { LotProperty } from '@/src/data/lots';
 import { getLotWhatsAppUrl } from '@/src/data/lots';
 import { WhatsAppIcon } from '../SocialIcons';
@@ -277,24 +275,43 @@ export function AdminDashboard({
     setEditingProperty(lot);
   };
 
-  const handleSaveProperty = (data: Omit<LotProperty, 'id'>, id?: string) => {
-    if (id) {
-      updateProperty(id, data);
-    } else {
-      addProperty(data);
+  const handleSaveProperty = async (data: Omit<LotProperty, 'id'>, id?: string) => {
+    try {
+      if (id) {
+        await updateProperty(id, data);
+      } else {
+        await addProperty(data);
+      }
+      setIsCreatingProperty(false);
+      setEditingProperty(null);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Error al guardar en Supabase';
+      alert(`No se pudo guardar la propiedad: ${msg}`);
+      throw err;
     }
   };
 
   const handleToggleStatusWithFeedback = async (id: string) => {
     setUpdatingStatusId(id);
-    await toggleStatus(id);
-    setTimeout(() => setUpdatingStatusId(null), 300);
+    try {
+      await toggleStatus(id);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Error al actualizar estado';
+      alert(`No se pudo actualizar el estado: ${msg}`);
+    } finally {
+      setTimeout(() => setUpdatingStatusId(null), 300);
+    }
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (propertyToDelete) {
-      deleteProperty(propertyToDelete.id);
-      setPropertyToDelete(null);
+      try {
+        await deleteProperty(propertyToDelete.id);
+        setPropertyToDelete(null);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Error al eliminar';
+        alert(`No se pudo eliminar la propiedad: ${msg}`);
+      }
     }
   };
 
@@ -364,7 +381,42 @@ export function AdminDashboard({
           )}
 
           <nav className="space-y-1" aria-label="Navegación del panel">
-            {/* 1. Propiedades */}
+            {/* 1. Perfil & Configuración (Al principio de la barra lateral) */}
+            <button
+              type="button"
+              onClick={() => {
+                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
+                setEditingProperty(null);
+                setIsCreatingProperty(false);
+                setActiveTab('profile');
+              }}
+              className={`relative w-full flex items-center ${
+                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
+              } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                !editingProperty && !isCreatingProperty && activeTab === 'profile'
+                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
+                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
+              }`}
+              title="Perfil de Administrador y Configuración"
+            >
+              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
+                <User
+                  className={`h-4 w-4 shrink-0 ${
+                    !editingProperty && !isCreatingProperty && activeTab === 'profile'
+                      ? 'text-emerald-800'
+                      : 'opacity-70'
+                  }`}
+                />
+                {!isSidebarCollapsed && <span className="truncate">Perfil</span>}
+              </div>
+            </button>
+
+            {/* Separador visual sutil */}
+            <div className="py-2">
+              <div className="border-t border-emerald-900/60" />
+            </div>
+
+            {/* 2. Propiedades */}
             <button
               type="button"
               onClick={() => {
@@ -405,7 +457,7 @@ export function AdminDashboard({
               )}
             </button>
 
-            {/* 2. + Nueva Propiedad */}
+            {/* 3. Nueva Propiedad */}
             <button
               type="button"
               onClick={handleOpenCreate}
@@ -423,42 +475,7 @@ export function AdminDashboard({
                   isCreatingProperty ? 'text-slate-950 font-black' : 'text-emerald-300'
                 }`}
               />
-              {!isSidebarCollapsed && <span className="truncate">+ Nueva Propiedad</span>}
-            </button>
-
-            {/* Separador visual sutil */}
-            <div className="py-2">
-              <div className="border-t border-emerald-900/60" />
-            </div>
-
-            {/* 3. Perfil & Configuración */}
-            <button
-              type="button"
-              onClick={() => {
-                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
-                setEditingProperty(null);
-                setIsCreatingProperty(false);
-                setActiveTab('profile');
-              }}
-              className={`relative w-full flex items-center ${
-                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
-              } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                !editingProperty && !isCreatingProperty && activeTab === 'profile'
-                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
-                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
-              }`}
-              title="Perfil de Administrador y Configuración"
-            >
-              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
-                <User
-                  className={`h-4 w-4 shrink-0 ${
-                    !editingProperty && !isCreatingProperty && activeTab === 'profile'
-                      ? 'text-emerald-800'
-                      : 'opacity-70'
-                  }`}
-                />
-                {!isSidebarCollapsed && <span className="truncate">Perfil</span>}
-              </div>
+              {!isSidebarCollapsed && <span className="truncate"> Nueva Propiedad</span>}
             </button>
           </nav>
         </div>
@@ -466,14 +483,15 @@ export function AdminDashboard({
         {/* Sidebar Bottom Profile Card */}
         <div className="pt-4 border-t border-emerald-900/60 mt-4 space-y-2">
           {!isSidebarCollapsed ? (
-            <div className="flex items-center justify-between text-[11px] text-emerald-400/80 px-2">
-              <span className="truncate font-mono">Sociedad Civil MGM</span>
+            <div className="px-2">
               <button
                 type="button"
                 onClick={onLogout}
-                className="hover:text-rose-300 font-bold transition-colors cursor-pointer shrink-0 ml-2"
+                className="w-full flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md shadow-rose-950/25 transition-all cursor-pointer active:scale-95 border border-rose-500/30"
+                title="Cerrar Sesión"
               >
-                Cerrar Sesión
+                <LogOut className="h-3.5 w-3.5" />
+                <span>Cerrar Sesión</span>
               </button>
             </div>
           ) : (
@@ -481,7 +499,7 @@ export function AdminDashboard({
               <button
                 type="button"
                 onClick={onLogout}
-                className="p-2 rounded-xl text-rose-300 hover:text-white hover:bg-rose-500/20 transition-colors cursor-pointer"
+                className="p-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition-all cursor-pointer active:scale-95 border border-rose-500/30"
                 title="Cerrar Sesión"
               >
                 <LogOut className="h-4 w-4" />
@@ -607,20 +625,6 @@ export function AdminDashboard({
                       ⌘K
                     </kbd>
                   </button>
-
-                  {/* View Public Web Button */}
-                  <button
-                    type="button"
-                    onClick={onViewCatalog}
-                    className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold transition-all cursor-pointer shadow-2xs"
-                    title="Ver portal web público"
-                  >
-                    <Eye className="h-3.5 w-3.5 text-emerald-700" />
-                    <span>Ver Web</span>
-                  </button>
-
-                  {/* Notification Dropdown */}
-                  <AdminNotificationsDropdown onNavigateTab={setActiveTab} />
                 </div>
               </div>
 
@@ -702,7 +706,7 @@ export function AdminDashboard({
             >
               <Plus className="h-4 w-4 stroke-[2.5]" />
             </div>
-            <span className="text-[11px] tracking-tight leading-none">+ Nueva</span>
+            <span className="text-[11px] tracking-tight leading-none">Nueva</span>
           </button>
 
           {/* 3. Perfil */}

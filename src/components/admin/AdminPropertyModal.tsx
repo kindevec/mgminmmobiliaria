@@ -34,7 +34,7 @@ interface AdminPropertyModalProps {
   isOpen?: boolean;
   isPageView?: boolean;
   onClose: () => void;
-  onSave: (data: Omit<LotProperty, 'id'>, id?: string) => void;
+  onSave: (data: Omit<LotProperty, 'id'>, id?: string) => Promise<void> | void;
   onDelete?: (id: string) => void;
   propertyToEdit?: LotProperty | null;
 }
@@ -289,7 +289,8 @@ export function AdminPropertyModal({
       setUploadMessage('¡Imágenes WebP subidas con éxito!');
     } catch (err) {
       console.error('Error al subir imágenes:', err);
-      alert('Hubo un error al optimizar o subir la imagen. Por favor, intenta nuevamente.');
+      const msg = err instanceof Error ? err.message : 'Hubo un error al optimizar o subir la imagen.';
+      alert(msg);
     } finally {
       setIsUploadingImage(false);
       setTimeout(() => setUploadMessage(''), 3000);
@@ -317,7 +318,8 @@ export function AdminPropertyModal({
       setUploadMessage('¡Documento PDF subido con éxito!');
     } catch (err) {
       console.error('Error al subir documento:', err);
-      alert('Hubo un error al subir el documento PDF. Por favor, intenta nuevamente.');
+      const msg = err instanceof Error ? err.message : 'Hubo un error al subir el documento PDF.';
+      alert(msg);
     } finally {
       setIsUploadingDoc(false);
       setTimeout(() => setUploadMessage(''), 3000);
@@ -345,7 +347,7 @@ export function AdminPropertyModal({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const finalImage = image.trim() || gallery[0] || PRESET_IMAGES[0].url;
@@ -391,8 +393,13 @@ export function AdminPropertyModal({
       documents,
     };
 
-    onSave(data, propertyToEdit?.id);
-    onClose();
+    try {
+      await onSave(data, propertyToEdit?.id);
+      onClose();
+    } catch {
+      // Si la persistencia falló, el error ya fue alertado por handleSaveProperty
+      // Se mantiene el modal abierto para no perder la información ingresada
+    }
   };
 
   if (!isOpen && !isPageView) return null;

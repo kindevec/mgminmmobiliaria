@@ -93,9 +93,9 @@ export function AdminDocumentsView() {
       if (!docName) {
         setDocName(uploadedDoc.title || file.name.replace(/\.[^/.]+$/, ''));
       }
-      setDocSize(uploadedDoc.size || `${(file.size / (1024 * 1024)).toFixed(1)} MB`);
-    } catch {
-      alert('Error al subir documento a almacenamiento.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Error al subir documento a almacenamiento.';
+      alert(msg);
     } finally {
       setIsUploading(false);
     }

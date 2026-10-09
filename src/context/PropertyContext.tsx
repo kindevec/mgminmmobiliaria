@@ -107,29 +107,35 @@ export function PropertyProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Add Property (Optimistic + Supabase DB)
+  // Add Property (Supabase DB first + Local Sync)
   const addProperty = async (newLot: Omit<LotProperty, 'id'>): Promise<LotProperty> => {
     const id = `prop-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
     const fullLot: LotProperty = {
       ...newLot,
       id,
     };
-    const updated = [fullLot, ...properties];
-    saveProperties(updated);
 
-    try {
-      const dbRow = mapPropertyToRow(fullLot);
-      const { error } = await supabase.from('properties').insert(dbRow);
-      if (error) console.error('Supabase insert error:', error);
-    } catch (err) {
-      console.error('Supabase addProperty network error:', err);
+    const dbRow = mapPropertyToRow(fullLot);
+    const { error } = await supabase.from('properties').insert(dbRow);
+    if (error) {
+      console.error('Error insertando propiedad en Supabase:', error);
+      throw new Error(`Error en Supabase: ${error.message || 'No se pudo guardar la propiedad'}`);
     }
 
+    const updated = [fullLot, ...properties];
+    saveProperties(updated);
     return fullLot;
   };
 
-  // Update Property (Optimistic + Supabase DB)
+  // Update Property (Supabase DB first + Local Sync)
   const updateProperty = async (id: string, updates: Partial<LotProperty>) => {
+    const dbRowUpdates = mapPropertyToRow(updates);
+    const { error } = await supabase.from('properties').update(dbRowUpdates).eq('id', id);
+    if (error) {
+      console.error('Error actualizando propiedad en Supabase:', error);
+      throw new Error(`Error en Supabase: ${error.message || 'No se pudo actualizar la propiedad'}`);
+    }
+
     const updated = properties.map((p) => {
       if (p.id === id) {
         return { ...p, ...updates };
@@ -137,37 +143,34 @@ export function PropertyProvider({ children }: { children: ReactNode }) {
       return p;
     });
     saveProperties(updated);
-
-    try {
-      const dbRowUpdates = mapPropertyToRow(updates);
-      const { error } = await supabase.from('properties').update(dbRowUpdates).eq('id', id);
-      if (error) console.error('Supabase update error:', error);
-    } catch (err) {
-      console.error('Supabase updateProperty network error:', err);
-    }
   };
 
-  // Delete Property (Optimistic + Supabase DB + Storage Cleanup)
+  // Delete Property (Supabase DB first + Storage Cleanup + Local Sync)
   const deleteProperty = async (id: string) => {
     const toDelete = properties.find((p) => p.id === id);
+    const { error } = await supabase.from('properties').delete().eq('id', id);
+    if (error) {
+      console.error('Error eliminando propiedad en Supabase:', error);
+      throw new Error(`Error en Supabase: ${error.message || 'No se pudo eliminar la propiedad'}`);
+    }
+
+    // Limpieza de archivos multimedia en Storage tras confirmación de eliminación en DB
+    if (toDelete) {
+      await deletePropertyStorageFiles(toDelete);
+    }
+
     const updated = properties.filter((p) => p.id !== id);
     saveProperties(updated);
-
-    try {
-      // 1. Eliminar archivos multimedia (fotos WebP y PDFs) de Supabase Storage
-      if (toDelete) {
-        await deletePropertyStorageFiles(toDelete);
-      }
-      // 2. Eliminar registro en base de datos PostgreSQL
-      const { error } = await supabase.from('properties').delete().eq('id', id);
-      if (error) console.error('Supabase delete error:', error);
-    } catch (err) {
-      console.error('Supabase deleteProperty network error:', err);
-    }
   };
 
-  // Set explicit status
+  // Set explicit status (Supabase DB first + Local Sync)
   const setStatus = async (id: string, status: LotProperty['status']) => {
+    const { error } = await supabase.from('properties').update({ status }).eq('id', id);
+    if (error) {
+      console.error('Error actualizando estado en Supabase:', error);
+      throw new Error(`Error en Supabase: ${error.message || 'No se pudo actualizar el estado'}`);
+    }
+
     const updated = properties.map((p) => {
       if (p.id === id) {
         return { ...p, status };
@@ -175,13 +178,6 @@ export function PropertyProvider({ children }: { children: ReactNode }) {
       return p;
     });
     saveProperties(updated);
-
-    try {
-      const { error } = await supabase.from('properties').update({ status }).eq('id', id);
-      if (error) console.error('Supabase setStatus error:', error);
-    } catch (err) {
-      console.error('Supabase setStatus network error:', err);
-    }
   };
 
   // One-Touch Status Toggle: cycles through Disponible -> En Reserva -> Vendido -> Inactiva -> Disponible
