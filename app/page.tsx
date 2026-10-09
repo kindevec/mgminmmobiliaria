@@ -252,19 +252,25 @@ function HomePageContent() {
         </AnimatePresence>
       </main>
 
-      {/* 3. Corporate Footer with Kindev Official Backlink */}
-      <Footer
-        currentPage={currentPage}
-        onNavigate={handleNavigate}
-        onOpenVisitModal={() => handleOpenVisitModal()}
-        onOpenLegalModal={handleOpenLegalModal}
-      />
+      {/* 3. Corporate Footer with Kindev Official Backlink (Solo en vistas públicas) */}
+      {currentPage !== 'admin' && currentPage !== 'new_property' && (
+        <Footer
+          currentPage={currentPage}
+          onNavigate={handleNavigate}
+          onOpenVisitModal={() => handleOpenVisitModal()}
+          onOpenLegalModal={handleOpenLegalModal}
+        />
+      )}
 
-      {/* 4. Mobile Ergonomic Bottom Navigation Bar (< 768px) */}
-      <BottomNav currentPage={currentPage} onNavigate={handleNavigate} />
+      {/* 4. Mobile Ergonomic Bottom Navigation Bar (< 768px - Solo en vistas públicas) */}
+      {currentPage !== 'admin' && currentPage !== 'new_property' && (
+        <BottomNav currentPage={currentPage} onNavigate={handleNavigate} />
+      )}
 
-      {/* 5. Persistent Smart WhatsApp FAB with Live Pulse & Tooltip */}
-      <WhatsAppFAB />
+      {/* 5. Persistent Smart WhatsApp FAB (Solo en vistas públicas) */}
+      {currentPage !== 'admin' && currentPage !== 'new_property' && (
+        <WhatsAppFAB />
+      )}
 
       {/* 6. Interactive Modals */}
       <VisitModal

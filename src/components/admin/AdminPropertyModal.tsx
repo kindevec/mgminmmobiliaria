@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import {
   X,
@@ -13,8 +13,20 @@ import {
   Layers,
   Save,
   ImageIcon,
+  FileText,
+  Trash2,
+  Star,
+  Plus,
+  Loader2,
+  ExternalLink,
+  Info,
 } from 'lucide-react';
 import type { LotProperty } from '@/src/data/lots';
+import {
+  convertImageToWebP,
+  uploadOptimizedImage,
+  uploadPropertyDocument,
+} from '@/src/lib/imageOptimizer';
 
 interface AdminPropertyModalProps {
   isOpen: boolean;
@@ -52,13 +64,28 @@ const PRESET_IMAGES = [
 
 const AVAILABLE_SERVICES = [
   'Red eléctrica soterrada',
+  'Energía eléctrica y alumbrado público',
   'Agua potable garantizada',
   'Alcantarillado pluvial y sanitario',
   'Vías adoquinadas de alto tonelaje',
+  'Acceso por vías amplias',
   'Bordillos y aceras podotáctiles',
   'Ductería soterrada para fibra óptica',
   'Alumbrado público LED',
   'Garita de seguridad y control 24/7',
+  'Uso de suelo residencial y comercial (COS/CUS 70%)',
+  'Permiso de construcción hasta 3 pisos',
+  'Cisterna con bomba y portón eléctrico',
+  'Local comercial independiente con infraestructura lista',
+];
+
+const PROJECT_OPTIONS: LotProperty['project'][] = [
+  'San Antonio · Manta',
+  'Jerusalén · Malchinguí',
+  'Ciudadela Miravalle',
+  'Mirador del Valle',
+  'Colinas Verdes',
+  'Residencial San Antonio',
 ];
 
 export function AdminPropertyModal({
@@ -69,78 +96,120 @@ export function AdminPropertyModal({
 }: AdminPropertyModalProps) {
   const isEditing = Boolean(propertyToEdit);
 
-  // Form States initialized cleanly from propertyToEdit or defaults
-  const [code, setCode] = useState(
-    () => propertyToEdit?.code || `MV-${Math.floor(100 + Math.random() * 900)}`
-  );
-  const [name, setName] = useState(
-    () => propertyToEdit?.name || 'Lote Residencial Miravalle'
-  );
-  const [project, setProject] = useState<LotProperty['project']>(
-    () => propertyToEdit?.project || 'Ciudadela Miravalle'
-  );
-  const [type, setType] = useState<LotProperty['type']>(
-    () => propertyToEdit?.type || 'Lote de Terreno'
-  );
-  const [category, setCategory] = useState<LotProperty['category']>(
-    () => propertyToEdit?.category || 'Residencial'
-  );
-  const [areaM2, setAreaM2] = useState<number>(
-    () => propertyToEdit?.areaM2 || 200
-  );
-  const [dimensions, setDimensions] = useState(
-    () => propertyToEdit?.dimensions || '10.0m × 20.0m'
-  );
-  const [priceUSD, setPriceUSD] = useState<number>(
-    () => propertyToEdit?.priceUSD || 28500
-  );
-  const [minDownPaymentUSD, setMinDownPaymentUSD] = useState<number>(
-    () => propertyToEdit?.minDownPaymentUSD || 5700
-  );
-  const [maxMonths, setMaxMonths] = useState<number>(
-    () => propertyToEdit?.maxMonths || 48
-  );
-  const [topography, setTopography] = useState(
-    () => propertyToEdit?.topography || '100% Plano'
-  );
-  const [status, setStatus] = useState<LotProperty['status']>(
-    () => propertyToEdit?.status || 'Disponible'
-  );
-  const [zone, setZone] = useState(
-    () => propertyToEdit?.zone || 'Etapa 1 · Sector Miravalle Central'
-  );
-  const [orientation, setOrientation] = useState(
-    () => propertyToEdit?.orientation || 'Norte - Sur'
-  );
-  const [registryStatus, setRegistryStatus] = useState(
-    () => propertyToEdit?.registryStatus || 'Escritura individual legalizada e inscrita'
-  );
-  const [image, setImage] = useState(
-    () => propertyToEdit?.image || PRESET_IMAGES[0].url
-  );
-  const [description, setDescription] = useState(
-    () => propertyToEdit?.description || 'Excelente lote residencial urbanizado con obras al 100% y financiamiento directo hasta 48 meses.'
-  );
-  const [selectedServices, setSelectedServices] = useState<string[]>(
-    () => propertyToEdit?.features || [
-      'Red eléctrica soterrada',
-      'Agua potable garantizada',
-      'Alcantarillado pluvial y sanitario',
-      'Vías adoquinadas de alto tonelaje',
-    ]
-  );
+  // Form States
+  const [code, setCode] = useState('');
+  const [name, setName] = useState('');
+  const [project, setProject] = useState<LotProperty['project']>('San Antonio · Manta');
+  const [type, setType] = useState<LotProperty['type']>('Lote de Terreno');
+  const [category, setCategory] = useState<LotProperty['category']>('Residencial');
+  const [areaM2, setAreaM2] = useState<number>(200);
+  const [dimensions, setDimensions] = useState('10.0m × 20.0m');
+  const [priceUSD, setPriceUSD] = useState<number>(28500);
+  const [minDownPaymentUSD, setMinDownPaymentUSD] = useState<number>(5700);
+  const [maxMonths, setMaxMonths] = useState<number>(48);
+  const [topography, setTopography] = useState('100% Plano y Regular');
+  const [status, setStatus] = useState<LotProperty['status']>('Disponible');
+  const [zone, setZone] = useState('');
+  const [orientation, setOrientation] = useState('');
+  const [registryStatus, setRegistryStatus] = useState('');
+  const [image, setImage] = useState('');
+  const [gallery, setGallery] = useState<string[]>([]);
+  const [description, setDescription] = useState('');
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [beds, setBeds] = useState<number | undefined>(undefined);
+  const [baths, setBaths] = useState<number | undefined>(undefined);
+  const [featured, setFeatured] = useState<boolean>(false);
+  const [pdfUrl, setPdfUrl] = useState<string>('');
+  const [pdfTitle, setPdfTitle] = useState<string>('');
+  const [documents, setDocuments] = useState<
+    { title: string; url: string; size?: string; description?: string }[]
+  >([]);
 
-  // Keep down payment auto-synced at ~20% when price changes (unless customized)
+  // Upload progress states
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isUploadingDoc, setIsUploadingDoc] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState('');
+
+  const imageFileInputRef = useRef<HTMLInputElement>(null);
+  const docFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync state whenever propertyToEdit changes or modal opens
+  useEffect(() => {
+    if (isOpen) {
+      if (propertyToEdit) {
+        setCode(propertyToEdit.code);
+        setName(propertyToEdit.name);
+        setProject(propertyToEdit.project);
+        setType(propertyToEdit.type);
+        setCategory(propertyToEdit.category);
+        setAreaM2(propertyToEdit.areaM2);
+        setDimensions(propertyToEdit.dimensions);
+        setPriceUSD(propertyToEdit.priceUSD);
+        setMinDownPaymentUSD(propertyToEdit.minDownPaymentUSD);
+        setMaxMonths(propertyToEdit.maxMonths || 48);
+        setTopography(propertyToEdit.topography);
+        setStatus(propertyToEdit.status);
+        setZone(propertyToEdit.zone);
+        setOrientation(propertyToEdit.orientation || '');
+        setRegistryStatus(propertyToEdit.registryStatus || '');
+        setImage(propertyToEdit.image);
+        setGallery(
+          Array.isArray(propertyToEdit.gallery) && propertyToEdit.gallery.length > 0
+            ? propertyToEdit.gallery
+            : [propertyToEdit.image]
+        );
+        setDescription(propertyToEdit.description);
+        setSelectedServices(propertyToEdit.features || []);
+        setBeds(propertyToEdit.beds);
+        setBaths(propertyToEdit.baths);
+        setFeatured(Boolean(propertyToEdit.featured));
+        setPdfUrl(propertyToEdit.pdfUrl || '');
+        setPdfTitle(propertyToEdit.pdfTitle || '');
+        setDocuments(propertyToEdit.documents || []);
+      } else {
+        // Reset to initial new property template
+        const randCode = `PROP-${Math.floor(100 + Math.random() * 900)}`;
+        setCode(randCode);
+        setName('Nuevo Inmueble MGM');
+        setProject('San Antonio · Manta');
+        setType('Lote de Terreno');
+        setCategory('Residencial');
+        setAreaM2(300);
+        setDimensions('12.0m × 25.0m');
+        setPriceUSD(35000);
+        setMinDownPaymentUSD(7000);
+        setMaxMonths(48);
+        setTopography('100% Plano y Regular');
+        setStatus('Disponible');
+        setZone('Sector Urbano de Alta Plusvalía');
+        setOrientation('Vías de primer orden y entorno residencial');
+        setRegistryStatus('Escritura pública, certificado de gravámenes al día');
+        setImage(PRESET_IMAGES[0].url);
+        setGallery([PRESET_IMAGES[0].url]);
+        setDescription('Excelente oportunidad de inversión con financiamiento directo y documentos en regla.');
+        setSelectedServices([
+          'Agua potable garantizada',
+          'Energía eléctrica y alumbrado público',
+          'Alcantarillado pluvial y sanitario',
+          'Acceso por vías amplias',
+        ]);
+        setBeds(undefined);
+        setBaths(undefined);
+        setFeatured(true);
+        setPdfUrl('');
+        setPdfTitle('');
+        setDocuments([]);
+      }
+    }
+  }, [isOpen, propertyToEdit]);
+
   const handlePriceChange = (val: number) => {
     setPriceUSD(val);
     setMinDownPaymentUSD(Math.round(val * 0.2));
   };
 
-  const estimatedMonthly = maxMonths > 0
-    ? Math.round((Math.max(0, priceUSD - minDownPaymentUSD)) / maxMonths)
-    : 0;
-
-  if (!isOpen) return null;
+  const estimatedMonthly =
+    maxMonths > 0 ? Math.round(Math.max(0, priceUSD - minDownPaymentUSD) / maxMonths) : 0;
 
   const toggleService = (srv: string) => {
     if (selectedServices.includes(srv)) {
@@ -150,8 +219,96 @@ export function AdminPropertyModal({
     }
   };
 
+  // Image upload handler with automatic WebP conversion
+  const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploadingImage(true);
+    setUploadMessage('Optimizando a formato WebP y subiendo...');
+
+    try {
+      const uploadedUrls: string[] = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        setUploadMessage(`Comprimiendo a WebP foto ${i + 1} de ${files.length}...`);
+        const url = await uploadOptimizedImage(file, code || 'prop');
+        uploadedUrls.push(url);
+      }
+
+      if (uploadedUrls.length > 0) {
+        // Append to gallery
+        const newGallery = [...gallery, ...uploadedUrls].filter(Boolean);
+        setGallery(newGallery);
+        if (!image || image === PRESET_IMAGES[0].url) {
+          setImage(uploadedUrls[0]);
+        }
+      }
+      setUploadMessage('¡Imágenes WebP subidas con éxito!');
+    } catch (err) {
+      console.error('Error al subir imágenes:', err);
+      alert('Hubo un error al optimizar o subir la imagen a Supabase Storage.');
+    } finally {
+      setIsUploadingImage(false);
+      setTimeout(() => setUploadMessage(''), 3000);
+      if (imageFileInputRef.current) imageFileInputRef.current.value = '';
+    }
+  };
+
+  // Document PDF upload handler
+  const handleDocFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingDoc(true);
+    setUploadMessage('Subiendo documento oficial...');
+
+    try {
+      const uploadedDoc = await uploadPropertyDocument(file, code || 'prop');
+      const newDocs = [...documents, uploadedDoc];
+      setDocuments(newDocs);
+
+      if (!pdfUrl) {
+        setPdfUrl(uploadedDoc.url);
+        setPdfTitle(uploadedDoc.title);
+      }
+      setUploadMessage('¡Documento PDF subido con éxito!');
+    } catch (err) {
+      console.error('Error al subir documento:', err);
+      alert('Hubo un error al subir el documento PDF a Supabase Storage.');
+    } finally {
+      setIsUploadingDoc(false);
+      setTimeout(() => setUploadMessage(''), 3000);
+      if (docFileInputRef.current) docFileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemovePhoto = (photoUrl: string) => {
+    const updated = gallery.filter((p) => p !== photoUrl);
+    setGallery(updated);
+    if (image === photoUrl && updated.length > 0) {
+      setImage(updated[0]);
+    }
+  };
+
+  const handleRemoveDoc = (index: number) => {
+    const updated = documents.filter((_, i) => i !== index);
+    setDocuments(updated);
+    if (updated.length === 0) {
+      setPdfUrl('');
+      setPdfTitle('');
+    } else {
+      setPdfUrl(updated[0].url);
+      setPdfTitle(updated[0].title);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const finalImage = image.trim() || gallery[0] || PRESET_IMAGES[0].url;
+    const finalGallery = gallery.length > 0 ? gallery : [finalImage];
 
     const data: Omit<LotProperty, 'id'> = {
       code: code.trim().toUpperCase(),
@@ -172,17 +329,25 @@ export function AdminPropertyModal({
       description: description.trim(),
       orientation: orientation.trim(),
       registryStatus: registryStatus.trim(),
-      image: image.trim(),
-      gallery: [image.trim()],
+      image: finalImage,
+      gallery: finalGallery,
+      beds: beds ? Number(beds) : undefined,
+      baths: baths ? Number(baths) : undefined,
+      featured,
+      pdfUrl: pdfUrl.trim() || undefined,
+      pdfTitle: pdfTitle.trim() || (pdfUrl ? `Ficha Técnica ${code}` : undefined),
+      documents,
     };
 
     onSave(data, propertyToEdit?.id);
     onClose();
   };
 
+  if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden max-h-[92dvh] flex flex-col">
+      <div className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden max-h-[92dvh] flex flex-col">
         {/* Header */}
         <div className="bg-slate-950 p-5 sm:p-6 text-white relative shrink-0">
           <button
@@ -194,264 +359,478 @@ export function AdminPropertyModal({
           </button>
           <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">
             <Sparkles className="h-4 w-4" />
-            <span>Panel CMS · MGM Inmobiliaria</span>
+            <span>Panel CMS Directo · Supabase Database Sync</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
-            {isEditing ? `Editar Propiedad ${propertyToEdit?.code}` : 'Publicar Nueva Propiedad'}
+            {isEditing ? `Editar Propiedad ${propertyToEdit?.code}` : 'Publicar Nuevo Inmueble Real'}
           </h2>
           <p className="text-xs text-slate-300 mt-0.5">
-            Los cambios se guardan y se sincronizan en tiempo real con el catálogo web.
+            Sincronización en tiempo real con Supabase Postgres y compresión automática WebP.
           </p>
         </div>
 
+        {/* Upload feedback banner */}
+        {uploadMessage && (
+          <div className="bg-emerald-500 text-slate-950 px-4 py-2 text-xs font-bold flex items-center justify-between shrink-0 transition-all">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4" />
+              <span>{uploadMessage}</span>
+            </div>
+            {(isUploadingImage || isUploadingDoc) && <Loader2 className="h-4 w-4 animate-spin" />}
+          </div>
+        )}
+
         {/* Form Body Scrollable */}
-        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-6 flex-1">
-          {/* Group 1: General Info */}
+        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-6 flex-1 text-slate-800">
+          {/* Group 1: Identificación y Proyecto */}
           <div className="space-y-4">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-1">
-              1. Identificación y Proyecto
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-1 flex items-center justify-between">
+              <span>1. Identificación y Ubicación</span>
+              <span className="text-[10px] text-emerald-600 font-semibold lowercase">
+                * Campos requeridos
+              </span>
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label className="text-xs font-bold text-slate-700 block mb-1">
-                  Código Inmueble *
+                  Código Único (Ej: MT24-023)
                 </label>
                 <input
                   type="text"
                   required
                   value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  placeholder="Ej. MV-105"
-                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm font-mono font-bold text-slate-900 focus:border-emerald-600 focus:outline-none"
+                  onChange={(e) => setCode(e.target.value.toUpperCase())}
+                  placeholder="MT24-023"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-mono font-bold text-slate-900 focus:border-emerald-600 focus:outline-none"
                 />
               </div>
 
               <div className="sm:col-span-2">
                 <label className="text-xs font-bold text-slate-700 block mb-1">
-                  Título Comercial *
+                  Nombre Comercial del Inmueble
                 </label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Ej. Lote Residencial Esquinero Miravalle"
-                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm text-slate-900 focus:border-emerald-600 focus:outline-none"
+                  placeholder="Casa con Local Comercial en Manta"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:border-emerald-600 focus:outline-none"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Proyecto</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Proyecto / Desarrollo
+                </label>
                 <select
                   value={project}
                   onChange={(e) => setProject(e.target.value as LotProperty['project'])}
-                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:border-emerald-600 focus:outline-none"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs text-slate-900 bg-white focus:border-emerald-600 focus:outline-none"
                 >
-                  <option value="Ciudadela Miravalle">Ciudadela Miravalle</option>
-                  <option value="Mirador del Valle">Mirador del Valle</option>
-                  <option value="Colinas Verdes">Colinas Verdes</option>
-                  <option value="Residencial San Antonio">Residencial San Antonio</option>
+                  {PROJECT_OPTIONS.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Tipo</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Tipo de Bien</label>
                 <select
                   value={type}
                   onChange={(e) => setType(e.target.value as LotProperty['type'])}
-                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:border-emerald-600 focus:outline-none"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs text-slate-900 bg-white focus:border-emerald-600 focus:outline-none"
                 >
                   <option value="Lote de Terreno">Lote de Terreno</option>
-                  <option value="Vivienda">Vivienda</option>
+                  <option value="Vivienda">Vivienda / Casa</option>
                   <option value="Proyecto en Planos">Proyecto en Planos</option>
                 </select>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Estado</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Categoría</label>
                 <select
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value as LotProperty['status'])}
-                  className={`w-full rounded-xl border px-3 py-2 text-xs font-bold focus:outline-none ${
-                    status === 'Disponible'
-                      ? 'border-emerald-500 bg-emerald-50 text-emerald-800'
-                      : status === 'En Reserva'
-                      ? 'border-amber-500 bg-amber-50 text-amber-800'
-                      : 'border-rose-500 bg-rose-50 text-rose-800'
-                  }`}
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value as LotProperty['category'])}
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs text-slate-900 bg-white focus:border-emerald-600 focus:outline-none"
                 >
-                  <option value="Disponible">🟢 Disponible</option>
-                  <option value="En Reserva">🟡 En Reserva</option>
-                  <option value="Vendido">🔴 Vendido</option>
+                  <option value="Residencial">Residencial</option>
+                  <option value="Comercial">Comercial</option>
+                  <option value="Esquinero">Esquinero</option>
+                  <option value="Campestre">Campestre</option>
                 </select>
               </div>
             </div>
           </div>
 
-          {/* Group 2: Dimensions & Pricing */}
+          {/* Group 2: Dimensiones, Habitaciones y Precios */}
           <div className="space-y-4">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-1">
-              2. Metraje, Dimensiones y Financiamiento Directo
+              2. Dimensiones, Finanzas y Habitaciones
             </h3>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">
-                  Área (m²) *
-                </label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Área Total (m²)</label>
                 <input
                   type="number"
+                  step="0.01"
                   required
-                  min={50}
                   value={areaM2}
-                  onChange={(e) => setAreaM2(Number(e.target.value))}
-                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm font-mono text-slate-900 focus:border-emerald-600 focus:outline-none"
+                  onChange={(e) => setAreaM2(parseFloat(e.target.value) || 0)}
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-mono text-slate-900 focus:border-emerald-600 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">
-                  Dimensiones
-                </label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Dimensiones</label>
                 <input
                   type="text"
+                  required
                   value={dimensions}
                   onChange={(e) => setDimensions(e.target.value)}
-                  placeholder="10.0m × 20.0m"
-                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm font-mono text-slate-900 focus:border-emerald-600 focus:outline-none"
+                  placeholder="12.00m × 26.56m"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:border-emerald-600 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">
-                  Precio Total (USD) *
-                </label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Precio Total (USD)</label>
                 <input
                   type="number"
                   required
-                  step={500}
                   value={priceUSD}
-                  onChange={(e) => handlePriceChange(Number(e.target.value))}
-                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm font-mono font-bold text-slate-900 focus:border-emerald-600 focus:outline-none"
+                  onChange={(e) => handlePriceChange(parseFloat(e.target.value) || 0)}
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-mono font-bold text-slate-900 focus:border-emerald-600 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">
-                  Entrada Sugerida ($)
-                </label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Entrada Mínima (USD)</label>
                 <input
                   type="number"
+                  required
                   value={minDownPaymentUSD}
-                  onChange={(e) => setMinDownPaymentUSD(Number(e.target.value))}
-                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm font-mono text-slate-900 focus:border-emerald-600 focus:outline-none"
+                  onChange={(e) => setMinDownPaymentUSD(parseFloat(e.target.value) || 0)}
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-mono text-slate-900 focus:border-emerald-600 focus:outline-none"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Plazo Máximo</label>
-                <select
+                <label className="text-xs font-bold text-slate-700 block mb-1">Plazo Máx (Meses)</label>
+                <input
+                  type="number"
                   value={maxMonths}
-                  onChange={(e) => setMaxMonths(Number(e.target.value))}
-                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:border-emerald-600 focus:outline-none"
+                  onChange={(e) => setMaxMonths(parseInt(e.target.value) || 48)}
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:border-emerald-600 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Estado de Venta</label>
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as LotProperty['status'])}
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs text-slate-900 bg-white focus:border-emerald-600 focus:outline-none font-semibold"
                 >
-                  <option value={12}>12 meses</option>
-                  <option value={24}>24 meses</option>
-                  <option value={36}>36 meses</option>
-                  <option value={48}>48 meses</option>
+                  <option value="Disponible">Disponible</option>
+                  <option value="En Reserva">En Reserva</option>
+                  <option value="Vendido">Vendido</option>
                 </select>
               </div>
 
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Dormitorios (Opcional)</label>
+                <input
+                  type="number"
+                  value={beds || ''}
+                  onChange={(e) => setBeds(e.target.value ? parseInt(e.target.value) : undefined)}
+                  placeholder="Ej: 4"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:border-emerald-600 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Baños (Opcional)</label>
+                <input
+                  type="number"
+                  value={baths || ''}
+                  onChange={(e) => setBaths(e.target.value ? parseInt(e.target.value) : undefined)}
+                  placeholder="Ej: 4"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:border-emerald-600 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="text-xs font-bold text-slate-700 block mb-1">Topografía</label>
                 <input
                   type="text"
                   value={topography}
                   onChange={(e) => setTopography(e.target.value)}
-                  placeholder="100% Plano"
+                  placeholder="100% Plano y Regular"
                   className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:border-emerald-600 focus:outline-none"
                 />
               </div>
 
-              <div className="col-span-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] uppercase font-bold text-slate-400 block">
                     Cuota mensual proyectada
                   </span>
                   <span className="text-base font-black font-mono text-emerald-800">
-                    ~${estimatedMonthly} <span className="text-xs font-normal text-slate-500">USD/mes</span>
+                    ~${estimatedMonthly}{' '}
+                    <span className="text-xs font-normal text-slate-500">USD/mes</span>
                   </span>
                 </div>
-                <span className="text-[11px] text-slate-500">Sin intereses abusivos</span>
+                <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-emerald-700">
+                  <input
+                    type="checkbox"
+                    checked={featured}
+                    onChange={(e) => setFeatured(e.target.checked)}
+                    className="rounded text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <span>Destacar en Portada</span>
+                </label>
               </div>
             </div>
           </div>
 
-          {/* Group 3: Image & Presets */}
+          {/* Group 3: Fotografías y Galería con Auto-WebP */}
           <div className="space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-1">
-              3. Imagen Principal (URL o Biblioteca Rápida HD)
-            </h3>
+            <div className="flex items-center justify-between border-b border-slate-100 pb-1">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                3. Fotografías y Galería (Conversión WebP Automática)
+              </h3>
+              <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md font-bold">
+                Auto-WebP 82% Ultra-Ahorro
+              </span>
+            </div>
+
+            <div className="p-4 rounded-2xl border-2 border-dashed border-emerald-300 bg-emerald-50/30 flex flex-col items-center justify-center text-center gap-2">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                <Upload className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-slate-800">
+                  Subir fotos desde dispositivo (Móvil / PC)
+                </p>
+                <p className="text-[11px] text-slate-500">
+                  Se optimizarán automáticamente a WebP antes de subirse a Supabase Storage.
+                </p>
+              </div>
+
+              <input
+                ref={imageFileInputRef}
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageFileChange}
+                className="hidden"
+              />
+
+              <button
+                type="button"
+                disabled={isUploadingImage}
+                onClick={() => imageFileInputRef.current?.click()}
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {isUploadingImage ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Optimizando a WebP...</span>
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4" />
+                    <span>Seleccionar Imágenes</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Gallery Grid Preview */}
+            {gallery.length > 0 && (
+              <div>
+                <span className="text-[11px] font-bold text-slate-600 block mb-1.5">
+                  Galería cargada ({gallery.length} fotos) · Toca la estrella para elegir foto de portada:
+                </span>
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                  {gallery.map((photo, idx) => {
+                    const isCover = photo === image;
+                    return (
+                      <div
+                        key={idx}
+                        className={`relative aspect-square rounded-xl overflow-hidden border group bg-slate-100 ${
+                          isCover ? 'ring-2 ring-emerald-500 border-emerald-500' : 'border-slate-200'
+                        }`}
+                      >
+                        <Image
+                          src={photo}
+                          alt={`Foto ${idx + 1}`}
+                          fill
+                          sizes="120px"
+                          className="object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setImage(photo)}
+                            title="Fijar como Portada Principal"
+                            className={`p-1.5 rounded-lg text-white transition-all ${
+                              isCover ? 'bg-emerald-600' : 'bg-black/60 hover:bg-emerald-600'
+                            }`}
+                          >
+                            <Star className="h-3.5 w-3.5 fill-current" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRemovePhoto(photo)}
+                            title="Eliminar foto"
+                            className="p-1.5 rounded-lg bg-black/60 hover:bg-red-600 text-white transition-all"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                        {isCover && (
+                          <div className="absolute bottom-1 left-1 bg-emerald-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-xs">
+                            Portada
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">
-                URL de Fotografía Directa
+              <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                URL de Portada Principal Manual (o selecciona de la galería):
               </label>
               <input
                 type="url"
                 required
                 value={image}
                 onChange={(e) => setImage(e.target.value)}
-                placeholder="https://images.unsplash.com/..."
+                placeholder="https://... o /properties/MT24-023/foto-1.webp"
                 className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-mono text-slate-900 focus:border-emerald-600 focus:outline-none"
               />
             </div>
-
-            {/* Quick preset chips for rapid mobile updating */}
-            <div>
-              <span className="text-[11px] text-slate-500 block mb-1.5 font-medium">
-                Selección Rápida desde Terreno (Toca para asignar foto HD):
-              </span>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {PRESET_IMAGES.map((preset, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setImage(preset.url)}
-                    className={`relative rounded-xl overflow-hidden border p-1 text-left transition-all cursor-pointer ${
-                      image === preset.url
-                        ? 'border-emerald-600 ring-2 ring-emerald-500/20'
-                        : 'border-slate-200 hover:border-slate-300'
-                    }`}
-                  >
-                    <div className="relative aspect-[16/9] w-full rounded-lg overflow-hidden bg-slate-100">
-                      <Image
-                        src={preset.url}
-                        alt={preset.title}
-                        fill
-                        sizes="160px"
-                        className="object-cover"
-                        referrerPolicy="no-referrer"
-                      />
-                    </div>
-                    <span className="text-[10px] font-semibold text-slate-700 block truncate mt-1">
-                      {preset.title}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
 
-          {/* Group 4: Services Checkboxes */}
+          {/* Group 4: Documentos Oficiales y Fichas Técnicas (PDF) */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-1">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                4. Ficha Técnica Oficial y Documentos (PDF)
+              </h3>
+              <span className="text-[10px] text-slate-500 font-semibold">
+                Soporte de Respaldo Jurídico
+              </span>
+            </div>
+
+            <div className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                  <FileText className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-slate-800">
+                    Subir Ficha Técnica en PDF a Supabase Storage
+                  </p>
+                  <p className="text-[11px] text-slate-500">
+                    Aparecerá en los botones oficiales de descarga en el detalle de la propiedad.
+                  </p>
+                </div>
+              </div>
+
+              <input
+                ref={docFileInputRef}
+                type="file"
+                accept=".pdf,application/pdf"
+                onChange={handleDocFileChange}
+                className="hidden"
+              />
+
+              <button
+                type="button"
+                disabled={isUploadingDoc}
+                onClick={() => docFileInputRef.current?.click()}
+                className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 shrink-0 cursor-pointer disabled:opacity-50"
+              >
+                {isUploadingDoc ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    <span>Subiendo PDF...</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-3.5 w-3.5" />
+                    <span>Subir Ficha PDF</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Documents List */}
+            {documents.length > 0 && (
+              <div className="space-y-2">
+                <span className="text-[11px] font-bold text-slate-600 block">
+                  Documentos vinculados ({documents.length}):
+                </span>
+                {documents.map((doc, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 bg-white shadow-2xs text-xs"
+                  >
+                    <div className="flex items-center gap-2 truncate">
+                      <FileText className="h-4 w-4 text-emerald-700 shrink-0" />
+                      <div className="truncate">
+                        <span className="font-bold text-slate-800 block truncate">{doc.title}</span>
+                        <span className="text-[10px] text-slate-500 font-mono">
+                          {doc.size || 'PDF'} · {doc.url.substring(0, 45)}...
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0 ml-2">
+                      <a
+                        href={doc.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="p-1.5 rounded-lg text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition-all"
+                        title="Ver PDF"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveDoc(idx)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all"
+                        title="Eliminar documento"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Group 5: Obras y Servicios */}
           <div className="space-y-2">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-1">
-              4. Obras e Infraestructura Incluidas
+              5. Obras e Infraestructura Incluidas
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
               {AVAILABLE_SERVICES.map((srv) => {
@@ -478,21 +857,21 @@ export function AdminPropertyModal({
             </div>
           </div>
 
-          {/* Group 5: Description & Legal */}
+          {/* Group 6: Descripción y Respaldo Legal */}
           <div className="space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-1">
-              5. Descripción y Situación Jurídica
+              6. Reseña Comercial, Sector y Respaldo Legal
             </h3>
 
             <div>
               <label className="text-xs font-bold text-slate-700 block mb-1">
-                Descripción para Clientes
+                Descripción Completa para Clientes
               </label>
               <textarea
-                rows={2}
+                rows={3}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe el lote, orientación, vistas o cercanía a las áreas verdes..."
+                placeholder="Describe la propiedad, distribución, vistas, ventajas comerciales y facilidades de acceso..."
                 className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm text-slate-900 focus:border-emerald-600 focus:outline-none"
               />
             </div>
@@ -500,34 +879,48 @@ export function AdminPropertyModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="text-xs font-bold text-slate-700 block mb-1">
-                  Ubicación / Sector
+                  Ubicación Exacta / Sector
                 </label>
                 <input
                   type="text"
+                  required
                   value={zone}
                   onChange={(e) => setZone(e.target.value)}
-                  placeholder="Etapa 1 · Sector Miravalle Central"
+                  placeholder="San Antonio · Eloy Alfaro · Manta, Manabí"
                   className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:border-emerald-600 focus:outline-none"
                 />
               </div>
 
               <div>
                 <label className="text-xs font-bold text-slate-700 block mb-1">
-                  Estado Registral Notarial
+                  Estado Registral / Notarial
                 </label>
                 <input
                   type="text"
                   value={registryStatus}
                   onChange={(e) => setRegistryStatus(e.target.value)}
-                  placeholder="Escritura individual legalizada e inscrita"
+                  placeholder="Escritura pública, catastro actualizado e impuestos al día"
                   className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:border-emerald-600 focus:outline-none"
                 />
               </div>
             </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1">
+                Entorno / Orientación
+              </label>
+              <input
+                type="text"
+                value={orientation}
+                onChange={(e) => setOrientation(e.target.value)}
+                placeholder="Sector comercial y residencial de alta plusvalía"
+                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:border-emerald-600 focus:outline-none"
+              />
+            </div>
           </div>
 
           {/* Submit Actions */}
-          <div className="pt-4 border-t border-slate-200 flex items-center justify-end gap-3 sticky bottom-0 bg-white py-2">
+          <div className="pt-4 border-t border-slate-200 flex items-center justify-end gap-3 sticky bottom-0 bg-white py-2 z-10">
             <button
               type="button"
               onClick={onClose}
@@ -537,10 +930,11 @@ export function AdminPropertyModal({
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 flex items-center gap-2 cursor-pointer"
+              disabled={isUploadingImage || isUploadingDoc}
+              className="px-6 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
               <Save className="h-4 w-4" />
-              <span>{isEditing ? 'Guardar Cambios' : 'Publicar Inmueble'}</span>
+              <span>{isEditing ? 'Guardar y Sincronizar' : 'Publicar Inmueble'}</span>
             </button>
           </div>
         </form>

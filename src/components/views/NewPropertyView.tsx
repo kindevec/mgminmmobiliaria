@@ -26,6 +26,7 @@ import {
 import type { LotProperty } from '@/src/data/lots';
 import type { PageView } from '@/src/data/navigation';
 import { useProperties } from '@/src/context/PropertyContext';
+import { uploadOptimizedImage } from '@/src/lib/imageOptimizer';
 
 const InteractiveMapPicker = dynamic(
   () => import('@/src/components/common/InteractiveMapPicker').then((m) => m.InteractiveMapPicker),
@@ -136,26 +137,39 @@ export function NewPropertyView({ onNavigate }: NewPropertyViewProps) {
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      if (dataUrl) {
-        const newImg = {
-          title: file.name.replace(/\.[^/.]+$/, ''),
-          url: dataUrl,
-        };
-        setImagesList((prev) => [newImg, ...prev]);
-        setImage(dataUrl);
-        setCustomImageUrl('');
-      }
-    };
-    reader.readAsDataURL(file);
-    // Reset file input value so selecting the same file triggers change
-    e.target.value = '';
+    try {
+      const publicUrl = await uploadOptimizedImage(file, code || 'new-prop');
+      const newImg = {
+        title: file.name.replace(/\.[^/.]+$/, ''),
+        url: publicUrl,
+      };
+      setImagesList((prev) => [newImg, ...prev]);
+      setImage(publicUrl);
+      setCustomImageUrl('');
+    } catch (err) {
+      console.error('Error al optimizar/subir imagen WebP:', err);
+      // Fallback a DataURL si no hay conexión
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const dataUrl = event.target?.result as string;
+        if (dataUrl) {
+          const newImg = {
+            title: file.name.replace(/\.[^/.]+$/, ''),
+            url: dataUrl,
+          };
+          setImagesList((prev) => [newImg, ...prev]);
+          setImage(dataUrl);
+          setCustomImageUrl('');
+        }
+      };
+      reader.readAsDataURL(file);
+    } finally {
+      e.target.value = '';
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
