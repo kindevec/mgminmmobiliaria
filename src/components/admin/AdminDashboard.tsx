@@ -27,8 +27,8 @@ import {
   AlertTriangle,
   ShieldCheck,
   MapPin,
-  Sparkles,
   ChevronRight,
+  ChevronLeft,
   X,
   FileCheck,
   Upload,
@@ -43,9 +43,22 @@ import {
   Share2,
   ArrowRight,
   SlidersHorizontal,
+  Users,
+  BarChart3,
 } from 'lucide-react';
 import { useProperties } from '@/src/context/PropertyContext';
+import { useAdminData } from '@/src/context/AdminDataContext';
 import { AdminPropertyModal } from './AdminPropertyModal';
+import { AdminDashboardOverview } from './AdminDashboardOverview';
+import { AdminPropertiesList } from './AdminPropertiesList';
+import { AdminClientsView } from './AdminClientsView';
+import { AdminAppointmentsView } from './AdminAppointmentsView';
+import { AdminLegalFilesView } from './AdminLegalFilesView';
+import { AdminDocumentsView } from './AdminDocumentsView';
+import { AdminReportsView } from './AdminReportsView';
+import { AdminSettingsView } from './AdminSettingsView';
+import { AdminGlobalSearchModal } from './AdminGlobalSearchModal';
+import { AdminNotificationsDropdown } from './AdminNotificationsDropdown';
 import type { LotProperty } from '@/src/data/lots';
 import { getLotWhatsAppUrl } from '@/src/data/lots';
 import { WhatsAppIcon } from '../SocialIcons';
@@ -54,7 +67,18 @@ import { supabase } from '@/src/lib/supabase';
 import { convertImageToWebP } from '@/src/lib/imageOptimizer';
 import { LogoMGM } from '../LogoMGM';
 
-type AdminTab = 'inventory' | 'overview' | 'simulator' | 'documents' | 'system';
+export type AdminTab =
+  | 'overview'
+  | 'inventory'
+  | 'clients'
+  | 'appointments'
+  | 'legalFiles'
+  | 'documentsManager'
+  | 'reports'
+  | 'profile'
+  | 'settings'
+  | 'simulator'
+  | 'system';
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -80,8 +104,13 @@ export function AdminDashboard({
     resetToDefaults,
   } = useProperties();
 
-  // Navigation tab state (default to 'inventory' to match the uploaded reference design)
-  const [activeTab, setActiveTab] = useState<AdminTab>('inventory');
+  const { clients, appointments, legalFiles, documents } = useAdminData();
+
+  // Navigation tab state (default to 'overview' - Dashboard as requested in Section 1)
+  const [activeTab, setActiveTab] = useState<AdminTab>('overview');
+
+  // Global search modal state
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
   // Filters & Search
   const [search, setSearch] = useState('');
@@ -90,14 +119,20 @@ export function AdminDashboard({
   // Interactive selected row (for the prominent highlighted card row like in the reference)
   const [selectedRowId, setSelectedRowId] = useState<string>(properties[0]?.id || '');
 
+  // Full-page property editor & creator states
+  const [editingProperty, setEditingProperty] = useState<LotProperty | null>(null);
+  const [isCreatingProperty, setIsCreatingProperty] = useState(false);
+
+  // Collapsible sidebar state (collapses on New Property, expands on icon click)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
   // Modals state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [propertyToEdit, setPropertyToEdit] = useState<LotProperty | null>(null);
   const [propertyToDelete, setPropertyToDelete] = useState<LotProperty | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
-  // Profile & Password Modal
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  // Profile & Password State
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordLoading, setPasswordLoading] = useState(false);
@@ -120,6 +155,15 @@ export function AdminDashboard({
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user?.email) setAdminEmail(user.email);
     });
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchModalOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   // Commercial Simulator State
@@ -227,18 +271,25 @@ export function AdminDashboard({
     }
   };
 
-  const handleOpenCreate = () => {
+  const handleGoHome = () => {
+    setEditingProperty(null);
+    setIsCreatingProperty(false);
+    setIsSidebarCollapsed(false);
     if (onNavigate) {
-      onNavigate('new_property');
+      onNavigate('home');
     } else {
-      setPropertyToEdit(null);
-      setIsModalOpen(true);
+      window.location.hash = '';
     }
   };
 
+  const handleOpenCreate = () => {
+    setEditingProperty(null);
+    setIsCreatingProperty(true);
+    setIsSidebarCollapsed(true);
+  };
+
   const handleOpenEdit = (lot: LotProperty) => {
-    setPropertyToEdit(lot);
-    setIsModalOpen(true);
+    setEditingProperty(lot);
   };
 
   const handleSaveProperty = (data: Omit<LotProperty, 'id'>, id?: string) => {
@@ -302,485 +353,632 @@ export function AdminDashboard({
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+    <div className="w-full min-h-screen bg-slate-50 flex flex-col lg:flex-row">
       {/* ======================================================== */}
-      {/* MAIN CONTAINER: FLOATING SAAS DASHBOARD CARD */}
       {/* ======================================================== */}
-      <div className="bg-white rounded-3xl sm:rounded-4xl shadow-2xl shadow-slate-300/50 border border-slate-200/90 overflow-hidden flex flex-col lg:flex-row min-h-[780px]">
-        
-        {/* ======================================================== */}
-        {/* LEFT SIDEBAR (MGM BRANDED DEEP FOREST GREEN) */}
-        {/* ======================================================== */}
-        <aside className="w-full lg:w-64 bg-[#0d2e1a] text-emerald-100/90 flex flex-col justify-between shrink-0 p-5 sm:p-6 select-none border-b lg:border-b-0 lg:border-r border-emerald-900/60">
-          <div>
-            {/* Brand Header */}
-            <div className="flex items-center gap-3 pb-8 pt-2 px-2">
-              <div className="h-10 w-10 rounded-2xl bg-white/10 flex items-center justify-center p-1.5 border border-white/15 shadow-sm">
-                <LogoMGM variant="icon" isGhost={true} className="h-full w-auto" />
-              </div>
-              <div className="min-w-0">
-                <h2 className="text-sm font-black tracking-tight text-white leading-tight">
-                  MGM Inmobiliaria
-                </h2>
-                <span className="text-[10px] font-mono text-emerald-400 font-semibold uppercase tracking-wider block">
-                  Admin Suite 2026
-                </span>
-              </div>
-            </div>
-
-            {/* Sidebar Navigation Items with Clean Active Indicators */}
-            <nav className="space-y-1.5" aria-label="Navegación del panel">
-              {/* Dashboard / Resumen */}
+      {/* LEFT SIDEBAR (Collapsible to icons-only on New Property / Toggle) */}
+      {/* ======================================================== */}
+      <aside
+        className={`hidden lg:flex lg:fixed lg:top-0 lg:bottom-0 lg:left-0 transition-all duration-300 ease-in-out ${
+          isSidebarCollapsed ? 'lg:w-20 p-3' : 'lg:w-64 p-5 sm:p-6'
+        } bg-[#0d2e1a] text-emerald-100/90 flex-col justify-between shrink-0 select-none border-r border-emerald-900/60 z-30 overflow-y-auto overflow-x-hidden`}
+      >
+        <div>
+          {/* Brand Header */}
+          {isSidebarCollapsed ? (
+            <div className="w-full flex flex-col items-center gap-2.5 pb-6 pt-1">
               <button
                 type="button"
-                onClick={() => setActiveTab('overview')}
-                className={`relative w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === 'overview'
-                    ? 'bg-white text-emerald-950 shadow-md font-black translate-x-1'
-                    : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
-                }`}
+                onClick={() => setIsSidebarCollapsed(false)}
+                className="h-10 w-10 rounded-2xl bg-white/10 hover:bg-white/20 flex items-center justify-center p-1.5 border border-white/15 shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                title="Expandir menú lateral a la derecha"
               >
-                <LayoutDashboard className={`h-4 w-4 ${activeTab === 'overview' ? 'text-emerald-800' : 'opacity-70'}`} />
-                <span>Dashboard</span>
+                <LogoMGM variant="symbol" isGhost={true} className="h-full w-auto" />
               </button>
-
-              {/* Propiedades / Catálogo (Primary focus matching the uploaded design) */}
               <button
                 type="button"
-                onClick={() => setActiveTab('inventory')}
-                className={`relative w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === 'inventory'
-                    ? 'bg-white text-emerald-950 shadow-md font-black translate-x-1'
-                    : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
-                }`}
+                onClick={() => setIsSidebarCollapsed(false)}
+                className="p-1 rounded-lg bg-white/5 hover:bg-white/20 text-emerald-300 hover:text-white transition-colors cursor-pointer"
+                title="Expandir menú a la derecha"
               >
-                <div className="flex items-center gap-3.5">
-                  <Building2 className={`h-4 w-4 ${activeTab === 'inventory' ? 'text-emerald-800' : 'opacity-70'}`} />
-                  <span>Propiedades</span>
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between pb-8 pt-2 px-1">
+              <button
+                type="button"
+                onClick={handleGoHome}
+                className="flex items-center gap-3 text-left cursor-pointer group transition-transform hover:scale-[1.02] active:scale-95 min-w-0"
+                title="Ir a la pantalla principal"
+              >
+                <div className="h-10 w-10 rounded-2xl bg-white/10 group-hover:bg-white/20 flex items-center justify-center p-1.5 border border-white/15 shadow-sm transition-colors shrink-0">
+                  <LogoMGM variant="symbol" isGhost={true} className="h-full w-auto" />
                 </div>
+                <div className="min-w-0">
+                  <h2 className="text-sm font-black tracking-tight text-white leading-tight group-hover:text-emerald-300 transition-colors truncate">
+                    MGM Inmobiliaria
+                  </h2>
+                  <span className="text-[10px] font-mono text-emerald-400 font-semibold uppercase tracking-wider block truncate">
+                    Admin Suite 2026
+                  </span>
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsSidebarCollapsed(true)}
+                className="p-1.5 rounded-xl bg-white/5 hover:bg-white/15 text-emerald-300 hover:text-white transition-all cursor-pointer shrink-0 ml-1"
+                title="Colapsar menú lateral"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+
+          {/* Sidebar Navigation Items with Clean Active Indicators */}
+          <nav className="space-y-1" aria-label="Navegación del panel">
+            {/* 1. Dashboard */}
+            <button
+              type="button"
+              onClick={() => {
+                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
+                setEditingProperty(null);
+                setIsCreatingProperty(false);
+                setActiveTab('overview');
+              }}
+              className={`relative w-full flex items-center ${
+                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
+              } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                !editingProperty && !isCreatingProperty && activeTab === 'overview'
+                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
+                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
+              }`}
+              title="Dashboard"
+            >
+              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
+                <LayoutDashboard
+                  className={`h-4 w-4 shrink-0 ${
+                    !editingProperty && !isCreatingProperty && activeTab === 'overview'
+                      ? 'text-emerald-800'
+                      : 'opacity-70'
+                  }`}
+                />
+                {!isSidebarCollapsed && <span className="truncate">Dashboard</span>}
+              </div>
+            </button>
+
+            {/* 2. Propiedades */}
+            <button
+              type="button"
+              onClick={() => {
+                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
+                setEditingProperty(null);
+                setIsCreatingProperty(false);
+                setActiveTab('inventory');
+              }}
+              className={`relative w-full flex items-center ${
+                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
+              } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                !editingProperty && !isCreatingProperty && activeTab === 'inventory'
+                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
+                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
+              }`}
+              title="Propiedades"
+            >
+              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
+                <Building2
+                  className={`h-4 w-4 shrink-0 ${
+                    !editingProperty && !isCreatingProperty && activeTab === 'inventory'
+                      ? 'text-emerald-800'
+                      : 'opacity-70'
+                  }`}
+                />
+                {!isSidebarCollapsed && <span className="truncate">Propiedades</span>}
+              </div>
+              {!isSidebarCollapsed && (
                 <span
                   className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${
-                    activeTab === 'inventory'
+                    !editingProperty && !isCreatingProperty && activeTab === 'inventory'
                       ? 'bg-emerald-100 text-emerald-900'
                       : 'bg-emerald-900/60 text-emerald-300'
                   }`}
                 >
                   {properties.length}
                 </span>
-              </button>
+              )}
+            </button>
 
-              {/* Estadísticas & Cotizador */}
-              <button
-                type="button"
-                onClick={() => setActiveTab('simulator')}
-                className={`relative w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === 'simulator'
-                    ? 'bg-white text-emerald-950 shadow-md font-black translate-x-1'
-                    : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                <Calculator className={`h-4 w-4 ${activeTab === 'simulator' ? 'text-emerald-800' : 'opacity-70'}`} />
-                <span>Cotizador Crédito</span>
-              </button>
-
-              {/* Nueva Propiedad */}
-              <button
-                type="button"
-                onClick={handleOpenCreate}
-                className="w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-bold text-emerald-100/70 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
-              >
-                <Plus className="h-4 w-4 opacity-70" />
-                <span>Nueva Propiedad</span>
-              </button>
-
-              {/* Documentos & Legal */}
-              <button
-                type="button"
-                onClick={() => setActiveTab('documents')}
-                className={`relative w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === 'documents'
-                    ? 'bg-white text-emerald-950 shadow-md font-black translate-x-1'
-                    : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                <FileCheck className={`h-4 w-4 ${activeTab === 'documents' ? 'text-emerald-800' : 'opacity-70'}`} />
-                <span>Expedientes Legal</span>
-              </button>
-
-              {/* Infraestructura Supabase */}
-              <button
-                type="button"
-                onClick={() => setActiveTab('system')}
-                className={`relative w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === 'system'
-                    ? 'bg-white text-emerald-950 shadow-md font-black translate-x-1'
-                    : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                <Database className={`h-4 w-4 ${activeTab === 'system' ? 'text-emerald-800' : 'opacity-70'}`} />
-                <span>Supabase & Medios</span>
-              </button>
-            </nav>
-          </div>
-
-          {/* Sidebar Bottom Profile Card */}
-          <div className="pt-6 border-t border-emerald-900/60 mt-6 space-y-3">
+            {/* 3. Clientes */}
             <button
               type="button"
-              onClick={() => setIsProfileModalOpen(true)}
-              className="w-full p-2.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all text-left flex items-center gap-3 cursor-pointer group"
-              title="Ver Perfil y Cambiar Contraseña"
+              onClick={() => {
+                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
+                setEditingProperty(null);
+                setIsCreatingProperty(false);
+                setActiveTab('clients');
+              }}
+              className={`relative w-full flex items-center ${
+                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
+              } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                !editingProperty && !isCreatingProperty && activeTab === 'clients'
+                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
+                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
+              }`}
+              title="Clientes"
             >
-              <div className="h-9 w-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs group-hover:scale-105 transition-transform">
-                {adminEmail.slice(0, 2).toUpperCase()}
+              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
+                <Users
+                  className={`h-4 w-4 shrink-0 ${
+                    !editingProperty && !isCreatingProperty && activeTab === 'clients'
+                      ? 'text-emerald-800'
+                      : 'opacity-70'
+                  }`}
+                />
+                {!isSidebarCollapsed && <span className="truncate">Clientes</span>}
               </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-xs font-bold text-white truncate">{adminEmail}</div>
-                <div className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
-                  <span>Mi Perfil & Seguridad</span>
-                  <ChevronRight className="h-2.5 w-2.5 opacity-60" />
-                </div>
+              {!isSidebarCollapsed && (
+                <span
+                  className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${
+                    !editingProperty && !isCreatingProperty && activeTab === 'clients'
+                      ? 'bg-emerald-100 text-emerald-900'
+                      : 'bg-emerald-900/60 text-emerald-300'
+                  }`}
+                >
+                  {clients.length}
+                </span>
+              )}
+            </button>
+
+            {/* 4. Citas y visitas */}
+            <button
+              type="button"
+              onClick={() => {
+                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
+                setEditingProperty(null);
+                setIsCreatingProperty(false);
+                setActiveTab('appointments');
+              }}
+              className={`relative w-full flex items-center ${
+                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
+              } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                !editingProperty && !isCreatingProperty && activeTab === 'appointments'
+                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
+                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
+              }`}
+              title="Citas y visitas"
+            >
+              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
+                <Calendar
+                  className={`h-4 w-4 shrink-0 ${
+                    !editingProperty && !isCreatingProperty && activeTab === 'appointments'
+                      ? 'text-emerald-800'
+                      : 'opacity-70'
+                  }`}
+                />
+                {!isSidebarCollapsed && <span className="truncate">Citas y visitas</span>}
+              </div>
+              {!isSidebarCollapsed && (
+                <span
+                  className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${
+                    !editingProperty && !isCreatingProperty && activeTab === 'appointments'
+                      ? 'bg-emerald-100 text-emerald-900'
+                      : 'bg-emerald-900/60 text-emerald-300'
+                  }`}
+                >
+                  {appointments.length}
+                </span>
+              )}
+            </button>
+
+            {/* 5. Expedientes legales */}
+            <button
+              type="button"
+              onClick={() => {
+                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
+                setEditingProperty(null);
+                setIsCreatingProperty(false);
+                setActiveTab('legalFiles');
+              }}
+              className={`relative w-full flex items-center ${
+                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
+              } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                !editingProperty && !isCreatingProperty && activeTab === 'legalFiles'
+                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
+                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
+              }`}
+              title="Expedientes legales"
+            >
+              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
+                <FileCheck
+                  className={`h-4 w-4 shrink-0 ${
+                    !editingProperty && !isCreatingProperty && activeTab === 'legalFiles'
+                      ? 'text-emerald-800'
+                      : 'opacity-70'
+                  }`}
+                />
+                {!isSidebarCollapsed && <span className="truncate">Expedientes legales</span>}
               </div>
             </button>
 
-            <div className="flex items-center justify-between text-[11px] text-emerald-400/80 px-1">
-              <span>Sociedad Civil MGM</span>
+            {/* 6. Documentos */}
+            <button
+              type="button"
+              onClick={() => {
+                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
+                setEditingProperty(null);
+                setIsCreatingProperty(false);
+                setActiveTab('documentsManager');
+              }}
+              className={`relative w-full flex items-center ${
+                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
+              } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                !editingProperty && !isCreatingProperty && activeTab === 'documentsManager'
+                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
+                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
+              }`}
+              title="Documentos"
+            >
+              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
+                <FileText
+                  className={`h-4 w-4 shrink-0 ${
+                    !editingProperty && !isCreatingProperty && activeTab === 'documentsManager'
+                      ? 'text-emerald-800'
+                      : 'opacity-70'
+                  }`}
+                />
+                {!isSidebarCollapsed && <span className="truncate">Documentos</span>}
+              </div>
+              {!isSidebarCollapsed && (
+                <span
+                  className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${
+                    !editingProperty && !isCreatingProperty && activeTab === 'documentsManager'
+                      ? 'bg-emerald-100 text-emerald-900'
+                      : 'bg-emerald-900/60 text-emerald-300'
+                  }`}
+                >
+                  {documents.length}
+                </span>
+              )}
+            </button>
+
+            {/* 7. Reportes */}
+            <button
+              type="button"
+              onClick={() => {
+                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
+                setEditingProperty(null);
+                setIsCreatingProperty(false);
+                setActiveTab('reports');
+              }}
+              className={`relative w-full flex items-center ${
+                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
+              } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                !editingProperty && !isCreatingProperty && activeTab === 'reports'
+                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
+                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
+              }`}
+              title="Reportes"
+            >
+              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
+                <TrendingUp
+                  className={`h-4 w-4 shrink-0 ${
+                    !editingProperty && !isCreatingProperty && activeTab === 'reports'
+                      ? 'text-emerald-800'
+                      : 'opacity-70'
+                  }`}
+                />
+                {!isSidebarCollapsed && <span className="truncate">Reportes</span>}
+              </div>
+            </button>
+
+            {/* Separador visual */}
+            <div className="py-1.5">
+              <div className="border-t border-emerald-900/60" />
+            </div>
+
+            {/* Perfil */}
+            <button
+              type="button"
+              onClick={() => {
+                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
+                setEditingProperty(null);
+                setIsCreatingProperty(false);
+                setActiveTab('profile');
+              }}
+              className={`relative w-full flex items-center ${
+                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
+              } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                !editingProperty && !isCreatingProperty && activeTab === 'profile'
+                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
+                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
+              }`}
+              title="Perfil"
+            >
+              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
+                <User
+                  className={`h-4 w-4 shrink-0 ${
+                    !editingProperty && !isCreatingProperty && activeTab === 'profile'
+                      ? 'text-emerald-800'
+                      : 'opacity-70'
+                  }`}
+                />
+                {!isSidebarCollapsed && <span className="truncate">Perfil</span>}
+              </div>
+            </button>
+
+            {/* Configuración */}
+            <button
+              type="button"
+              onClick={() => {
+                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
+                setEditingProperty(null);
+                setIsCreatingProperty(false);
+                setActiveTab('settings');
+              }}
+              className={`relative w-full flex items-center ${
+                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
+              } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                !editingProperty && !isCreatingProperty && activeTab === 'settings'
+                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
+                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
+              }`}
+              title="Configuración"
+            >
+              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
+                <Settings
+                  className={`h-4 w-4 shrink-0 ${
+                    !editingProperty && !isCreatingProperty && activeTab === 'settings'
+                      ? 'text-emerald-800'
+                      : 'opacity-70'
+                  }`}
+                />
+                {!isSidebarCollapsed && <span className="truncate">Configuración</span>}
+              </div>
+            </button>
+          </nav>
+        </div>
+
+        {/* Sidebar Bottom Profile Card */}
+        <div className="pt-4 border-t border-emerald-900/60 mt-4 space-y-2">
+          {!isSidebarCollapsed ? (
+            <div className="flex items-center justify-between text-[11px] text-emerald-400/80 px-2">
+              <span className="truncate font-mono">Sociedad Civil MGM</span>
               <button
                 type="button"
                 onClick={onLogout}
-                className="hover:text-rose-300 font-semibold transition-colors cursor-pointer"
+                className="hover:text-rose-300 font-bold transition-colors cursor-pointer shrink-0 ml-2"
               >
                 Cerrar Sesión
               </button>
             </div>
+          ) : (
+            <div className="flex justify-center">
+              <button
+                type="button"
+                onClick={onLogout}
+                className="p-2 rounded-xl text-rose-300 hover:text-white hover:bg-rose-500/20 transition-colors cursor-pointer"
+                title="Cerrar Sesión"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+        </div>
+      </aside>
+
+      {/* ======================================================== */}
+      {/* MOBILE TOP BAR (Only on < lg screens) */}
+      {/* ======================================================== */}
+      <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-[#0d2e1a] border-b border-emerald-900/60 sticky top-0 z-30 shrink-0">
+        <button
+          type="button"
+          onClick={handleGoHome}
+          className="flex items-center gap-2.5 text-left cursor-pointer group active:scale-95"
+          title="Ir a la pantalla principal"
+        >
+          <div className="h-8 w-8 rounded-xl bg-white/10 group-hover:bg-white/20 flex items-center justify-center p-1 border border-white/15 transition-colors">
+            <LogoMGM variant="symbol" isGhost={true} className="h-full w-auto" />
           </div>
-        </aside>
+          <div className="min-w-0">
+            <h2 className="text-xs font-black tracking-tight text-white leading-tight group-hover:text-emerald-300 transition-colors">
+              MGM Inmobiliaria
+            </h2>
+            <span className="text-[9px] font-mono text-emerald-400 font-semibold uppercase">
+              Admin Panel
+            </span>
+          </div>
+        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setEditingProperty(null);
+              setIsCreatingProperty(false);
+              setActiveTab('profile');
+            }}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+              !editingProperty && !isCreatingProperty && activeTab === 'profile'
+                ? 'bg-white text-emerald-950 border-white'
+                : 'bg-white/10 text-white border-white/10 hover:bg-white/20'
+            }`}
+            title="Ver Perfil y Contraseña"
+          >
+            <div className="h-5 w-5 rounded-md bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">
+              {adminEmail.slice(0, 2).toUpperCase()}
+            </div>
+            <span className="text-[11px]">Perfil</span>
+          </button>
+          <button
+            type="button"
+            onClick={onLogout}
+            className="p-1.5 rounded-lg text-rose-300 hover:text-rose-100 hover:bg-rose-500/20 transition-colors cursor-pointer"
+            title="Cerrar Sesión"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
 
-        {/* ======================================================== */}
-        {/* MAIN CANVAS (PURE WHITE, CLEAN & MODERN) */}
-        {/* ======================================================== */}
-        <main className="flex-1 p-5 sm:p-8 flex flex-col justify-between overflow-x-hidden bg-white">
-          <div className="space-y-6">
-            
-            {/* TOP HEADER BAR (Matching reference layout with Search, Bell, Profile) */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                  {activeTab === 'inventory' && 'Propiedades en Cartera'}
-                  {activeTab === 'overview' && 'Resumen Ejecutivo & KPIs'}
-                  {activeTab === 'simulator' && 'Cotizador de Crédito Directo'}
-                  {activeTab === 'documents' && 'Expedientes Notariales & Planos'}
-                  {activeTab === 'system' && 'Supabase & Optimización de Medios'}
-                </h1>
-                <p className="text-xs text-slate-400 mt-0.5 font-medium">
-                  {properties.length} propiedades reales en catálogo activo
-                </p>
-              </div>
+      {/* ======================================================== */}
+      {/* MAIN CANVAS (PURE WHITE, CLEAN & MODERN) */}
+      {/* ======================================================== */}
+      <main
+        className={`flex-1 ${
+          isSidebarCollapsed ? 'lg:ml-20' : 'lg:ml-64'
+        } transition-all duration-300 ease-in-out p-4 sm:p-6 lg:p-8 flex flex-col justify-between overflow-x-hidden bg-white min-h-screen pb-24 lg:pb-8`}
+      >
+        {editingProperty || isCreatingProperty ? (
+          <AdminPropertyModal
+            key={editingProperty?.id || 'create-new-property'}
+            isPageView={true}
+            onClose={() => {
+              setEditingProperty(null);
+              setIsCreatingProperty(false);
+              setIsSidebarCollapsed(false);
+            }}
+            onSave={(data, id) => {
+              handleSaveProperty(data, id);
+              setEditingProperty(null);
+              setIsCreatingProperty(false);
+              setIsSidebarCollapsed(false);
+            }}
+            onDelete={(id) => {
+              deleteProperty(id);
+              setEditingProperty(null);
+              setIsCreatingProperty(false);
+              setIsSidebarCollapsed(false);
+            }}
+            propertyToEdit={editingProperty}
+          />
+        ) : (
+            <div className="space-y-6">
+              
+              {/* TOP HEADER BAR with Global Search, Web View, and Notifications */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                    {activeTab === 'overview' && 'Dashboard General'}
+                    {activeTab === 'inventory' && 'Propiedades en Cartera'}
+                    {activeTab === 'clients' && 'Clientes e Interesados'}
+                    {activeTab === 'appointments' && 'Agenda de Citas y Visitas'}
+                    {activeTab === 'legalFiles' && 'Expedientes Legales Notariales'}
+                    {activeTab === 'documentsManager' && 'Gestor Central de Documentos'}
+                    {activeTab === 'reports' && 'Reportes & Métricas Operativas'}
+                    {activeTab === 'profile' && 'Mi Perfil & Seguridad de Acceso'}
+                    {activeTab === 'settings' && 'Configuración del Sistema'}
+                    {activeTab === 'simulator' && 'Cotizador de Crédito Directo'}
+                    {activeTab === 'system' && 'Supabase & Optimización de Medios'}
+                  </h1>
+                  <p className="text-xs text-slate-400 mt-0.5 font-medium">
+                    {activeTab === 'overview' && 'Visión global, KPIs de venta y actividades comerciales en tiempo real'}
+                    {activeTab === 'inventory' && `${properties.length} propiedades reales en catálogo activo`}
+                    {activeTab === 'clients' && `${clients.length} clientes e interesados registrados`}
+                    {activeTab === 'appointments' && `${appointments.length} citas programadas en agenda`}
+                    {activeTab === 'legalFiles' && `${legalFiles.length} expedientes de propiedad bajo supervisión`}
+                    {activeTab === 'documentsManager' && `${documents.length} archivos y fichas técnicas indexadas`}
+                    {activeTab === 'reports' && 'Estadísticas ejecutivas del portafolio inmobiliario'}
+                    {activeTab === 'profile' && 'Gestión de credenciales, seguridad de sesión y cambio de contraseña'}
+                    {activeTab === 'settings' && 'Parámetros institucionales y financiamiento comercial'}
+                    {activeTab === 'simulator' && 'Cálculo de entrada, cuotas mensuales y proyecciones'}
+                    {activeTab === 'system' && 'Conexión a base de datos y optimizador de medios'}
+                  </p>
+                </div>
 
-              {/* Right Controls: Search, Web Button, Bell, Avatar */}
-              <div className="flex items-center gap-3">
-                {/* Search Bar */}
-                <div className="relative w-48 sm:w-60">
-                  <Search className="h-3.5 w-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Buscar inmueble..."
-                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-full text-xs text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-emerald-600 focus:outline-none transition-all"
-                  />
-                  {search && (
+                {/* Right Controls: Búsqueda Global, Web Button, Notificaciones */}
+                <div className="flex items-center gap-3">
+                  {/* Búsqueda Global Trigger */}
+                  <button
+                    type="button"
+                    onClick={() => setIsSearchModalOpen(true)}
+                    className="flex items-center gap-2 pl-3.5 pr-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full text-xs text-slate-500 hover:text-slate-800 transition-all cursor-pointer shadow-2xs group"
+                    title="Búsqueda global (Ctrl + K)"
+                  >
+                    <Search className="h-3.5 w-3.5 text-slate-400 group-hover:text-emerald-700 transition-colors" />
+                    <span className="hidden sm:inline">Buscar en el panel...</span>
+                    <span className="sm:hidden">Buscar...</span>
+                    <kbd className="hidden sm:inline-block text-[10px] bg-white border border-slate-200 px-1.5 py-0.5 rounded-md font-mono text-slate-400">
+                      ⌘K
+                    </kbd>
+                  </button>
+
+                  {/* View Public Web Button */}
+                  <button
+                    type="button"
+                    onClick={onViewCatalog}
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold transition-all cursor-pointer shadow-2xs"
+                    title="Ver portal web público"
+                  >
+                    <Eye className="h-3.5 w-3.5 text-emerald-700" />
+                    <span>Ver Web</span>
+                  </button>
+
+                  {/* Notification Dropdown */}
+                  <AdminNotificationsDropdown onNavigateTab={setActiveTab} />
+
+                  {/* Botón de Citas (Visible en sección Clientes, al lado de notificaciones) */}
+                  {activeTab === 'clients' && (
                     <button
                       type="button"
-                      onClick={() => setSearch('')}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400"
+                      onClick={() => setActiveTab('appointments')}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer animate-in fade-in"
+                      title="Ver Agenda de Citas y Visitas"
                     >
-                      ✕
+                      <Calendar className="h-3.5 w-3.5 text-emerald-300" />
+                      <span>Citas</span>
                     </button>
                   )}
                 </div>
-
-                {/* View Public Web Button */}
-                <button
-                  type="button"
-                  onClick={onViewCatalog}
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold transition-all cursor-pointer"
-                  title="Ver portal web público"
-                >
-                  <Eye className="h-3.5 w-3.5 text-emerald-700" />
-                  <span>Ver Web</span>
-                </button>
-
-                {/* Notification Bell */}
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('overview')}
-                    className="h-9 w-9 rounded-full bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 transition-colors cursor-pointer"
-                    title="2 Propiedades en seguimiento"
-                  >
-                    <Bell className="h-4 w-4" />
-                    <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white" />
-                  </button>
-                </div>
-
-                {/* Avatar with click to open Profile & Password */}
-                <button
-                  type="button"
-                  onClick={() => setIsProfileModalOpen(true)}
-                  className="flex items-center gap-2 p-1 pl-1.5 pr-2 rounded-full bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer"
-                  title="Haz clic para ver perfil y cambiar contraseña"
-                >
-                  <div className="h-7 w-7 rounded-full bg-emerald-700 text-white font-bold text-xs flex items-center justify-center">
-                    {adminEmail.slice(0, 2).toUpperCase()}
-                  </div>
-                  <Settings className="h-3.5 w-3.5 text-slate-400 hover:text-slate-700" />
-                </button>
               </div>
-            </div>
 
             {/* ======================================================== */}
-            {/* TAB CONTENT: PROPIEDADES (INVENTORY - MATCHING IMAGE) */}
-            {/* ======================================================== */}
-            {activeTab === 'inventory' && (
-              <div className="space-y-5 animate-in fade-in duration-200">
-                
-                {/* Horizontal Filter Tabs (Directly matching 'All orders, Dispatch, Pending, Completed') */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-6 text-xs font-bold border-b border-slate-100 sm:border-0 pb-2 sm:pb-0">
-                    {(['Todos', 'Disponible', 'En Reserva', 'Vendido'] as const).map((st) => (
-                      <button
-                        key={st}
-                        type="button"
-                        onClick={() => setFilterStatus(st)}
-                        className={`relative pb-1.5 transition-all cursor-pointer ${
-                          filterStatus === st
-                            ? 'text-slate-900 border-b-2 border-emerald-700 font-black'
-                            : 'text-slate-400 hover:text-slate-700'
-                        }`}
-                      >
-                        {st === 'Todos' ? 'Todas las propiedades' : st}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={handleOpenCreate}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
-                    >
-                      <Plus className="h-3.5 w-3.5" />
-                      <span>Nuevo Inmueble</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Data Table with Rows matching reference design */}
-                <div className="overflow-x-auto">
-                  <div className="min-w-[700px] space-y-2">
-                    
-                    {/* Table Header Row */}
-                    <div className="grid grid-cols-12 px-4 py-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                      <div className="col-span-2">Código / ID</div>
-                      <div className="col-span-3">Inmueble</div>
-                      <div className="col-span-3">Ubicación / Proyecto</div>
-                      <div className="col-span-1 text-right">Precio</div>
-                      <div className="col-span-2 text-center">Estado</div>
-                      <div className="col-span-1 text-right">Acción</div>
-                    </div>
-
-                    {/* Table Data Rows */}
-                    {filtered.map((lot) => {
-                      const isSelected = selectedRowId === lot.id;
-                      const isAvail = lot.status === 'Disponible';
-                      const isRes = lot.status === 'En Reserva';
-
-                      return (
-                        <div
-                          key={lot.id}
-                          onClick={() => setSelectedRowId(lot.id)}
-                          className={`grid grid-cols-12 items-center px-4 py-3 rounded-2xl transition-all cursor-pointer select-none ${
-                            isSelected
-                              ? 'bg-[#113d22] text-white shadow-xl shadow-emerald-950/20 translate-y-[-1px]'
-                              : 'bg-white hover:bg-slate-50/80 text-slate-700 border border-slate-100 shadow-2xs'
-                          }`}
-                        >
-                          {/* Code ID */}
-                          <div className="col-span-2 font-mono font-bold text-xs flex items-center gap-2">
-                            <span className={isSelected ? 'text-emerald-300' : 'text-slate-400'}>#</span>
-                            <span className={isSelected ? 'text-white' : 'text-slate-800'}>{lot.code}</span>
-                          </div>
-
-                          {/* Image & Title */}
-                          <div className="col-span-3 flex items-center gap-3 min-w-0 pr-2">
-                            <div className="relative h-9 w-9 rounded-full overflow-hidden bg-slate-900 shrink-0 border border-black/10">
-                              <Image
-                                src={lot.image}
-                                alt={lot.name}
-                                fill
-                                sizes="36px"
-                                className="object-cover"
-                                referrerPolicy="no-referrer"
-                              />
-                            </div>
-                            <div className="min-w-0">
-                              <div className={`font-bold text-xs truncate ${isSelected ? 'text-white' : 'text-slate-900'}`}>
-                                {lot.name}
-                              </div>
-                              <div className={`text-[10px] truncate ${isSelected ? 'text-emerald-200/80' : 'text-slate-400'}`}>
-                                {lot.areaM2} m² · {lot.dimensions}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Location */}
-                          <div className={`col-span-3 text-xs truncate pr-3 ${isSelected ? 'text-emerald-100/90' : 'text-slate-500'}`}>
-                            {lot.project} · {lot.zone}
-                          </div>
-
-                          {/* Price */}
-                          <div className={`col-span-1 text-right font-mono font-black text-xs ${isSelected ? 'text-white' : 'text-slate-900'}`}>
-                            ${lot.priceUSD.toLocaleString()}
-                          </div>
-
-                          {/* Status with Color Dot */}
-                          <div className="col-span-2 flex items-center justify-center">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleToggleStatusWithFeedback(lot.id);
-                              }}
-                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
-                                isSelected
-                                  ? 'bg-white/20 text-white hover:bg-white/30 border border-white/20'
-                                  : isAvail
-                                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100'
-                                  : isRes
-                                  ? 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100'
-                                  : 'bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200'
-                              }`}
-                              title="Haz clic para alternar estado"
-                            >
-                              <span
-                                className={`h-1.5 w-1.5 rounded-full ${
-                                  isAvail ? 'bg-emerald-500' : isRes ? 'bg-amber-500' : 'bg-slate-500'
-                                }`}
-                              />
-                              <span>{lot.status}</span>
-                            </button>
-                          </div>
-
-                          {/* Actions */}
-                          <div className="col-span-1 flex items-center justify-end gap-1.5">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleOpenEdit(lot);
-                              }}
-                              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                                isSelected
-                                  ? 'text-white hover:bg-white/20'
-                                  : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100'
-                              }`}
-                              title="Editar Inmueble"
-                            >
-                              <Edit2 className="h-3.5 w-3.5" />
-                            </button>
-
-                            <a
-                              href={getLotWhatsAppUrl(lot.code, lot.name, lot.priceUSD)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                                isSelected
-                                  ? 'text-emerald-300 hover:bg-white/20'
-                                  : 'text-emerald-700 hover:bg-emerald-50'
-                              }`}
-                              title="Cotizar por WhatsApp"
-                            >
-                              <WhatsAppIcon size={14} />
-                            </a>
-                          </div>
-                        </div>
-                      );
-                    })}
-
-                    {filtered.length === 0 && (
-                      <div className="text-center py-12 text-slate-400 text-xs">
-                        No se encontraron inmuebles con este filtro.
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Table Footer with Pagination matching reference design */}
-                <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
-                  <span>Mostrando {filtered.length} de {properties.length} inmuebles</span>
-                  <div className="flex items-center gap-1 font-mono font-bold">
-                    <button type="button" className="px-2 py-1 text-slate-300 cursor-not-allowed">‹</button>
-                    <span className="px-2 py-1 bg-slate-900 text-white rounded-lg text-[11px]">1</span>
-                    <button type="button" className="px-2 py-1 text-slate-300 cursor-not-allowed">›</button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ======================================================== */}
-            {/* TAB CONTENT: DASHBOARD & KPIS */}
+            {/* TAB CONTENT: DASHBOARD OVERVIEW (SECTION 1) */}
             {/* ======================================================== */}
             {activeTab === 'overview' && (
-              <div className="space-y-6 animate-in fade-in duration-200">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Total Inventario
-                    </span>
-                    <span className="text-2xl font-black font-mono text-slate-900 mt-1 block">
-                      ${(metrics.totalInventoryValueUSD / 1000).toFixed(0)}k USD
-                    </span>
-                    <span className="text-[11px] text-slate-500">{properties.length} propiedades reales</span>
-                  </div>
-
-                  <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200/80">
-                    <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider block">
-                      Disponibles
-                    </span>
-                    <span className="text-2xl font-black font-mono text-emerald-950 mt-1 block">
-                      {metrics.availableCount}
-                    </span>
-                    <span className="text-[11px] text-emerald-700 font-semibold">
-                      ${(metrics.totalActiveValueUSD / 1000).toFixed(0)}k USD activos
-                    </span>
-                  </div>
-
-                  <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200/80">
-                    <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider block">
-                      En Reserva
-                    </span>
-                    <span className="text-2xl font-black font-mono text-amber-950 mt-1 block">
-                      {metrics.reservedCount}
-                    </span>
-                    <span className="text-[11px] text-amber-700">Trámite notarial</span>
-                  </div>
-
-                  <div className="p-4 rounded-2xl bg-slate-900 text-white border border-slate-800">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Tasa de Venta
-                    </span>
-                    <span className="text-2xl font-black font-mono text-white mt-1 block">
-                      {properties.length > 0
-                        ? Math.round((metrics.soldCount / properties.length) * 100)
-                        : 0}%
-                    </span>
-                    <span className="text-[11px] text-emerald-400">Escriturados</span>
-                  </div>
-                </div>
-              </div>
+              <AdminDashboardOverview
+                onNavigateTab={setActiveTab}
+                onOpenCreateProperty={handleOpenCreate}
+              />
             )}
+
+            {/* ======================================================== */}
+            {/* TAB CONTENT: PROPIEDADES (SECTION 2) */}
+            {/* ======================================================== */}
+            {activeTab === 'inventory' && (
+              <AdminPropertiesList
+                onOpenCreate={handleOpenCreate}
+                onOpenEdit={handleOpenEdit}
+              />
+            )}
+
+            {/* ======================================================== */}
+            {/* TAB CONTENT: CLIENTES E INTERESADOS (SECTION 3) */}
+            {/* ======================================================== */}
+            {activeTab === 'clients' && <AdminClientsView />}
+
+            {/* ======================================================== */}
+            {/* TAB CONTENT: CITAS Y VISITAS (SECTION 4) */}
+            {/* ======================================================== */}
+            {activeTab === 'appointments' && <AdminAppointmentsView />}
+
+            {/* ======================================================== */}
+            {/* TAB CONTENT: EXPEDIENTES LEGALES (SECTION 5) */}
+            {/* ======================================================== */}
+            {activeTab === 'legalFiles' && <AdminLegalFilesView />}
+
+            {/* ======================================================== */}
+            {/* TAB CONTENT: GESTOR DE DOCUMENTOS (SECTION 6) */}
+            {/* ======================================================== */}
+            {activeTab === 'documentsManager' && <AdminDocumentsView />}
+
+            {/* ======================================================== */}
+            {/* TAB CONTENT: REPORTES (SECTION 7) */}
+            {/* ======================================================== */}
+            {activeTab === 'reports' && <AdminReportsView />}
+
+            {/* ======================================================== */}
+            {/* TAB CONTENT: CONFIGURACIÓN (SECTION 8) */}
+            {/* ======================================================== */}
+            {activeTab === 'settings' && <AdminSettingsView />}
 
             {/* ======================================================== */}
             {/* TAB CONTENT: COTIZADOR */}
@@ -847,44 +1045,6 @@ export function AdminDashboard({
               </div>
             )}
 
-            {/* ======================================================== */}
-            {/* TAB CONTENT: EXPEDIENTES & LEGAL */}
-            {/* ======================================================== */}
-            {activeTab === 'documents' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
-                <div className="border border-slate-200 rounded-2xl overflow-hidden">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 text-slate-400 font-bold uppercase text-[10px]">
-                      <tr>
-                        <th className="py-3 px-4">Código</th>
-                        <th className="py-3 px-4">Inmueble</th>
-                        <th className="py-3 px-4">Estado Notarial</th>
-                        <th className="py-3 px-4">Plano / Ficha</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {properties.map((p) => (
-                        <tr key={p.id}>
-                          <td className="py-3 px-4 font-mono font-bold text-slate-900">{p.code}</td>
-                          <td className="py-3 px-4 font-bold text-slate-800">{p.name}</td>
-                          <td className="py-3 px-4 text-emerald-700 font-semibold">{p.registryStatus || 'Escritura Pública'}</td>
-                          <td className="py-3 px-4">
-                            {p.pdfUrl ? (
-                              <a href={p.pdfUrl} target="_blank" rel="noopener noreferrer" className="text-emerald-700 font-bold hover:underline flex items-center gap-1">
-                                <FileText className="h-3.5 w-3.5" />
-                                <span>Ver PDF</span>
-                              </a>
-                            ) : (
-                              <span className="text-slate-400 italic">Sin PDF</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
 
             {/* ======================================================== */}
             {/* TAB CONTENT: SUPABASE & TESTBENCH */}
@@ -946,123 +1106,304 @@ export function AdminDashboard({
               </div>
             )}
 
+            {/* ======================================================== */}
+            {/* TAB CONTENT: MI PERFIL & SEGURIDAD (FULL PAGE VIEW) */}
+            {/* ======================================================== */}
+            {activeTab === 'profile' && (
+              <div className="space-y-6 max-w-4xl animate-in fade-in duration-200">
+                {/* Banner de Cabecera de Cuenta */}
+                <div className="bg-gradient-to-r from-[#0d2e1a] via-[#124225] to-[#1a5b33] rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
+                  <div className="absolute right-0 top-0 translate-x-8 -translate-y-8 w-64 h-64 bg-white/5 rounded-full pointer-events-none blur-2xl" />
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
+                    <div className="flex items-center gap-4">
+                      <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md text-white font-black text-xl sm:text-2xl flex items-center justify-center shadow-inner">
+                        {adminEmail.slice(0, 2).toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white">
+                            Perfil de Administrador
+                          </h3>
+                          <span className="text-[10px] font-bold text-emerald-300 bg-emerald-950/70 border border-emerald-500/30 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                            Super Admin
+                          </span>
+                        </div>
+                        <p className="text-sm text-emerald-200/90 font-mono mt-1">{adminEmail}</p>
+                        <p className="text-xs text-emerald-300/70 mt-0.5">
+                          Sociedad Civil MGM Inmobiliaria · Acceso Cifrado
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={onLogout}
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600/90 hover:bg-rose-600 text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
+                      >
+                        <LogOut className="h-3.5 w-3.5" />
+                        <span>Cerrar Sesión</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Formulario y Detalles de Seguridad en Rejilla */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  {/* Formulario de Cambio de Contraseña */}
+                  <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs">
+                    <div className="flex items-center gap-2.5 pb-4 border-b border-slate-100 mb-5">
+                      <div className="h-9 w-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                        <KeyRound className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-black text-slate-900">
+                          Cambiar Contraseña de Acceso
+                        </h4>
+                        <p className="text-xs text-slate-500">
+                          Actualización criptográfica directa en Supabase Auth
+                        </p>
+                      </div>
+                    </div>
+
+                    <form onSubmit={handleChangePassword} className="space-y-4">
+                      {passwordError && (
+                        <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-700 font-semibold flex items-center gap-2.5">
+                          <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600" />
+                          <span>{passwordError}</span>
+                        </div>
+                      )}
+
+                      {passwordSuccess && (
+                        <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-semibold flex items-center gap-2.5">
+                          <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+                          <span>{passwordSuccess}</span>
+                        </div>
+                      )}
+
+                      <div>
+                        <label className="text-xs font-bold text-slate-700 block mb-1.5">
+                          Nueva Contraseña
+                        </label>
+                        <input
+                          type="password"
+                          required
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          placeholder="Mínimo 6 caracteres..."
+                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:border-emerald-600 focus:outline-none transition-all"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold text-slate-700 block mb-1.5">
+                          Confirmar Nueva Contraseña
+                        </label>
+                        <input
+                          type="password"
+                          required
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="Repite la contraseña..."
+                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:border-emerald-600 focus:outline-none transition-all"
+                        />
+                      </div>
+
+                      <div className="pt-2">
+                        <button
+                          type="submit"
+                          disabled={passwordLoading}
+                          className="w-full py-3 rounded-xl bg-slate-900 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
+                        >
+                          <Lock className="h-3.5 w-3.5" />
+                          <span>{passwordLoading ? 'Guardando en Supabase...' : 'Actualizar Contraseña'}</span>
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+
+                  {/* Panel Lateral: Parámetros de Seguridad de Sesión */}
+                  <div className="lg:col-span-5 space-y-4">
+                    <div className="bg-slate-50/80 rounded-3xl border border-slate-200 p-6 space-y-4">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className="h-4 w-4 text-emerald-700" />
+                        <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                          Seguridad de Sesión
+                        </h4>
+                      </div>
+
+                      <div className="space-y-3 text-xs">
+                        <div className="p-3 bg-white rounded-2xl border border-slate-200/80">
+                          <span className="text-[11px] font-bold text-slate-400 block uppercase">
+                            Proveedor de Identidad
+                          </span>
+                          <span className="font-semibold text-slate-800">
+                            Supabase Cloud Auth (JWT 256-bit)
+                          </span>
+                        </div>
+
+                        <div className="p-3 bg-white rounded-2xl border border-slate-200/80">
+                          <span className="text-[11px] font-bold text-slate-400 block uppercase">
+                            Protección de Canal
+                          </span>
+                          <span className="font-semibold text-emerald-700 flex items-center gap-1.5">
+                            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                            TLS 1.3 / HTTPS Cifrado
+                          </span>
+                        </div>
+
+                        <div className="p-3 bg-white rounded-2xl border border-slate-200/80">
+                          <span className="text-[11px] font-bold text-slate-400 block uppercase">
+                            Nivel de Privilegios
+                          </span>
+                          <span className="font-semibold text-slate-800">
+                            Lectura y Escritura Total (CRUD Lotes)
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200 text-[11px] text-amber-800 space-y-1">
+                      <p className="font-bold flex items-center gap-1.5">
+                        <AlertTriangle className="h-3.5 w-3.5 text-amber-600 shrink-0" />
+                        <span>Recomendación de Seguridad</span>
+                      </p>
+                      <p className="text-amber-700/90 leading-relaxed">
+                        Usa una clave de al menos 8 caracteres con números y símbolos para mantener protegidos los datos y catálogos de MGM Inmobiliaria.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        </main>
-      </div>
+        )}
+      </main>
 
       {/* ======================================================== */}
-      {/* MODAL: PROFILE & PASSWORD CHANGE */}
+      {/* MOBILE BOTTOM NAVIGATION BAR (Fixed at bottom on < lg) */}
       {/* ======================================================== */}
-      {isProfileModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-200 space-y-5 relative">
-            <button
-              type="button"
-              onClick={() => setIsProfileModalOpen(false)}
-              className="absolute top-5 right-5 p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
-            >
-              <X className="h-4 w-4" />
-            </button>
+      <nav
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0d2e1a]/95 backdrop-blur-md border-t border-emerald-900/80 px-2 py-1.5 flex items-center justify-between overflow-x-auto no-scrollbar gap-1 shadow-2xl"
+        aria-label="Navegación móvil del panel de administración"
+      >
+        <button
+          type="button"
+          onClick={() => {
+            setEditingProperty(null);
+            setIsCreatingProperty(false);
+            setActiveTab('overview');
+          }}
+          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold shrink-0 transition-all cursor-pointer ${
+            !editingProperty && !isCreatingProperty && activeTab === 'overview'
+              ? 'text-white bg-white/15'
+              : 'text-emerald-200/70 hover:text-white'
+          }`}
+        >
+          <LayoutDashboard className="h-4 w-4 mb-0.5" />
+          <span>Dashboard</span>
+        </button>
 
-            {/* Profile Header */}
-            <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
-              <div className="h-12 w-12 rounded-2xl bg-emerald-700 text-white font-black text-sm flex items-center justify-center shadow-md">
-                {adminEmail.slice(0, 2).toUpperCase()}
-              </div>
-              <div>
-                <h3 className="text-base font-black text-slate-900">Perfil de Administrador</h3>
-                <p className="text-xs text-slate-500 font-mono">{adminEmail}</p>
-                <span className="inline-block mt-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                  Super Administrador MGM
-                </span>
-              </div>
-            </div>
+        <button
+          type="button"
+          onClick={() => {
+            setEditingProperty(null);
+            setIsCreatingProperty(false);
+            setActiveTab('inventory');
+          }}
+          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold shrink-0 transition-all cursor-pointer ${
+            !editingProperty && !isCreatingProperty && activeTab === 'inventory'
+              ? 'text-white bg-white/15'
+              : 'text-emerald-200/70 hover:text-white'
+          }`}
+        >
+          <Building2 className="h-4 w-4 mb-0.5" />
+          <span>Propiedades</span>
+        </button>
 
-            {/* Password Change Form */}
-            <form onSubmit={handleChangePassword} className="space-y-4">
-              <div>
-                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                  <KeyRound className="h-3.5 w-3.5 text-emerald-700" />
-                  <span>Cambiar Contraseña de Acceso</span>
-                </h4>
-                <p className="text-[11px] text-slate-400">
-                  Se actualizará directamente en Supabase Auth para tus próximos inicios de sesión.
-                </p>
-              </div>
+        <button
+          type="button"
+          onClick={() => {
+            setEditingProperty(null);
+            setIsCreatingProperty(false);
+            setActiveTab('clients');
+          }}
+          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold shrink-0 transition-all cursor-pointer ${
+            !editingProperty && !isCreatingProperty && activeTab === 'clients'
+              ? 'text-white bg-white/15'
+              : 'text-emerald-200/70 hover:text-white'
+          }`}
+        >
+          <Users className="h-4 w-4 mb-0.5" />
+          <span>Clientes</span>
+        </button>
 
-              {passwordError && (
-                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 font-semibold flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600" />
-                  <span>{passwordError}</span>
-                </div>
-              )}
+        <button
+          type="button"
+          onClick={() => {
+            setEditingProperty(null);
+            setIsCreatingProperty(false);
+            setActiveTab('legalFiles');
+          }}
+          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold shrink-0 transition-all cursor-pointer ${
+            !editingProperty && !isCreatingProperty && activeTab === 'legalFiles'
+              ? 'text-white bg-white/15'
+              : 'text-emerald-200/70 hover:text-white'
+          }`}
+        >
+          <FileCheck className="h-4 w-4 mb-0.5" />
+          <span>Legal</span>
+        </button>
 
-              {passwordSuccess && (
-                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-semibold flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
-                  <span>{passwordSuccess}</span>
-                </div>
-              )}
+        <button
+          type="button"
+          onClick={() => {
+            setEditingProperty(null);
+            setIsCreatingProperty(false);
+            setActiveTab('documentsManager');
+          }}
+          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold shrink-0 transition-all cursor-pointer ${
+            !editingProperty && !isCreatingProperty && activeTab === 'documentsManager'
+              ? 'text-white bg-white/15'
+              : 'text-emerald-200/70 hover:text-white'
+          }`}
+        >
+          <FileText className="h-4 w-4 mb-0.5" />
+          <span>Docs</span>
+        </button>
 
-              <div>
-                <label className="text-[11px] font-bold text-slate-600 block mb-1">
-                  Nueva Contraseña
-                </label>
-                <input
-                  type="password"
-                  required
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Mínimo 6 caracteres..."
-                  className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-900 focus:bg-white focus:border-emerald-600 focus:outline-none"
-                />
-              </div>
+        <button
+          type="button"
+          onClick={() => {
+            setEditingProperty(null);
+            setIsCreatingProperty(false);
+            setActiveTab('profile');
+          }}
+          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold shrink-0 transition-all cursor-pointer ${
+            !editingProperty && !isCreatingProperty && activeTab === 'profile'
+              ? 'text-white bg-white/15'
+              : 'text-emerald-200/70 hover:text-white'
+          }`}
+          title="Credenciales y Perfil de Administrador"
+        >
+          <User className="h-4 w-4 mb-0.5" />
+          <span>Perfil</span>
+        </button>
+      </nav>
 
-              <div>
-                <label className="text-[11px] font-bold text-slate-600 block mb-1">
-                  Confirmar Nueva Contraseña
-                </label>
-                <input
-                  type="password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Repite la contraseña..."
-                  className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-900 focus:bg-white focus:border-emerald-600 focus:outline-none"
-                />
-              </div>
+      {/* ======================================================== */}
+      {/* MODAL: BÚSQUEDA GLOBAL */}
+      {/* ======================================================== */}
+      <AdminGlobalSearchModal
+        isOpen={isSearchModalOpen}
+        onClose={() => setIsSearchModalOpen(false)}
+        onNavigateTab={setActiveTab}
+        onSelectProperty={(lot) => {
+          handleOpenEdit(lot);
+          setIsSearchModalOpen(false);
+        }}
+      />
 
-              <div className="pt-2 flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsProfileModalOpen(false)}
-                  className="flex-1 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-bold transition-all cursor-pointer"
-                >
-                  Cerrar
-                </button>
-                <button
-                  type="submit"
-                  disabled={passwordLoading}
-                  className="flex-1 py-2.5 rounded-xl bg-slate-950 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md cursor-pointer disabled:opacity-60"
-                >
-                  {passwordLoading ? 'Guardando...' : 'Guardar Contraseña'}
-                </button>
-              </div>
-            </form>
 
-            <div className="pt-3 border-t border-slate-100 flex justify-between items-center text-xs">
-              <span className="text-slate-400">¿Deseas salir del panel?</span>
-              <button
-                type="button"
-                onClick={onLogout}
-                className="text-rose-600 hover:text-rose-700 font-bold transition-colors cursor-pointer"
-              >
-                Cerrar Sesión
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ======================================================== */}
       {/* MODAL: EDIT / CREATE PROPERTY */}
@@ -1075,6 +1416,11 @@ export function AdminDashboard({
           setPropertyToEdit(null);
         }}
         onSave={handleSaveProperty}
+        onDelete={(id) => {
+          deleteProperty(id);
+          setIsModalOpen(false);
+          setPropertyToEdit(null);
+        }}
         propertyToEdit={propertyToEdit}
       />
 

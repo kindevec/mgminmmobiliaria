@@ -2,7 +2,7 @@ export interface LotProperty {
   id: string;
   code: string;
   name: string;
-  project: 'Ciudadela Miravalle' | 'Mirador del Valle' | 'Colinas Verdes' | 'Residencial San Antonio' | 'San Antonio · Manta' | 'Jerusalén · Malchinguí';
+  project: 'Ciudadela Miravalle' | 'Mirador del Valle' | 'Colinas Verdes' | 'Residencial San Antonio' | 'San Antonio · Manta' | 'Jerusalén · Malchinguí' | 'San Francisco de Chocoto · Conocoto' | string;
   type: 'Lote de Terreno' | 'Vivienda' | 'Proyecto en Planos';
   category: 'Residencial' | 'Esquinero' | 'Comercial' | 'Campestre';
   areaM2: number;
@@ -12,7 +12,7 @@ export interface LotProperty {
   estimatedMonthlyUSD: number;
   maxMonths: number;
   topography: string;
-  status: 'Disponible' | 'En Reserva' | 'Vendido';
+  status: 'Disponible' | 'En Reserva' | 'Vendido' | 'Inactiva';
   zone: string;
   features: string[];
   description: string;
@@ -22,6 +22,18 @@ export interface LotProperty {
   gallery: string[];
   beds?: number;
   baths?: number;
+  parkingSpaces?: number;
+  floors?: number;
+  ageYears?: number;
+  address?: string;
+  services?: string[];
+  terrainFront?: number;
+  terrainDepth?: number;
+  terrainType?: string;
+  landUse?: string;
+  accessibility?: string;
+  additionalTerrainInfo?: string;
+  createdAt?: string;
   featured?: boolean;
   pdfUrl?: string;
   pdfTitle?: string;
@@ -157,6 +169,82 @@ export const LOTS_DATA: LotProperty[] = [
         url: '/properties/C24-279/ficha-tecnica-C24-279.pdf',
         size: '191 KB',
         description: 'Levantamiento de linderos, uso de suelo residencial/comercial y servicios.',
+      },
+      {
+        title: 'Dossier Institucional MGM Inmobiliaria',
+        url: '/docs/MGM_Inmobiliaria_Dossier_Institucional_Completo.pdf',
+        size: '36 KB',
+        description: 'Respaldo jurídico, garantías notariales y trayectoria empresarial.',
+      },
+    ],
+  },
+  {
+    id: 'lote-qc25-016',
+    code: 'QC25-016',
+    name: 'Terreno de Remate en Conocoto',
+    project: 'San Francisco de Chocoto · Conocoto',
+    type: 'Lote de Terreno',
+    category: 'Residencial',
+    areaM2: 283.3,
+    dimensions: '11.00m × 25.00m',
+    priceUSD: 20500,
+    minDownPaymentUSD: 4100,
+    estimatedMonthlyUSD: 342,
+    maxMonths: 48,
+    topography: 'Inclinada',
+    status: 'Disponible',
+    zone: 'San Francisco de Chocoto · Conocoto · Quito, Pichincha',
+    address: 'Calle Manuel Mario Revalde - Lote No. 64, San Francisco de Chocoto',
+    terrainFront: 11,
+    terrainDepth: 25,
+    landUse: 'Residencial (COS/CUS 120%, hasta 3 pisos)',
+    accessibility: 'Vías adoquinadas con acceso vehicular',
+    services: [
+      'Agua potable',
+      'Energía eléctrica',
+      'Alcantarillado',
+      'Internet / fibra óptica',
+      'Telefonía',
+      'Aceras y bordillos',
+      'Alumbrado público',
+      'Transporte público',
+    ],
+    features: [
+      'Área total: 283.30 m² (11.00m × 25.00m)',
+      'Topografía inclinada apta para construcción',
+      'Dispone de todos los servicios básicos',
+      'Vías de acceso totalmente adoquinadas con aceras y bordillos',
+      'Permiso de construcción hasta 3 pisos (COS 120%)',
+      'Cerca de canchas de Ignacio Arauz y unidades educativas',
+      'Fácil acceso a vías principales y transporte público',
+      'Precio de remate exclusivo negociable',
+    ],
+    description:
+      'Excelente lote de terreno de 283.30 m² ubicado en el sector San Francisco de Chocoto, Conocoto, Quito. Dispone de acceso vehicular directo por vía adoquinada, disponibilidad completa de servicios básicos (agua potable, energía eléctrica, alcantarillado e internet/telefonía) y uso de suelo residencial para edificar hasta 3 niveles. Gran cercanía a canchas de Ignacio Arauz, centros educativos y transporte público. Documentación jurídica y catastral totalmente en orden.',
+    orientation: 'Sector residencial consolidado con vías adoquinadas y fácil acceso',
+    registryStatus: 'Escritura pública, certificado de gravámenes e impuestos al día. Documentación completa en orden',
+    image: '/properties/QC25-016/foto-1.webp',
+    gallery: [
+      '/properties/QC25-016/foto-1.webp',
+      '/properties/QC25-016/foto-2.webp',
+      '/properties/QC25-016/foto-3.webp',
+      '/properties/QC25-016/foto-4.webp',
+      '/properties/QC25-016/foto-5.webp',
+      '/properties/QC25-016/foto-6.webp',
+      '/properties/QC25-016/foto-7.webp',
+      '/properties/QC25-016/foto-8.webp',
+      '/properties/QC25-016/foto-9.webp',
+      '/properties/QC25-016/foto-10.webp',
+    ],
+    featured: true,
+    pdfUrl: '/properties/QC25-016/ficha-tecnica-QC25-016.pdf',
+    pdfTitle: 'Ficha Técnica Oficial QC25-016 (PDF)',
+    documents: [
+      {
+        title: 'Ficha Técnica Oficial de Inmueble QC25-016',
+        url: '/properties/QC25-016/ficha-tecnica-QC25-016.pdf',
+        size: '178 KB',
+        description: 'Levantamiento de linderos, especificaciones técnicas, uso de suelo y servicios.',
       },
       {
         title: 'Dossier Institucional MGM Inmobiliaria',

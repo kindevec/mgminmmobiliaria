@@ -2,12 +2,12 @@ import { createClient } from '@supabase/supabase-js';
 import type { LotProperty } from '@/src/data/lots';
 
 const supabaseUrl =
-  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) ||
+  (typeof import.meta !== 'undefined' && (import.meta as Record<string, any>).env?.VITE_SUPABASE_URL) ||
   (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_URL) ||
   'https://ospsnohsrhmqtnyfndhh.supabase.co';
 
 const supabaseAnonKey =
-  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) ||
+  (typeof import.meta !== 'undefined' && (import.meta as Record<string, any>).env?.VITE_SUPABASE_ANON_KEY) ||
   (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY) ||
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcHNub2hzcmhtcXRueWZuZGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMjM2OTAsImV4cCI6MjEwNjg5OTY5MH0.ax29LOrsEmRy-6MaeJtwMAVhLZ-14jIqqBGh4aAOvTM';
 
@@ -27,7 +27,7 @@ export interface DbPropertyRow {
   estimated_monthly_usd: number;
   max_months: number;
   topography: string;
-  status: 'Disponible' | 'En Reserva' | 'Vendido';
+  status: 'Disponible' | 'En Reserva' | 'Vendido' | 'Inactiva';
   zone: string;
   features: string[];
   description: string;

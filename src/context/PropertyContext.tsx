@@ -5,13 +5,14 @@ import { LOTS_DATA, type LotProperty } from '@/src/data/lots';
 import { supabase, mapRowToProperty, mapPropertyToRow, type DbPropertyRow } from '@/src/lib/supabase';
 import { deletePropertyStorageFiles } from '@/src/lib/imageOptimizer';
 
-const STORAGE_KEY = 'mgm_inmobiliaria_inventory_v7';
+const STORAGE_KEY = 'mgm_inmobiliaria_inventory_v8';
 
 interface PropertyMetrics {
   totalCount: number;
   availableCount: number;
   reservedCount: number;
   soldCount: number;
+  inactiveCount: number;
   totalActiveValueUSD: number;
   totalInventoryValueUSD: number;
 }
@@ -24,7 +25,7 @@ interface PropertyContextType {
   updateProperty: (id: string, updates: Partial<LotProperty>) => Promise<void>;
   deleteProperty: (id: string) => Promise<void>;
   toggleStatus: (id: string) => Promise<void>;
-  setStatus: (id: string, status: 'Disponible' | 'En Reserva' | 'Vendido') => Promise<void>;
+  setStatus: (id: string, status: LotProperty['status']) => Promise<void>;
   resetToDefaults: () => Promise<void>;
 }
 
@@ -166,7 +167,7 @@ export function PropertyProvider({ children }: { children: ReactNode }) {
   };
 
   // Set explicit status
-  const setStatus = async (id: string, status: 'Disponible' | 'En Reserva' | 'Vendido') => {
+  const setStatus = async (id: string, status: LotProperty['status']) => {
     const updated = properties.map((p) => {
       if (p.id === id) {
         return { ...p, status };
@@ -183,12 +184,13 @@ export function PropertyProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // One-Touch Status Toggle: cycles through Disponible -> En Reserva -> Vendido -> Disponible
+  // One-Touch Status Toggle: cycles through Disponible -> En Reserva -> Vendido -> Inactiva -> Disponible
   const toggleStatus = async (id: string) => {
-    const statusCycle: Record<'Disponible' | 'En Reserva' | 'Vendido', 'Disponible' | 'En Reserva' | 'Vendido'> = {
+    const statusCycle: Record<LotProperty['status'], LotProperty['status']> = {
       Disponible: 'En Reserva',
       'En Reserva': 'Vendido',
-      Vendido: 'Disponible',
+      Vendido: 'Inactiva',
+      Inactiva: 'Disponible',
     };
 
     const current = properties.find((p) => p.id === id);
@@ -207,6 +209,7 @@ export function PropertyProvider({ children }: { children: ReactNode }) {
     let availableCount = 0;
     let reservedCount = 0;
     let soldCount = 0;
+    let inactiveCount = 0;
     let totalActiveValueUSD = 0;
     let totalInventoryValueUSD = 0;
 
@@ -220,6 +223,8 @@ export function PropertyProvider({ children }: { children: ReactNode }) {
         totalActiveValueUSD += p.priceUSD || 0;
       } else if (p.status === 'Vendido') {
         soldCount++;
+      } else if (p.status === 'Inactiva') {
+        inactiveCount++;
       }
     }
 
@@ -228,6 +233,7 @@ export function PropertyProvider({ children }: { children: ReactNode }) {
       availableCount,
       reservedCount,
       soldCount,
+      inactiveCount,
       totalActiveValueUSD,
       totalInventoryValueUSD,
     };

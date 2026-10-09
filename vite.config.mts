@@ -13,6 +13,7 @@ export default defineConfig({
   server: {
     port: 3005,
     host: true,
+    allowedHosts: true,
   },
   build: {
     outDir: 'out',

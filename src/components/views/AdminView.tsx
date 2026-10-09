@@ -8,6 +8,8 @@ import { supabase } from '@/src/lib/supabase';
 
 import type { PageView } from '@/src/data/navigation';
 
+import { AdminDataProvider } from '@/src/context/AdminDataContext';
+
 interface AdminViewProps {
   onNavigateToCatalog?: () => void;
   onNavigate?: (page: PageView) => void;
@@ -76,20 +78,22 @@ export function AdminView({
 
   if (!isAuthenticated) {
     return (
-      <div className="pt-24 min-h-screen bg-slate-50">
-        <AdminLogin onSuccess={handleLoginSuccess} />
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <AdminLogin onSuccess={handleLoginSuccess} onNavigate={onNavigate} />
       </div>
     );
   }
 
   return (
-    <div className="pt-20 pb-12 min-h-screen bg-slate-100/80">
-      <AdminDashboard
-        onLogout={handleLogout}
-        onViewCatalog={goToCatalog}
-        onSelectLotPreview={onSelectLotPreview}
-        onNavigate={onNavigate}
-      />
+    <div className="w-full min-h-screen">
+      <AdminDataProvider>
+        <AdminDashboard
+          onLogout={handleLogout}
+          onViewCatalog={goToCatalog}
+          onSelectLotPreview={onSelectLotPreview}
+          onNavigate={onNavigate}
+        />
+      </AdminDataProvider>
     </div>
   );
 }

@@ -4,15 +4,17 @@ import React, { useState } from 'react';
 import { Lock, KeyRound, ShieldAlert, ArrowRight, Sparkles, Building2, CheckCircle2, Mail, Key, Loader2, ShieldCheck } from 'lucide-react';
 import { LogoMGM } from '../LogoMGM';
 import { supabase } from '@/src/lib/supabase';
+import type { PageView } from '@/src/data/navigation';
 
 interface AdminLoginProps {
   onSuccess: () => void;
+  onNavigate?: (page: PageView) => void;
 }
 
 const DEFAULT_PIN = 'mgm2026';
 const BACKUP_PIN = 'admin1234';
 
-export function AdminLogin({ onSuccess }: AdminLoginProps) {
+export function AdminLogin({ onSuccess, onNavigate }: AdminLoginProps) {
   const [authMode, setAuthMode] = useState<'supabase' | 'pin'>('supabase');
   const [email, setEmail] = useState('noemaliza01@gmail.com');
   const [password, setPassword] = useState('');
@@ -87,7 +89,20 @@ export function AdminLogin({ onSuccess }: AdminLoginProps) {
         {/* Brand Header */}
         <div className="text-center space-y-4 mb-6">
           <div className="flex justify-center">
-            <LogoMGM className="h-12 w-auto" variant="compact" showSubtitle={true} />
+            <button
+              type="button"
+              onClick={() => {
+                if (onNavigate) {
+                  onNavigate('home');
+                } else {
+                  window.location.hash = '';
+                }
+              }}
+              className="cursor-pointer hover:scale-105 active:scale-95 transition-transform p-1 rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+              title="Ir a la pantalla principal"
+            >
+              <LogoMGM className="h-12 w-auto" variant="compact" showSubtitle={true} />
+            </button>
           </div>
 
           <div className="space-y-1">
