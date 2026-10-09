@@ -5,9 +5,11 @@ import { AdminLogin } from '../admin/AdminLogin';
 import { AdminDashboard } from '../admin/AdminDashboard';
 import type { LotProperty } from '@/src/data/lots';
 
+import type { PageView } from '@/src/data/navigation';
+
 interface AdminViewProps {
   onNavigateToCatalog?: () => void;
-  onNavigate?: (page: 'home' | 'about' | 'properties' | 'contact' | 'admin') => void;
+  onNavigate?: (page: PageView) => void;
   onSelectLotPreview?: (lot: LotProperty) => void;
 }
 
@@ -57,6 +59,7 @@ export function AdminView({
         onLogout={handleLogout}
         onViewCatalog={goToCatalog}
         onSelectLotPreview={onSelectLotPreview}
+        onNavigate={onNavigate}
       />
     </div>
   );

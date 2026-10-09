@@ -38,7 +38,7 @@ export function Header({
   }, []);
 
   const isGreenHeader =
-    isScrolled || currentPage === 'property-detail' || currentPage === 'admin';
+    isScrolled || currentPage === 'property-detail' || currentPage === 'admin' || currentPage === 'new_property' || currentPage === 'privacy';
 
   const navLinks: { id: PageView; label: string; hash: string }[] = [
     { id: 'home', label: 'Inicio', hash: getPageCanonicalHash('home') },
@@ -49,10 +49,10 @@ export function Header({
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out rounded-none m-0 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out ${
         isGreenHeader
           ? 'bg-[#113d22] border-b border-white/10 shadow-2xl py-2.5 sm:py-2.5'
-          : 'bg-[#113d22]/90 backdrop-blur-md border-b border-white/10 shadow-md py-3 sm:py-3.5'
+          : 'bg-gradient-to-b from-[#113d22]/90 via-[#113d22]/50 to-transparent py-3 sm:py-4.5'
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 w-full">
