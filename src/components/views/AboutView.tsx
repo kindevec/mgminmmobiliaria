@@ -36,23 +36,23 @@ const ABOUT_HERO_IMAGE = {
 
 const ACQUISITION_BG_PROPERTIES = [
   {
-    url: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=1200&q=80',
-    alt: 'Suscripción notarial y firma de promesas de compraventa',
+    url: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Protocolo de legalización y firma de instrumentos notariales',
     className: 'sm:-translate-y-4',
   },
   {
-    url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80',
-    alt: 'Certeza jurídica y legislación notarial inmobiliaria',
+    url: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Revisión técnica de planos y linderos arquitectónicos',
     className: 'sm:translate-y-6',
   },
   {
-    url: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80',
-    alt: 'Revisión planimétrica, linderos y levantamiento topográfico',
+    url: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Acuerdo de adjudicación y formalización de compraventa',
     className: 'sm:-translate-y-6',
   },
   {
-    url: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80',
-    alt: 'Entrega formal de posesión y títulos de propiedad',
+    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Entrega física de predio urbanizado con escrituras',
     className: 'sm:translate-y-4',
   },
 ];
