@@ -623,70 +623,74 @@ export function HomeView({
       </section>
 
       {/* =========================================================================
-          5. BANDA DE MÉTRICAS CON CASA EN PERSPECTIVA (DESBORDAMIENTO EDITORIAL)
+          5. BANDA DE MÉTRICAS COMPACTA CON CASA EN DESBORDE EDITORIAL
           ========================================================================= */}
-      <section className="relative w-full bg-[#0d2f1a] text-white pt-12 pb-12 sm:pt-16 sm:pb-16 lg:py-16 border-y border-emerald-950/60 overflow-visible z-20">
+      <section className="relative w-full bg-[#0d2f1a] text-white py-4 sm:py-5 lg:py-6 border-y border-emerald-950/60 overflow-visible z-20">
         {/* Trazo topográfico decorativo sutil de fondo */}
         <div className="absolute inset-0 opacity-[0.04] pointer-events-none bg-[radial-gradient(#5be196_1px,transparent_1px)] [background-size:16px_16px] overflow-hidden" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-center">
             
-            {/* Columna Izquierda: Casa con fondo transparente que desborda la franja verde */}
+            {/* Columna Izquierda: Casa que empieza desde arriba y la franja cubre su mitad inferior */}
             <div className="lg:col-span-5 relative flex justify-center items-center">
               <ScrollReveal direction="right" delay={0.1} className="relative w-full flex justify-center">
-                <div className="relative w-full max-w-[340px] sm:max-w-[420px] lg:max-w-none lg:-my-24 xl:-my-28 transition-transform duration-500 hover:scale-[1.03]">
+                <div className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[400px] -mt-16 sm:-mt-24 lg:-mt-32 -mb-2 sm:-mb-3 lg:-mb-4 transition-transform duration-500 hover:scale-[1.03]">
                   {/* Sombra de proyección suave hacia la franja */}
-                  <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-[85%] h-12 bg-black/50 blur-xl rounded-full pointer-events-none" />
+                  <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-[85%] h-8 bg-black/60 blur-lg rounded-full pointer-events-none" />
                   
-                  {/* Imagen de la propiedad con fondo transparente sobresaliendo */}
+                  {/* Imagen de la casa con fondo transparente sobresaliendo hacia arriba */}
                   <img
                     src="/house-isolated.png"
                     alt="Propiedad residencial modelo en urbanización MGM"
-                    className="relative z-10 w-full h-auto object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.55)] pointer-events-none select-none"
+                    className="relative z-10 w-full h-auto object-contain drop-shadow-[0_18px_24px_rgba(0,0,0,0.6)] pointer-events-none select-none"
                     loading="lazy"
                   />
                 </div>
               </ScrollReveal>
             </div>
 
-            {/* Columna Derecha: Las 4 métricas verificadas de MGM */}
+            {/* Columna Derecha: Las 4 métricas compactas en 1 sola línea */}
             <div className="lg:col-span-7">
-              <div className="grid grid-cols-2 gap-5 sm:gap-6 lg:gap-8 text-center sm:text-left">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5 lg:gap-4">
                 {/* Métrica 1: Propiedades */}
-                <ScrollReveal direction="up" delay={0.05} className="space-y-1.5 p-3 sm:p-4 rounded-2xl bg-white/[0.03] sm:bg-transparent border border-white/5 sm:border-0 backdrop-blur-sm sm:backdrop-blur-0">
-                  <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono text-[#5be196] tracking-tight">
+                <ScrollReveal direction="up" delay={0.05} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-sm">
+                  <span className="text-xl sm:text-2xl font-black font-mono text-[#5be196] tracking-tight shrink-0">
                     {properties.length}+
-                  </div>
-                  <p className="text-sm sm:text-base font-bold text-white">Propiedades en Catálogo</p>
-                  <p className="text-[11px] sm:text-xs text-slate-300/90 leading-relaxed">Lotes y viviendas con disponibilidad en tiempo real</p>
+                  </span>
+                  <span className="text-xs sm:text-sm font-semibold text-white truncate">
+                    Propiedades en Catálogo
+                  </span>
                 </ScrollReveal>
 
                 {/* Métrica 2: Plazo Crédito */}
-                <ScrollReveal direction="up" delay={0.15} className="space-y-1.5 p-3 sm:p-4 rounded-2xl bg-white/[0.03] sm:bg-transparent border border-white/5 sm:border-0 backdrop-blur-sm sm:backdrop-blur-0">
-                  <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono text-[#F58220] tracking-tight">
+                <ScrollReveal direction="up" delay={0.15} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-sm">
+                  <span className="text-xl sm:text-2xl font-black font-mono text-[#F58220] tracking-tight shrink-0">
                     48
-                  </div>
-                  <p className="text-sm sm:text-base font-bold text-white">Meses Crédito Directo</p>
-                  <p className="text-[11px] sm:text-xs text-slate-300/90 leading-relaxed">Financiamiento directo con tu cédula sin buró</p>
+                  </span>
+                  <span className="text-xs sm:text-sm font-semibold text-white truncate">
+                    Meses Crédito Directo
+                  </span>
                 </ScrollReveal>
 
                 {/* Métrica 3: Proyectos & Ciudadelas Reales */}
-                <ScrollReveal direction="up" delay={0.25} className="space-y-1.5 p-3 sm:p-4 rounded-2xl bg-white/[0.03] sm:bg-transparent border border-white/5 sm:border-0 backdrop-blur-sm sm:backdrop-blur-0">
-                  <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono text-white tracking-tight">
+                <ScrollReveal direction="up" delay={0.25} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-sm">
+                  <span className="text-xl sm:text-2xl font-black font-mono text-white tracking-tight shrink-0">
                     {projectCount}+
-                  </div>
-                  <p className="text-sm sm:text-base font-bold text-white">Ciudadelas & Proyectos</p>
-                  <p className="text-[11px] sm:text-xs text-slate-300/90 leading-relaxed">Desarrollos urbanizados en Pichincha, Manabí y Azuay</p>
+                  </span>
+                  <span className="text-xs sm:text-sm font-semibold text-white truncate">
+                    Ciudadelas & Proyectos
+                  </span>
                 </ScrollReveal>
 
                 {/* Métrica 4: Certeza Notarial */}
-                <ScrollReveal direction="up" delay={0.35} className="space-y-1.5 p-3 sm:p-4 rounded-2xl bg-white/[0.03] sm:bg-transparent border border-white/5 sm:border-0 backdrop-blur-sm sm:backdrop-blur-0">
-                  <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono text-[#5be196] tracking-tight">
+                <ScrollReveal direction="up" delay={0.35} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-sm">
+                  <span className="text-xl sm:text-2xl font-black font-mono text-[#5be196] tracking-tight shrink-0">
                     100%
-                  </div>
-                  <p className="text-sm sm:text-base font-bold text-white">Certeza Notarial</p>
-                  <p className="text-[11px] sm:text-xs text-slate-300/90 leading-relaxed">Escrituras individuales y minutas legalizadas</p>
+                  </span>
+                  <span className="text-xs sm:text-sm font-semibold text-white truncate">
+                    Certeza Notarial
+                  </span>
                 </ScrollReveal>
               </div>
             </div>
