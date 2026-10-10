@@ -609,7 +609,7 @@ export function HomeView({
           </div>
 
           {/* Botón inferior para explorar todo el catálogo */}
-          <div className="text-center pt-2">
+          <div className="relative z-30 text-center pt-2 pb-6 sm:pb-8">
             <button
               type="button"
               onClick={() => handleCatalogExplore()}
@@ -625,7 +625,7 @@ export function HomeView({
       {/* =========================================================================
           5. BANDA DE MÉTRICAS COMPACTA CON CASA EN DESBORDE EDITORIAL
           ========================================================================= */}
-      <section className="relative w-full bg-[#0d2f1a] text-white py-4 sm:py-5 lg:py-6 border-y border-emerald-950/60 overflow-visible z-20">
+      <section className="relative w-full bg-[#0d2f1a] text-white mt-12 sm:mt-20 lg:mt-24 py-4 sm:py-5 lg:py-6 border-y border-emerald-950/60 overflow-visible z-20">
         {/* Trazo topográfico decorativo sutil de fondo */}
         <div className="absolute inset-0 opacity-[0.04] pointer-events-none bg-[radial-gradient(#5be196_1px,transparent_1px)] [background-size:16px_16px] overflow-hidden" />
 
@@ -633,9 +633,9 @@ export function HomeView({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-center">
             
             {/* Columna Izquierda: Casa protagónica que sobresale ampliamente de la franja */}
-            <div className="lg:col-span-6 relative flex justify-center items-center">
-              <ScrollReveal direction="right" delay={0.1} className="relative w-full flex justify-center">
-                <div className="relative w-full max-w-[340px] sm:max-w-[440px] md:max-w-[500px] lg:max-w-[560px] -mt-20 sm:-mt-28 md:-mt-36 lg:-mt-44 -mb-4 sm:-mb-6 lg:-mb-8 transition-transform duration-500 hover:scale-[1.04]">
+            <div className="lg:col-span-6 relative flex justify-center items-center pointer-events-none">
+              <ScrollReveal direction="right" delay={0.1} className="relative w-full flex justify-center pointer-events-none">
+                <div className="relative w-full max-w-[340px] sm:max-w-[440px] md:max-w-[500px] lg:max-w-[560px] -mt-16 sm:-mt-24 md:-mt-32 lg:-mt-36 -mb-4 sm:-mb-6 lg:-mb-8 transition-transform duration-500 hover:scale-[1.04]">
                   {/* Sombra de proyección cinematográfica en la base */}
                   <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[90%] h-10 bg-black/70 blur-xl rounded-full pointer-events-none" />
                   
