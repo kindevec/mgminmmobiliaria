@@ -650,11 +650,11 @@ export function HomeView({
               </ScrollReveal>
             </div>
 
-            {/* Columna Derecha: Las 4 métricas compactas en 1 sola línea */}
+            {/* Columna Derecha: Las 4 métricas compactas en 1 sola línea (sin boxes ni bordes) */}
             <div className="lg:col-span-7">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5 lg:gap-4">
                 {/* Métrica 1: Propiedades */}
-                <ScrollReveal direction="up" delay={0.05} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-sm">
+                <ScrollReveal direction="up" delay={0.05} className="flex items-center gap-2.5">
                   <span className="text-xl sm:text-2xl font-black font-mono text-[#5be196] tracking-tight shrink-0">
                     {properties.length}+
                   </span>
@@ -664,7 +664,7 @@ export function HomeView({
                 </ScrollReveal>
 
                 {/* Métrica 2: Plazo Crédito */}
-                <ScrollReveal direction="up" delay={0.15} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-sm">
+                <ScrollReveal direction="up" delay={0.15} className="flex items-center gap-2.5">
                   <span className="text-xl sm:text-2xl font-black font-mono text-[#F58220] tracking-tight shrink-0">
                     48
                   </span>
@@ -674,7 +674,7 @@ export function HomeView({
                 </ScrollReveal>
 
                 {/* Métrica 3: Proyectos & Ciudadelas Reales */}
-                <ScrollReveal direction="up" delay={0.25} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-sm">
+                <ScrollReveal direction="up" delay={0.25} className="flex items-center gap-2.5">
                   <span className="text-xl sm:text-2xl font-black font-mono text-white tracking-tight shrink-0">
                     {projectCount}+
                   </span>
@@ -684,7 +684,7 @@ export function HomeView({
                 </ScrollReveal>
 
                 {/* Métrica 4: Certeza Notarial */}
-                <ScrollReveal direction="up" delay={0.35} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-sm">
+                <ScrollReveal direction="up" delay={0.35} className="flex items-center gap-2.5">
                   <span className="text-xl sm:text-2xl font-black font-mono text-[#5be196] tracking-tight shrink-0">
                     100%
                   </span>
