@@ -831,32 +831,14 @@ export function HomeView({
                   className={`group relative bg-gradient-to-b ${item.palette.cardGradient} rounded-2xl p-6 sm:p-7 border ${item.palette.border} shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden`}
                 >
                   <div>
-                    {/* Encabezado del módulo: Categoría descriptiva real y estatus de obra */}
-                    <div className="flex items-center justify-between pb-3.5 border-b border-slate-200/60 mb-4">
-                      <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full ${item.palette.accentDot} animate-pulse`} />
-                        <span className="font-bold text-xs text-slate-700 tracking-tight">
-                          {item.category}
-                        </span>
-                      </div>
-                      <span className={`font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${item.palette.statusColor}`}>
-                        {item.status}
-                      </span>
-                    </div>
-
                     {/* Ícono con contenedor vibrante y Título */}
-                    <div className="flex items-start gap-3.5 mb-3">
+                    <div className="flex items-center gap-3.5 mb-3.5">
                       <div className={`p-3 rounded-2xl ${item.palette.iconGradient} shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300`}>
                         <IconComp className="h-5 w-5" strokeWidth={2.2} />
                       </div>
-                      <div>
-                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md inline-block mb-1 border ${item.palette.tagColor}`}>
-                          {item.tag}
-                        </span>
-                        <h3 className="font-black text-base sm:text-lg text-slate-900 leading-snug group-hover:text-slate-950 transition-colors">
-                          {item.title}
-                        </h3>
-                      </div>
+                      <h3 className="font-black text-base sm:text-lg text-slate-900 leading-snug group-hover:text-slate-950 transition-colors">
+                        {item.title}
+                      </h3>
                     </div>
 
                     {/* Descripción de Obra */}
