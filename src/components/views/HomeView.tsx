@@ -632,18 +632,18 @@ export function HomeView({
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-center">
             
-            {/* Columna Izquierda: Casa que empieza desde arriba y la franja cubre su mitad inferior */}
-            <div className="lg:col-span-5 relative flex justify-center items-center">
+            {/* Columna Izquierda: Casa protagónica que sobresale ampliamente de la franja */}
+            <div className="lg:col-span-6 relative flex justify-center items-center">
               <ScrollReveal direction="right" delay={0.1} className="relative w-full flex justify-center">
-                <div className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[400px] -mt-16 sm:-mt-24 lg:-mt-32 -mb-2 sm:-mb-3 lg:-mb-4 transition-transform duration-500 hover:scale-[1.03]">
-                  {/* Sombra de proyección suave hacia la franja */}
-                  <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-[85%] h-8 bg-black/60 blur-lg rounded-full pointer-events-none" />
+                <div className="relative w-full max-w-[340px] sm:max-w-[440px] md:max-w-[500px] lg:max-w-[560px] -mt-20 sm:-mt-28 md:-mt-36 lg:-mt-44 -mb-4 sm:-mb-6 lg:-mb-8 transition-transform duration-500 hover:scale-[1.04]">
+                  {/* Sombra de proyección cinematográfica en la base */}
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[90%] h-10 bg-black/70 blur-xl rounded-full pointer-events-none" />
                   
-                  {/* Imagen de la casa con fondo transparente sobresaliendo hacia arriba */}
+                  {/* Imagen de la casa con fondo transparente de alto impacto */}
                   <img
                     src="/house-isolated.png"
                     alt="Propiedad residencial modelo en urbanización MGM"
-                    className="relative z-10 w-full h-auto object-contain drop-shadow-[0_18px_24px_rgba(0,0,0,0.6)] pointer-events-none select-none"
+                    className="relative z-10 w-full h-auto object-contain drop-shadow-[0_24px_36px_rgba(0,0,0,0.7)] pointer-events-none select-none"
                     loading="lazy"
                   />
                 </div>
@@ -651,7 +651,7 @@ export function HomeView({
             </div>
 
             {/* Columna Derecha: Las 4 métricas compactas en 1 sola línea (sin boxes ni bordes) */}
-            <div className="lg:col-span-7">
+            <div className="lg:col-span-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5 lg:gap-4">
                 {/* Métrica 1: Propiedades */}
                 <ScrollReveal direction="up" delay={0.05} className="flex items-center gap-2.5">
