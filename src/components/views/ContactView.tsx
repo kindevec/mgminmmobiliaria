@@ -366,7 +366,7 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
                   </a>
 
                   <a
-                    href="https://facebook.com"
+                    href="https://www.facebook.com/mgm.avaluos.5"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Facebook MGM Inmobiliaria"
@@ -376,7 +376,7 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
                   </a>
 
                   <a
-                    href="https://instagram.com"
+                    href="https://www.instagram.com/mgminmobiliariaec/"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Instagram MGM Inmobiliaria"
@@ -386,7 +386,7 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
                   </a>
 
                   <a
-                    href="https://tiktok.com"
+                    href="https://www.tiktok.com/@mgm_inmobiliaria"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="TikTok MGM Inmobiliaria"

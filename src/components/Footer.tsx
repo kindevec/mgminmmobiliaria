@@ -39,7 +39,7 @@ function SocialIconsStrip({ size = 22 }: { size?: number }) {
       </motion.a>
 
       <motion.a
-        href="https://facebook.com"
+        href="https://www.facebook.com/mgm.avaluos.5"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Facebook MGM Inmobiliaria"
@@ -51,7 +51,7 @@ function SocialIconsStrip({ size = 22 }: { size?: number }) {
       </motion.a>
 
       <motion.a
-        href="https://instagram.com"
+        href="https://www.instagram.com/mgminmobiliariaec/"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Instagram MGM Inmobiliaria"
@@ -63,7 +63,7 @@ function SocialIconsStrip({ size = 22 }: { size?: number }) {
       </motion.a>
 
       <motion.a
-        href="https://tiktok.com"
+        href="https://www.tiktok.com/@mgm_inmobiliaria"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="TikTok MGM Inmobiliaria"
