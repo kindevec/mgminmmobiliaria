@@ -307,19 +307,19 @@ export function InteractiveMapPicker({
           </button>
         </div>
 
-        {/* Floating Instruction Banner with Real-time Building / Place Detection */}
-        <div className="absolute bottom-2.5 left-2.5 right-2.5 z-[400] bg-slate-950/90 backdrop-blur-xs text-white px-3 py-2 rounded-xl text-[11px] flex flex-col sm:flex-row sm:items-center justify-between gap-1 shadow-lg pointer-events-none">
+        {/* Floating Instruction Banner with Real-time Building / Place Detection (White card) */}
+        <div className="absolute bottom-2.5 left-2.5 right-2.5 z-[400] bg-white/95 backdrop-blur-xs text-slate-800 border border-slate-200/90 px-3 py-2 rounded-xl text-[11px] flex flex-col sm:flex-row sm:items-center justify-between gap-1 shadow-lg pointer-events-none">
           <div className="flex items-center gap-1.5 min-w-0">
             {isDetecting ? (
-              <Loader2 className="h-3.5 w-3.5 text-emerald-400 animate-spin shrink-0" />
+              <Loader2 className="h-3.5 w-3.5 text-emerald-600 animate-spin shrink-0" />
             ) : (
-              <Building2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+              <Building2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
             )}
-            <span className="truncate font-semibold text-white">
+            <span className="truncate font-bold text-slate-900">
               {isDetecting ? 'Detectando edificio o negocio...' : detectedPlace}
             </span>
           </div>
-          <span className="font-mono font-bold text-emerald-400 text-[10px] shrink-0">
+          <span className="font-mono font-bold text-emerald-700 text-[10px] shrink-0">
             {coords.lat.toFixed(5)}, {coords.lng.toFixed(5)}
           </span>
         </div>

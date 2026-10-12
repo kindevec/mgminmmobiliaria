@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import {
   X,
   Upload,
@@ -22,12 +23,21 @@ import {
   Info,
   ArrowLeft,
   Eye,
+  EyeOff,
   Sun,
   Moon,
+  ChevronRight,
+  ChevronLeft,
+  Search,
 } from 'lucide-react';
 import type { LotProperty } from '@/src/data/lots';
 import { PropertyCard } from '../PropertyCard';
 import { LotDetailsModal } from '../LotDetailsModal';
+
+const InteractiveMapPicker = dynamic(
+  () => import('@/src/components/common/InteractiveMapPicker').then((m) => m.InteractiveMapPicker),
+  { ssr: false }
+);
 import { useProperties } from '@/src/context/PropertyContext';
 import {
   convertImageToWebP,
@@ -79,9 +89,13 @@ export function AdminPropertyModal({
   const isEditing = Boolean(propertyToEdit);
   const { deleteProperty } = useProperties();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [mobileTab, setMobileTab] = useState<'form' | 'preview'>('form');
   const [darkPreview, setDarkPreview] = useState(false);
   const [showFichaPreviewModal, setShowFichaPreviewModal] = useState(false);
+  const [isPreviewCollapsed, setIsPreviewCollapsed] = useState(false);
+  const [coords, setCoords] = useState<{ lat: number; lng: number }>({
+    lat: -2.8685,
+    lng: -78.9654,
+  });
 
   // Form States
   const [code, setCode] = useState('');
@@ -337,13 +351,11 @@ export function AdminPropertyModal({
 
     if (!trimmedCode) {
       alert('Por favor ingresa un código único para la propiedad (ej: MT24-001).');
-      setMobileTab('form');
       return;
     }
 
     if (!trimmedName) {
       alert('Por favor ingresa un título o nombre para la propiedad.');
-      setMobileTab('form');
       return;
     }
 
@@ -446,7 +458,11 @@ export function AdminPropertyModal({
     <div
       className={
         isPageView
-          ? 'w-full space-y-6 text-slate-800 lg:pr-[420px] xl:pr-[460px] 2xl:pr-[500px]'
+          ? `w-full space-y-6 text-slate-800 transition-all duration-300 ${
+              isPreviewCollapsed
+                ? 'lg:pr-12'
+                : 'lg:pr-[420px] xl:pr-[460px] 2xl:pr-[500px]'
+            }`
           : 'relative w-full max-w-7xl bg-white rounded-3xl shadow-2xl border border-slate-200 h-[96dvh] max-h-[96dvh] overflow-hidden flex flex-col'
       }
     >
@@ -463,9 +479,11 @@ export function AdminPropertyModal({
                 <ArrowLeft className="h-4 w-4" />
                 <span>Volver a Propiedades</span>
               </button>
-              <span className="text-[11px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
-                {isEditing ? `EDITANDO: ${propertyToEdit?.code}` : 'NUEVO INMUEBLE'}
-              </span>
+              {isEditing && (
+                <span className="text-[11px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                  EDITANDO: {propertyToEdit?.code}
+                </span>
+              )}
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
               {isEditing
@@ -480,20 +498,44 @@ export function AdminPropertyModal({
           <div className="flex items-center gap-3 shrink-0">
             <button
               type="button"
+              onClick={() => setIsPreviewCollapsed(!isPreviewCollapsed)}
+              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition-all cursor-pointer shadow-2xs"
+              title={isPreviewCollapsed ? 'Mostrar vista previa' : 'Colapsar vista previa'}
+            >
+              {isPreviewCollapsed ? <Eye className="h-4 w-4 text-emerald-600" /> : <EyeOff className="h-4 w-4 text-slate-500" />}
+              <span>{isPreviewCollapsed ? 'Ver Vista Previa' : 'Ocultar Panel'}</span>
+            </button>
+            <button
+              type="button"
               onClick={onClose}
               className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-all cursor-pointer"
             >
               Cancelar
             </button>
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={isUploadingImage || isUploadingDoc}
-              className="px-5 py-2 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 flex items-center gap-2 cursor-pointer disabled:opacity-50"
-            >
-              <Save className="h-4 w-4" />
-              <span>Guardar Cambios</span>
-            </button>
+            <div className="flex flex-col items-end gap-1.5">
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={isUploadingImage || isUploadingDoc}
+                className="w-full px-5 py-2 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                <Save className="h-4 w-4" />
+                <span>Guardar Cambios</span>
+              </button>
+              
+              {/* Estado Select Box Blanco del mismo tamaño */}
+              <div className="w-full flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-500 shrink-0">Estado:</span>
+                <select
+                  value={status === 'Inactiva' ? 'Inactiva' : 'Disponible'}
+                  onChange={(e) => setStatus(e.target.value as LotProperty['status'])}
+                  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs sm:text-sm font-black text-slate-900 shadow-2xs focus:border-emerald-600 focus:outline-none cursor-pointer"
+                >
+                  <option value="Disponible">Activo</option>
+                  <option value="Inactiva">Borrador</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
       ) : (
@@ -542,51 +584,23 @@ export function AdminPropertyModal({
             : 'flex-1 min-h-0 flex flex-col overflow-hidden text-slate-800'
         }
       >
-        {/* Mobile View Switcher (Solo en pantallas móviles < lg) */}
-        <div
-          className={`lg:hidden flex items-center justify-between p-1 bg-slate-100 rounded-2xl border border-slate-200 ${
-            isPageView ? 'mb-4' : 'm-3 shrink-0'
-          }`}
-        >
-          <button
-            type="button"
-            onClick={() => setMobileTab('form')}
-            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-              mobileTab === 'form'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <FileText className="h-3.5 w-3.5" />
-            <span>Formulario</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setMobileTab('preview')}
-            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-              mobileTab === 'preview'
-                ? 'bg-[#22A33D] text-white shadow-xs font-black'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Eye className="h-3.5 w-3.5" />
-            <span>Vista Previa en Vivo</span>
-          </button>
-        </div>
-
         <div
           className={
             isPageView
               ? 'w-full'
-              : 'flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 overflow-hidden'
+              : 'flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 overflow-hidden relative'
           }
         >
           {/* Left Column: Formulario completo */}
           <div
             className={
               isPageView
-                ? `w-full space-y-6 ${mobileTab === 'preview' ? 'hidden lg:block' : 'block'}`
-                : `lg:col-span-7 xl:col-span-7 h-full overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6 ${mobileTab === 'preview' ? 'hidden lg:block' : 'block'}`
+                ? 'w-full space-y-6 block'
+                : `${
+                    isPreviewCollapsed
+                      ? 'lg:col-span-12'
+                      : 'lg:col-span-7 xl:col-span-7'
+                  } h-full overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6 block transition-all duration-300`
             }
           >
             {/* Group 1: Identificación y Proyecto */}
@@ -633,17 +647,14 @@ export function AdminPropertyModal({
                 <label className="text-xs font-bold text-slate-700 block mb-1">
                   Proyecto / Desarrollo
                 </label>
-                <select
+                <input
+                  type="text"
+                  required
                   value={project}
-                  onChange={(e) => setProject(e.target.value as LotProperty['project'])}
+                  onChange={(e) => setProject(e.target.value)}
+                  placeholder="Ej: San Antonio · Manta"
                   className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs text-slate-900 bg-white focus:border-emerald-600 focus:outline-none"
-                >
-                  {PROJECT_OPTIONS.map((p) => (
-                    <option key={p} value={p}>
-                      {p}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
 
               <div>
@@ -1286,6 +1297,37 @@ export function AdminPropertyModal({
             </div>
           </div>
 
+          {/* Group 7: Ubicación Exacta en Mapa Interactivo (Arrastre de Pin + Buscador de Ciudades) */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-1">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <MapPin className="h-4 w-4 text-[#22A33D]" />
+                <span>7. Ubicación en Google Maps / Satelital</span>
+              </h3>
+              <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-md font-bold">
+                Pin Arrastrable &amp; Buscador
+              </span>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-slate-200 p-3 sm:p-4 shadow-2xs space-y-3">
+              <p className="text-[11px] text-slate-500 leading-relaxed">
+                Busca una ciudad o sector en el buscador o arrastra el marcador directamente sobre el predio para fijar la ubicación exacta del lote:
+              </p>
+
+              <InteractiveMapPicker
+                selectedLocality={zone || project}
+                initialLat={coords.lat}
+                initialLng={coords.lng}
+                onLocationChange={(lat, lng, placeName) => {
+                  setCoords({ lat, lng });
+                  if (placeName) {
+                    setZone(placeName);
+                  }
+                }}
+              />
+            </div>
+          </div>
+
           {/* Submit Actions */}
           <div className={`${isPageView ? 'pt-6 border-t border-slate-100' : 'pt-4 border-t border-slate-200 sticky bottom-0 bg-white py-2 z-10'} flex flex-wrap items-center justify-end gap-3`}>
             {isEditing && propertyToEdit && (
@@ -1329,16 +1371,6 @@ export function AdminPropertyModal({
               </>
             )}
 
-            {/* Mobile preview quick toggle button */}
-            <button
-              type="button"
-              onClick={() => setMobileTab('preview')}
-              className="lg:hidden px-4 py-2.5 rounded-xl border border-emerald-300 bg-emerald-50 text-xs font-bold text-emerald-800 hover:bg-emerald-100 transition-all flex items-center gap-1.5 cursor-pointer"
-            >
-              <Eye className="h-4 w-4 text-emerald-600" />
-              <span>Ver Vista Previa</span>
-            </button>
-
             <button
               type="button"
               onClick={onClose}
@@ -1358,53 +1390,54 @@ export function AdminPropertyModal({
         </div>
 
         {/* Right Column: Fixed Live Preview Column (de arriba a abajo, ocupando todo el alto vertical) */}
-        <div
-          className={
-            isPageView
-              ? `lg:fixed lg:top-0 lg:bottom-0 lg:right-0 lg:w-[400px] xl:w-[440px] 2xl:w-[480px] lg:h-screen lg:z-30 ${
-                  mobileTab === 'form' ? 'hidden lg:flex' : 'flex'
-                } flex-col bg-slate-50 border-t lg:border-t-0 lg:border-l border-slate-200 p-4 sm:p-5 shadow-xl min-h-0`
-              : `lg:col-span-5 xl:col-span-5 ${
-                  mobileTab === 'form' ? 'hidden lg:flex' : 'flex'
-                } flex-col h-full border-t lg:border-t-0 lg:border-l border-slate-200 bg-slate-50/95 p-4 sm:p-5 min-h-0`
-          }
-        >
-          <div className="h-full flex flex-col justify-between min-h-0 overflow-hidden">
-            {/* Header with Dark Mode Toggle (Pinned at top) */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 shrink-0">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                  <Eye className="h-4 w-4" />
+        {!isPreviewCollapsed && (
+          <div
+            className={
+              isPageView
+                ? 'lg:fixed lg:top-0 lg:bottom-0 lg:right-0 lg:w-[400px] xl:w-[440px] 2xl:w-[480px] lg:h-screen lg:z-30 hidden lg:flex flex-col bg-slate-50 border-t lg:border-t-0 lg:border-l border-slate-200 p-4 sm:p-5 shadow-xl min-h-0'
+                : 'lg:col-span-5 xl:col-span-5 hidden lg:flex flex-col h-full border-t lg:border-t-0 lg:border-l border-slate-200 bg-slate-50/95 p-4 sm:p-5 min-h-0'
+            }
+          >
+            <div className="h-full flex flex-col justify-between min-h-0 overflow-hidden">
+              {/* Header with Dark Mode Toggle (Pinned at top) */}
+              <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 shrink-0">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                    <Eye className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 leading-tight">
+                      Vista Previa en Vivo
+                    </h4>
+                    <p className="text-[10px] text-slate-400 font-medium">
+                      Simulación en catálogo público
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 leading-tight">
-                    Vista Previa en Vivo
-                  </h4>
-                  <p className="text-[10px] text-slate-400 font-medium">
-                    Simulación en catálogo público
-                  </p>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setDarkPreview(!darkPreview)}
+                    className={`px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all border cursor-pointer ${
+                      darkPreview
+                        ? 'bg-slate-900 text-amber-300 border-slate-700 shadow-xs'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 shadow-xs'
+                    }`}
+                    title={darkPreview ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+                  >
+                    {darkPreview ? <Moon className="h-3 w-3 text-amber-300" /> : <Sun className="h-3 w-3 text-amber-500" />}
+                    <span>{darkPreview ? 'Oscuro' : 'Claro'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsPreviewCollapsed(true)}
+                    className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/70 transition-all cursor-pointer hidden lg:flex"
+                    title="Colapsar vista previa hacia la derecha"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setDarkPreview(!darkPreview)}
-                  className={`px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all border cursor-pointer ${
-                    darkPreview
-                      ? 'bg-slate-900 text-amber-300 border-slate-700 shadow-xs'
-                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 shadow-xs'
-                  }`}
-                  title={darkPreview ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-                >
-                  {darkPreview ? <Moon className="h-3 w-3 text-amber-300" /> : <Sun className="h-3 w-3 text-amber-500" />}
-                  <span>{darkPreview ? 'Oscuro' : 'Claro'}</span>
-                </button>
-                <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>En vivo</span>
-                </div>
-              </div>
-            </div>
 
             {/* Scrollable Center: Card + Metadata */}
             <div className="flex-1 overflow-y-auto min-h-0 space-y-4 py-3 pr-1">
@@ -1545,19 +1578,24 @@ export function AdminPropertyModal({
                 <Eye className="h-3.5 w-3.5 text-emerald-600" />
                 <span>Ver Ficha Técnica Completa</span>
               </button>
-
-              {mobileTab === 'preview' && (
-                <button
-                  type="button"
-                  onClick={() => setMobileTab('form')}
-                  className="w-full py-2.5 px-4 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer lg:hidden"
-                >
-                  Volver a Editar Formulario
-                </button>
-              )}
             </div>
           </div>
         </div>
+      )}
+
+      {/* Floating Expand Preview Button when Collapsed (Desktop) */}
+      {isPreviewCollapsed && (
+        <button
+          type="button"
+          onClick={() => setIsPreviewCollapsed(false)}
+          className="hidden lg:flex fixed right-4 bottom-6 z-40 items-center gap-2 px-4 py-2.5 rounded-full bg-slate-950 hover:bg-emerald-700 text-white font-bold text-xs shadow-xl transition-all hover:scale-105 active:scale-95 cursor-pointer border border-white/20"
+          title="Restaurar panel de vista previa"
+        >
+          <Eye className="h-4 w-4 text-emerald-400" />
+          <span>Mostrar Vista Previa</span>
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+      )}
       </div>
     </form>
 
