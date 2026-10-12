@@ -35,11 +35,7 @@ import { useProperties } from '@/src/context/PropertyContext';
 import { uploadOptimizedImage } from '@/src/lib/imageOptimizer';
 import { supabase } from '@/src/lib/supabase';
 import { AdminLogin } from '../admin/AdminLogin';
-
-const InteractiveMapPicker = dynamic(
-  () => import('@/src/components/common/InteractiveMapPicker').then((m) => m.InteractiveMapPicker),
-  { ssr: false }
-);
+import { InteractiveMapPicker } from '../common/InteractiveMapPicker';
 
 interface NewPropertyViewProps {
   onNavigate: (page: PageView) => void;

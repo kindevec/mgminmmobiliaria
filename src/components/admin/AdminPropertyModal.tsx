@@ -33,11 +33,7 @@ import {
 import type { LotProperty } from '@/src/data/lots';
 import { PropertyCard } from '../PropertyCard';
 import { LotDetailsModal } from '../LotDetailsModal';
-
-const InteractiveMapPicker = dynamic(
-  () => import('@/src/components/common/InteractiveMapPicker').then((m) => m.InteractiveMapPicker),
-  { ssr: false }
-);
+import { InteractiveMapPicker } from '../common/InteractiveMapPicker';
 import { useProperties } from '@/src/context/PropertyContext';
 import {
   convertImageToWebP,
