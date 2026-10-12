@@ -203,29 +203,29 @@ export function Footer({
             <div className="grid grid-cols-2 gap-x-2.5 sm:gap-x-4 gap-y-1.5 sm:gap-y-2 text-xs">
               {/* Teléfono & WhatsApp */}
               <a
-                href="tel:+593984887434"
+                href="tel:+593992849965"
                 className="py-0.5 sm:py-1 flex items-center gap-2 sm:gap-2.5 transition-all group cursor-pointer min-w-0"
               >
                 <Phone size={16} strokeWidth={2.2} className="text-[#25D366] shrink-0 sm:w-[18px] sm:h-[18px] group-hover:scale-110 transition-transform" />
                 <div className="min-w-0">
                   <span className="block text-[8.5px] sm:text-[9px] uppercase font-bold text-slate-300 tracking-wider truncate">Llamadas / WA</span>
                   <span className="block text-[10.5px] sm:text-xs font-semibold text-white group-hover:text-[#5be196] truncate">
-                    +593 98 488 7434
+                    +593 99 284 9965
                   </span>
                 </div>
               </a>
 
               {/* Correo Electrónico */}
               <a
-                href="mailto:info@mgminmobiliaria.ec"
+                href="mailto:noemaliza01@gmail.com"
                 className="py-0.5 sm:py-1 flex items-center gap-2 sm:gap-2.5 transition-all group cursor-pointer min-w-0"
-                title="info@mgminmobiliaria.ec"
+                title="noemaliza01@gmail.com"
               >
                 <Mail size={16} strokeWidth={2.2} className="text-[#F58220] shrink-0 sm:w-[18px] sm:h-[18px] group-hover:scale-110 transition-transform" />
                 <div className="min-w-0">
                   <span className="block text-[8.5px] sm:text-[9px] uppercase font-bold text-slate-300 tracking-wider truncate">Correo Notarial</span>
                   <span className="block text-[10.5px] sm:text-xs font-semibold text-white group-hover:text-[#F58220] truncate">
-                    info@mgminmobiliaria.ec
+                    noemaliza01@gmail.com
                   </span>
                 </div>
               </a>

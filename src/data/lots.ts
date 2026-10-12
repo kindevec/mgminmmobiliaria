@@ -357,7 +357,7 @@ export const VISITOR_GUIDE = [
   },
 ];
 
-export const WHATSAPP_PHONE = '593991952889';
+export const WHATSAPP_PHONE = '593992849965';
 
 export function getGeneralWhatsAppUrl() {
   const text = encodeURIComponent(

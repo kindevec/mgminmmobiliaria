@@ -551,12 +551,12 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
                   <div>
                     <h4 className="text-sm font-bold text-slate-900 mb-0.5">Teléfono Directo</h4>
                     <a
-                      href="tel:+593984887434"
+                      href="tel:+593992849965"
                       className="text-sm font-bold text-slate-900 hover:text-[#F58220] transition-colors block"
                     >
-                      098 488 7434
+                      099 284 9965
                     </a>
-                    <p className="text-[11px] text-gray-500">+593 99 924 7434</p>
+                    <p className="text-[11px] text-gray-500">+593 99 284 9965</p>
                   </div>
                 </motion.div>
 
@@ -581,10 +581,10 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
                   <div>
                     <h4 className="text-sm font-bold text-slate-900 mb-0.5">Correo Electrónico</h4>
                     <a
-                      href="mailto:info@mgminmobiliaria.ec"
+                      href="mailto:noemaliza01@gmail.com"
                       className="text-xs text-gray-600 hover:text-[#F58220] transition-colors break-all font-medium"
                     >
-                      info@mgminmobiliaria.ec
+                      noemaliza01@gmail.com
                     </a>
                   </div>
                 </motion.div>
