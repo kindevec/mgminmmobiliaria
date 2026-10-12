@@ -5,4 +5,4 @@ Disallow: /administracion
 Disallow: /new_property
 Allow: /
 
-Sitemap: https://sociedadmgminmobiliaria.web.app/sitemap.xml
+Sitemap: https://www.mgminmobiliariaec.com/sitemap.xml

@@ -60,9 +60,27 @@ function HomePageContent() {
       const targetPage = resolvePageFromHash(rawHash);
       const pageConfig = PAGES_CONFIG[targetPage];
 
-      // 1. Actualizar el título de la página en la pestaña e historial del navegador
+      // 1. Actualizar título, descripción, canonical y directivas de robots por ruta
       if (typeof document !== 'undefined' && pageConfig?.fullTitle) {
         document.title = pageConfig.fullTitle;
+        const descMeta = document.querySelector('meta[name="description"]');
+        if (descMeta && pageConfig.description) {
+          descMeta.setAttribute('content', pageConfig.description);
+        }
+        const canonicalLink = document.querySelector('link[rel="canonical"]');
+        if (canonicalLink && pageConfig.path) {
+          canonicalLink.setAttribute('href', `https://www.mgminmobiliariaec.com${pageConfig.path}`);
+        }
+        const robotsMeta = document.querySelector('meta[name="robots"]');
+        if (robotsMeta) {
+          const isPrivate = targetPage === 'admin' || targetPage === 'new_property';
+          robotsMeta.setAttribute(
+            'content',
+            isPrivate
+              ? 'noindex, nofollow'
+              : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+          );
+        }
       }
 
       // 2. Comprobar si el hash o el pathname incluye un lote específico (ej. /lote/vm-101 o #lote/vm-101)

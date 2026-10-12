@@ -10,8 +10,14 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.APP_URL || 'https://sociedadmgminmobiliaria.web.app'
+    process.env.APP_URL || 'https://www.mgminmobiliariaec.com'
   ),
+  alternates: {
+    canonical: '/',
+  },
+  verification: {
+    google: 'a04c1dce4977fc72',
+  },
   title: 'MGM Inmobiliaria | Lotes Urbanizados & Proyectos Residenciales en Ecuador',
   description:
     'Sociedad Civil MGM Inmobiliaria. Venta de lotes con escrituras legalizadas, servicios básicos, alta plusvalía y proyectos exclusivos como Ciudadela Miravalle en Ecuador.',
@@ -19,6 +25,7 @@ export const metadata: Metadata = {
   keywords: [
     'MGM Inmobiliaria',
     'Sociedad Civil MGM Inmobiliaria',
+    'mgminmobiliariaec',
     'Lotes Ecuador',
     'Ciudadela Miravalle',
     'Terrenos urbanizados',
@@ -34,6 +41,7 @@ export const metadata: Metadata = {
     description:
       'Lotes urbanizados con escrituras al día, servicios soterrados y proyectos exclusivos como Ciudadela Miravalle. Invierte con respaldo legal.',
     type: 'website',
+    url: 'https://www.mgminmobiliariaec.com',
     locale: 'es_EC',
     siteName: 'Sociedad Civil MGM Inmobiliaria',
     images: [
@@ -78,9 +86,9 @@ export default function RootLayout({
     name: 'Sociedad Civil MGM Inmobiliaria',
     description:
       'Empresa inmobiliaria líder en desarrollo y comercialización de lotes urbanizados y comunidades planificadas en Ecuador como Ciudadela Miravalle.',
-    telephone: '+593991952889',
-    url: 'https://wa.me/593991952889',
-    image: 'https://sociedadmgminmobiliaria.web.app/opengraph-image',
+    telephone: '+593984887434',
+    url: 'https://www.mgminmobiliariaec.com',
+    image: 'https://www.mgminmobiliariaec.com/og-image.jpg',
     address: {
       '@type': 'PostalAddress',
       addressCountry: 'EC',

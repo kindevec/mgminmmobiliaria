@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "name": "Sociedad Civil MGM Inmobiliaria",
   "description": "Catálogo de proyectos y lotes de terreno con crédito directo propio en Ecuador.",
-  "url": "https://sociedadmgminmobiliaria.web.app",
+  "url": "https://www.mgminmobiliariaec.com",
   "projects": [
     {
       "id": "ciudadela-miravalle",
