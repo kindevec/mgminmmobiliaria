@@ -3,9 +3,33 @@
   "framework": "vite",
   "buildCommand": "vite build",
   "outputDirectory": "out",
+  "headers": [
+    {
+      "source": "/(sitemap\\.xml|sitemap_index\\.xml)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/robots.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        }
+      ]
+    }
+  ],
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!sitemap\\.xml|sitemap_index\\.xml|robots\\.txt|llms\\.txt|ai-catalog\\.json|googlea04c1dce4977fc72\\.html|assets/|properties/|docs/).*)",
       "destination": "/index.html"
     }
   ]
