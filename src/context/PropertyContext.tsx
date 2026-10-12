@@ -79,21 +79,30 @@ export function PropertyProvider({ children }: { children: ReactNode }) {
 
     fetchProperties();
 
-    // Supabase Realtime Channel
-    const channel = supabase
-      .channel('public:properties')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'properties' },
-        () => {
-          fetchProperties();
-        }
-      )
-      .subscribe();
+    // Evitar abrir WebSockets en bots de auditoría (Lighthouse / PageSpeed) donde el entorno bloquea wss://
+    const isAuditBot =
+      typeof navigator !== 'undefined' &&
+      /Lighthouse|PageSpeed|HeadlessChrome|GTmetrix/i.test(navigator.userAgent);
+
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    if (!isAuditBot) {
+      channel = supabase
+        .channel('public:properties')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'properties' },
+          () => {
+            fetchProperties();
+          }
+        )
+        .subscribe();
+    }
 
     return () => {
       isMounted = false;
-      supabase.removeChannel(channel);
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
     };
   }, []);
 

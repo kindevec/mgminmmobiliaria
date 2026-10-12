@@ -1,23 +1,25 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Header } from '@/src/components/Header';
 import { BottomNav } from '@/src/components/BottomNav';
 import { Footer } from '@/src/components/Footer';
 import { WhatsAppFAB } from '@/src/components/WhatsAppFAB';
-import { VisitModal } from '@/src/components/VisitModal';
-import { LegalModal, type LegalTab } from '@/src/components/modals/LegalModal';
-import { PropertyDetailView } from '@/src/components/views/PropertyDetailView';
+import type { LegalTab } from '@/src/components/modals/LegalModal';
 import { InteractiveBackground } from '@/src/components/InteractiveBackground';
 import { HomeView } from '@/src/components/views/HomeView';
-import { AboutView } from '@/src/components/views/AboutView';
-import { PropertiesView } from '@/src/components/views/PropertiesView';
-import { ContactView } from '@/src/components/views/ContactView';
-import { AdminView } from '@/src/components/views/AdminView';
-import { PrivacyView } from '@/src/components/views/PrivacyView';
-import { NewPropertyView } from '@/src/components/views/NewPropertyView';
 import { PropertyProvider, useProperties } from '@/src/context/PropertyContext';
+
+const VisitModal = lazy(() => import('@/src/components/VisitModal').then((m) => ({ default: m.VisitModal })));
+const LegalModal = lazy(() => import('@/src/components/modals/LegalModal').then((m) => ({ default: m.LegalModal })));
+const PropertyDetailView = lazy(() => import('@/src/components/views/PropertyDetailView').then((m) => ({ default: m.PropertyDetailView })));
+const AboutView = lazy(() => import('@/src/components/views/AboutView').then((m) => ({ default: m.AboutView })));
+const PropertiesView = lazy(() => import('@/src/components/views/PropertiesView').then((m) => ({ default: m.PropertiesView })));
+const ContactView = lazy(() => import('@/src/components/views/ContactView').then((m) => ({ default: m.ContactView })));
+const AdminView = lazy(() => import('@/src/components/views/AdminView').then((m) => ({ default: m.AdminView })));
+const PrivacyView = lazy(() => import('@/src/components/views/PrivacyView').then((m) => ({ default: m.PrivacyView })));
+const NewPropertyView = lazy(() => import('@/src/components/views/NewPropertyView').then((m) => ({ default: m.NewPropertyView })));
 import { ScrollToTop } from '@/src/components/ScrollToTop';
 import { LOTS_DATA, type LotProperty } from '@/src/data/lots';
 import {
@@ -247,51 +249,53 @@ function HomePageContent() {
               />
             )}
 
-            {currentPage === 'about' && (
-              <AboutView
-                onNavigate={handleNavigate}
-                onOpenVisitModal={handleOpenVisitModal}
-              />
-            )}
+            <Suspense fallback={<div className="min-h-[60vh] w-full" />}>
+              {currentPage === 'about' && (
+                <AboutView
+                  onNavigate={handleNavigate}
+                  onOpenVisitModal={handleOpenVisitModal}
+                />
+              )}
 
-            {currentPage === 'properties' && (
-              <PropertiesView
-                onSelectLot={handleSelectLot}
-                onOpenVisitModal={handleOpenVisitModal}
-                initialLocation={filterLocation}
-                initialType={filterType}
-                initialMaxPrice={filterMaxPrice}
-              />
-            )}
+              {currentPage === 'properties' && (
+                <PropertiesView
+                  onSelectLot={handleSelectLot}
+                  onOpenVisitModal={handleOpenVisitModal}
+                  initialLocation={filterLocation}
+                  initialType={filterType}
+                  initialMaxPrice={filterMaxPrice}
+                />
+              )}
 
-            {currentPage === 'contact' && (
-              <ContactView
-                onOpenVisitModal={handleOpenVisitModal}
-                onOpenLegalModal={handleOpenLegalModal}
-              />
-            )}
+              {currentPage === 'contact' && (
+                <ContactView
+                  onOpenVisitModal={handleOpenVisitModal}
+                  onOpenLegalModal={handleOpenLegalModal}
+                />
+              )}
 
-            {currentPage === 'admin' && (
-              <AdminView onNavigate={handleNavigate} />
-            )}
+              {currentPage === 'admin' && (
+                <AdminView onNavigate={handleNavigate} />
+              )}
 
-            {currentPage === 'new_property' && (
-              <NewPropertyView onNavigate={handleNavigate} />
-            )}
+              {currentPage === 'new_property' && (
+                <NewPropertyView onNavigate={handleNavigate} />
+              )}
 
-            {currentPage === 'privacy' && (
-              <PrivacyView onNavigate={handleNavigate} />
-            )}
+              {currentPage === 'privacy' && (
+                <PrivacyView onNavigate={handleNavigate} />
+              )}
 
-            {currentPage === 'property-detail' && (
-              <PropertyDetailView
-                lot={selectedLot || properties[0] || LOTS_DATA[0]}
-                allLots={properties.length > 0 ? properties : LOTS_DATA}
-                onNavigate={handleNavigate}
-                onSelectLot={handleSelectLot}
-                onOpenVisitModal={handleOpenVisitModal}
-              />
-            )}
+              {currentPage === 'property-detail' && (
+                <PropertyDetailView
+                  lot={selectedLot || properties[0] || LOTS_DATA[0]}
+                  allLots={properties.length > 0 ? properties : LOTS_DATA}
+                  onNavigate={handleNavigate}
+                  onSelectLot={handleSelectLot}
+                  onOpenVisitModal={handleOpenVisitModal}
+                />
+              )}
+            </Suspense>
           </motion.div>
         </AnimatePresence>
       </main>
@@ -317,18 +321,24 @@ function HomePageContent() {
       )}
 
       {/* 6. Interactive Modals */}
-      <VisitModal
-        isOpen={isVisitModalOpen}
-        onClose={() => setIsVisitModalOpen(false)}
-        defaultInterest={visitInterest}
-      />
+      <Suspense fallback={null}>
+        {isVisitModalOpen && (
+          <VisitModal
+            isOpen={isVisitModalOpen}
+            onClose={() => setIsVisitModalOpen(false)}
+            defaultInterest={visitInterest}
+          />
+        )}
 
-      {/* 7. Blindaje Legal (Privacidad, Términos, Cookies) */}
-      <LegalModal
-        isOpen={isLegalModalOpen}
-        onClose={() => setIsLegalModalOpen(false)}
-        initialTab={legalModalTab}
-      />
+        {/* 7. Blindaje Legal (Privacidad, Términos, Cookies) */}
+        {isLegalModalOpen && (
+          <LegalModal
+            isOpen={isLegalModalOpen}
+            onClose={() => setIsLegalModalOpen(false)}
+            initialTab={legalModalTab}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }

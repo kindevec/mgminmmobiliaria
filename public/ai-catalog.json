@@ -1,15 +1,28 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "name": "Sociedad Civil MGM Inmobiliaria",
-  "description": "Catálogo de proyectos y lotes de terreno con crédito directo propio en Ecuador.",
-  "url": "https://www.mgminmobiliariaec.com",
-  "projects": [
+  "specVersion": "1.0",
+  "entries": [
     {
-      "id": "ciudadela-miravalle",
-      "name": "Ciudadela Miravalle",
-      "type": "Urbanización Residencial",
-      "location": "Daule, Guayas, Ecuador",
-      "financingMonths": 48
+      "identifier": "urn:air:mgminmobiliariaec.com:catalog:properties",
+      "displayName": "Catálogo Inmobiliario MGM Inmobiliaria",
+      "description": "Inventario de lotes urbanizados, terrenos comerciales, quintas vacacionales y casas en venta con crédito directo en Ecuador.",
+      "type": "application/ai-catalog+json",
+      "url": "https://www.mgminmobiliariaec.com/lotes",
+      "representativeQueries": [
+        "lotes y terrenos en venta en Ecuador con crédito directo",
+        "propiedades disponibles en Sociedad Civil MGM Inmobiliaria",
+        "casas y terrenos en Quito, Santo Domingo, El Carmen y Manta"
+      ]
+    },
+    {
+      "identifier": "urn:air:mgminmobiliariaec.com:service:contact",
+      "displayName": "Asesoría Legal, Avalúos y Crédito Directo MGM",
+      "description": "Atención directa, agendamiento de visitas guiadas y calificación de crédito directo sin bancos en Ecuador.",
+      "type": "application/ld+json",
+      "url": "https://www.mgminmobiliariaec.com/contacto",
+      "representativeQueries": [
+        "agendar visita a terreno o lote en MGM Inmobiliaria",
+        "requisitos para crédito directo inmobiliario sin bancos en Ecuador"
+      ]
     }
   ]
 }

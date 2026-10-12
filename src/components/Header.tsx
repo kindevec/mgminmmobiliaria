@@ -122,9 +122,9 @@ export function Header({
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Cotizar vía WhatsApp Oficial"
-            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-xs sm:text-sm transition-all shadow-[0_2px_10px_rgba(0,0,0,0.35)] hover:shadow-lg hover:scale-105 active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-slate-950 font-extrabold text-xs sm:text-sm transition-all shadow-[0_2px_10px_rgba(0,0,0,0.35)] hover:shadow-lg hover:scale-105 active:scale-95 cursor-pointer"
           >
-            <WhatsAppIcon size={16} className="text-white shrink-0 drop-shadow-xs" />
+            <WhatsAppIcon size={16} className="text-slate-950 shrink-0" />
             <span className="hidden sm:inline">Cotizar</span>
           </a>
         </div>

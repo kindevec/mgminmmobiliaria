@@ -47,31 +47,31 @@ interface HomeViewProps {
 // 1. Imágenes continuas de alta resolución para el Hero panorámico
 const HERO_REAL_ESTATE_IMAGES = [
   {
-    url: '/inicio-banner.jpg',
+    url: '/inicio-banner.webp',
     alt: 'Residencia Arquitectónica Contemporánea de Lujo - MGM Inmobiliaria',
   },
   {
-    url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=2000&q=85',
+    url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1280&q=75&fm=webp',
     alt: 'Residencia Moderna con Piscina y Áreas Verdes - MGM Inmobiliaria',
   },
   {
-    url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2000&q=85',
+    url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1280&q=75&fm=webp',
     alt: 'Arquitectura Residencial Contemporánea de Vanguardia con Fachada Iluminada',
   },
   {
-    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2000&q=85',
+    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1280&q=75&fm=webp',
     alt: 'Fachada Residencial Contemporánea con Obras Civiles Concluidas',
   },
   {
-    url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=2000&q=85',
+    url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1280&q=75&fm=webp',
     alt: 'Villa Exclusiva con Vistas Panorámicas y Terrazas Iluminadas',
   },
   {
-    url: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=2000&q=85',
+    url: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1280&q=75&fm=webp',
     alt: 'Residencia Exclusiva y Urbanización con Servicios Básicos Garantizados',
   },
   {
-    url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=2000&q=85',
+    url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1280&q=75&fm=webp',
     alt: 'Arquitectura de Lujo y Vialidad Planificada de Primer Orden',
   },
 ];
@@ -416,24 +416,33 @@ export function HomeView({
       >
         {/* Fotografía Inmobiliaria Panorámica Protagonista: Ocupa todo el ancho y alto de pantalla (edge-to-edge) */}
         <div className="absolute inset-0 w-full h-full">
-          {HERO_REAL_ESTATE_IMAGES.map((img, idx) => (
-            <div
-              key={idx}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                heroImgIndex === idx ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none'
-              }`}
-            >
-              <Image
-                src={img.url}
-                alt={img.alt}
-                fill
-                priority={idx === 0}
-                sizes="100vw"
-                className="object-cover object-center transform transition-transform duration-7000 ease-out hover:scale-105"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-          ))}
+          {HERO_REAL_ESTATE_IMAGES.map((img, idx) => {
+            const shouldRenderImage =
+              idx === 0 ||
+              idx === heroImgIndex ||
+              (heroImgIndex > 0 && idx === (heroImgIndex + 1) % HERO_REAL_ESTATE_IMAGES.length);
+
+            return (
+              <div
+                key={idx}
+                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                  heroImgIndex === idx ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none'
+                }`}
+              >
+                {shouldRenderImage && (
+                  <Image
+                    src={img.url}
+                    alt={img.alt}
+                    fill
+                    priority={idx === 0}
+                    sizes="100vw"
+                    className="object-cover object-center transform transition-transform duration-7000 ease-out hover:scale-105"
+                    referrerPolicy="no-referrer"
+                  />
+                )}
+              </div>
+            );
+          })}
 
           {/* Degradados cinematográficos neutros para máxima legibilidad editorial del texto directamente sobre la foto */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 sm:via-black/50 to-black/20 pointer-events-none" />
@@ -466,7 +475,7 @@ export function HomeView({
         {/* Controles de diapositivas en esquina inferior (sin contador numérico "01/07") */}
         <div className="absolute bottom-6 right-4 sm:bottom-8 sm:right-8 lg:right-12 z-20 flex items-center gap-3">
           {/* Indicadores lineales / dots */}
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/15">
+          <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md border border-white/15">
             {HERO_REAL_ESTATE_IMAGES.map((_, i) => (
               <button
                 key={i}
@@ -476,7 +485,7 @@ export function HomeView({
                   setHeroImgIndex(i);
                 }}
                 aria-label={`Ver diapositiva ${i + 1}`}
-                className="p-1 flex items-center justify-center cursor-pointer"
+                className="min-w-[24px] min-h-[24px] p-1 flex items-center justify-center cursor-pointer"
               >
                 <span
                   className={`h-1.5 rounded-full transition-all block ${
@@ -641,8 +650,11 @@ export function HomeView({
                   
                   {/* Imagen de la casa con fondo transparente de alto impacto */}
                   <img
-                    src="/house-isolated.png"
+                    src="/house-isolated.webp"
                     alt="Propiedad residencial modelo en urbanización MGM"
+                    width={600}
+                    height={313}
+                    decoding="async"
                     className="relative z-10 w-full h-auto object-contain drop-shadow-[0_24px_36px_rgba(0,0,0,0.7)] pointer-events-none select-none"
                     loading="lazy"
                   />
@@ -709,7 +721,7 @@ export function HomeView({
             <ScrollReveal direction="left" delay={0.1} className="lg:col-span-6 relative">
               <div className="relative w-full h-[360px] sm:h-[440px] lg:h-[480px] rounded-3xl overflow-hidden shadow-2xl border border-slate-200/80 bg-slate-950">
                 <Image
-                  src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80"
+                  src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=75&fm=webp"
                   alt="Urbanización Planificada y Obras Civiles Concluidas - MGM Inmobiliaria"
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
@@ -979,7 +991,7 @@ export function HomeView({
             <ScrollReveal direction="right" delay={0.2} className="lg:col-span-6 relative">
               <div className="relative w-full h-[320px] sm:h-[400px] lg:h-[440px] rounded-3xl overflow-hidden shadow-2xl border border-white/15 bg-slate-900">
                 <Image
-                  src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=85"
+                  src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=75&fm=webp"
                   alt="Entrega de Vivienda y Satisfacción Familiar - MGM Inmobiliaria"
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"

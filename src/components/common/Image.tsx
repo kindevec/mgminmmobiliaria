@@ -42,7 +42,8 @@ export default function Image({
       alt={alt}
       sizes={sizes}
       loading={priority ? 'eager' : loading || 'lazy'}
-      decoding={decoding || 'async'}
+      fetchPriority={priority ? 'high' : undefined}
+      decoding={priority ? 'sync' : decoding || 'async'}
       className={className}
       style={computedStyle}
       {...rest}

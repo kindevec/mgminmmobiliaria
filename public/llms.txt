@@ -1,10 +1,18 @@
 # Sociedad Civil MGM Inmobiliaria
 
-> Lotes de terreno urbanizados y viviendas con financiamiento directo propio en Daule y Guayas, Ecuador.
+> Comercialización, corretaje, avalúos y gestión de activos inmobiliarios, terrenos urbanizados, lotes comerciales, quintas vacacionales y residencias con crédito directo en Ecuador.
 
-## Información Institucional
-- Nombre: Sociedad Civil MGM Inmobiliaria
-- Ubicación: Ecuador
-- Proyectos principales: Ciudadela Miravalle (Daule, Guayas).
-- Financiamiento: Crédito directo de la inmobiliaria hasta 48 meses sin intermediarios bancarios ni requisitos complejos.
-- Infraestructura: Obras civiles concluidas con vías adoquinadas, alcantarillado, redes eléctricas y áreas recreativas.
+Sociedad Civil MGM Inmobiliaria ofrece terrenos, casas y propiedades de inversión con escrituras inmediatas, obras civiles concluidas y planes de financiamiento directo sin intermediarios bancarios en Quito, Santo Domingo, El Carmen, Manta, Pedernales y más ciudades del Ecuador.
+
+## Secciones Principales
+
+- [Inicio - Sociedad Civil MGM Inmobiliaria](https://www.mgminmobiliariaec.com/): Portal principal con catálogo destacado, calculadora de crédito directo y asesoría inmobiliaria.
+- [Catálogo de Lotes, Terrenos y Casas en Venta](https://www.mgminmobiliariaec.com/lotes): Inventario actualizado de lotes urbanizados, quintas, terrenos de remate y viviendas en Ecuador.
+- [Sobre Nosotros y Trayectoria Legal](https://www.mgminmobiliariaec.com/nosotros): Historia corporativa, misión, visión, respaldo jurídico y valores de Sociedad Civil MGM Inmobiliaria.
+- [Contacto y Agendamiento de Visitas](https://www.mgminmobiliariaec.com/contacto): Atención personalizada por WhatsApp (+593 99 544 1083), correo electrónico (mgm.avaluos@gmail.com) y ubicación de oficinas en El Carmen, Manabí.
+- [Políticas de Privacidad y Términos Legales](https://www.mgminmobiliariaec.com/privacidad): Protección de datos personales y condiciones de uso del portal inmobiliario.
+
+## Recursos para Agentes e Indexación
+
+- [Catálogo AI (ARD v1.0)](https://www.mgminmobiliariaec.com/.well-known/ai-catalog.json): Especificación estructurada de recursos de inteligencia artificial y catálogo de propiedades.
+- [Mapa del Sitio XML](https://www.mgminmobiliariaec.com/sitemap.xml): Índice completo de URLs canónicas indexables.
