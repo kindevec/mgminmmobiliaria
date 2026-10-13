@@ -37,6 +37,12 @@ export interface LotProperty {
   featured?: boolean;
   pdfUrl?: string;
   pdfTitle?: string;
+  lat?: number;
+  lng?: number;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
   documents?: {
     title: string;
     url: string;
@@ -97,6 +103,9 @@ export const LOTS_DATA: LotProperty[] = [
     beds: 4,
     baths: 4,
     featured: true,
+    lat: -0.96765,
+    lng: -80.70892,
+    coordinates: { lat: -0.96765, lng: -80.70892 },
     pdfUrl: '/properties/MT24-023/ficha-tecnica-MT24-023.pdf',
     pdfTitle: 'Ficha Técnica Oficial MT24-023 (PDF)',
     documents: [
@@ -161,6 +170,9 @@ export const LOTS_DATA: LotProperty[] = [
       '/properties/C24-279/afiche-publicidad.webp',
     ],
     featured: true,
+    lat: 0.05264,
+    lng: -78.33912,
+    coordinates: { lat: 0.05264, lng: -78.33912 },
     pdfUrl: '/properties/C24-279/ficha-tecnica-C24-279.pdf',
     pdfTitle: 'Ficha Técnica Oficial C24-279 (PDF)',
     documents: [
@@ -237,6 +249,9 @@ export const LOTS_DATA: LotProperty[] = [
       '/properties/QC25-016/foto-10.webp',
     ],
     featured: true,
+    lat: -0.30155,
+    lng: -78.47982,
+    coordinates: { lat: -0.30155, lng: -78.47982 },
     pdfUrl: '/properties/QC25-016/ficha-tecnica-QC25-016.pdf',
     pdfTitle: 'Ficha Técnica Oficial QC25-016 (PDF)',
     documents: [
@@ -255,6 +270,27 @@ export const LOTS_DATA: LotProperty[] = [
     ],
   },
 ];
+
+export function getCoordinatesForProperty(lot?: Partial<LotProperty>): { lat: number; lng: number } {
+  if (lot?.coordinates && typeof lot.coordinates.lat === 'number' && typeof lot.coordinates.lng === 'number') {
+    return lot.coordinates;
+  }
+  if (typeof lot?.lat === 'number' && typeof lot?.lng === 'number') {
+    return { lat: lot.lat, lng: lot.lng };
+  }
+  const p = (lot?.project || '').toLowerCase();
+  const z = (lot?.zone || '').toLowerCase();
+  if (p.includes('manta') || z.includes('manta')) {
+    return { lat: -0.96765, lng: -80.70892 };
+  }
+  if (p.includes('malchingu') || z.includes('malchingu') || p.includes('jerusal')) {
+    return { lat: 0.05264, lng: -78.33912 };
+  }
+  if (p.includes('conocoto') || z.includes('conocoto') || p.includes('chocoto') || z.includes('chocoto')) {
+    return { lat: -0.30155, lng: -78.47982 };
+  }
+  return { lat: -2.8685, lng: -78.9654 };
+}
 
 export const AMENITIES_MIRAVALLE = [
   {

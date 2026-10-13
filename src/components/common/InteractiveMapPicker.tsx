@@ -158,6 +158,21 @@ export function InteractiveMapPicker({
     };
   }, []);
 
+  // Sync coords and marker if external initialLat / initialLng changes
+  useEffect(() => {
+    if (typeof initialLat === 'number' && typeof initialLng === 'number') {
+      const updatedLat = Number(initialLat.toFixed(6));
+      const updatedLng = Number(initialLng.toFixed(6));
+      setCoords({ lat: updatedLat, lng: updatedLng });
+      if (markerRef.current) {
+        markerRef.current.setLatLng([updatedLat, updatedLng]);
+      }
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.setView([updatedLat, updatedLng], mapInstanceRef.current.getZoom() || 16);
+      }
+    }
+  }, [initialLat, initialLng]);
+
   // Update tile layer when switching map type
   const switchMapType = (type: 'streets' | 'satellite') => {
     setMapType(type);

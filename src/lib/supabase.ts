@@ -40,6 +40,9 @@ export interface DbPropertyRow {
   featured?: boolean;
   pdf_url?: string | null;
   pdf_title?: string | null;
+  lat?: number | null;
+  lng?: number | null;
+  coordinates?: { lat: number; lng: number } | null;
   documents?: {
     title: string;
     url: string;
@@ -51,6 +54,37 @@ export interface DbPropertyRow {
 }
 
 export function mapRowToProperty(row: DbPropertyRow): LotProperty {
+  let lat: number | undefined = undefined;
+  let lng: number | undefined = undefined;
+
+  if (row.lat !== null && row.lat !== undefined) {
+    lat = Number(row.lat);
+  }
+  if (row.lng !== null && row.lng !== undefined) {
+    lng = Number(row.lng);
+  }
+  if (row.coordinates?.lat !== undefined && row.coordinates?.lng !== undefined) {
+    lat = Number(row.coordinates.lat);
+    lng = Number(row.coordinates.lng);
+  }
+
+  // Check for GPS metadata stored in documents
+  const coordDoc = row.documents?.find((d) => d.title === '__mgm_coords__');
+  if (coordDoc && coordDoc.url) {
+    try {
+      const parsed = JSON.parse(coordDoc.url);
+      if (typeof parsed.lat === 'number' && typeof parsed.lng === 'number') {
+        lat = parsed.lat;
+        lng = parsed.lng;
+      }
+    } catch {}
+  }
+
+  // Filter out internal metadata document from public user downloads
+  const cleanDocs = Array.isArray(row.documents)
+    ? row.documents.filter((d) => d.title !== '__mgm_coords__')
+    : [];
+
   return {
     id: row.id,
     code: row.code,
@@ -78,7 +112,10 @@ export function mapRowToProperty(row: DbPropertyRow): LotProperty {
     featured: Boolean(row.featured),
     pdfUrl: row.pdf_url || undefined,
     pdfTitle: row.pdf_title || undefined,
-    documents: Array.isArray(row.documents) ? row.documents : [],
+    lat,
+    lng,
+    coordinates: lat !== undefined && lng !== undefined ? { lat, lng } : undefined,
+    documents: cleanDocs,
   };
 }
 
@@ -110,6 +147,22 @@ export function mapPropertyToRow(prop: Partial<LotProperty>): Partial<DbProperty
   if (prop.featured !== undefined) row.featured = prop.featured;
   if (prop.pdfUrl !== undefined) row.pdf_url = prop.pdfUrl;
   if (prop.pdfTitle !== undefined) row.pdf_title = prop.pdfTitle;
-  if (prop.documents !== undefined) row.documents = prop.documents;
+
+  // Preserve documents and sync GPS coordinates into JSONB metadata so Supabase accepts it without schema errors
+  const docs = Array.isArray(prop.documents) ? [...prop.documents] : [];
+  const cleanDocs = docs.filter((d) => d.title !== '__mgm_coords__');
+  const targetLat = prop.coordinates?.lat ?? prop.lat;
+  const targetLng = prop.coordinates?.lng ?? prop.lng;
+  if (typeof targetLat === 'number' && typeof targetLng === 'number') {
+    cleanDocs.push({
+      title: '__mgm_coords__',
+      url: JSON.stringify({ lat: targetLat, lng: targetLng }),
+      size: 'GEO',
+      description: 'Coordenadas georreferenciadas MGM',
+    });
+  }
+  if (prop.documents !== undefined || (typeof targetLat === 'number' && typeof targetLng === 'number')) {
+    row.documents = cleanDocs;
+  }
   return row;
 }

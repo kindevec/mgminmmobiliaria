@@ -27,6 +27,7 @@ import {
 import type { LotProperty } from '@/src/data/lots';
 import { getLotWhatsAppUrl } from '@/src/data/lots';
 import { WhatsAppIcon } from './SocialIcons';
+import { PropertyLocationMap } from './common/PropertyLocationMap';
 
 interface LotDetailsModalProps {
   lot: LotProperty | null;
@@ -279,6 +280,20 @@ export function LotDetailsModal({
               </div>
             );
           })()}
+
+          {/* Ubicación en Google Maps / Satelital */}
+          <div className="pt-2">
+            <PropertyLocationMap
+              lat={lot.lat}
+              lng={lot.lng}
+              coordinates={lot.coordinates}
+              propertyName={lot.name}
+              project={lot.project}
+              zone={lot.zone}
+              address={lot.address}
+              heightClass="h-[240px] sm:h-[280px]"
+            />
+          </div>
 
           {/* Pricing & Financing Options */}
           <div className="p-6 rounded-2xl bg-slate-950 text-white flex flex-col sm:flex-row items-center justify-between gap-4">

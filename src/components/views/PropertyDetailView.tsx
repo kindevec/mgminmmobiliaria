@@ -30,11 +30,11 @@ import {
   FileDown,
   ImageIcon,
 } from 'lucide-react';
-import type { LotProperty } from '@/src/data/lots';
-import { getLotWhatsAppUrl, WHATSAPP_PHONE } from '@/src/data/lots';
+import { getCoordinatesForProperty, getLotWhatsAppUrl, WHATSAPP_PHONE, type LotProperty } from '@/src/data/lots';
 import type { PageView } from '../Header';
 import { WhatsAppIcon } from '../SocialIcons';
 import { ScrollReveal } from '../common/ScrollReveal';
+import { PropertyLocationMap } from '../common/PropertyLocationMap';
 
 interface PropertyDetailViewProps {
   lot: LotProperty;
@@ -126,6 +126,20 @@ function PropertyExtendedSpecs({ lot }: { lot: LotProperty }) {
             <ExternalLink className="h-3.5 w-3.5 text-slate-400 shrink-0 ml-0.5" />
           </a>
         </div>
+      </div>
+
+      {/* Ubicación Satelital y Google Maps de la Propiedad */}
+      <div className="pt-6 sm:pt-8 border-t border-slate-200/90">
+        <PropertyLocationMap
+          lat={lot.lat}
+          lng={lot.lng}
+          coordinates={lot.coordinates}
+          propertyName={lot.name}
+          project={lot.project}
+          zone={lot.zone}
+          address={lot.address}
+          heightClass="h-[280px] sm:h-[350px]"
+        />
       </div>
     </div>
   );
@@ -544,9 +558,11 @@ export function PropertyDetailView({
 
                 {/* 2. Enlace Google Maps sin box */}
                 <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                    `${lot.project}, ${lot.zone}, Azuay, Ecuador`
-                  )}`}
+                  href={`https://www.google.com/maps/search/?api=1&query=${
+                    (lot.coordinates?.lat ?? lot.lat) !== undefined
+                      ? `${lot.coordinates?.lat ?? lot.lat},${lot.coordinates?.lng ?? lot.lng}`
+                      : `${getCoordinatesForProperty(lot).lat},${getCoordinatesForProperty(lot).lng}`
+                  }`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full inline-flex items-center justify-center gap-2 py-1 text-xs sm:text-sm font-bold text-slate-700 hover:text-emerald-700 transition-colors hover:underline cursor-pointer text-center"

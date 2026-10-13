@@ -30,7 +30,7 @@ import {
   ChevronLeft,
   Search,
 } from 'lucide-react';
-import type { LotProperty } from '@/src/data/lots';
+import { getCoordinatesForProperty, type LotProperty } from '@/src/data/lots';
 import { PropertyCard } from '../PropertyCard';
 import { LotDetailsModal } from '../LotDetailsModal';
 import { InteractiveMapPicker } from '../common/InteractiveMapPicker';
@@ -189,6 +189,8 @@ export function AdminPropertyModal({
         setPdfUrl(propertyToEdit.pdfUrl || '');
         setPdfTitle(propertyToEdit.pdfTitle || '');
         setDocuments(propertyToEdit.documents || []);
+        const editCoords = getCoordinatesForProperty(propertyToEdit);
+        setCoords(editCoords);
       } else {
         // Reset to initial new property template
         const randCode = `PROP-${Math.floor(100 + Math.random() * 900)}`;
@@ -232,6 +234,7 @@ export function AdminPropertyModal({
         setPdfUrl('');
         setPdfTitle('');
         setDocuments([]);
+        setCoords({ lat: -0.96765, lng: -80.70892 });
       }
     }
   }, [isEffectiveOpen, propertyToEdit]);
@@ -395,6 +398,9 @@ export function AdminPropertyModal({
       featured,
       pdfUrl: pdfUrl.trim() || undefined,
       pdfTitle: pdfTitle.trim() || (pdfUrl ? `Ficha Técnica ${code}` : undefined),
+      lat: coords.lat,
+      lng: coords.lng,
+      coordinates: { lat: coords.lat, lng: coords.lng },
       documents,
     };
 
@@ -443,6 +449,9 @@ export function AdminPropertyModal({
     accessibility: accessibility ? accessibility.trim() : undefined,
     additionalTerrainInfo: additionalTerrainInfo ? additionalTerrainInfo.trim() : undefined,
     featured,
+    lat: coords.lat,
+    lng: coords.lng,
+    coordinates: { lat: coords.lat, lng: coords.lng },
     pdfUrl: pdfUrl.trim() || undefined,
     pdfTitle: pdfTitle.trim() || undefined,
     documents,

@@ -220,6 +220,9 @@ export function NewPropertyView({ onNavigate }: NewPropertyViewProps) {
       registryStatus: registryStatus.trim(),
       image: finalImage,
       gallery: finalGallery,
+      lat: coords.lat,
+      lng: coords.lng,
+      coordinates: { lat: coords.lat, lng: coords.lng },
     };
 
     try {
@@ -260,6 +263,9 @@ export function NewPropertyView({ onNavigate }: NewPropertyViewProps) {
     registryStatus: registryStatus.trim(),
     image: (customImageUrl.trim() || image) || (imagesList.length > 0 ? imagesList[0].url : ''),
     gallery: imagesList.length > 0 ? imagesList.map((img) => img.url) : ((customImageUrl.trim() || image) ? [(customImageUrl.trim() || image)] : []),
+    lat: coords.lat,
+    lng: coords.lng,
+    coordinates: { lat: coords.lat, lng: coords.lng },
   };
 
   // Si no está autenticado, renderizar formulario de inicio de sesión administrativo
