@@ -33,6 +33,7 @@ import {
   type LotProperty,
 } from '@/src/data/lots';
 import { useProperties } from '@/src/context/PropertyContext';
+import { useSiteBanners } from '@/src/lib/bannerStorage';
 import { PropertyCard } from '../PropertyCard';
 import { WhatsAppIcon } from '../SocialIcons';
 import { ScrollReveal } from '../common/ScrollReveal';
@@ -275,11 +276,14 @@ export function HomeView({
   onFilterSearch,
 }: HomeViewProps) {
   const { properties } = useProperties();
+  const { banners } = useSiteBanners();
+  const homeSlides = banners.inicio;
 
   // Estados del Hero Carrusel
   const [heroImgIndex, setHeroImgIndex] = useState(0);
   const [heroHovered, setHeroHovered] = useState(false);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const activeHeroSlide = homeSlides[heroImgIndex] || homeSlides[0];
 
 
   // Cálculo de proyectos únicos verificados
@@ -327,17 +331,17 @@ export function HomeView({
     const mediaQuery = typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
     if (mediaQuery?.matches) return;
     const interval = setInterval(() => {
-      setHeroImgIndex((prev) => (prev + 1 >= HERO_REAL_ESTATE_IMAGES.length ? 0 : prev + 1));
+      setHeroImgIndex((prev) => (prev + 1 >= homeSlides.length ? 0 : prev + 1));
     }, 6000);
     return () => clearInterval(interval);
-  }, [heroHovered]);
+  }, [heroHovered, homeSlides.length]);
 
   const nextHeroImage = () => {
-    setHeroImgIndex((prev) => (prev + 1 >= HERO_REAL_ESTATE_IMAGES.length ? 0 : prev + 1));
+    setHeroImgIndex((prev) => (prev + 1 >= homeSlides.length ? 0 : prev + 1));
   };
 
   const prevHeroImage = () => {
-    setHeroImgIndex((prev) => (prev - 1 < 0 ? HERO_REAL_ESTATE_IMAGES.length - 1 : prev - 1));
+    setHeroImgIndex((prev) => (prev - 1 < 0 ? homeSlides.length - 1 : prev - 1));
   };
 
   // Gesto táctil Swipe para dispositivos móviles
@@ -416,27 +420,35 @@ export function HomeView({
       >
         {/* Fotografía Inmobiliaria Panorámica Protagonista: Ocupa todo el ancho y alto de pantalla (edge-to-edge) */}
         <div className="absolute inset-0 w-full h-full">
-          {HERO_REAL_ESTATE_IMAGES.map((img, idx) => {
+          {homeSlides.map((img, idx) => {
             const shouldRenderImage =
               idx === 0 ||
               idx === heroImgIndex ||
-              (heroImgIndex > 0 && idx === (heroImgIndex + 1) % HERO_REAL_ESTATE_IMAGES.length);
+              (heroImgIndex > 0 && idx === (heroImgIndex + 1) % homeSlides.length);
+            const posX = img.bgPositionX ?? 50;
+            const posY = img.bgPositionY ?? 50;
+            const zoom = (img.bgZoom ?? 100) / 100;
 
             return (
               <div
-                key={idx}
+                key={img.id || idx}
                 className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
                   heroImgIndex === idx ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none'
                 }`}
               >
                 {shouldRenderImage && (
                   <Image
-                    src={img.url}
+                    src={img.image}
                     alt={img.alt}
                     fill
                     priority={idx === 0}
                     sizes="100vw"
-                    className="object-cover object-center transform transition-transform duration-7000 ease-out hover:scale-105"
+                    className="object-cover transform transition-transform duration-7000 ease-out hover:scale-105"
+                    style={{
+                      objectPosition: `${posX}% ${posY}%`,
+                      transform: zoom > 1 ? `scale(${zoom})` : undefined,
+                      transformOrigin: 'center center',
+                    }}
                     referrerPolicy="no-referrer"
                   />
                 )}
@@ -455,28 +467,30 @@ export function HomeView({
             {/* Título Principal de Estilo Editorial (máx 2 líneas) */}
             <ScrollReveal direction="down" delay={0.1} duration={0.7}>
               <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.12] tracking-tight drop-shadow-md">
-                <span className="block">Tierra Firme, Certeza Jurídica</span>
-                <span className="block mt-1">
-                  <span className="text-[#5be196]">y el Hogar </span>
-                  <span className="text-[#F58220]">de tu Familia</span>
-                </span>
+                <span className="block">{activeHeroSlide.titleLine1}</span>
+                {(activeHeroSlide.titleHighlight1 || activeHeroSlide.titleHighlight2) && (
+                  <span className="block mt-1">
+                    <span className="text-[#5be196]">{activeHeroSlide.titleHighlight1} </span>
+                    <span className="text-[#F58220]">{activeHeroSlide.titleHighlight2}</span>
+                  </span>
+                )}
               </h1>
             </ScrollReveal>
 
             {/* Párrafo Descriptivo con tipografía limpia */}
             <ScrollReveal direction="up" delay={0.2} duration={0.65}>
               <p className="text-sm sm:text-base lg:text-xl text-slate-200 leading-relaxed font-normal max-w-2xl mt-4 sm:mt-6 drop-shadow-xs">
-                Desarrollamos comunidades residenciales y comerciales con obras civiles concluidas, servicios básicos garantizados in situ y crédito directo hasta 48 meses sin bancos ni buró de crédito.
+                {activeHeroSlide.description}
               </p>
             </ScrollReveal>
           </div>
         </div>
 
-        {/* Controles de diapositivas en esquina inferior (sin contador numérico "01/07") */}
+        {/* Controles de diapositivas en esquina inferior (3 banners de inicio) */}
         <div className="absolute bottom-6 right-4 sm:bottom-8 sm:right-8 lg:right-12 z-20 flex items-center gap-3">
           {/* Indicadores lineales / dots */}
           <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md border border-white/15">
-            {HERO_REAL_ESTATE_IMAGES.map((_, i) => (
+            {homeSlides.map((_, i) => (
               <button
                 key={i}
                 type="button"

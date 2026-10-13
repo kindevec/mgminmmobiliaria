@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import type { PageView } from '../Header';
 import { getGeneralWhatsAppUrl } from '@/src/data/lots';
+import { useSiteBanners } from '@/src/lib/bannerStorage';
 import { WhatsAppIcon } from '../SocialIcons';
 import { WaveCreamToDark, TopographicContours } from '../WaveDividers';
 import { ScrollReveal } from '../common/ScrollReveal';
@@ -58,6 +59,11 @@ const ACQUISITION_BG_PROPERTIES = [
 ];
 
 export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
+  const { banners } = useSiteBanners();
+  const aboutBanner = banners.nosotros;
+  const posX = aboutBanner.bgPositionX ?? 50;
+  const posY = aboutBanner.bgPositionY ?? 50;
+  const zoom = (aboutBanner.bgZoom ?? 100) / 100;
 
   return (
     <div className="w-full overflow-hidden bg-white text-slate-900">
@@ -71,12 +77,17 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
         {/* Fotografía Institucional Panorámica de Ancho Completo */}
         <div className="absolute inset-0 w-full h-full">
           <Image
-            src={ABOUT_HERO_IMAGE.url}
-            alt={ABOUT_HERO_IMAGE.alt}
+            src={aboutBanner.image || ABOUT_HERO_IMAGE.url}
+            alt={aboutBanner.alt || ABOUT_HERO_IMAGE.alt}
             fill
             priority
             sizes="100vw"
-            className="object-cover object-center transform transition-transform duration-1000 ease-out hover:scale-105"
+            className="object-cover transform transition-transform duration-1000 ease-out hover:scale-105"
+            style={{
+              objectPosition: `${posX}% ${posY}%`,
+              transform: zoom > 1 ? `scale(${zoom})` : undefined,
+              transformOrigin: 'center center',
+            }}
             referrerPolicy="no-referrer"
           />
 
@@ -94,16 +105,21 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
 
             <ScrollReveal direction="down" delay={0.15} duration={0.7}>
               <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.12] tracking-tight mt-4 sm:mt-5 drop-shadow-md">
-                <span className="block">Solidez, transparencia</span>
-                <span className="block mt-1">
-                  y <span className="text-[#5be196]">certeza jurídica</span>.
-                </span>
+                <span className="block">{aboutBanner.titleLine1}</span>
+                {(aboutBanner.titleHighlight1 || aboutBanner.titleHighlight2) && (
+                  <span className="block mt-1">
+                    <span className="text-[#5be196]">{aboutBanner.titleHighlight1}</span>{' '}
+                    {aboutBanner.titleHighlight2 && (
+                      <span className="text-[#F58220]">{aboutBanner.titleHighlight2}</span>
+                    )}
+                  </span>
+                )}
               </h1>
             </ScrollReveal>
 
             <ScrollReveal direction="up" delay={0.25} duration={0.65}>
               <p className="text-sm sm:text-base lg:text-xl text-slate-200 leading-relaxed font-normal max-w-2xl mt-4 sm:mt-6 drop-shadow-xs">
-                Somos una entidad inmobiliaria ecuatoriana constituida para transformar terrenos de alta vocación residencial en comunidades planificadas con obras concluidas, saneamiento legal definitivo y crédito directo.
+                {aboutBanner.description}
               </p>
             </ScrollReveal>
           </div>

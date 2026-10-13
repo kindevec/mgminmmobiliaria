@@ -22,6 +22,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { useProperties } from '@/src/context/PropertyContext';
+import { useSiteBanners } from '@/src/lib/bannerStorage';
 import type { LotProperty } from '@/src/data/lots';
 import { PropertyCard } from '../PropertyCard';
 import { ScrollReveal } from '../common/ScrollReveal';
@@ -263,6 +264,11 @@ export function PropertiesView({
   const getTypeCount = (type: string) => properties.filter((p) => p.type === type).length;
   const getStatusCount = (status: string) => properties.filter((p) => p.status === status).length;
   const getCategoryCount = (category: string) => properties.filter((p) => p.category === category).length;
+  const { banners } = useSiteBanners();
+  const lotesBanner = banners.lotes;
+  const posX = lotesBanner.bgPositionX ?? 50;
+  const posY = lotesBanner.bgPositionY ?? 50;
+  const zoom = (lotesBanner.bgZoom ?? 100) / 100;
 
   return (
     <div className="w-full bg-white text-slate-900">
@@ -273,12 +279,17 @@ export function PropertiesView({
         {/* Fotografía Panorámica Protagonista de Ancho Completo */}
         <div className="absolute inset-0 w-full h-full">
           <Image
-            src={PROPERTIES_HERO_IMAGE.url}
-            alt={PROPERTIES_HERO_IMAGE.alt}
+            src={lotesBanner.image || PROPERTIES_HERO_IMAGE.url}
+            alt={lotesBanner.alt || PROPERTIES_HERO_IMAGE.alt}
             fill
             priority
             sizes="100vw"
-            className="object-cover object-center transform transition-transform duration-1000 ease-out hover:scale-105"
+            className="object-cover transform transition-transform duration-1000 ease-out hover:scale-105"
+            style={{
+              objectPosition: `${posX}% ${posY}%`,
+              transform: zoom > 1 ? `scale(${zoom})` : undefined,
+              transformOrigin: 'center center',
+            }}
             referrerPolicy="no-referrer"
           />
 
@@ -296,17 +307,19 @@ export function PropertiesView({
 
             <ScrollReveal direction="down" delay={0.15} duration={0.7}>
               <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.12] tracking-tight mt-4 sm:mt-5 drop-shadow-md">
-                <span className="block">Lotes urbanizados y proyectos</span>
-                <span className="block mt-1">
-                  con <span className="text-[#5be196]">escrituras inmediatas</span>{' '}
-                  <span className="text-[#F58220]">&amp; crédito directo</span>.
-                </span>
+                <span className="block">{lotesBanner.titleLine1}</span>
+                {(lotesBanner.titleHighlight1 || lotesBanner.titleHighlight2) && (
+                  <span className="block mt-1">
+                    <span className="text-[#5be196]">{lotesBanner.titleHighlight1}</span>{' '}
+                    <span className="text-[#F58220]">{lotesBanner.titleHighlight2}</span>
+                  </span>
+                )}
               </h1>
             </ScrollReveal>
 
             <ScrollReveal direction="up" delay={0.25} duration={0.65}>
               <p className="text-sm sm:text-base lg:text-xl text-slate-200 leading-relaxed font-normal max-w-2xl mt-4 sm:mt-6 drop-shadow-xs">
-                Propiedades legalizadas con vías concluidas, alcantarillado, acometidas soterradas y crédito directo de hasta 48 meses. Elige tu terreno con planos topográficos y asesoría técnica directa.
+                {lotesBanner.description}
               </p>
             </ScrollReveal>
           </div>

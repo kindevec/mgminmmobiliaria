@@ -50,6 +50,7 @@ import { useAdminData } from '@/src/context/AdminDataContext';
 import { AdminPropertyModal } from './AdminPropertyModal';
 import { AdminPropertiesList } from './AdminPropertiesList';
 import { AdminProfileView } from './AdminProfileView';
+import { AdminBannersView } from './AdminBannersView';
 import { AdminGlobalSearchModal } from './AdminGlobalSearchModal';
 import type { LotProperty } from '@/src/data/lots';
 import { getLotWhatsAppUrl } from '@/src/data/lots';
@@ -62,6 +63,7 @@ import { LogoMGM } from '../LogoMGM';
 export type AdminTab =
   | 'overview'
   | 'inventory'
+  | 'banners'
   | 'clients'
   | 'appointments'
   | 'legalFiles'
@@ -481,6 +483,47 @@ export function AdminDashboard({
               />
               {!isSidebarCollapsed && <span className="truncate"> Nueva Propiedad</span>}
             </button>
+
+            {/* 4. Banners */}
+            <button
+              type="button"
+              onClick={() => {
+                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
+                setEditingProperty(null);
+                setIsCreatingProperty(false);
+                setActiveTab('banners');
+              }}
+              className={`relative w-full flex items-center ${
+                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
+              } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                !editingProperty && !isCreatingProperty && activeTab === 'banners'
+                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
+                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
+              }`}
+              title="Editar Banners de Inicio de Cada Ventana"
+            >
+              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
+                <SlidersHorizontal
+                  className={`h-4 w-4 shrink-0 ${
+                    !editingProperty && !isCreatingProperty && activeTab === 'banners'
+                      ? 'text-emerald-800'
+                      : 'opacity-70'
+                  }`}
+                />
+                {!isSidebarCollapsed && <span className="truncate">Banners</span>}
+              </div>
+              {!isSidebarCollapsed && (
+                <span
+                  className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${
+                    !editingProperty && !isCreatingProperty && activeTab === 'banners'
+                      ? 'bg-emerald-100 text-emerald-900'
+                      : 'bg-emerald-900/60 text-emerald-300'
+                  }`}
+                >
+                  4
+                </span>
+              )}
+            </button>
           </nav>
         </div>
 
@@ -605,10 +648,12 @@ export function AdminDashboard({
                 <div>
                   <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                     {activeTab === 'inventory' && 'Propiedades en Cartera'}
+                    {activeTab === 'banners' && 'Banners y Portadas Web'}
                     {activeTab === 'profile' && 'Perfil & Configuración'}
                   </h1>
                   <p className="text-xs text-slate-400 mt-0.5 font-medium">
                     {activeTab === 'inventory' && `${properties.length} propiedades reales en catálogo activo`}
+                    {activeTab === 'banners' && 'Edición de los 3 banners de Inicio y portada única de Lotes, Nosotros y Contacto'}
                     {activeTab === 'profile' && 'Gestión de cuenta de administrador y parámetros de la inmobiliaria'}
                   </p>
                 </div>
@@ -655,7 +700,10 @@ export function AdminDashboard({
               />
             )}
 
-
+            {/* ======================================================== */}
+            {/* TAB CONTENT: BANNERS DE CADA VENTANA */}
+            {/* ======================================================== */}
+            {activeTab === 'banners' && <AdminBannersView />}
 
             {/* ======================================================== */}
             {/* TAB CONTENT: PERFIL & CONFIGURACIÓN UNIFICADO */}
@@ -678,7 +726,7 @@ export function AdminDashboard({
         style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0.75rem))' }}
         aria-label="Navegación móvil del panel de administración"
       >
-        <div className="max-w-md mx-auto grid grid-cols-3 items-center gap-2">
+        <div className="max-w-md mx-auto grid grid-cols-4 items-center gap-1.5">
           {/* 1. Propiedades */}
           <button
             type="button"
@@ -722,7 +770,32 @@ export function AdminDashboard({
             <span className="text-[11px] tracking-tight leading-none">Nueva</span>
           </button>
 
-          {/* 3. Perfil */}
+          {/* 3. Banners */}
+          <button
+            type="button"
+            onClick={() => {
+              setEditingProperty(null);
+              setIsCreatingProperty(false);
+              setActiveTab('banners');
+            }}
+            className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all cursor-pointer min-h-[50px] ${
+              !editingProperty && !isCreatingProperty && activeTab === 'banners'
+                ? 'text-white bg-white/15 font-black shadow-xs'
+                : 'text-emerald-200/70 hover:text-white hover:bg-white/5 font-semibold'
+            }`}
+            title="Editar Banners de Inicio"
+          >
+            <SlidersHorizontal
+              className={`h-5 w-5 mb-1 ${
+                !editingProperty && !isCreatingProperty && activeTab === 'banners'
+                  ? 'text-emerald-300'
+                  : 'text-emerald-400/80'
+              }`}
+            />
+            <span className="text-[11px] tracking-tight leading-none">Banners</span>
+          </button>
+
+          {/* 4. Perfil */}
           <button
             type="button"
             onClick={() => {

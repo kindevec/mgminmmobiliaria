@@ -20,6 +20,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { WHATSAPP_PHONE, getGeneralWhatsAppUrl } from '@/src/data/lots';
+import { useSiteBanners } from '@/src/lib/bannerStorage';
 import { WhatsAppIcon, FacebookIcon, InstagramIcon, TikTokIcon } from '../SocialIcons';
 import { ScrollReveal } from '../common/ScrollReveal';
 import { AnimatedInsignia } from '../common/AnimatedInsignia';
@@ -43,6 +44,8 @@ const sanitizeInput = (text: string) => {
 };
 
 export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewProps) {
+  const { banners } = useSiteBanners();
+  const contactBanner = banners.contacto;
 
   const [formData, setFormData] = useState({
     nombre: '',
@@ -112,12 +115,17 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
         {/* Fotografía de Contacto Panorámica de Ancho Completo */}
         <div className="absolute inset-0 w-full h-full">
           <Image
-            src={CONTACT_HERO_IMAGE.url}
-            alt={CONTACT_HERO_IMAGE.alt}
+            src={contactBanner.image || CONTACT_HERO_IMAGE.url}
+            alt={contactBanner.alt || CONTACT_HERO_IMAGE.alt}
             fill
             priority
             sizes="100vw"
-            className="object-cover object-center transform transition-transform duration-1000 ease-out hover:scale-105"
+            className="object-cover transform transition-transform duration-1000 ease-out hover:scale-105"
+            style={{
+              objectPosition: `${contactBanner.bgPositionX ?? 50}% ${contactBanner.bgPositionY ?? 50}%`,
+              transform: (contactBanner.bgZoom ?? 100) > 100 ? `scale(${(contactBanner.bgZoom ?? 100) / 100})` : undefined,
+              transformOrigin: 'center center',
+            }}
             referrerPolicy="no-referrer"
           />
 
@@ -135,17 +143,17 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
 
             <ScrollReveal direction="down" delay={0.15} duration={0.7}>
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.1] tracking-tight mt-4 sm:mt-5 drop-shadow-md">
-                Ponte en{' '}
+                {contactBanner.titleLine1}{' '}
                 <span className="text-[#F58220] inline-block">
-                  Contacto
+                  {contactBanner.titleHighlight1}
                 </span>{' '}
-                con MGM
+                {contactBanner.titleHighlight2}
               </h1>
             </ScrollReveal>
 
             <ScrollReveal direction="up" delay={0.25} duration={0.65}>
               <p className="text-sm sm:text-base lg:text-xl text-slate-200 leading-relaxed font-normal max-w-2xl mt-4 sm:mt-6 drop-shadow-xs">
-                Estamos listos para atenderte. Comunícate con nuestro equipo técnico, legal y comercial para cotizaciones de lotes, planes de financiamiento y asesoría notarial personalizada.
+                {contactBanner.description}
               </p>
             </ScrollReveal>
 
