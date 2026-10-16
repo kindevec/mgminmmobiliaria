@@ -35,6 +35,7 @@ import {
 import { useProperties } from '@/src/context/PropertyContext';
 import { useSiteBanners } from '@/src/lib/bannerStorage';
 import { useSiteSettings } from '@/src/lib/siteSettings';
+import { useStoredReviews } from '@/src/lib/reviewStorage';
 import { PropertyCard } from '../PropertyCard';
 import { WhatsAppIcon } from '../SocialIcons';
 import { ScrollReveal } from '../common/ScrollReveal';
@@ -298,8 +299,8 @@ export function HomeView({
     return unique.size || 6;
   }, [activeProperties]);
 
-  // Estados de Testimonios
-  const [testimonials, setTestimonials] = useState(TESTIMONIALS_DATA);
+  // Reseñas persistentes con respaldo en la nube y almacenamiento local
+  const { reviews: storedReviews, addReview } = useStoredReviews();
   const [activeTestimonialIdx, setActiveTestimonialIdx] = useState(0);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [newReview, setNewReview] = useState({
@@ -310,6 +311,9 @@ export function HomeView({
     stars: 5,
   });
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
+
+  // Lista activa de testimonios con fallback a los predeterminados
+  const testimonials = storedReviews && storedReviews.length > 0 ? storedReviews : TESTIMONIALS_DATA;
 
   // Soporte de navegación y filtrado conectado
   const handleCatalogExplore = (typeFilter?: string) => {
@@ -377,20 +381,17 @@ export function HomeView({
     setActiveTestimonialIdx((prev) => (prev - 1 < 0 ? testimonials.length - 1 : prev - 1));
   };
 
-  const handleAddReview = (e: React.FormEvent) => {
+  const handleAddReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newReview.name.trim() || !newReview.text.trim()) return;
 
-    setTestimonials((prev) => [
-      {
-        name: newReview.name.trim(),
-        role: newReview.role.trim() || 'Propietario Lote · Ciudadela Miravalle',
-        text: newReview.text.trim(),
-        stars: newReview.stars,
-        location: newReview.location.trim() || 'Cuenca, Ecuador',
-      },
-      ...prev,
-    ]);
+    await addReview({
+      name: newReview.name.trim(),
+      role: newReview.role.trim() || 'Propietario Lote · Ciudadela Miravalle',
+      text: newReview.text.trim(),
+      stars: newReview.stars,
+      location: newReview.location.trim() || 'Cuenca, Ecuador',
+    });
 
     setReviewSubmitted(true);
     setTimeout(() => {
