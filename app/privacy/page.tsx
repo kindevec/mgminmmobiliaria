@@ -30,7 +30,6 @@ export default function PrivacyPage() {
         <Footer 
           currentPage="privacy" 
           onNavigate={handleNavigate} 
-          onOpenVisitModal={() => handleNavigate('contact')} 
         />
       </div>
     </PropertyProvider>

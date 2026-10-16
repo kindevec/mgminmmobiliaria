@@ -35,10 +35,8 @@ const PROPERTIES_HERO_IMAGE = {
 
 interface PropertiesViewProps {
   onSelectLot: (lot: LotProperty) => void;
-  onOpenVisitModal: (lotCode: string) => void;
   initialType?: string;
   initialLocation?: string;
-  initialMaxPrice?: number;
 }
 
 interface MobileCarouselSectionProps {
@@ -48,7 +46,6 @@ interface MobileCarouselSectionProps {
   badgeText: string;
   lots: LotProperty[];
   onSelectLot: (lot: LotProperty) => void;
-  onOpenVisitModal: (lotCode: string) => void;
 }
 
 function MobileCarouselSection({
@@ -58,7 +55,6 @@ function MobileCarouselSection({
   badgeText,
   lots,
   onSelectLot,
-  onOpenVisitModal,
 }: MobileCarouselSectionProps) {
   if (lots.length === 0) return null;
 
@@ -84,7 +80,6 @@ function MobileCarouselSection({
               lot={lot}
               dark={false}
               onSelectLot={onSelectLot}
-              onOpenVisitModal={onOpenVisitModal}
             />
           </div>
         ))}
@@ -95,12 +90,16 @@ function MobileCarouselSection({
 
 export function PropertiesView({
   onSelectLot,
-  onOpenVisitModal,
   initialType,
   initialLocation,
-  initialMaxPrice,
 }: PropertiesViewProps) {
-  const { properties } = useProperties();
+  const { properties: rawProperties } = useProperties();
+
+  // Excluir propiedades en estado 'Inactiva' / Borrador de la web pública
+  const properties = React.useMemo(
+    () => rawProperties.filter((p) => p.status !== 'Inactiva'),
+    [rawProperties]
+  );
 
   const [searchQuery, setSearchQuery] = useState(
     initialLocation && initialLocation !== 'Todas' ? initialLocation : ''
@@ -621,7 +620,6 @@ export function PropertiesView({
                           lot={lot}
                           dark={false}
                           onSelectLot={onSelectLot}
-                          onOpenVisitModal={onOpenVisitModal}
                         />
                       </div>
                     ))}
@@ -650,7 +648,6 @@ export function PropertiesView({
                   badgeText={`${villasLots.length} viviendas`}
                   lots={villasLots}
                   onSelectLot={onSelectLot}
-                  onOpenVisitModal={onOpenVisitModal}
                 />
 
                 <MobileCarouselSection
@@ -660,7 +657,6 @@ export function PropertiesView({
                   badgeText={`${residentialLots.length} lotes`}
                   lots={residentialLots}
                   onSelectLot={onSelectLot}
-                  onOpenVisitModal={onOpenVisitModal}
                 />
 
                 <MobileCarouselSection
@@ -670,7 +666,6 @@ export function PropertiesView({
                   badgeText={`${cornerLots.length} opciones`}
                   lots={cornerLots}
                   onSelectLot={onSelectLot}
-                  onOpenVisitModal={onOpenVisitModal}
                 />
 
                 <MobileCarouselSection
@@ -680,7 +675,6 @@ export function PropertiesView({
                   badgeText={`${directCreditLots.length} lotes`}
                   lots={directCreditLots}
                   onSelectLot={onSelectLot}
-                  onOpenVisitModal={onOpenVisitModal}
                 />
               </div>
             )}
@@ -883,7 +877,6 @@ export function PropertiesView({
                             lot={lot}
                             dark={false}
                             onSelectLot={onSelectLot}
-                            onOpenVisitModal={onOpenVisitModal}
                           />
                         </ScrollReveal>
                       );

@@ -1,33 +1,28 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import { motion } from 'motion/react';
 import {
   ShieldCheck,
   Building2,
   FileCheck2,
-  Scale,
   Award,
   ArrowRight,
   ArrowUpRight,
-  CalendarCheck2,
-  CheckCircle2,
-  MapPin,
   FileText,
-  BadgeCheck,
 } from 'lucide-react';
 import type { PageView } from '../Header';
 import { getGeneralWhatsAppUrl } from '@/src/data/lots';
 import { useSiteBanners } from '@/src/lib/bannerStorage';
+import { useSiteSettings } from '@/src/lib/siteSettings';
 import { WhatsAppIcon } from '../SocialIcons';
-import { WaveCreamToDark, TopographicContours } from '../WaveDividers';
+import { TopographicContours } from '../WaveDividers';
 import { ScrollReveal } from '../common/ScrollReveal';
 import { AnimatedInsignia } from '../common/AnimatedInsignia';
 
 interface AboutViewProps {
   onNavigate: (page: PageView) => void;
-  onOpenVisitModal: (defaultInterest?: string) => void;
 }
 
 const ABOUT_HERO_IMAGE = {
@@ -58,8 +53,9 @@ const ACQUISITION_BG_PROPERTIES = [
   },
 ];
 
-export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
+export function AboutView({ onNavigate }: AboutViewProps) {
   const { banners } = useSiteBanners();
+  useSiteSettings();
   const aboutBanner = banners.nosotros;
   const posX = aboutBanner.bgPositionX ?? 50;
   const posY = aboutBanner.bgPositionY ?? 50;
@@ -67,9 +63,6 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
 
   return (
     <div className="w-full overflow-hidden bg-white text-slate-900">
-      {/* =========================================================================
-          1. BANNER CINEMÁTICO — PANORÁMICO INTEGRAL (SIN PARTICIONES VERTICALES)
-          ========================================================================= */}
       {/* =========================================================================
           1. BANNER CINEMÁTICO — FULL BLEED EDGE-TO-EDGE (TEXTO SOBRE IMAGEN, SIN BOXES)
           ========================================================================= */}
@@ -369,12 +362,11 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
       </section>
 
       {/* =========================================================================
-          4. PROCESO DE ADQUISICIÓN — DISEÑO CUADRO VERDE CLARO & PALETA CORPORATIVA MGM
+          4. PROCESO DE ADQUISICIÓN
           ========================================================================= */}
       <section className="relative w-full bg-slate-950 text-white py-16 sm:py-24 overflow-hidden border-b border-slate-800">
-        {/* Fondo nítido de imágenes de propiedades sin difuminado ni degradados verdes */}
+        {/* Fondo nítido de imágenes de propiedades */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
-          {/* Mosaico de propiedades nítido sin difuminado */}
           <div className="absolute inset-0 opacity-85 sm:opacity-90">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 h-full w-full p-3 sm:p-6 scale-105">
               {ACQUISITION_BG_PROPERTIES.map((prop, idx) => (
@@ -394,7 +386,6 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
             </div>
           </div>
 
-          {/* Sombreado sutil neutro para legibilidad de textos sin opacar las fotos */}
           <div className="absolute inset-0 bg-slate-950/45 pointer-events-none" />
         </div>
 
@@ -415,20 +406,22 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
                 </p>
               </div>
 
-              {/* Action Button: Warm Orange (#F58220) */}
+              {/* Action Button: Direct WhatsApp */}
               <div className="pt-2 flex justify-center lg:justify-start w-full">
-                <button
-                  type="button"
-                  onClick={() => onOpenVisitModal('Ruta de Adquisición Segura')}
+                <a
+                  href={getGeneralWhatsAppUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-2.5 px-8 py-3.5 bg-[#F58220] hover:bg-[#ea580c] text-white text-sm font-bold rounded-full shadow-lg shadow-black/30 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                 >
-                  <span>Agendar Asesoría</span>
+                  <WhatsAppIcon size={18} className="text-white shrink-0" />
+                  <span>Solicitar Asesoría</span>
                   <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-                </button>
+                </a>
               </div>
             </ScrollReveal>
 
-            {/* Right Column: Protocolo Notarial Solemne (Línea de Tiempo Editorial Humana, Sin Cajas Artificiales de IA) */}
+            {/* Right Column: Protocolo Notarial Solemne */}
             <ScrollReveal
               direction="right"
               delay={0.15}
@@ -552,7 +545,7 @@ export function AboutView({ onNavigate, onOpenVisitModal }: AboutViewProps) {
                   ¿Deseas examinar la documentación jurídica?
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  Agendamos una reunión con nuestro equipo notarial para que revises planos catastrales, certificados de gravámenes y licencias de urbanismo con total transparencia.
+                  Conversa directamente con nuestro equipo notarial para que revises planos catastrales, certificados de gravámenes y licencias de urbanismo con total transparencia.
                 </p>
               </div>
 

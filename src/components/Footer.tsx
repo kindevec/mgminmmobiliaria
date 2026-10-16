@@ -13,17 +13,18 @@ import {
 import type { PageView } from './Header';
 import { getPageCanonicalHash } from '@/src/data/navigation';
 import { getGeneralWhatsAppUrl } from '@/src/data/lots';
+import { useSiteSettings, formatPhoneForTel } from '@/src/lib/siteSettings';
 
 const kindevIcon = '/kindev_icon.webp';
 
 interface FooterProps {
   currentPage?: PageView;
   onNavigate: (page: PageView) => void;
-  onOpenVisitModal: () => void;
   onOpenLegalModal?: (tab: 'privacy' | 'terms' | 'cookies') => void;
 }
 
 function SocialIconsStrip({ size = 22 }: { size?: number }) {
+  useSiteSettings();
   return (
     <div className="flex items-center gap-3">
       <motion.a
@@ -80,10 +81,11 @@ function SocialIconsStrip({ size = 22 }: { size?: number }) {
 export function Footer({
   currentPage,
   onNavigate,
-  onOpenVisitModal,
-  onOpenLegalModal,
 }: FooterProps) {
   const currentYear = new Date().getFullYear();
+  const { settings } = useSiteSettings();
+  const telHref = `tel:${formatPhoneForTel(settings.supportPhone)}`;
+  const mapsUrl = `https://www.google.com/maps?q=${settings.hqLat},${settings.hqLng}`;
 
   const handleNavClick = (page: PageView) => {
     onNavigate(page);
@@ -174,7 +176,7 @@ export function Footer({
                 <LogoMGM className="h-7 sm:h-9 w-auto" variant="full" showSubtitle={true} isGhost={true} />
               </motion.a>
 
-              {/* Redes Sociales en Móvil (Ubicadas a la derecha del Logo para eliminar el vacío y ganar espacio vertical) */}
+              {/* Redes Sociales en Móvil */}
               <div className="lg:hidden">
                 <SocialIconsStrip size={20} />
               </div>
@@ -182,7 +184,7 @@ export function Footer({
 
             {/* Misión inmobiliaria */}
             <p className="text-[11px] sm:text-[12px] text-slate-300 font-normal leading-relaxed max-w-md">
-              Sociedad Civil MGM Inmobiliaria. Desarrolladores de comunidades urbanizadas planificadas en Azuay, Ecuador. Solidez jurídica notarial y crédito directo sin intermediarios.
+              {settings.companyName}. Desarrolladores de comunidades urbanizadas planificadas en Ecuador. Solidez jurídica notarial y crédito directo sin intermediarios.
             </p>
 
             {/* Redes Sociales en Escritorio */}
@@ -192,7 +194,7 @@ export function Footer({
           </div>
 
           {/* ----------------------------------------------------
-              COLUMNA 2: Contacto Directo 2 Columnas (Sin espacios vacíos)
+              COLUMNA 2: Contacto Directo 2 Columnas (Reflejado desde Admin)
              ---------------------------------------------------- */}
           <div className="lg:col-span-6 flex flex-col gap-1.5 sm:gap-2 text-left">
             <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#5be196] flex items-center gap-1.5">
@@ -203,46 +205,46 @@ export function Footer({
             <div className="grid grid-cols-2 gap-x-2.5 sm:gap-x-4 gap-y-1.5 sm:gap-y-2 text-xs">
               {/* Teléfono & WhatsApp */}
               <a
-                href="tel:+593992849965"
+                href={telHref}
                 className="py-0.5 sm:py-1 flex items-center gap-2 sm:gap-2.5 transition-all group cursor-pointer min-w-0"
               >
                 <Phone size={16} strokeWidth={2.2} className="text-[#25D366] shrink-0 sm:w-[18px] sm:h-[18px] group-hover:scale-110 transition-transform" />
                 <div className="min-w-0">
                   <span className="block text-[8.5px] sm:text-[9px] uppercase font-bold text-slate-300 tracking-wider truncate">Llamadas / WA</span>
                   <span className="block text-[10.5px] sm:text-xs font-semibold text-white group-hover:text-[#5be196] truncate">
-                    +593 99 284 9965
+                    {settings.supportPhone}
                   </span>
                 </div>
               </a>
 
               {/* Correo Electrónico */}
               <a
-                href="mailto:noemaliza01@gmail.com"
+                href={`mailto:${settings.supportEmail}`}
                 className="py-0.5 sm:py-1 flex items-center gap-2 sm:gap-2.5 transition-all group cursor-pointer min-w-0"
-                title="noemaliza01@gmail.com"
+                title={settings.supportEmail}
               >
                 <Mail size={16} strokeWidth={2.2} className="text-[#F58220] shrink-0 sm:w-[18px] sm:h-[18px] group-hover:scale-110 transition-transform" />
                 <div className="min-w-0">
-                  <span className="block text-[8.5px] sm:text-[9px] uppercase font-bold text-slate-300 tracking-wider truncate">Correo Notarial</span>
+                  <span className="block text-[8.5px] sm:text-[9px] uppercase font-bold text-slate-300 tracking-wider truncate">Correo Oficial</span>
                   <span className="block text-[10.5px] sm:text-xs font-semibold text-white group-hover:text-[#F58220] truncate">
-                    noemaliza01@gmail.com
+                    {settings.supportEmail}
                   </span>
                 </div>
               </a>
 
               {/* Ubicación en Terreno */}
               <a
-                href="https://maps.google.com/?q=Ciudadela+Miravalle+Ecuador"
+                href={mapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="py-0.5 sm:py-1 flex items-center gap-2 sm:gap-2.5 transition-all group cursor-pointer min-w-0"
-                title="Ciudadela Miravalle · Azuay"
+                title={settings.hqAddress}
               >
                 <MapPin size={16} strokeWidth={2.2} className="text-[#5be196] shrink-0 sm:w-[18px] sm:h-[18px] group-hover:scale-110 transition-transform" />
                 <div className="min-w-0">
                   <span className="block text-[8.5px] sm:text-[9px] uppercase font-bold text-slate-300 tracking-wider truncate">Ubicación</span>
                   <span className="block text-[10.5px] sm:text-xs font-semibold text-white group-hover:text-[#5be196] truncate">
-                    Ciudadela Miravalle
+                    {settings.hqTitle}
                   </span>
                 </div>
               </a>
@@ -253,7 +255,7 @@ export function Footer({
                 <div className="min-w-0">
                   <span className="block text-[8.5px] sm:text-[9px] uppercase font-bold text-slate-300 tracking-wider truncate">Horario</span>
                   <span className="block text-[10.5px] sm:text-xs font-semibold text-white truncate">
-                    Lun-Sáb: 8:30-18:00
+                    {settings.businessHours}
                   </span>
                 </div>
               </div>
@@ -269,7 +271,7 @@ export function Footer({
           {/* Izquierda: Copyright y Enlaces Legales */}
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-2.5 gap-y-0.5 text-center sm:text-left">
             <p>
-              © {currentYear} Sociedad Civil MGM Inmobiliaria.
+              © {currentYear} {settings.companyName}.
             </p>
             <div className="flex items-center gap-1.5">
               <span className="text-slate-500">•</span>

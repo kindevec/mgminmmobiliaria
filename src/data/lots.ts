@@ -393,44 +393,38 @@ export const VISITOR_GUIDE = [
   },
 ];
 
+import { getLocalSiteSettings, formatPhoneForWhatsApp } from '@/src/lib/siteSettings';
+
 export const WHATSAPP_PHONE = '593992849965';
 
+export function getActiveWhatsAppPhone(): string {
+  return formatPhoneForWhatsApp(getLocalSiteSettings().supportPhone);
+}
+
 export function getGeneralWhatsAppUrl() {
+  const settings = getLocalSiteSettings();
+  const phone = formatPhoneForWhatsApp(settings.supportPhone);
   const text = encodeURIComponent(
-    'Hola MGM Inmobiliaria, deseo más información sobre sus proyectos de lotes y viviendas.'
+    `Hola ${settings.companyName}, deseo más información sobre sus proyectos de lotes y viviendas.`
   );
-  return `https://wa.me/${WHATSAPP_PHONE}?text=${text}`;
+  return `https://wa.me/${phone}?text=${text}`;
 }
 
 export function getLotWhatsAppUrl(lotName: string, lotCode: string, priceUSD?: number) {
+  const settings = getLocalSiteSettings();
+  const phone = formatPhoneForWhatsApp(settings.supportPhone);
   const priceText = priceUSD ? ` valorado en $${priceUSD.toLocaleString()} USD` : '';
   const text = encodeURIComponent(
-    `Hola MGM Inmobiliaria, deseo información del lote ${lotCode} (${lotName})${priceText} y agendar una visita.`
+    `Hola ${settings.companyName}, estoy interesado en la propiedad con código ${lotCode} (${lotName})${priceText}. Deseo recibir más información.`
   );
-  return `https://wa.me/${WHATSAPP_PHONE}?text=${text}`;
+  return `https://wa.me/${phone}?text=${text}`;
 }
 
 export function getMiravalleWhatsAppUrl() {
+  const settings = getLocalSiteSettings();
+  const phone = formatPhoneForWhatsApp(settings.supportPhone);
   const text = encodeURIComponent(
-    'Hola MGM Inmobiliaria, deseo agendar un recorrido guiado a Ciudadela Miravalle en transporte de la empresa.'
+    `Hola ${settings.companyName}, deseo consultar información sobre Ciudadela Miravalle.`
   );
-  return `https://wa.me/${WHATSAPP_PHONE}?text=${text}`;
-}
-
-export function getCustomQuoteWhatsAppUrl(
-  lotCode: string,
-  price: number,
-  downPayment: number,
-  months: number,
-  monthlyQuota: number
-) {
-  const text = encodeURIComponent(
-    `Hola MGM Inmobiliaria, he simulado la cotización para el lote/propiedad ${lotCode}:\n` +
-      `• Valor total: $${price.toLocaleString()} USD\n` +
-      `• Entrada inicial: $${downPayment.toLocaleString()} USD\n` +
-      `• Plazo: ${months} meses\n` +
-      `• Cuota mensual proyectada: $${monthlyQuota.toLocaleString()} USD\n\n` +
-      `Deseo coordinar la reserva y revisión de documentación.`
-  );
-  return `https://wa.me/${WHATSAPP_PHONE}?text=${text}`;
+  return `https://wa.me/${phone}?text=${text}`;
 }

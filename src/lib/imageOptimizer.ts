@@ -181,7 +181,8 @@ export async function validateFileMagicBytes(
  */
 export async function uploadOptimizedImage(
   file: File,
-  propertyCode: string = 'general'
+  propertyCode: string = 'general',
+  options?: OptimizationOptions
 ): Promise<string> {
   if (!file) {
     throw new Error('No se proporcionó ningún archivo para subir.');
@@ -200,7 +201,7 @@ export async function uploadOptimizedImage(
     throw new Error(validation.error || 'Formato de imagen inválido o manipulado.');
   }
 
-  const optimizedWebpFile = await convertImageToWebP(file);
+  const optimizedWebpFile = await convertImageToWebP(file, options);
   const cleanCode = propertyCode.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '-');
   const timestamp = Date.now();
   const randomSuffix = Math.random().toString(36).substring(2, 7);

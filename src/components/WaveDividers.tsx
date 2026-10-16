@@ -2,67 +2,9 @@ import React from 'react';
 
 /**
  * Kindev Architectural Section Transitions
- * Subtle, luxury curves and topological linework that maintain visual continuity
- * without jarring or disruptive color cuts.
+ * Subtle topological linework that maintains visual continuity.
  */
 
-interface WaveProps {
-  className?: string;
-  fillColor?: string;
-  flip?: boolean;
-}
-
-// 1. Subtle Architectural Flow (Dark into Light)
-export function WaveDarkToCream({ className = '', fillColor = '#FAF7F2' }: WaveProps) {
-  return (
-    <div className={`w-full overflow-hidden leading-none pointer-events-none -mb-0.5 ${className}`}>
-      <svg
-        viewBox="0 0 1440 60"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        preserveAspectRatio="none"
-        className="w-full h-8 sm:h-12 md:h-14 block"
-      >
-        <path
-          d="M0,24 C360,52 1080,-8 1440,24 L1440,60 L0,60 Z"
-          fill={fillColor}
-        />
-      </svg>
-    </div>
-  );
-}
-
-// 2. Subtle Architectural Flow (Light into Dark)
-export function WaveCreamToDark({ className = '', fillColor = '#080D18' }: WaveProps) {
-  return (
-    <div className={`w-full overflow-hidden leading-none pointer-events-none -mb-0.5 ${className}`}>
-      <svg
-        viewBox="0 0 1440 60"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        preserveAspectRatio="none"
-        className="w-full h-8 sm:h-12 md:h-14 block"
-      >
-        <path
-          d="M0,36 C420,4 1020,56 1440,36 L1440,60 L0,60 Z"
-          fill={fillColor}
-        />
-      </svg>
-    </div>
-  );
-}
-
-// 3. Subtle Architectural Flow with Soft Gradient
-export function WaveDarkToCreamSkyline({ className = '', fillColor = '#FAF7F2' }: WaveProps) {
-  return <WaveDarkToCream className={className} fillColor={fillColor} />;
-}
-
-// 4. Subtle Architectural Flow with Soft Gradient
-export function WaveCreamToDarkSkyline({ className = '', fillColor = '#070B14' }: WaveProps) {
-  return <WaveCreamToDark className={className} fillColor={fillColor} />;
-}
-
-// 5. Topographic Blueprint Contour Grid
 export function TopographicContours({ className = '' }: { className?: string }) {
   return (
     <svg

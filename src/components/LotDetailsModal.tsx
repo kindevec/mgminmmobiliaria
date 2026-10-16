@@ -1,47 +1,38 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import Image from 'next/image';
 import {
   X,
-  Compass,
   CheckCircle2,
-  CalendarCheck2,
-  ShieldCheck,
   MapPin,
-  TrendingUp,
   FileText,
   ImageIcon,
-  BadgeCheck,
-  BedDouble,
-  Bath,
-  Maximize2,
-  Ruler,
   ChevronLeft,
   ChevronRight,
-  ArrowRight,
   FileDown,
-  Download,
-  ExternalLink,
 } from 'lucide-react';
 import type { LotProperty } from '@/src/data/lots';
 import { getLotWhatsAppUrl } from '@/src/data/lots';
+import { useSiteSettings } from '@/src/lib/siteSettings';
 import { WhatsAppIcon } from './SocialIcons';
-import { PropertyLocationMap } from './common/PropertyLocationMap';
+
+const PropertyLocationMap = lazy(() =>
+  import('./common/PropertyLocationMap').then((m) => ({ default: m.PropertyLocationMap }))
+);
 
 interface LotDetailsModalProps {
   lot: LotProperty | null;
   isOpen: boolean;
   onClose: () => void;
-  onOpenVisitModal: (lotCode: string) => void;
 }
 
 export function LotDetailsModal({
   lot,
   isOpen,
   onClose,
-  onOpenVisitModal,
 }: LotDetailsModalProps) {
+  useSiteSettings();
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
 
   if (!isOpen || !lot) return null;
@@ -283,16 +274,18 @@ export function LotDetailsModal({
 
           {/* Ubicación en Google Maps / Satelital */}
           <div className="pt-2">
-            <PropertyLocationMap
-              lat={lot.lat}
-              lng={lot.lng}
-              coordinates={lot.coordinates}
-              propertyName={lot.name}
-              project={lot.project}
-              zone={lot.zone}
-              address={lot.address}
-              heightClass="h-[240px] sm:h-[280px]"
-            />
+            <Suspense fallback={<div className="w-full h-[240px] sm:h-[280px] rounded-2xl bg-slate-100 animate-pulse" />}>
+              <PropertyLocationMap
+                lat={lot.lat}
+                lng={lot.lng}
+                coordinates={lot.coordinates}
+                propertyName={lot.name}
+                project={lot.project}
+                zone={lot.zone}
+                address={lot.address}
+                heightClass="h-[240px] sm:h-[280px]"
+              />
+            </Suspense>
           </div>
 
           {/* Pricing & Financing Options */}
@@ -324,25 +317,14 @@ export function LotDetailsModal({
 
         {/* Modal Bottom Actions with Official WhatsApp Icon */}
         <div className="p-3 sm:p-5 bg-white border-t border-slate-200 flex flex-col sm:flex-row gap-2.5 sm:gap-3 shrink-0">
-          <button
-            onClick={() => {
-              onClose();
-              onOpenVisitModal(`${lot.code} - ${lot.name}`);
-            }}
-            className="flex-1 inline-flex items-center justify-center gap-2 py-3 px-3 rounded-xl border border-slate-300 bg-white text-slate-800 font-bold text-xs sm:text-sm hover:bg-slate-50 active:scale-95 transition-all cursor-pointer text-center"
-          >
-            <CalendarCheck2 className="h-4 w-4 text-emerald-700 shrink-0" />
-            <span>Agendar Recorrido en Terreno</span>
-          </button>
-
           <a
-            href={getLotWhatsAppUrl(lot.code, lot.name, lot.priceUSD)}
+            href={getLotWhatsAppUrl(lot.name, lot.code, lot.priceUSD)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 inline-flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-[#25D366] text-slate-950 font-black text-xs sm:text-sm hover:bg-[#20bd5a] shadow-md active:scale-95 transition-all cursor-pointer text-center"
+            className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#25D366] text-slate-950 font-black text-xs sm:text-sm hover:bg-[#20bd5a] shadow-md active:scale-95 transition-all cursor-pointer text-center"
           >
             <WhatsAppIcon size={18} className="text-slate-950 shrink-0" />
-            <span>Cotizar</span>
+            <span>Cotizar por WhatsApp ({lot.code})</span>
           </a>
         </div>
       </div>

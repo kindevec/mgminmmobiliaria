@@ -19,6 +19,7 @@ import {
   FileText,
   Copy,
   Check,
+  Star,
 } from 'lucide-react';
 import type { LotProperty } from '@/src/data/lots';
 import { useProperties } from '@/src/context/PropertyContext';
@@ -344,6 +345,24 @@ export function AdminPropertiesList({
                       {/* Acciones */}
                       <td className="py-3.5 px-4 text-right">
                         <div className="inline-flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              propertyContext.updateProperty(p.id, { featured: !p.featured })
+                            }
+                            className={`p-1.5 rounded-xl border transition-all cursor-pointer ${
+                              p.featured
+                                ? 'border-amber-300 bg-amber-50 text-amber-500 hover:bg-amber-100'
+                                : 'border-slate-200 text-slate-300 hover:text-amber-500 hover:bg-amber-50/50 hover:border-amber-200'
+                            }`}
+                            title={
+                              p.featured
+                                ? 'Propiedad destacada en Inicio (clic para quitar)'
+                                : 'Destacar propiedad en Inicio'
+                            }
+                          >
+                            <Star className={`h-3.5 w-3.5 ${p.featured ? 'fill-current' : ''}`} />
+                          </button>
                           <button
                             type="button"
                             onClick={() => onOpenEdit(p)}

@@ -714,7 +714,7 @@ export function AdminBannersView() {
                 ) : (
                   <Upload className="w-4 h-4 text-white" />
                 )}
-                <span>{isUploadingBg ? 'Subiendo WebP...' : 'Subir Imagen'}</span>
+                <span>{isUploadingBg ? 'Subiendo imagen...' : 'Subir Imagen'}</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -755,7 +755,7 @@ export function AdminBannersView() {
                 </div>
                 <input
                   type="text"
-                  placeholder="https://... o /inicio-banner.webp"
+                  placeholder="https://... o /inicio-banner.jpg"
                   value={bgUrlInput}
                   onChange={(e) => setBgUrlInput(e.target.value)}
                   className="w-full text-xs px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono outline-none focus:ring-2 focus:ring-emerald-600 text-slate-800"

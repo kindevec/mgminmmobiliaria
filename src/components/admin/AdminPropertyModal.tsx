@@ -1,17 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
 import {
   X,
   Upload,
   CheckCircle2,
-  DollarSign,
-  Maximize2,
   MapPin,
   Sparkles,
-  Layers,
   Save,
   ImageIcon,
   FileText,
@@ -20,7 +16,6 @@ import {
   Plus,
   Loader2,
   ExternalLink,
-  Info,
   ArrowLeft,
   Eye,
   EyeOff,
@@ -28,18 +23,19 @@ import {
   Moon,
   ChevronRight,
   ChevronLeft,
-  Search,
 } from 'lucide-react';
 import { getCoordinatesForProperty, type LotProperty } from '@/src/data/lots';
 import { PropertyCard } from '../PropertyCard';
 import { LotDetailsModal } from '../LotDetailsModal';
-import { InteractiveMapPicker } from '../common/InteractiveMapPicker';
 import { useProperties } from '@/src/context/PropertyContext';
 import {
-  convertImageToWebP,
   uploadOptimizedImage,
   uploadPropertyDocument,
 } from '@/src/lib/imageOptimizer';
+
+const InteractiveMapPicker = lazy(() =>
+  import('../common/InteractiveMapPicker').then((mod) => ({ default: mod.InteractiveMapPicker }))
+);
 
 interface AdminPropertyModalProps {
   isOpen?: boolean;
@@ -255,20 +251,20 @@ export function AdminPropertyModal({
     }
   };
 
-  // Image upload handler with automatic WebP conversion
+  // Image upload handler with automatic background optimization
   const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
     setIsUploadingImage(true);
-    setUploadMessage('Optimizando a formato WebP y subiendo...');
+    setUploadMessage('Subiendo imágenes...');
 
     try {
       const uploadedUrls: string[] = [];
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        setUploadMessage(`Comprimiendo a WebP foto ${i + 1} de ${files.length}...`);
+        setUploadMessage(`Subiendo foto ${i + 1} de ${files.length}...`);
         const url = await uploadOptimizedImage(file, code || 'prop');
         uploadedUrls.push(url);
       }
@@ -281,10 +277,10 @@ export function AdminPropertyModal({
           setImage(uploadedUrls[0]);
         }
       }
-      setUploadMessage('¡Imágenes WebP subidas con éxito!');
+      setUploadMessage('¡Imágenes subidas con éxito!');
     } catch (err) {
       console.error('Error al subir imágenes:', err);
-      const msg = err instanceof Error ? err.message : 'Hubo un error al optimizar o subir la imagen.';
+      const msg = err instanceof Error ? err.message : 'Hubo un error al subir la imagen.';
       alert(msg);
     } finally {
       setIsUploadingImage(false);
@@ -496,7 +492,7 @@ export function AdminPropertyModal({
                 : 'Publicar Nuevo Inmueble Real'}
             </h1>
             <p className="text-xs text-slate-400 mt-0.5 font-medium">
-              Sincronización en tiempo real y optimización automática WebP.
+              Sincronización en tiempo real con el catálogo público.
             </p>
           </div>
 
@@ -560,7 +556,7 @@ export function AdminPropertyModal({
             {isEditing ? `Editar Propiedad ${propertyToEdit?.code}` : 'Publicar Nuevo Inmueble Real'}
           </h2>
           <p className="text-xs text-slate-300 mt-0.5">
-            Sincronización en tiempo real y optimización automática WebP.
+            Sincronización en tiempo real con el catálogo público.
           </p>
         </div>
       )}
@@ -975,15 +971,12 @@ export function AdminPropertyModal({
             )}
           </div>
 
-          {/* Group 3: Fotografías y Galería con Auto-WebP */}
+          {/* Group 3: Fotografías y Galería */}
           <div className="space-y-3">
             <div className="flex items-center justify-between border-b border-slate-100 pb-1">
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                3. Fotografías y Galería (Conversión WebP Automática)
+                3. Fotografías y Galería
               </h3>
-              <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md font-bold">
-                Auto-WebP 82% Ultra-Ahorro
-              </span>
             </div>
 
             <div className="p-4 rounded-2xl border-2 border-dashed border-emerald-300 bg-emerald-50/30 flex flex-col items-center justify-center text-center gap-2">
@@ -995,7 +988,7 @@ export function AdminPropertyModal({
                   Subir fotos desde dispositivo (Móvil / PC)
                 </p>
                 <p className="text-[11px] text-slate-500">
-                  Se optimizarán automáticamente a formato WebP de alto rendimiento.
+                  Selecciona una o varias fotografías de la propiedad para la galería.
                 </p>
               </div>
 
@@ -1017,7 +1010,7 @@ export function AdminPropertyModal({
                 {isUploadingImage ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Optimizando a WebP...</span>
+                    <span>Subiendo imágenes...</span>
                   </>
                 ) : (
                   <>
@@ -1105,7 +1098,7 @@ export function AdminPropertyModal({
                 type="url"
                 value={image}
                 onChange={(e) => setImage(e.target.value)}
-                placeholder="https://... o /properties/MT24-023/foto-1.webp"
+                placeholder="https://... o /properties/MT24-023/foto-1.jpg"
                 className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-mono text-slate-900 focus:border-emerald-600 focus:outline-none"
               />
             </div>
@@ -1319,17 +1312,25 @@ export function AdminPropertyModal({
                 Busca una ciudad o sector en el buscador o arrastra el marcador directamente sobre el predio para fijar la ubicación exacta del lote:
               </p>
 
-              <InteractiveMapPicker
-                selectedLocality={zone || project}
-                initialLat={coords.lat}
-                initialLng={coords.lng}
-                onLocationChange={(lat, lng, placeName) => {
-                  setCoords({ lat, lng });
-                  if (placeName) {
-                    setZone(placeName);
-                  }
-                }}
-              />
+              <Suspense
+                fallback={
+                  <div className="w-full h-[280px] rounded-2xl bg-slate-100 animate-pulse flex items-center justify-center text-xs text-slate-500 font-semibold">
+                    Cargando mapa interactivo...
+                  </div>
+                }
+              >
+                <InteractiveMapPicker
+                  selectedLocality={zone || project}
+                  initialLat={coords.lat}
+                  initialLng={coords.lng}
+                  onLocationChange={(lat, lng, placeName) => {
+                    setCoords({ lat, lng });
+                    if (placeName) {
+                      setZone(placeName);
+                    }
+                  }}
+                />
+              </Suspense>
             </div>
           </div>
 
@@ -1394,7 +1395,7 @@ export function AdminPropertyModal({
           </div>
         </div>
 
-        {/* Right Column: Fixed Live Preview Column (de arriba a abajo, ocupando todo el alto vertical) */}
+        {/* Right Column: Fixed Live Preview Column */}
         {!isPreviewCollapsed && (
           <div
             className={
@@ -1456,7 +1457,7 @@ export function AdminPropertyModal({
                 {isUploadingImage && (
                   <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-xs flex flex-col items-center justify-center gap-2 text-white p-4 text-center z-10 animate-in fade-in">
                     <Loader2 className="h-6 w-6 text-emerald-400 animate-spin" />
-                    <span className="text-xs font-bold">Optimizando foto a WebP...</span>
+                    <span className="text-xs font-bold">Subiendo imagen...</span>
                   </div>
                 )}
               </div>
@@ -1609,7 +1610,6 @@ export function AdminPropertyModal({
       lot={previewLot}
       isOpen={showFichaPreviewModal}
       onClose={() => setShowFichaPreviewModal(false)}
-      onOpenVisitModal={() => {}}
     />
   </div>
   );

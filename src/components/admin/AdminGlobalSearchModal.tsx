@@ -4,24 +4,42 @@ import React, { useState, useMemo, useEffect } from 'react';
 import {
   Search,
   Building2,
-  Users,
-  Calendar,
-  FileCheck,
-  FileText,
+  SlidersHorizontal,
+  User,
   X,
   ArrowRight,
 } from 'lucide-react';
 import { useProperties } from '@/src/context/PropertyContext';
-import { useAdminData } from '@/src/context/AdminDataContext';
-
 import type { LotProperty } from '@/src/data/lots';
+import type { AdminTab } from './AdminDashboard';
 
 interface AdminGlobalSearchModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onNavigateTab: (tab: any) => void;
+  onNavigateTab: (tab: AdminTab) => void;
   onSelectProperty?: (lot: LotProperty) => void;
 }
+
+const ADMIN_SECTIONS: { id: AdminTab; title: string; subtitle: string; keywords: string }[] = [
+  {
+    id: 'inventory',
+    title: 'Propiedades en Cartera',
+    subtitle: 'Gestión de lotes, casas, quintas, precios y estados',
+    keywords: 'propiedades lotes terrenos casas quintas inventario catalogo',
+  },
+  {
+    id: 'banners',
+    title: 'Banners y Portadas Web',
+    subtitle: 'Imágenes de portada para Inicio, Lotes, Nosotros y Contacto',
+    keywords: 'banners portadas hero imagenes inicio fotos carrusel',
+  },
+  {
+    id: 'profile',
+    title: 'Perfil & Configuración de Sede',
+    subtitle: 'Teléfono WhatsApp, correo, ubicación de la sede en mapa y contraseña',
+    keywords: 'perfil configuracion sede mapa direccion telefono whatsapp correo horarios contraseña',
+  },
+];
 
 export function AdminGlobalSearchModal({
   isOpen,
@@ -31,14 +49,10 @@ export function AdminGlobalSearchModal({
 }: AdminGlobalSearchModalProps) {
   const [query, setQuery] = useState('');
   const { properties } = useProperties();
-  const { clients, appointments, legalFiles, documents } = useAdminData();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-      }
     };
     if (isOpen) {
       window.addEventListener('keydown', handleKeyDown);
@@ -56,42 +70,26 @@ export function AdminGlobalSearchModal({
           p.code.toLowerCase().includes(q) ||
           p.name.toLowerCase().includes(q) ||
           p.zone.toLowerCase().includes(q) ||
-          p.project.toLowerCase().includes(q)
+          p.project.toLowerCase().includes(q) ||
+          p.status.toLowerCase().includes(q)
       )
-      .slice(0, 4);
+      .slice(0, 6);
 
-    const matchedClients = clients
-      .filter((c) => c.name.toLowerCase().includes(q) || c.phone.includes(q) || c.email.toLowerCase().includes(q))
-      .slice(0, 4);
+    const matchedSections = ADMIN_SECTIONS.filter(
+      (s) =>
+        s.title.toLowerCase().includes(q) ||
+        s.subtitle.toLowerCase().includes(q) ||
+        s.keywords.includes(q)
+    );
 
-    const matchedAppointments = appointments
-      .filter((a) => a.clientName.toLowerCase().includes(q) || a.propertyTitle.toLowerCase().includes(q))
-      .slice(0, 4);
-
-    const matchedLegal = legalFiles
-      .filter((l) => l.propertyCode.toLowerCase().includes(q) || l.propertyTitle.toLowerCase().includes(q))
-      .slice(0, 4);
-
-    const matchedDocs = documents
-      .filter((d) => d.name.toLowerCase().includes(q) || (d.propertyCode && d.propertyCode.toLowerCase().includes(q)))
-      .slice(0, 4);
-
-    const count =
-      matchedProps.length +
-      matchedClients.length +
-      matchedAppointments.length +
-      matchedLegal.length +
-      matchedDocs.length;
+    const count = matchedProps.length + matchedSections.length;
 
     return {
       properties: matchedProps,
-      clients: matchedClients,
-      appointments: matchedAppointments,
-      legalFiles: matchedLegal,
-      documents: matchedDocs,
+      sections: matchedSections,
       totalCount: count,
     };
-  }, [query, properties, clients, appointments, legalFiles, documents]);
+  }, [query, properties]);
 
   if (!isOpen) return null;
 
@@ -106,7 +104,7 @@ export function AdminGlobalSearchModal({
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar en Propiedades, Clientes, Citas, Expedientes, Documentos..."
+            placeholder="Buscar por código de lote, nombre, sector o sección del panel..."
             className="w-full text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
           />
           <button
@@ -122,7 +120,7 @@ export function AdminGlobalSearchModal({
         <div className="p-4 overflow-y-auto space-y-4 text-xs">
           {!query.trim() && (
             <div className="p-8 text-center text-slate-400 text-xs">
-              Escribe el nombre de un cliente, código de lote (ej: MT24-023), sector o documento...
+              Escribe el código de una propiedad (ej: MT24-023), nombre, sector o configuración...
             </div>
           )}
 
@@ -171,126 +169,34 @@ export function AdminGlobalSearchModal({
                 </div>
               )}
 
-              {/* Clientes */}
-              {results.clients.length > 0 && (
+              {/* Secciones del Panel */}
+              {results.sections.length > 0 && (
                 <div className="space-y-1.5">
                   <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 flex items-center gap-1.5">
-                    <Users className="h-3 w-3 text-blue-700" />
-                    <span>Clientes ({results.clients.length})</span>
+                    <SlidersHorizontal className="h-3 w-3 text-emerald-700" />
+                    <span>Secciones del Panel ({results.sections.length})</span>
                   </span>
                   <div className="space-y-1">
-                    {results.clients.map((c) => (
+                    {results.sections.map((s) => (
                       <button
-                        key={c.id}
+                        key={s.id}
                         type="button"
                         onClick={() => {
-                          onNavigateTab('clients');
+                          onNavigateTab(s.id);
                           onClose();
                         }}
-                        className="w-full p-2.5 rounded-2xl border border-slate-200/80 hover:bg-blue-50/50 hover:border-blue-300 text-left transition-all flex items-center justify-between cursor-pointer group"
+                        className="w-full p-2.5 rounded-2xl border border-slate-200/80 hover:bg-emerald-50/50 hover:border-emerald-300 text-left transition-all flex items-center justify-between cursor-pointer group"
                       >
-                        <div>
-                          <div className="font-bold text-slate-900 group-hover:text-blue-900">{c.name}</div>
-                          <div className="text-[11px] text-slate-500">
-                            {c.phone} · {c.email || 'Sin correo'} · {c.status}
+                        <div className="flex items-center gap-2.5">
+                          {s.id === 'inventory' && <Building2 className="h-4 w-4 text-emerald-700 shrink-0" />}
+                          {s.id === 'banners' && <SlidersHorizontal className="h-4 w-4 text-emerald-700 shrink-0" />}
+                          {s.id === 'profile' && <User className="h-4 w-4 text-emerald-700 shrink-0" />}
+                          <div>
+                            <div className="font-bold text-slate-900 group-hover:text-emerald-900">{s.title}</div>
+                            <div className="text-[11px] text-slate-500">{s.subtitle}</div>
                           </div>
                         </div>
-                        <ArrowRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-blue-700" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Citas */}
-              {results.appointments.length > 0 && (
-                <div className="space-y-1.5">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 flex items-center gap-1.5">
-                    <Calendar className="h-3 w-3 text-purple-700" />
-                    <span>Citas y Visitas ({results.appointments.length})</span>
-                  </span>
-                  <div className="space-y-1">
-                    {results.appointments.map((a) => (
-                      <button
-                        key={a.id}
-                        type="button"
-                        onClick={() => {
-                          onNavigateTab('appointments');
-                          onClose();
-                        }}
-                        className="w-full p-2.5 rounded-2xl border border-slate-200/80 hover:bg-purple-50/50 hover:border-purple-300 text-left transition-all flex items-center justify-between cursor-pointer group"
-                      >
-                        <div>
-                          <div className="font-bold text-slate-900 group-hover:text-purple-900">
-                            {a.clientName} - {a.date} ({a.time} hrs)
-                          </div>
-                          <div className="text-[11px] text-slate-500">
-                            {a.propertyTitle} · {a.status}
-                          </div>
-                        </div>
-                        <ArrowRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-purple-700" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Expedientes */}
-              {results.legalFiles.length > 0 && (
-                <div className="space-y-1.5">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 flex items-center gap-1.5">
-                    <FileCheck className="h-3 w-3 text-amber-700" />
-                    <span>Expedientes Legales ({results.legalFiles.length})</span>
-                  </span>
-                  <div className="space-y-1">
-                    {results.legalFiles.map((l) => (
-                      <button
-                        key={l.id}
-                        type="button"
-                        onClick={() => {
-                          onNavigateTab('legalFiles');
-                          onClose();
-                        }}
-                        className="w-full p-2.5 rounded-2xl border border-slate-200/80 hover:bg-amber-50/50 hover:border-amber-300 text-left transition-all flex items-center justify-between cursor-pointer group"
-                      >
-                        <div>
-                          <div className="font-bold text-slate-900 group-hover:text-amber-900">
-                            Expediente {l.propertyCode} - {l.propertyTitle}
-                          </div>
-                          <div className="text-[11px] text-slate-500">Estado: {l.status}</div>
-                        </div>
-                        <ArrowRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-amber-700" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Documentos */}
-              {results.documents.length > 0 && (
-                <div className="space-y-1.5">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 flex items-center gap-1.5">
-                    <FileText className="h-3 w-3 text-teal-700" />
-                    <span>Documentos ({results.documents.length})</span>
-                  </span>
-                  <div className="space-y-1">
-                    {results.documents.map((d) => (
-                      <button
-                        key={d.id}
-                        type="button"
-                        onClick={() => {
-                          onNavigateTab('documentsManager');
-                          onClose();
-                        }}
-                        className="w-full p-2.5 rounded-2xl border border-slate-200/80 hover:bg-teal-50/50 hover:border-teal-300 text-left transition-all flex items-center justify-between cursor-pointer group"
-                      >
-                        <div>
-                          <div className="font-bold text-slate-900 group-hover:text-teal-900">{d.name}</div>
-                          <div className="text-[11px] text-slate-500">
-                            Tipo: {d.type} · {d.propertyCode || 'General'}
-                          </div>
-                        </div>
-                        <ArrowRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-teal-700" />
+                        <ArrowRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-emerald-700" />
                       </button>
                     ))}
                   </div>

@@ -1,22 +1,27 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import {
-  User,
   KeyRound,
   Building,
   Phone,
   Mail,
-  Percent,
-  Calendar,
+  MapPin,
+  Clock,
   Save,
   CheckCircle2,
   AlertTriangle,
   Lock,
   LogOut,
   Sliders,
+  Loader2,
 } from 'lucide-react';
 import { supabase } from '@/src/lib/supabase';
+import { useSiteSettings } from '@/src/lib/siteSettings';
+
+const InteractiveMapPicker = lazy(() =>
+  import('../common/InteractiveMapPicker').then((m) => ({ default: m.InteractiveMapPicker }))
+);
 
 interface AdminProfileViewProps {
   adminEmail: string;
@@ -24,49 +29,55 @@ interface AdminProfileViewProps {
 }
 
 export function AdminProfileView({ adminEmail, onLogout }: AdminProfileViewProps) {
-  // Institutional & Commercial Settings State
-  const [companyName, setCompanyName] = useState('Sociedad Civil MGM Inmobiliaria');
-  const [supportPhone, setSupportPhone] = useState('+593 99 195 2889');
-  const [supportEmail, setSupportEmail] = useState('contacto@mgminmobiliaria.ec');
-  const [defaultDownPercent, setDefaultDownPercent] = useState(20);
-  const [defaultMaxMonths, setDefaultMaxMonths] = useState(48);
+  const { settings, saveSettings } = useSiteSettings();
+
+  // Institutional & Headquarters Location State
+  const [companyName, setCompanyName] = useState(settings.companyName);
+  const [supportPhone, setSupportPhone] = useState(settings.supportPhone);
+  const [supportEmail, setSupportEmail] = useState(settings.supportEmail);
+  const [hqTitle, setHqTitle] = useState(settings.hqTitle);
+  const [hqAddress, setHqAddress] = useState(settings.hqAddress);
+  const [hqLat, setHqLat] = useState(settings.hqLat);
+  const [hqLng, setHqLng] = useState(settings.hqLng);
+  const [businessHours, setBusinessHours] = useState(settings.businessHours);
+  const [businessHoursWeekend, setBusinessHoursWeekend] = useState(settings.businessHoursWeekend);
+
+  const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [settingsSaved, setSettingsSaved] = useState(false);
 
-  // Load from localStorage on mount
+  // Sync local state when remote settings load
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('mgm_admin_settings');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.companyName) setCompanyName(parsed.companyName);
-        if (parsed.supportPhone) setSupportPhone(parsed.supportPhone);
-        if (parsed.supportEmail) setSupportEmail(parsed.supportEmail);
-        if (parsed.defaultDownPercent) setDefaultDownPercent(parsed.defaultDownPercent);
-        if (parsed.defaultMaxMonths) setDefaultMaxMonths(parsed.defaultMaxMonths);
-      }
-    } catch {
-      // Ignore parse errors
-    }
-  }, []);
+    setCompanyName(settings.companyName);
+    setSupportPhone(settings.supportPhone);
+    setSupportEmail(settings.supportEmail);
+    setHqTitle(settings.hqTitle);
+    setHqAddress(settings.hqAddress);
+    setHqLat(settings.hqLat);
+    setHqLng(settings.hqLng);
+    setBusinessHours(settings.businessHours);
+    setBusinessHoursWeekend(settings.businessHoursWeekend);
+  }, [settings]);
 
-  const handleSaveSettings = (e: React.FormEvent) => {
+  const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSavingSettings(true);
     try {
-      localStorage.setItem(
-        'mgm_admin_settings',
-        JSON.stringify({
-          companyName,
-          supportPhone,
-          supportEmail,
-          defaultDownPercent,
-          defaultMaxMonths,
-        })
-      );
-    } catch {
-      // LocalStorage fallback
+      await saveSettings({
+        companyName,
+        supportPhone,
+        supportEmail,
+        hqTitle,
+        hqAddress,
+        hqLat,
+        hqLng,
+        businessHours,
+        businessHoursWeekend,
+      });
+      setSettingsSaved(true);
+      setTimeout(() => setSettingsSaved(false), 3000);
+    } finally {
+      setIsSavingSettings(false);
     }
-    setSettingsSaved(true);
-    setTimeout(() => setSettingsSaved(false), 3000);
   };
 
   // Password Update State
@@ -116,7 +127,7 @@ export function AdminProfileView({ adminEmail, onLogout }: AdminProfileViewProps
 
   return (
     <div className="space-y-8 max-w-6xl animate-in fade-in duration-200">
-      {/* 1. Header de Identidad de Administrador (Sin box-in-box) */}
+      {/* 1. Header de Identidad de Administrador */}
       <div className="bg-gradient-to-r from-[#0d2e1a] via-[#124225] to-[#1a5b33] rounded-3xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
         <div className="absolute right-0 top-0 translate-x-12 -translate-y-12 w-64 h-64 bg-white/5 rounded-full pointer-events-none blur-3xl" />
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
@@ -135,7 +146,7 @@ export function AdminProfileView({ adminEmail, onLogout }: AdminProfileViewProps
               </div>
               <p className="text-sm text-emerald-200/90 font-mono mt-0.5 truncate">{adminEmail}</p>
               <p className="text-xs text-emerald-300/70 mt-0.5">
-                Sociedad Civil MGM Inmobiliaria · Sesión de Control Activa
+                {companyName} · Sesión de Control Activa
               </p>
             </div>
           </div>
@@ -153,9 +164,9 @@ export function AdminProfileView({ adminEmail, onLogout }: AdminProfileViewProps
         </div>
       </div>
 
-      {/* 2. Cuadrícula de Distribución Limpia: Ajustes de Empresa + Seguridad (Anti box-in-box) */}
+      {/* 2. Cuadrícula de Distribución: Ajustes de Empresa y Ubicación + Seguridad */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Lado Izquierdo: Configuración Institucional y Políticas Comerciales (7 cols) */}
+        {/* Lado Izquierdo: Configuración Institucional y Ubicación de Sede (7 cols) */}
         <section className="lg:col-span-7 bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-6">
           <div className="border-b border-slate-100 pb-4">
             <div className="flex items-center gap-2.5">
@@ -164,10 +175,10 @@ export function AdminProfileView({ adminEmail, onLogout }: AdminProfileViewProps
               </div>
               <div>
                 <h3 className="text-base font-black text-slate-900 tracking-tight">
-                  Parámetros de la Inmobiliaria
+                  Datos de Contacto y Sede MGM
                 </h3>
                 <p className="text-xs text-slate-400 font-medium">
-                  Información corporativa y condiciones base de financiamiento.
+                  Se reflejan en tiempo real en toda la página web pública, botones de WhatsApp, pie de página y mapa de Contacto.
                 </p>
               </div>
             </div>
@@ -176,7 +187,7 @@ export function AdminProfileView({ adminEmail, onLogout }: AdminProfileViewProps
           {settingsSaved && (
             <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center gap-2.5 animate-in fade-in">
               <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-              <span>Parámetros institucionales guardados correctamente.</span>
+              <span>¡Cambios guardados y sincronizados con la web pública!</span>
             </div>
           )}
 
@@ -201,7 +212,7 @@ export function AdminProfileView({ adminEmail, onLogout }: AdminProfileViewProps
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-bold text-slate-700 block mb-1.5">
-                    WhatsApp Comercial
+                    Teléfono / WhatsApp Oficial
                   </label>
                   <div className="relative">
                     <Phone className="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
@@ -210,6 +221,7 @@ export function AdminProfileView({ adminEmail, onLogout }: AdminProfileViewProps
                       required
                       value={supportPhone}
                       onChange={(e) => setSupportPhone(e.target.value)}
+                      placeholder="+593 99 284 9965"
                       className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-900 font-mono focus:bg-white focus:border-emerald-600 focus:outline-none transition-all"
                     />
                   </div>
@@ -231,64 +243,122 @@ export function AdminProfileView({ adminEmail, onLogout }: AdminProfileViewProps
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Separador sutil sin anidar cajas */}
-            <div className="pt-4 border-t border-slate-100">
-              <h4 className="text-xs font-black uppercase tracking-wider text-slate-400 mb-3">
-                Políticas de Financiamiento Directo
-              </h4>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-bold text-slate-700 block mb-1.5">
-                    Entrada Mínima Predeterminada (%)
+                    Horario Lunes a Viernes
                   </label>
                   <div className="relative">
-                    <Percent className="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    <Clock className="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                     <input
-                      type="number"
-                      min={5}
-                      max={50}
-                      value={defaultDownPercent}
-                      onChange={(e) => setDefaultDownPercent(parseInt(e.target.value) || 20)}
-                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-900 font-mono focus:bg-white focus:border-emerald-600 focus:outline-none transition-all"
+                      type="text"
+                      value={businessHours}
+                      onChange={(e) => setBusinessHours(e.target.value)}
+                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-900 focus:bg-white focus:border-emerald-600 focus:outline-none transition-all"
                     />
                   </div>
-                  <span className="text-[10px] text-slate-400 mt-1 block">
-                    Calcula la entrada inicial al cotizar lotes.
-                  </span>
                 </div>
 
                 <div>
                   <label className="text-xs font-bold text-slate-700 block mb-1.5">
-                    Plazo Máximo Habitual (Meses)
+                    Horario Fin de Semana
                   </label>
                   <div className="relative">
-                    <Calendar className="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    <Clock className="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                     <input
-                      type="number"
-                      min={12}
-                      max={120}
-                      value={defaultMaxMonths}
-                      onChange={(e) => setDefaultMaxMonths(parseInt(e.target.value) || 48)}
-                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-900 font-mono focus:bg-white focus:border-emerald-600 focus:outline-none transition-all"
+                      type="text"
+                      value={businessHoursWeekend}
+                      onChange={(e) => setBusinessHoursWeekend(e.target.value)}
+                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-900 focus:bg-white focus:border-emerald-600 focus:outline-none transition-all"
                     />
                   </div>
-                  <span className="text-[10px] text-slate-400 mt-1 block">
-                    Plazo de referencia en cuotas de crédito directo.
-                  </span>
                 </div>
+              </div>
+            </div>
+
+            {/* Ubicación de la Sede Principal en Mapa */}
+            <div className="pt-4 border-t border-slate-100 space-y-4">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                  <MapPin className="h-4 w-4 text-emerald-600" />
+                  <span>Ubicación de la Sede MGM (Sección Contacto)</span>
+                </h4>
+                <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+                  {hqLat.toFixed(4)}, {hqLng.toFixed(4)}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5">
+                    Título de la Sede
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={hqTitle}
+                    onChange={(e) => setHqTitle(e.target.value)}
+                    placeholder="MGM Inmobiliaria · Miravalle"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-900 font-medium focus:bg-white focus:border-emerald-600 focus:outline-none transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5">
+                    Dirección Pública de la Sede
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={hqAddress}
+                    onChange={(e) => setHqAddress(e.target.value)}
+                    placeholder="Vía Principal Ciudadela Miravalle, Azuay, Ecuador"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-900 font-medium focus:bg-white focus:border-emerald-600 focus:outline-none transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 p-3 bg-slate-50/50 space-y-2">
+                <p className="text-[11px] text-slate-500">
+                  Busca la dirección o arrastra el pin verde para establecer el punto exacto que verán los clientes en el mapa de la pestaña <strong>Contacto</strong>:
+                </p>
+                <Suspense
+                  fallback={
+                    <div className="h-[260px] w-full rounded-2xl bg-slate-100 flex items-center justify-center text-xs text-slate-500 gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+                      <span>Cargando mapa interactivo...</span>
+                    </div>
+                  }
+                >
+                  <InteractiveMapPicker
+                    initialLat={hqLat}
+                    initialLng={hqLng}
+                    selectedLocality={hqAddress}
+                    onLocationChange={(lat, lng, placeName) => {
+                      setHqLat(lat);
+                      setHqLng(lng);
+                      if (placeName) {
+                        setHqAddress(placeName);
+                      }
+                    }}
+                  />
+                </Suspense>
               </div>
             </div>
 
             <div className="pt-3 flex justify-end">
               <button
                 type="submit"
-                className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+                disabled={isSavingSettings}
+                className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-emerald-800 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-95 disabled:opacity-60"
               >
-                <Save className="h-4 w-4" />
-                <span>Guardar Parámetros</span>
+                {isSavingSettings ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
+                <span>{isSavingSettings ? 'Sincronizando...' : 'Guardar y Publicar en la Web'}</span>
               </button>
             </div>
           </form>
@@ -306,7 +376,7 @@ export function AdminProfileView({ adminEmail, onLogout }: AdminProfileViewProps
                   Cambiar Contraseña
                 </h3>
                 <p className="text-xs text-slate-400 font-medium">
-                  Actualiza tu credencial maestra de acceso.
+                  Actualiza tu credencial de Supabase Auth.
                 </p>
               </div>
             </div>

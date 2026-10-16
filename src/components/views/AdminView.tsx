@@ -5,10 +5,7 @@ import { AdminLogin } from '../admin/AdminLogin';
 import { AdminDashboard } from '../admin/AdminDashboard';
 import type { LotProperty } from '@/src/data/lots';
 import { supabase } from '@/src/lib/supabase';
-
 import type { PageView } from '@/src/data/navigation';
-
-import { AdminDataProvider } from '@/src/context/AdminDataContext';
 
 interface AdminViewProps {
   onNavigateToCatalog?: () => void;
@@ -21,17 +18,18 @@ export function AdminView({
   onNavigate,
   onSelectLotPreview,
 }: AdminViewProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      const local = localStorage.getItem('mgm_admin_authenticated');
-      const session = sessionStorage.getItem('mgm_admin_authenticated');
-      return local === 'true' || session === 'true';
-    }
-    return false;
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
-    // Escuchar cambios de sesión reales de Supabase Auth
+    // Limpiar cualquier llave antigua de localStorage que permitiera bypass
+    try {
+      localStorage.removeItem('mgm_admin_authenticated');
+      sessionStorage.removeItem('mgm_admin_authenticated');
+    } catch {
+      // Ignore
+    }
+
+    // Escuchar sesión real de Supabase Auth
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         setIsAuthenticated(true);
@@ -61,10 +59,6 @@ export function AdminView({
     } catch {
       // Ignorar errores de red
     }
-    localStorage.removeItem('mgm_admin_authenticated');
-    localStorage.removeItem('mgm_admin_user_email');
-    sessionStorage.removeItem('mgm_admin_authenticated');
-    sessionStorage.removeItem('mgm_admin_user_email');
     setIsAuthenticated(false);
   };
 
@@ -86,14 +80,12 @@ export function AdminView({
 
   return (
     <div className="w-full min-h-screen">
-      <AdminDataProvider>
-        <AdminDashboard
-          onLogout={handleLogout}
-          onViewCatalog={goToCatalog}
-          onSelectLotPreview={onSelectLotPreview}
-          onNavigate={onNavigate}
-        />
-      </AdminDataProvider>
+      <AdminDashboard
+        onLogout={handleLogout}
+        onViewCatalog={goToCatalog}
+        onSelectLotPreview={onSelectLotPreview}
+        onNavigate={onNavigate}
+      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useState, useEffect, useMemo, Suspense, lazy } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Header } from '@/src/components/Header';
 import { BottomNav } from '@/src/components/BottomNav';
@@ -8,10 +8,9 @@ import { Footer } from '@/src/components/Footer';
 import { WhatsAppFAB } from '@/src/components/WhatsAppFAB';
 import type { LegalTab } from '@/src/components/modals/LegalModal';
 import { InteractiveBackground } from '@/src/components/InteractiveBackground';
-import { HomeView } from '@/src/components/views/HomeView';
 import { PropertyProvider, useProperties } from '@/src/context/PropertyContext';
 
-const VisitModal = lazy(() => import('@/src/components/VisitModal').then((m) => ({ default: m.VisitModal })));
+const HomeView = lazy(() => import('@/src/components/views/HomeView').then((m) => ({ default: m.HomeView })));
 const LegalModal = lazy(() => import('@/src/components/modals/LegalModal').then((m) => ({ default: m.LegalModal })));
 const PropertyDetailView = lazy(() => import('@/src/components/views/PropertyDetailView').then((m) => ({ default: m.PropertyDetailView })));
 const AboutView = lazy(() => import('@/src/components/views/AboutView').then((m) => ({ default: m.AboutView })));
@@ -19,7 +18,7 @@ const PropertiesView = lazy(() => import('@/src/components/views/PropertiesView'
 const ContactView = lazy(() => import('@/src/components/views/ContactView').then((m) => ({ default: m.ContactView })));
 const AdminView = lazy(() => import('@/src/components/views/AdminView').then((m) => ({ default: m.AdminView })));
 const PrivacyView = lazy(() => import('@/src/components/views/PrivacyView').then((m) => ({ default: m.PrivacyView })));
-const NewPropertyView = lazy(() => import('@/src/components/views/NewPropertyView').then((m) => ({ default: m.NewPropertyView })));
+
 import { ScrollToTop } from '@/src/components/ScrollToTop';
 import { LOTS_DATA, type LotProperty } from '@/src/data/lots';
 import {
@@ -38,6 +37,13 @@ export default function HomePage() {
 
 function HomePageContent() {
   const { properties } = useProperties();
+
+  // Propiedades públicas activas (excluyendo 'Inactiva' / Borrador)
+  const activeProperties = useMemo(
+    () => properties.filter((p) => p.status !== 'Inactiva'),
+    [properties]
+  );
+
   const [currentPage, setCurrentPage] = useState<PageView>(() => {
     if (typeof window !== 'undefined') {
       return resolvePageFromHash(window.location.hash);
@@ -45,15 +51,12 @@ function HomePageContent() {
     return 'home';
   });
   const [selectedLot, setSelectedLot] = useState<LotProperty | null>(null);
-  const [isVisitModalOpen, setIsVisitModalOpen] = useState(false);
-  const [visitInterest, setVisitInterest] = useState('Ciudadela Miravalle');
   const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
   const [legalModalTab, setLegalModalTab] = useState<LegalTab>('privacy');
 
   // Filter state passed from Home search bar
   const [filterLocation, setFilterLocation] = useState('Todas');
   const [filterType, setFilterType] = useState('Todos');
-  const [filterMaxPrice, setFilterMaxPrice] = useState(100000);
 
   // Sincronización robusta bidireccional con el hash de la URL (Back / Forward nativo)
   useEffect(() => {
@@ -75,7 +78,7 @@ function HomePageContent() {
         }
         const robotsMeta = document.querySelector('meta[name="robots"]');
         if (robotsMeta) {
-          const isPrivate = targetPage === 'admin' || targetPage === 'new_property';
+          const isPrivate = targetPage === 'admin';
           robotsMeta.setAttribute(
             'content',
             isPrivate
@@ -94,11 +97,13 @@ function HomePageContent() {
         const lotIdentifier = parts[1]?.toLowerCase();
         if (lotIdentifier) {
           const matchedLot =
-            properties.find(
+            activeProperties.find(
               (l) => l.code.toLowerCase() === lotIdentifier || l.id.toLowerCase() === lotIdentifier
             ) ||
             LOTS_DATA.find(
-              (l) => l.code.toLowerCase() === lotIdentifier || l.id.toLowerCase() === lotIdentifier
+              (l) =>
+                l.status !== 'Inactiva' &&
+                (l.code.toLowerCase() === lotIdentifier || l.id.toLowerCase() === lotIdentifier)
             );
           if (matchedLot) {
             setSelectedLot(matchedLot);
@@ -137,27 +142,18 @@ function HomePageContent() {
       window.removeEventListener('hashchange', handleUrlSync);
       window.removeEventListener('popstate', handleUrlSync);
     };
-  }, [properties]);
+  }, [activeProperties]);
 
   const handleNavigate = (page: PageView) => {
-    const targetHash = PAGES_CONFIG[page]?.hash || 'inicio';
-    const currentHash = decodeURIComponent(window.location.hash)
-      .replace(/^#\/?/, '')
-      .toLowerCase()
-      .trim();
-
-    // 1. Cerrar modales abiertos
-    setIsVisitModalOpen(false);
-
-    // 2. Inmediatamente cambiar la vista en React sin depender de eventos asíncronos del navegador
+    // 1. Inmediatamente cambiar la vista en React sin depender de eventos asíncronos del navegador
     setCurrentPage(page);
 
-    // 3. Actualizar título de la página en la pestaña
+    // 2. Actualizar título de la página en la pestaña
     if (typeof document !== 'undefined') {
       document.title = PAGES_CONFIG[page]?.fullTitle || 'MGM Inmobiliaria';
     }
 
-    // 4. Gestión de scroll: si ya está en 'properties', desplaza al catálogo; si navega desde otra vista, inicia en el top para permitir la animación suave al catálogo
+    // 3. Gestión de scroll
     if (page === 'properties') {
       if (currentPage === 'properties') {
         const catalogEl = document.getElementById('catalog-search-section');
@@ -171,7 +167,7 @@ function HomePageContent() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // 5. Actualizar la URL limpia sin '#' usando HTML5 History API
+    // 4. Actualizar la URL limpia sin '#' usando HTML5 History API
     const targetPath = PAGES_CONFIG[page]?.path || '/';
     if (typeof window !== 'undefined') {
       const currentPath = window.location.pathname;
@@ -181,18 +177,10 @@ function HomePageContent() {
     }
   };
 
-  const handleHeroFilterSearch = (location: string, type: string, maxPrice: number) => {
+  const handleHeroFilterSearch = (location: string, type: string) => {
     setFilterLocation(location);
     setFilterType(type);
-    setFilterMaxPrice(maxPrice);
     handleNavigate('properties');
-  };
-
-  const handleOpenVisitModal = (defaultInterest?: string) => {
-    if (defaultInterest) {
-      setVisitInterest(defaultInterest);
-    }
-    setIsVisitModalOpen(true);
   };
 
   const handleSelectLot = (lot: LotProperty) => {
@@ -203,7 +191,11 @@ function HomePageContent() {
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (typeof window !== 'undefined') {
-      window.history.pushState({ page: 'property-detail', code: lot.code }, '', `/lote/${encodeURIComponent(lot.code.toLowerCase())}`);
+      window.history.pushState(
+        { page: 'property-detail', code: lot.code },
+        '',
+        `/lote/${encodeURIComponent(lot.code.toLowerCase())}`
+      );
     }
   };
 
@@ -217,15 +209,14 @@ function HomePageContent() {
       {/* ScrollToTop Ergonomic Behavior */}
       <ScrollToTop triggerKey={currentPage} />
 
-      {/* Dynamic Ambient Interactive Background (Kindev Awwwards signature) */}
+      {/* Dynamic Ambient Interactive Background */}
       <InteractiveBackground />
 
       {/* 1. Header (Solo en vistas públicas) */}
-      {currentPage !== 'admin' && currentPage !== 'new_property' && (
+      {currentPage !== 'admin' && (
         <Header
           currentPage={currentPage}
           onNavigate={handleNavigate}
-          onOpenVisitModal={handleOpenVisitModal}
         />
       )}
 
@@ -240,36 +231,31 @@ function HomePageContent() {
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className="w-full"
           >
-            {currentPage === 'home' && (
-              <HomeView
-                onNavigate={handleNavigate}
-                onOpenVisitModal={handleOpenVisitModal}
-                onSelectLot={handleSelectLot}
-                onFilterSearch={handleHeroFilterSearch}
-              />
-            )}
-
             <Suspense fallback={<div className="min-h-[60vh] w-full" />}>
+              {currentPage === 'home' && (
+                <HomeView
+                  onNavigate={handleNavigate}
+                  onSelectLot={handleSelectLot}
+                  onFilterSearch={handleHeroFilterSearch}
+                />
+              )}
+
               {currentPage === 'about' && (
                 <AboutView
                   onNavigate={handleNavigate}
-                  onOpenVisitModal={handleOpenVisitModal}
                 />
               )}
 
               {currentPage === 'properties' && (
                 <PropertiesView
                   onSelectLot={handleSelectLot}
-                  onOpenVisitModal={handleOpenVisitModal}
                   initialLocation={filterLocation}
                   initialType={filterType}
-                  initialMaxPrice={filterMaxPrice}
                 />
               )}
 
               {currentPage === 'contact' && (
                 <ContactView
-                  onOpenVisitModal={handleOpenVisitModal}
                   onOpenLegalModal={handleOpenLegalModal}
                 />
               )}
@@ -278,21 +264,20 @@ function HomePageContent() {
                 <AdminView onNavigate={handleNavigate} />
               )}
 
-              {currentPage === 'new_property' && (
-                <NewPropertyView onNavigate={handleNavigate} />
-              )}
-
               {currentPage === 'privacy' && (
                 <PrivacyView onNavigate={handleNavigate} />
               )}
 
               {currentPage === 'property-detail' && (
                 <PropertyDetailView
-                  lot={selectedLot || properties[0] || LOTS_DATA[0]}
-                  allLots={properties.length > 0 ? properties : LOTS_DATA}
+                  lot={
+                    selectedLot && selectedLot.status !== 'Inactiva'
+                      ? selectedLot
+                      : activeProperties[0] || LOTS_DATA[0]
+                  }
+                  allLots={activeProperties.length > 0 ? activeProperties : LOTS_DATA}
                   onNavigate={handleNavigate}
                   onSelectLot={handleSelectLot}
-                  onOpenVisitModal={handleOpenVisitModal}
                 />
               )}
             </Suspense>
@@ -301,36 +286,26 @@ function HomePageContent() {
       </main>
 
       {/* 3. Corporate Footer with Kindev Official Backlink (Solo en vistas públicas) */}
-      {currentPage !== 'admin' && currentPage !== 'new_property' && (
+      {currentPage !== 'admin' && (
         <Footer
           currentPage={currentPage}
           onNavigate={handleNavigate}
-          onOpenVisitModal={() => handleOpenVisitModal()}
           onOpenLegalModal={handleOpenLegalModal}
         />
       )}
 
       {/* 4. Mobile Ergonomic Bottom Navigation Bar (< 768px - Solo en vistas públicas) */}
-      {currentPage !== 'admin' && currentPage !== 'new_property' && (
+      {currentPage !== 'admin' && (
         <BottomNav currentPage={currentPage} onNavigate={handleNavigate} />
       )}
 
       {/* 5. Persistent Smart WhatsApp FAB (Solo en vistas públicas) */}
-      {currentPage !== 'admin' && currentPage !== 'new_property' && (
+      {currentPage !== 'admin' && (
         <WhatsAppFAB />
       )}
 
-      {/* 6. Interactive Modals */}
+      {/* 6. Blindaje Legal (Privacidad, Términos, Cookies) */}
       <Suspense fallback={null}>
-        {isVisitModalOpen && (
-          <VisitModal
-            isOpen={isVisitModalOpen}
-            onClose={() => setIsVisitModalOpen(false)}
-            defaultInterest={visitInterest}
-          />
-        )}
-
-        {/* 7. Blindaje Legal (Privacidad, Términos, Cookies) */}
         {isLegalModalOpen && (
           <LegalModal
             isOpen={isLegalModalOpen}

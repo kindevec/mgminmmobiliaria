@@ -4,27 +4,27 @@ import React from 'react';
 import Image from 'next/image';
 import {
   ArrowRight,
-  Ruler,
-  CreditCard,
   ImageIcon,
+  Star,
 } from 'lucide-react';
 import type { LotProperty } from '@/src/data/lots';
 import { getLotWhatsAppUrl } from '@/src/data/lots';
+import { useSiteSettings } from '@/src/lib/siteSettings';
 import { WhatsAppIcon } from './SocialIcons';
 
 interface PropertyCardProps {
   lot: LotProperty;
   onSelectLot: (lot: LotProperty) => void;
-  onOpenVisitModal?: (lotCode: string) => void;
   dark?: boolean;
 }
 
 export function PropertyCard({
   lot,
   onSelectLot,
-  onOpenVisitModal,
   dark = false,
 }: PropertyCardProps) {
+  useSiteSettings();
+
   return (
     <div
       onClick={() => onSelectLot(lot)}
@@ -53,6 +53,12 @@ export function PropertyCard({
             <ImageIcon className="h-8 w-8 text-slate-600" />
             <span className="text-[11px] font-semibold text-slate-300">Sin foto de portada</span>
             <span className="text-[9px] text-slate-500 font-medium">Sube una imagen para ver la previsualización</span>
+          </div>
+        )}
+        {lot.featured && (
+          <div className="absolute top-3 left-3 z-10 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/95 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow-md">
+            <Star className="w-3 h-3 fill-slate-950 text-slate-950" />
+            <span>Destacado</span>
           </div>
         )}
       </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'motion/react';
 import {
@@ -15,18 +15,21 @@ import {
   Layers,
   Send,
   MessageSquare,
-  CalendarCheck2,
   CheckCircle2,
   ChevronDown,
 } from 'lucide-react';
-import { WHATSAPP_PHONE, getGeneralWhatsAppUrl } from '@/src/data/lots';
+import { getGeneralWhatsAppUrl } from '@/src/data/lots';
 import { useSiteBanners } from '@/src/lib/bannerStorage';
+import {
+  useSiteSettings,
+  formatPhoneForWhatsApp,
+  formatPhoneForTel,
+} from '@/src/lib/siteSettings';
 import { WhatsAppIcon, FacebookIcon, InstagramIcon, TikTokIcon } from '../SocialIcons';
 import { ScrollReveal } from '../common/ScrollReveal';
 import { AnimatedInsignia } from '../common/AnimatedInsignia';
 
 interface ContactViewProps {
-  onOpenVisitModal: (defaultInterest?: string) => void;
   onOpenLegalModal?: (tab: 'privacy' | 'terms' | 'cookies') => void;
 }
 
@@ -43,8 +46,9 @@ const sanitizeInput = (text: string) => {
     .trim();
 };
 
-export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewProps) {
+export function ContactView({ onOpenLegalModal }: ContactViewProps) {
   const { banners } = useSiteBanners();
+  const { settings } = useSiteSettings();
   const contactBanner = banners.contacto;
 
   const [formData, setFormData] = useState({
@@ -95,21 +99,23 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
 
     setIsSent(true);
 
-    const textoMsg = `Hola Sociedad Civil MGM Inmobiliaria, mi nombre es ${cleanNombre}. Mi número es ${cleanTelefono}. Me interesa: ${formData.categoria}. Consulta: ${cleanMensaje}`;
-    const urlWa = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(textoMsg)}`;
+    const waPhone = formatPhoneForWhatsApp(settings.supportPhone);
+    const textoMsg = `Hola ${settings.companyName}, mi nombre es ${cleanNombre}. Mi número es ${cleanTelefono}. Me interesa: ${formData.categoria}. Consulta: ${cleanMensaje}`;
+    const urlWa = `https://wa.me/${waPhone}?text=${encodeURIComponent(textoMsg)}`;
 
     setTimeout(() => {
       window.open(urlWa, '_blank');
     }, 350);
   };
 
+  const gpsDirectionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${settings.hqLat},${settings.hqLng}`;
+  const mapEmbedUrl = `https://maps.google.com/maps?q=${settings.hqLat},${settings.hqLng}&hl=es&z=16&output=embed`;
+  const telHref = `tel:${formatPhoneForTel(settings.supportPhone)}`;
+
   return (
     <div className="min-h-screen bg-[#FBFBFA] font-sans pb-16">
       {/* =========================================================================
-          HERO BANNER DE CONTACTO (ESTILO AOVET ADAPTADO A PALETA MGM)
-          ========================================================================= */}
-      {/* =========================================================================
-          HERO BANNER DE CONTACTO — FULL BLEED EDGE-TO-EDGE (TEXTO SOBRE IMAGEN, SIN BOXES)
+          HERO BANNER DE CONTACTO — FULL BLEED EDGE-TO-EDGE
           ========================================================================= */}
       <section className="group/hero relative w-full bg-slate-950 text-white overflow-hidden min-h-[580px] sm:min-h-[620px] lg:min-h-[660px] flex flex-col justify-center select-none pt-24 sm:pt-28 pb-16 sm:pb-20">
         {/* Fotografía de Contacto Panorámica de Ancho Completo */}
@@ -134,7 +140,7 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/35 pointer-events-none" />
         </div>
 
-        {/* CONTENIDO EDITORIAL: Directamente sobre la foto, sin cajas envolventes */}
+        {/* CONTENIDO EDITORIAL */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="max-w-3xl lg:max-w-4xl flex flex-col items-start text-left select-text cursor-default">
             <ScrollReveal direction="down" delay={0.05} duration={0.65}>
@@ -161,9 +167,7 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
             <ScrollReveal direction="zoom" delay={0.35} duration={0.6}>
               <div className="pt-4">
                 <a
-                  href={`https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(
-                    'Hola Sociedad Civil MGM Inmobiliaria, deseo cotizar y solicitar información sobre los lotes disponibles.'
-                  )}`}
+                  href={getGeneralWhatsAppUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-bold text-xs sm:text-sm uppercase tracking-wider shadow-lg hover:shadow-[#25D366]/30 hover:scale-[1.02] active:scale-98 transition-all cursor-pointer"
@@ -178,7 +182,7 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
       </section>
 
       {/* =========================================================================
-          SECCIÓN PRINCIPAL DE FORMULARIO Y DATOS DE CONTACTO (ESTILO AOVET)
+          SECCIÓN PRINCIPAL DE FORMULARIO Y DATOS DE CONTACTO
           ========================================================================= */}
       <section className="pt-10 sm:pt-14 pb-6 sm:pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -209,7 +213,7 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
                     ¡Mensaje pre-cargado en WhatsApp!
                   </h3>
                   <p className="text-xs sm:text-sm text-gray-600 max-w-sm mx-auto">
-                    Se ha abierto la línea directa de WhatsApp con un asesor oficial de Sociedad Civil MGM Inmobiliaria.
+                    Se ha abierto la línea directa de WhatsApp con un asesor oficial de {settings.companyName}.
                   </p>
                   <button
                     type="button"
@@ -244,7 +248,7 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
                     />
                   </div>
 
-                  {/* Input Nombre (Línea abajo / Underline) */}
+                  {/* Input Nombre */}
                   <div className="relative flex items-center bg-transparent border-b-2 border-gray-300 hover:border-gray-400 focus-within:border-[#22A33D] transition-colors px-1 py-3">
                     <div className="text-[#22A33D] mr-3 flex-shrink-0">
                       <User size={18} />
@@ -262,7 +266,7 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
                     />
                   </div>
 
-                  {/* Input Teléfono / WhatsApp (Línea abajo / Underline) */}
+                  {/* Input Teléfono / WhatsApp */}
                   <div className="relative flex items-center bg-transparent border-b-2 border-gray-300 hover:border-gray-400 focus-within:border-[#22A33D] transition-colors px-1 py-3">
                     <div className="text-[#22A33D] mr-3 flex-shrink-0">
                       <Phone size={18} />
@@ -280,7 +284,7 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
                     />
                   </div>
 
-                  {/* Select Línea de Interés / Proyecto (Línea abajo / Underline) */}
+                  {/* Select Línea de Interés / Proyecto */}
                   <div className="relative flex items-center bg-transparent border-b-2 border-gray-300 hover:border-gray-400 focus-within:border-[#22A33D] transition-colors px-1 py-3">
                     <div className="text-[#22A33D] mr-3 flex-shrink-0">
                       <Layers size={18} />
@@ -296,12 +300,12 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
                       <option value="Lotes Comerciales">Lotes Comerciales & Esquineros 🏢</option>
                       <option value="Crédito Directo">Crédito Directo Propio (Sin banco) 💳</option>
                       <option value="Revisión Notarial">Revisión Notarial de Escrituras 📜</option>
-                      <option value="Visita a Obra">Visita Guiada en Terreno con Transporte 🚗</option>
+                      <option value="Información General">Información General de Propiedades 📋</option>
                     </select>
                     <ChevronDown size={16} className="text-gray-400 pointer-events-none absolute right-1" />
                   </div>
 
-                  {/* Textarea Mensaje (Línea abajo / Underline) */}
+                  {/* Textarea Mensaje */}
                   <div className="relative flex items-start bg-transparent border-b-2 border-gray-300 hover:border-gray-400 focus-within:border-[#22A33D] transition-colors px-1 py-3">
                     <div className="text-[#22A33D] mr-3 mt-1 flex-shrink-0">
                       <MessageSquare size={18} />
@@ -357,7 +361,7 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
                 </form>
               )}
 
-              {/* Canales de Contacto en Redes Sociales — Solo iconos, sin contenedores */}
+              {/* Canales de Contacto en Redes Sociales */}
               <div className="mt-6 pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
                 <span className="text-xs font-semibold text-slate-600">
                   O contáctanos directamente en redes:
@@ -406,9 +410,9 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
               </div>
             </ScrollReveal>
 
-            {/* Columna Derecha: Barra de Dirección + Mapa + Información con Animaciones e Iconos Iluminados */}
+            {/* Columna Derecha: Barra de Dirección + Mapa + Información Sincronizada con Admin */}
             <ScrollReveal direction="right" delay={0.2} className="flex flex-col space-y-5">
-              {/* Barra Independiente de Ubicación Encima del Mapa con Animación */}
+              {/* Barra Independiente de Ubicación Encima del Mapa */}
               <motion.div
                 initial={{ opacity: 0, y: -20, scale: 0.96 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -419,7 +423,6 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
               >
                 <div className="flex items-center gap-3.5">
                   <div className="relative flex-shrink-0">
-                    {/* Efecto de Iluminación Ambiental y Pulso Suave */}
                     <div className="absolute inset-0 rounded-full bg-emerald-500/25 blur-md opacity-40 group-hover:opacity-100 transition-opacity duration-500 scale-150 pointer-events-none" />
                     <MapPin
                       size={26}
@@ -429,19 +432,19 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
                   </div>
                   <div>
                     <h3 className="font-bold text-slate-900 text-sm sm:text-base leading-tight group-hover:text-[#22A33D] transition-colors">
-                      MGM Inmobiliaria · Miravalle
+                      {settings.hqTitle}
                     </h3>
                     <p className="text-xs text-gray-600 leading-snug mt-0.5">
-                      Vía Principal Ciudadela Miravalle, Azuay, Ecuador
+                      {settings.hqAddress}
                     </p>
                   </div>
                 </div>
 
                 <a
-                  href="https://maps.google.com/?q=Ciudadela+Miravalle+Ecuador"
+                  href={gpsDirectionsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#F58220] hover:text-[#ea580c] transition-all mt-1 sm:mt-0 group/link"
+                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#F58220] hover:text-[#ea580c] transition-all mt-1 sm:mt-0 group/link shrink-0"
                 >
                   <Navigation
                     size={14}
@@ -452,24 +455,25 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
                 </a>
               </motion.div>
 
-              {/* Contenedor del Mapa Interactivo (Limpio) */}
+              {/* Contenedor del Mapa Interactivo conectado a las coordenadas de la Sede del Admin */}
               <div className="bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100 p-2 sm:p-3 relative group">
                 <div className="relative w-full h-64 sm:h-72 md:h-80 rounded-2xl overflow-hidden shadow-inner">
                   <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127672.48425265487!2d-78.5833!3d-0.2298!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d59a4002422c9f%3A0x44b44695079a76f5!2sQuito%2C%20Ecuador!5e0!3m2!1ses!2sec!4v1700000000000!5m2!1ses!2sec"
+                    key={`${settings.hqLat}-${settings.hqLng}`}
+                    src={mapEmbedUrl}
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}
                     allowFullScreen={false}
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                    title="Ubicación Exacta Ciudadela Miravalle"
+                    title={`Ubicación Exacta ${settings.hqTitle}`}
                     className="w-full h-full"
                   />
                 </div>
               </div>
 
-              {/* Información de Contacto - Alternancia Verde & Naranja MGM con Efecto Glow */}
+              {/* Información de Contacto - Reflejada desde el Panel Administrativo */}
               <motion.div
                 initial="hidden"
                 whileInView="visible"
@@ -480,7 +484,7 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
                 }}
                 className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 pt-2"
               >
-                {/* Sede Principal (Verde MGM #22A33D) */}
+                {/* Sede Principal */}
                 <motion.div
                   variants={{
                     hidden: { opacity: 0, scale: 0.88, y: 20 },
@@ -501,15 +505,15 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
                   <div>
                     <h4 className="text-sm font-bold text-slate-900 mb-0.5">Sede Principal</h4>
                     <p className="text-xs text-[#22A33D] font-semibold mb-0.5">
-                      Sociedad Civil MGM Inmobiliaria
+                      {settings.companyName}
                     </p>
                     <p className="text-xs text-gray-600 leading-relaxed">
-                      Ciudadela Miravalle<br />Azuay, Ecuador.
+                      {settings.hqAddress}
                     </p>
                   </div>
                 </motion.div>
 
-                {/* Horario de Atención (Naranja Cálido MGM #F58220) */}
+                {/* Horario de Atención */}
                 <motion.div
                   variants={{
                     hidden: { opacity: 0, scale: 0.88, y: 20 },
@@ -530,15 +534,15 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
                   <div>
                     <h4 className="text-sm font-bold text-slate-900 mb-0.5">Horario de Atención</h4>
                     <p className="text-xs text-gray-700 font-medium leading-relaxed">
-                      Lunes a Viernes: 8:30 – 18:00
+                      {settings.businessHours}
                     </p>
                     <p className="text-[11px] text-gray-500 mt-0.5">
-                      Sábados: 9:00 – 14:00 (Domingos previa cita)
+                      Atención personalizada y asesoría notarial
                     </p>
                   </div>
                 </motion.div>
 
-                {/* Teléfono Directo (Verde MGM #22A33D) */}
+                {/* Teléfono Directo */}
                 <motion.div
                   variants={{
                     hidden: { opacity: 0, scale: 0.88, y: 20 },
@@ -559,16 +563,16 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
                   <div>
                     <h4 className="text-sm font-bold text-slate-900 mb-0.5">Teléfono Directo</h4>
                     <a
-                      href="tel:+593992849965"
+                      href={telHref}
                       className="text-sm font-bold text-slate-900 hover:text-[#F58220] transition-colors block"
                     >
-                      099 284 9965
+                      {settings.supportPhone}
                     </a>
-                    <p className="text-[11px] text-gray-500">+593 99 284 9965</p>
+                    <p className="text-[11px] text-gray-500">Llamadas y WhatsApp Oficial</p>
                   </div>
                 </motion.div>
 
-                {/* Correo Electrónico (Naranja Cálido MGM #F58220) */}
+                {/* Correo Electrónico */}
                 <motion.div
                   variants={{
                     hidden: { opacity: 0, scale: 0.88, y: 20 },
@@ -589,10 +593,10 @@ export function ContactView({ onOpenVisitModal, onOpenLegalModal }: ContactViewP
                   <div>
                     <h4 className="text-sm font-bold text-slate-900 mb-0.5">Correo Electrónico</h4>
                     <a
-                      href="mailto:noemaliza01@gmail.com"
+                      href={`mailto:${settings.supportEmail}`}
                       className="text-xs text-gray-600 hover:text-[#F58220] transition-colors break-all font-medium"
                     >
-                      noemaliza01@gmail.com
+                      {settings.supportEmail}
                     </a>
                   </div>
                 </motion.div>

@@ -1,4 +1,4 @@
-export type PageView = 'home' | 'about' | 'properties' | 'contact' | 'admin' | 'property-detail' | 'privacy' | 'new_property';
+export type PageView = 'home' | 'about' | 'properties' | 'contact' | 'admin' | 'property-detail' | 'privacy';
 
 export interface PageConfig {
   id: PageView;
@@ -44,7 +44,7 @@ export const PAGES_CONFIG: Record<PageView, PageConfig> = {
     path: '/contacto',
     label: 'Contacto',
     fullTitle: 'Contacto & Asesoría Directa | Sociedad Civil MGM Inmobiliaria',
-    description: 'Agenda tu recorrido corporativo VIP guiado o comunícate directamente con nuestros asesores.',
+    description: 'Comunícate directamente con nuestros asesores inmobiliarios.',
     aliases: ['contacto', 'contact', 'atencion', 'visita', 'agendar'],
   },
   admin: {
@@ -74,15 +74,6 @@ export const PAGES_CONFIG: Record<PageView, PageConfig> = {
     description: 'Marco legal oficial: política de protección de datos personales LOPDP, términos y condiciones contractuales y política de cookies.',
     aliases: ['privacy', 'privacidad', 'terminos', 'cookies', 'legal', 'politicas', 'politica-de-privacidad'],
   },
-  new_property: {
-    id: 'new_property',
-    hash: 'new_property',
-    path: '/new_property',
-    label: 'Nueva Propiedad',
-    fullTitle: 'Publicar Nueva Propiedad | Panel CMS MGM Inmobiliaria',
-    description: 'Formulario de registro y publicación en vivo de nuevos lotes o viviendas en el catálogo.',
-    aliases: ['new_property', 'nueva-propiedad', 'crear-lote', 'nuevo-lote', 'new-property'],
-  },
 };
 
 /**
@@ -103,9 +94,6 @@ export function resolvePageFromHash(rawHash: string): PageView {
       }
       if (prefix === 'admin' || prefix === 'panel' || prefix === 'administracion') {
         return 'admin';
-      }
-      if (prefix === 'new_property') {
-        return 'new_property';
       }
       for (const pageKey of Object.keys(PAGES_CONFIG) as PageView[]) {
         const config = PAGES_CONFIG[pageKey];
@@ -135,9 +123,6 @@ export function resolvePageFromHash(rawHash: string): PageView {
         if (pParts[0] === 'admin' || pParts[0] === 'panel' || pParts[0] === 'administracion') {
           return 'admin';
         }
-        if (pParts[0] === 'new_property') {
-          return 'new_property';
-        }
       }
       for (const pageKey of Object.keys(PAGES_CONFIG) as PageView[]) {
         const config = PAGES_CONFIG[pageKey];
@@ -152,9 +137,8 @@ export function resolvePageFromHash(rawHash: string): PageView {
 }
 
 /**
- * Devuelve el path canónico oficial sin '#' (ej: '/inicio', '/lotes', '/new_property')
+ * Devuelve el path canónico oficial sin '#' (ej: '/inicio', '/lotes')
  */
 export function getPageCanonicalHash(page: PageView): string {
   return PAGES_CONFIG[page]?.path || '/';
 }
-

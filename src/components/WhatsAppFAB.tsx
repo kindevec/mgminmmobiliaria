@@ -3,8 +3,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { WhatsAppIcon } from './SocialIcons';
 import { getGeneralWhatsAppUrl } from '@/src/data/lots';
+import { useSiteSettings } from '@/src/lib/siteSettings';
 
 export function WhatsAppFAB() {
+  // Subscribe to siteSettings so the WhatsApp number updates live when modified in Admin
+  useSiteSettings();
   const whatsappUrl = getGeneralWhatsAppUrl();
   const [isHovered, setIsHovered] = useState(false);
   const [isRevealedMobile, setIsRevealedMobile] = useState(false);

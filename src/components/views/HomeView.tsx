@@ -34,15 +34,15 @@ import {
 } from '@/src/data/lots';
 import { useProperties } from '@/src/context/PropertyContext';
 import { useSiteBanners } from '@/src/lib/bannerStorage';
+import { useSiteSettings } from '@/src/lib/siteSettings';
 import { PropertyCard } from '../PropertyCard';
 import { WhatsAppIcon } from '../SocialIcons';
 import { ScrollReveal } from '../common/ScrollReveal';
 
 interface HomeViewProps {
   onNavigate: (page: PageView) => void;
-  onOpenVisitModal: (defaultInterest?: string) => void;
   onSelectLot: (lot: LotProperty) => void;
-  onFilterSearch?: (location: string, type: string, maxPrice: number) => void;
+  onFilterSearch?: (location: string, type: string) => void;
 }
 
 // 1. Imágenes continuas de alta resolución para el Hero panorámico
@@ -271,13 +271,19 @@ const URBAN_BENEFIT_ITEMS = [
 
 export function HomeView({
   onNavigate,
-  onOpenVisitModal,
   onSelectLot,
   onFilterSearch,
 }: HomeViewProps) {
+  useSiteSettings();
   const { properties } = useProperties();
   const { banners } = useSiteBanners();
   const homeSlides = banners.inicio;
+
+  // Filtrar solo propiedades activas (excluir 'Inactiva' / Borrador)
+  const activeProperties = React.useMemo(
+    () => properties.filter((p) => p.status !== 'Inactiva'),
+    [properties]
+  );
 
   // Estados del Hero Carrusel
   const [heroImgIndex, setHeroImgIndex] = useState(0);
@@ -288,9 +294,9 @@ export function HomeView({
 
   // Cálculo de proyectos únicos verificados
   const projectCount = React.useMemo(() => {
-    const unique = new Set(properties.map((p) => p.project).filter(Boolean));
+    const unique = new Set(activeProperties.map((p) => p.project).filter(Boolean));
     return unique.size || 6;
-  }, [properties]);
+  }, [activeProperties]);
 
   // Estados de Testimonios
   const [testimonials, setTestimonials] = useState(TESTIMONIALS_DATA);
@@ -308,7 +314,7 @@ export function HomeView({
   // Soporte de navegación y filtrado conectado
   const handleCatalogExplore = (typeFilter?: string) => {
     if (typeFilter && onFilterSearch) {
-      onFilterSearch('', typeFilter, 0);
+      onFilterSearch('', typeFilter);
     } else {
       onNavigate('properties');
     }
@@ -401,8 +407,12 @@ export function HomeView({
     }, 1200);
   };
 
-  // Propiedades destacadas
-  const displayedProperties = properties;
+  // Propiedades destacadas primero (conectado al switch 'Destacar en Inicio' del Admin Panel)
+  const displayedProperties = React.useMemo(() => {
+    const featuredList = activeProperties.filter((p) => p.featured);
+    const others = activeProperties.filter((p) => !p.featured);
+    return [...featuredList, ...others];
+  }, [activeProperties]);
 
   const currentTestimonial = testimonials[activeTestimonialIdx] || testimonials[0];
 
@@ -613,7 +623,7 @@ export function HomeView({
                   onClick={() => handleCatalogExplore()}
                   className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-[#15803d] hover:underline cursor-pointer"
                 >
-                  <span>Ver todas las propiedades ({properties.length})</span>
+                  <span>Ver todas las propiedades ({activeProperties.length})</span>
                 </button>
               </div>
             ) : (
@@ -623,7 +633,6 @@ export function HomeView({
                     <PropertyCard
                       lot={lot}
                       onSelectLot={onSelectLot}
-                      onOpenVisitModal={onOpenVisitModal}
                     />
                   </div>
                 </ScrollReveal>
@@ -638,7 +647,7 @@ export function HomeView({
               onClick={() => handleCatalogExplore()}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-900 hover:bg-[#113d22] text-white text-xs sm:text-sm font-bold transition-all shadow-sm hover:shadow-md hover:scale-105 active:scale-95 cursor-pointer"
             >
-              <span>Explorar las {properties.length} Propiedades Disponibles</span>
+              <span>Explorar las {activeProperties.length} Propiedades Disponibles</span>
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
@@ -682,7 +691,7 @@ export function HomeView({
                 {/* Métrica 1: Propiedades */}
                 <ScrollReveal direction="up" delay={0.05} className="flex items-center gap-2.5">
                   <span className="text-xl sm:text-2xl font-black font-mono text-[#5be196] tracking-tight shrink-0">
-                    {properties.length}+
+                    {activeProperties.length}+
                   </span>
                   <span className="text-xs sm:text-sm font-semibold text-white truncate">
                     Propiedades en Catálogo

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, Suspense, lazy, useMemo } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -10,38 +10,30 @@ import {
   ChevronRight,
   ChevronDown,
   MapPin,
-  CalendarCheck2,
-  Phone,
   CheckCircle2,
   ShieldCheck,
-  Ruler,
-  Maximize2,
-  Compass,
   FileText,
-  BadgeCheck,
   Share2,
   Check,
-  BedDouble,
-  Bath,
   Sparkles,
-  Layers,
-  Calculator,
   ExternalLink,
   FileDown,
   ImageIcon,
 } from 'lucide-react';
-import { getCoordinatesForProperty, getLotWhatsAppUrl, WHATSAPP_PHONE, type LotProperty } from '@/src/data/lots';
+import { getCoordinatesForProperty, getLotWhatsAppUrl, type LotProperty } from '@/src/data/lots';
+import { useSiteSettings } from '@/src/lib/siteSettings';
 import type { PageView } from '../Header';
 import { WhatsAppIcon } from '../SocialIcons';
-import { ScrollReveal } from '../common/ScrollReveal';
-import { PropertyLocationMap } from '../common/PropertyLocationMap';
+
+const PropertyLocationMap = lazy(() =>
+  import('../common/PropertyLocationMap').then((m) => ({ default: m.PropertyLocationMap }))
+);
 
 interface PropertyDetailViewProps {
   lot: LotProperty;
   allLots: LotProperty[];
   onNavigate: (page: PageView) => void;
   onSelectLot: (lot: LotProperty) => void;
-  onOpenVisitModal: (defaultInterest?: string) => void;
 }
 
 function PropertyExtendedSpecs({ lot }: { lot: LotProperty }) {
@@ -130,16 +122,18 @@ function PropertyExtendedSpecs({ lot }: { lot: LotProperty }) {
 
       {/* Ubicación Satelital y Google Maps de la Propiedad */}
       <div className="pt-6 sm:pt-8 border-t border-slate-200/90">
-        <PropertyLocationMap
-          lat={lot.lat}
-          lng={lot.lng}
-          coordinates={lot.coordinates}
-          propertyName={lot.name}
-          project={lot.project}
-          zone={lot.zone}
-          address={lot.address}
-          heightClass="h-[280px] sm:h-[350px]"
-        />
+        <Suspense fallback={<div className="w-full h-[280px] sm:h-[350px] rounded-2xl bg-slate-100 animate-pulse" />}>
+          <PropertyLocationMap
+            lat={lot.lat}
+            lng={lot.lng}
+            coordinates={lot.coordinates}
+            propertyName={lot.name}
+            project={lot.project}
+            zone={lot.zone}
+            address={lot.address}
+            heightClass="h-[280px] sm:h-[350px]"
+          />
+        </Suspense>
       </div>
     </div>
   );
@@ -150,15 +144,11 @@ export function PropertyDetailView({
   allLots,
   onNavigate,
   onSelectLot,
-  onOpenVisitModal,
 }: PropertyDetailViewProps) {
+  useSiteSettings();
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
   const [copiedLink, setCopiedLink] = useState(false);
   const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false);
-
-  // Simulador rápido interactivo
-  const [customMonths, setCustomMonths] = useState(lot.maxMonths || 48);
-  const [customDownPayment, setCustomDownPayment] = useState(lot.minDownPaymentUSD);
 
   const carouselRef = useRef<HTMLDivElement>(null);
   const thumbnailsRef = useRef<HTMLDivElement>(null);
@@ -168,14 +158,32 @@ export function PropertyDetailView({
   const photos = lot.gallery && lot.gallery.length > 0 ? lot.gallery : [lot.image];
   const isHouse = lot.type === 'Vivienda';
 
-  // Filtrar propiedades recomendadas (excluyendo la actual)
-  const recommendedLots = allLots.filter((item) => item.id !== lot.id);
+  // Filtrar y priorizar propiedades similares (misma zona/proyecto/tipo, excluyendo inactivas y la actual)
+  const activeAllLots = useMemo(
+    () => allLots.filter((item) => item.status !== 'Inactiva'),
+    [allLots]
+  );
+
+  const recommendedLots = useMemo(() => {
+    return activeAllLots
+      .filter((item) => item.id !== lot.id)
+      .sort((a, b) => {
+        const score = (candidate: LotProperty) => {
+          let s = 0;
+          if (candidate.project === lot.project) s += 4;
+          if (candidate.zone === lot.zone) s += 3;
+          if (candidate.type === lot.type) s += 2;
+          if (candidate.category === lot.category) s += 1;
+          if (candidate.featured) s += 0.5;
+          return s;
+        };
+        return score(b) - score(a);
+      });
+  }, [activeAllLots, lot]);
 
   // Reiniciar foto y datos al cambiar de lote
   useEffect(() => {
     setActivePhotoIdx(0);
-    setCustomMonths(lot.maxMonths || 48);
-    setCustomDownPayment(lot.minDownPaymentUSD);
     setIsMobileDetailsOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [lot.id]);
@@ -211,9 +219,11 @@ export function PropertyDetailView({
     }
   };
 
-  // Cálculo de cuota en vivo
-  const financedAmount = Math.max(0, lot.priceUSD - customDownPayment);
-  const calculatedMonthly = Math.round(financedAmount / (customMonths || 1));
+  // Cálculo de cuota del lote
+  const maxFinancingMonths = lot.maxMonths || 48;
+  const minDownPayment = lot.minDownPaymentUSD;
+  const financedAmount = Math.max(0, lot.priceUSD - minDownPayment);
+  const calculatedMonthly = lot.estimatedMonthlyUSD || Math.round(financedAmount / maxFinancingMonths);
 
   // Control de scroll del carrusel de recomendados
   const checkScroll = () => {
@@ -528,7 +538,7 @@ export function PropertyDetailView({
                   <div className="flex items-center justify-between py-1 border-b border-slate-100">
                     <span className="text-slate-600">Entrada sugerida (20% inicial):</span>
                     <span className="font-mono font-bold text-slate-900 text-sm">
-                      ${customDownPayment.toLocaleString()} USD
+                      ${minDownPayment.toLocaleString()} USD
                     </span>
                   </div>
                   <div className="flex items-center justify-between py-1 border-b border-slate-100">
@@ -538,7 +548,7 @@ export function PropertyDetailView({
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-500 pt-0.5">
-                    * Planes flexibles hasta {customMonths} meses en cuotas fijas sin variación ni intereses bancarios.
+                    * Planes flexibles hasta {maxFinancingMonths} meses en cuotas fijas sin variación ni intereses bancarios.
                   </p>
                 </div>
               </div>
@@ -547,7 +557,7 @@ export function PropertyDetailView({
               <div className="space-y-3 pt-2">
                 {/* 1. Botón WhatsApp Oficial (Verde Vibrante) */}
                 <a
-                  href={getLotWhatsAppUrl(lot.code, lot.name, lot.priceUSD)}
+                  href={getLotWhatsAppUrl(lot.name, lot.code, lot.priceUSD)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider shadow-md hover:shadow-lg hover:scale-[1.01] active:scale-95 transition-all cursor-pointer text-center"
@@ -823,7 +833,7 @@ export function PropertyDetailView({
               onClick={() => onNavigate('properties')}
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-slate-900 hover:bg-[#113d22] text-white font-bold text-xs sm:text-sm uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer active:scale-95"
             >
-              <span>Explorar Todo el Catálogo ({allLots.length} Lotes Disponibles)</span>
+              <span>Explorar Todo el Catálogo ({activeAllLots.length} Lotes Disponibles)</span>
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>

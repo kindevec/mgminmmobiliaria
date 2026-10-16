@@ -18,7 +18,7 @@ export default defineConfig({
   build: {
     outDir: 'out',
     emptyOutDir: true,
-    sourcemap: true,
+    sourcemap: false,
     rollupOptions: {
       output: {
         manualChunks(id: string) {
@@ -26,6 +26,7 @@ export default defineConfig({
             if (id.includes('@supabase')) return 'supabase-vendor';
             if (id.includes('motion') || id.includes('framer-motion')) return 'motion-vendor';
             if (id.includes('lucide-react')) return 'icons-vendor';
+            if (id.includes('leaflet')) return 'leaflet-vendor';
           }
         },
       },

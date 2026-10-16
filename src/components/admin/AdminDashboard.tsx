@@ -1,78 +1,30 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
-import Image from 'next/image';
+import React, { useState, useEffect } from 'react';
 import {
-  LayoutDashboard,
   Building2,
   Plus,
-  FileText,
-  Calculator,
-  Database,
   Search,
-  CheckCircle2,
-  Clock,
-  DollarSign,
-  TrendingUp,
-  Download,
-  RefreshCw,
-  Edit2,
-  Trash2,
-  ExternalLink,
   LogOut,
-  Star,
-  Copy,
-  Check,
   AlertTriangle,
-  MapPin,
   ChevronRight,
   ChevronLeft,
-  X,
-  FileCheck,
-  Upload,
-  Zap,
-  Bell,
-  Settings,
   User,
-  KeyRound,
-  Lock,
-  ChevronDown,
-  Calendar,
-  Share2,
-  ArrowRight,
   SlidersHorizontal,
-  Users,
-  BarChart3,
   Globe,
 } from 'lucide-react';
 import { useProperties } from '@/src/context/PropertyContext';
-import { useAdminData } from '@/src/context/AdminDataContext';
 import { AdminPropertyModal } from './AdminPropertyModal';
 import { AdminPropertiesList } from './AdminPropertiesList';
 import { AdminProfileView } from './AdminProfileView';
 import { AdminBannersView } from './AdminBannersView';
 import { AdminGlobalSearchModal } from './AdminGlobalSearchModal';
 import type { LotProperty } from '@/src/data/lots';
-import { getLotWhatsAppUrl } from '@/src/data/lots';
-import { WhatsAppIcon } from '../SocialIcons';
 import type { PageView } from '@/src/data/navigation';
 import { supabase } from '@/src/lib/supabase';
-import { convertImageToWebP } from '@/src/lib/imageOptimizer';
 import { LogoMGM } from '../LogoMGM';
 
-export type AdminTab =
-  | 'overview'
-  | 'inventory'
-  | 'banners'
-  | 'clients'
-  | 'appointments'
-  | 'legalFiles'
-  | 'documentsManager'
-  | 'reports'
-  | 'profile'
-  | 'settings'
-  | 'simulator'
-  | 'system';
+export type AdminTab = 'inventory' | 'banners' | 'profile';
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -83,35 +35,20 @@ interface AdminDashboardProps {
 
 export function AdminDashboard({
   onLogout,
-  onViewCatalog,
-  onSelectLotPreview,
   onNavigate,
 }: AdminDashboardProps) {
   const {
     properties,
-    metrics,
     addProperty,
     updateProperty,
     deleteProperty,
-    toggleStatus,
-    setStatus,
-    resetToDefaults,
   } = useProperties();
-
-  const { clients, appointments, legalFiles, documents } = useAdminData();
 
   // Navigation tab state (default to 'inventory' - Propiedades)
   const [activeTab, setActiveTab] = useState<AdminTab>('inventory');
 
   // Global search modal state
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-
-  // Filters & Search
-  const [search, setSearch] = useState('');
-  const [filterStatus, setFilterStatus] = useState<string>('Todos');
-
-  // Interactive selected row (for the prominent highlighted card row like in the reference)
-  const [selectedRowId, setSelectedRowId] = useState<string>(properties[0]?.id || '');
 
   // Full-page property editor & creator states
   const [editingProperty, setEditingProperty] = useState<LotProperty | null>(null);
@@ -124,9 +61,6 @@ export function AdminDashboard({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [propertyToEdit, setPropertyToEdit] = useState<LotProperty | null>(null);
   const [propertyToDelete, setPropertyToDelete] = useState<LotProperty | null>(null);
-
-  // Status updating feedback
-  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
 
   // Admin user details
   const [adminEmail, setAdminEmail] = useState<string>(() => {
@@ -144,121 +78,7 @@ export function AdminDashboard({
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user?.email) setAdminEmail(user.email);
     });
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setIsSearchModalOpen((prev) => !prev);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
-
-  // Commercial Simulator State
-  const [simLotId, setSimLotId] = useState<string>(properties[0]?.id || '');
-  const [simDownPercent, setSimDownPercent] = useState<number>(30);
-  const [simMonths, setSimMonths] = useState<number>(48);
-  const [copiedSim, setCopiedSim] = useState(false);
-
-  // Interactive Optimizer Tool State
-  const [testedFiles, setTestedFiles] = useState<
-    { name: string; originalKB: number; webpKB: number; savings: number; previewUrl: string }[]
-  >([]);
-  const [isConvertingBatch, setIsConvertingBatch] = useState(false);
-
-  const handleTestOptimizerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    setIsConvertingBatch(true);
-    const results: {
-      name: string;
-      originalKB: number;
-      webpKB: number;
-      savings: number;
-      previewUrl: string;
-    }[] = [];
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const originalKB = Math.round(file.size / 1024);
-      let webpKB = originalKB;
-      let previewUrl = '';
-
-      if (file.type.startsWith('image/')) {
-        const optimized = await convertImageToWebP(file);
-        webpKB = Math.round(optimized.size / 1024);
-        previewUrl = URL.createObjectURL(optimized);
-      } else {
-        previewUrl = URL.createObjectURL(file);
-      }
-
-      const savings = originalKB > 0 ? Math.round(((originalKB - webpKB) / originalKB) * 100) : 0;
-      results.push({
-        name: file.name,
-        originalKB,
-        webpKB,
-        savings: Math.max(0, savings),
-        previewUrl,
-      });
-    }
-
-    setTestedFiles((prev) => [...results, ...prev]);
-    setIsConvertingBatch(false);
-  };
-
-  // Filtered properties
-  const filtered = useMemo(() => {
-    return properties.filter((p) => {
-      const q = search.toLowerCase().trim();
-      const matchesSearch =
-        !q ||
-        p.code.toLowerCase().includes(q) ||
-        p.name.toLowerCase().includes(q) ||
-        p.zone.toLowerCase().includes(q) ||
-        p.project.toLowerCase().includes(q);
-
-      const matchesStatus = filterStatus === 'Todos' || p.status === filterStatus;
-      return matchesSearch && matchesStatus;
-    });
-  }, [properties, search, filterStatus]);
-
-  // Selected Lot for Simulator
-  const selectedSimLot = useMemo(() => {
-    return properties.find((p) => p.id === simLotId) || properties[0] || null;
-  }, [properties, simLotId]);
-
-  const simPrice = selectedSimLot ? selectedSimLot.priceUSD : 0;
-  const simDownAmount = Math.round((simPrice * simDownPercent) / 100);
-  const simBalance = simPrice - simDownAmount;
-  const simMonthly = simMonths > 0 ? Math.round(simBalance / simMonths) : 0;
-
-  const simQuoteMessage = selectedSimLot
-    ? `*PROPUESTA DE FINANCIAMIENTO DIRECTO · MGM INMOBILIARIA*\n\n` +
-      `Estimado cliente, compartimos la cotización oficial para el inmueble:\n` +
-      `📌 *Inmueble:* ${selectedSimLot.name} (${selectedSimLot.code})\n` +
-      `📍 *Proyecto:* ${selectedSimLot.project}\n` +
-      `📐 *Área:* ${selectedSimLot.areaM2} m² (${selectedSimLot.dimensions})\n` +
-      `💰 *Precio de Venta:* $${simPrice.toLocaleString()} USD\n\n` +
-      `*Plan de Crédito Directo (Sin Interés Bancario):*\n` +
-      `✅ *Entrada (${simDownPercent}%):* $${simDownAmount.toLocaleString()} USD\n` +
-      `✅ *Saldo a Financiar:* $${simBalance.toLocaleString()} USD\n` +
-      `✅ *Plazo:* ${simMonths} meses\n` +
-      `💵 *Cuota Mensual Fija:* $${simMonthly.toLocaleString()} USD / mes\n\n` +
-      `📋 *Garantía Jurídica:* Escrituras individuales notariales inmediatas.\n` +
-      `¿Desea coordinar una visita guiada al terreno?`
-    : '';
-
-  const handleCopyQuote = async () => {
-    try {
-      await navigator.clipboard.writeText(simQuoteMessage);
-      setCopiedSim(true);
-      setTimeout(() => setCopiedSim(false), 2500);
-    } catch {
-      // Fallback
-    }
-  };
 
   const handleGoHome = () => {
     setEditingProperty(null);
@@ -297,18 +117,6 @@ export function AdminDashboard({
     }
   };
 
-  const handleToggleStatusWithFeedback = async (id: string) => {
-    setUpdatingStatusId(id);
-    try {
-      await toggleStatus(id);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Error al actualizar estado';
-      alert(`No se pudo actualizar el estado: ${msg}`);
-    } finally {
-      setTimeout(() => setUpdatingStatusId(null), 300);
-    }
-  };
-
   const confirmDelete = async () => {
     if (propertyToDelete) {
       try {
@@ -321,11 +129,8 @@ export function AdminDashboard({
     }
   };
 
-
-
   return (
     <div className="w-full min-h-screen bg-slate-50 flex flex-col lg:flex-row">
-      {/* ======================================================== */}
       {/* ======================================================== */}
       {/* LEFT SIDEBAR (Collapsible to icons-only on New Property / Toggle) */}
       {/* ======================================================== */}
@@ -387,7 +192,7 @@ export function AdminDashboard({
           )}
 
           <nav className="space-y-1" aria-label="Navegación del panel">
-            {/* 1. Perfil & Configuración (Al principio de la barra lateral) */}
+            {/* 1. Perfil & Configuración */}
             <button
               type="button"
               onClick={() => {
@@ -417,7 +222,6 @@ export function AdminDashboard({
               </div>
             </button>
 
-            {/* Separador visual sutil */}
             <div className="py-2">
               <div className="border-t border-emerald-900/60" />
             </div>
@@ -481,7 +285,7 @@ export function AdminDashboard({
                   isCreatingProperty ? 'text-emerald-800' : 'opacity-70'
                 }`}
               />
-              {!isSidebarCollapsed && <span className="truncate"> Nueva Propiedad</span>}
+              {!isSidebarCollapsed && <span className="truncate">Nueva Propiedad</span>}
             </button>
 
             {/* 4. Banners */}
@@ -591,7 +395,7 @@ export function AdminDashboard({
                 ? 'bg-white text-emerald-950 border-white'
                 : 'bg-white/10 text-white border-white/10 hover:bg-white/20'
             }`}
-            title="Ver Perfil y Contraseña"
+            title="Ver Perfil y Configuración"
           >
             <div className="h-5 w-5 rounded-md bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">
               {adminEmail.slice(0, 2).toUpperCase()}
@@ -641,58 +445,48 @@ export function AdminDashboard({
             propertyToEdit={editingProperty}
           />
         ) : (
-            <div className="space-y-6">
-              
-              {/* TOP HEADER BAR with Global Search, Web View, and Notifications */}
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-                <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                    {activeTab === 'inventory' && 'Propiedades en Cartera'}
-                    {activeTab === 'banners' && 'Banners y Portadas Web'}
-                    {activeTab === 'profile' && 'Perfil & Configuración'}
-                  </h1>
-                  <p className="text-xs text-slate-400 mt-0.5 font-medium">
-                    {activeTab === 'inventory' && `${properties.length} propiedades reales en catálogo activo`}
-                    {activeTab === 'banners' && 'Edición de los 3 banners de Inicio y portada única de Lotes, Nosotros y Contacto'}
-                    {activeTab === 'profile' && 'Gestión de cuenta de administrador y parámetros de la inmobiliaria'}
-                  </p>
-                </div>
-
-                {/* Right Controls: Búsqueda Global, Web Button, Notificaciones */}
-                <div className="flex items-center gap-2.5">
-                  {/* Botón para regresar al sitio web público */}
-                  <button
-                    type="button"
-                    onClick={handleGoHome}
-                    className="flex items-center gap-1.5 px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full text-xs text-slate-600 hover:text-slate-900 transition-all cursor-pointer shadow-2xs font-semibold group"
-                    title="Ver sitio web público"
-                  >
-                    <Globe className="h-3.5 w-3.5 text-emerald-600 group-hover:scale-110 transition-transform" />
-                    <span className="hidden sm:inline">Ver Sitio Web</span>
-                  </button>
-
-                  {/* Búsqueda Global Trigger */}
-                  <button
-                    type="button"
-                    onClick={() => setIsSearchModalOpen(true)}
-                    className="flex items-center gap-2 pl-3.5 pr-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full text-xs text-slate-500 hover:text-slate-800 transition-all cursor-pointer shadow-2xs group"
-                    title="Búsqueda global (Ctrl + K)"
-                  >
-                    <Search className="h-3.5 w-3.5 text-slate-400 group-hover:text-emerald-700 transition-colors" />
-                    <span className="hidden sm:inline">Buscar en el panel...</span>
-                    <span className="sm:hidden">Buscar...</span>
-                    <kbd className="hidden sm:inline-block text-[10px] bg-white border border-slate-200 px-1.5 py-0.5 rounded-md font-mono text-slate-400">
-                      ⌘K
-                    </kbd>
-                  </button>
-                </div>
+          <div className="space-y-6">
+            {/* TOP HEADER BAR with Global Search and Web View */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                  {activeTab === 'inventory' && 'Propiedades en Cartera'}
+                  {activeTab === 'banners' && 'Banners y Portadas Web'}
+                  {activeTab === 'profile' && 'Perfil & Configuración'}
+                </h1>
+                <p className="text-xs text-slate-400 mt-0.5 font-medium">
+                  {activeTab === 'inventory' && `${properties.length} propiedades registradas en el catálogo`}
+                  {activeTab === 'banners' && 'Edición de los 3 banners de Inicio y portada única de Lotes, Nosotros y Contacto'}
+                  {activeTab === 'profile' && 'Gestión de cuenta de administrador, datos de contacto y ubicación de la sede'}
+                </p>
               </div>
 
+              {/* Right Controls: Búsqueda Global & Web Button */}
+              <div className="flex items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={handleGoHome}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full text-xs text-slate-600 hover:text-slate-900 transition-all cursor-pointer shadow-2xs font-semibold group"
+                  title="Ver sitio web público"
+                >
+                  <Globe className="h-3.5 w-3.5 text-emerald-600 group-hover:scale-110 transition-transform" />
+                  <span className="hidden sm:inline">Ver Sitio Web</span>
+                </button>
 
+                <button
+                  type="button"
+                  onClick={() => setIsSearchModalOpen(true)}
+                  className="flex items-center gap-2 pl-3.5 pr-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full text-xs text-slate-500 hover:text-slate-800 transition-all cursor-pointer shadow-2xs group"
+                  title="Buscar en el panel"
+                >
+                  <Search className="h-3.5 w-3.5 text-slate-400 group-hover:text-emerald-700 transition-colors" />
+                  <span className="hidden sm:inline">Buscar en el panel...</span>
+                  <span className="sm:hidden">Buscar...</span>
+                </button>
+              </div>
+            </div>
 
-            {/* ======================================================== */}
-            {/* TAB CONTENT: PROPIEDADES (SECTION 2) */}
-            {/* ======================================================== */}
+            {/* TAB CONTENT: PROPIEDADES */}
             {activeTab === 'inventory' && (
               <AdminPropertiesList
                 onOpenCreate={handleOpenCreate}
@@ -700,14 +494,10 @@ export function AdminDashboard({
               />
             )}
 
-            {/* ======================================================== */}
             {/* TAB CONTENT: BANNERS DE CADA VENTANA */}
-            {/* ======================================================== */}
             {activeTab === 'banners' && <AdminBannersView />}
 
-            {/* ======================================================== */}
             {/* TAB CONTENT: PERFIL & CONFIGURACIÓN UNIFICADO */}
-            {/* ======================================================== */}
             {activeTab === 'profile' && (
               <AdminProfileView
                 adminEmail={adminEmail}
@@ -834,8 +624,6 @@ export function AdminDashboard({
           setIsSearchModalOpen(false);
         }}
       />
-
-
 
       {/* ======================================================== */}
       {/* MODAL: EDIT / CREATE PROPERTY */}

@@ -173,7 +173,11 @@ export function getLocalBannersConfig(): SiteBannersConfig {
   return DEFAULT_SITE_BANNERS;
 }
 
+let memoryCachedBanners: SiteBannersConfig | null = null;
+let inFlightBannersPromise: Promise<SiteBannersConfig> | null = null;
+
 function notifyBannersUpdated(config: SiteBannersConfig) {
+  memoryCachedBanners = config;
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(config));
@@ -196,29 +200,45 @@ function notifyBannersUpdated(config: SiteBannersConfig) {
   }
 }
 
-export async function fetchSiteBanners(): Promise<SiteBannersConfig> {
-  try {
-    const { data: pubData } = supabase.storage
-      .from('properties')
-      .getPublicUrl(SUPABASE_CONFIG_PATH);
-
-    if (pubData?.publicUrl) {
-      const res = await fetch(`${pubData.publicUrl}?t=${Date.now()}`, {
-        cache: 'no-store',
-      });
-      if (res.ok) {
-        const json = await res.json();
-        const normalized = normalizeBannersConfig(json);
-        if (typeof window !== 'undefined') {
-          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(normalized));
-        }
-        return normalized;
-      }
-    }
-  } catch {
-    // Fallback to localStorage / default
+export async function fetchSiteBanners(forceRefresh = false): Promise<SiteBannersConfig> {
+  if (!forceRefresh && memoryCachedBanners) {
+    return memoryCachedBanners;
   }
-  return getLocalBannersConfig();
+  if (!forceRefresh && inFlightBannersPromise) {
+    return inFlightBannersPromise;
+  }
+
+  inFlightBannersPromise = (async () => {
+    try {
+      const { data: pubData } = supabase.storage
+        .from('properties')
+        .getPublicUrl(SUPABASE_CONFIG_PATH);
+
+      if (pubData?.publicUrl) {
+        const res = await fetch(`${pubData.publicUrl}?t=${Date.now()}`, {
+          cache: 'no-store',
+        });
+        if (res.ok) {
+          const json = await res.json();
+          const normalized = normalizeBannersConfig(json);
+          memoryCachedBanners = normalized;
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(normalized));
+          }
+          return normalized;
+        }
+      }
+    } catch {
+      // Fallback to localStorage / default
+    } finally {
+      inFlightBannersPromise = null;
+    }
+    const local = getLocalBannersConfig();
+    memoryCachedBanners = local;
+    return local;
+  })();
+
+  return inFlightBannersPromise;
 }
 
 export async function saveSiteBanners(config: SiteBannersConfig): Promise<SiteBannersConfig> {
@@ -251,7 +271,11 @@ export async function saveSiteBanners(config: SiteBannersConfig): Promise<SiteBa
 }
 
 export async function uploadBannerImage(file: File, pageId: BannerPageId): Promise<string> {
-  return uploadOptimizedImage(file, `BANNER_${pageId.toUpperCase()}`);
+  return uploadOptimizedImage(file, `BANNER_${pageId.toUpperCase()}`, {
+    maxWidth: 1920,
+    maxHeight: 1920,
+    quality: 0.82,
+  });
 }
 
 export function useSiteBanners() {

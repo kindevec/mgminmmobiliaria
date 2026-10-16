@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { LogoMGM } from './LogoMGM';
 import { WhatsAppIcon } from './SocialIcons';
 import { getGeneralWhatsAppUrl } from '@/src/data/lots';
+import { useSiteSettings } from '@/src/lib/siteSettings';
 
 import { type PageView, getPageCanonicalHash } from '@/src/data/navigation';
 export type { PageView };
@@ -11,15 +12,15 @@ export type { PageView };
 interface HeaderProps {
   currentPage: PageView;
   onNavigate: (page: PageView) => void;
-  onOpenVisitModal?: (defaultInterest?: string) => void;
 }
 
 export function Header({
   currentPage,
   onNavigate,
-  onOpenVisitModal,
 }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
+  // Subscribe to siteSettings so the WhatsApp button updates in real time when changed in Admin
+  useSiteSettings();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,7 +38,7 @@ export function Header({
   }, []);
 
   const isGreenHeader =
-    isScrolled || currentPage === 'property-detail' || currentPage === 'admin' || currentPage === 'new_property' || currentPage === 'privacy';
+    isScrolled || currentPage === 'property-detail' || currentPage === 'admin' || currentPage === 'privacy';
 
   const navLinks: { id: PageView; label: string; hash: string }[] = [
     { id: 'home', label: 'Inicio', hash: getPageCanonicalHash('home') },
