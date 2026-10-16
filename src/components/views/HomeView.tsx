@@ -46,39 +46,7 @@ interface HomeViewProps {
   onFilterSearch?: (location: string, type: string) => void;
 }
 
-// 1. Imágenes continuas de alta resolución para el Hero panorámico
-const HERO_REAL_ESTATE_IMAGES = [
-  {
-    url: '/inicio-banner.webp',
-    alt: 'Residencia Arquitectónica Contemporánea de Lujo - MGM Inmobiliaria',
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1280&q=75&fm=webp',
-    alt: 'Residencia Moderna con Piscina y Áreas Verdes - MGM Inmobiliaria',
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1280&q=75&fm=webp',
-    alt: 'Arquitectura Residencial Contemporánea de Vanguardia con Fachada Iluminada',
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1280&q=75&fm=webp',
-    alt: 'Fachada Residencial Contemporánea con Obras Civiles Concluidas',
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1280&q=75&fm=webp',
-    alt: 'Villa Exclusiva con Vistas Panorámicas y Terrazas Iluminadas',
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1280&q=75&fm=webp',
-    alt: 'Residencia Exclusiva y Urbanización con Servicios Básicos Garantizados',
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1280&q=75&fm=webp',
-    alt: 'Arquitectura de Lujo y Vialidad Planificada de Primer Orden',
-  },
-];
-
-// 2. Franja de Confianza (Trust Strip)
+// 1. Franja de Confianza (Trust Strip)
 const TRUST_ITEMS = [
   {
     title: 'Certeza Notarial',
