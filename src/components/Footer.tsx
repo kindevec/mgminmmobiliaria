@@ -92,6 +92,11 @@ export function Footer({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Omitir Footer completamente en la sección de Avalúos
+  if (currentPage === 'appraisals') {
+    return null;
+  }
+
   // Footer exclusivo minimalista para la sección de Administración (solo logo, marca y Desarrollado por Kindev)
   if (currentPage === 'admin') {
     return (

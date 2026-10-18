@@ -38,11 +38,17 @@ export function Header({
   }, []);
 
   const isGreenHeader =
-    isScrolled || currentPage === 'property-detail' || currentPage === 'admin' || currentPage === 'privacy';
+    isScrolled ||
+    currentPage === 'property-detail' ||
+    currentPage === 'admin' ||
+    currentPage === 'privacy' ||
+    currentPage === 'appraisals';
 
   const navLinks: { id: PageView; label: string; hash: string }[] = [
     { id: 'home', label: 'Inicio', hash: getPageCanonicalHash('home') },
     { id: 'properties', label: 'Lotes', hash: getPageCanonicalHash('properties') },
+    { id: 'constructions', label: 'Construcciones', hash: getPageCanonicalHash('constructions') },
+    { id: 'appraisals', label: 'Avalúos', hash: getPageCanonicalHash('appraisals') },
     { id: 'about', label: 'Nosotros', hash: getPageCanonicalHash('about') },
     { id: 'contact', label: 'Contacto', hash: getPageCanonicalHash('contact') },
   ];

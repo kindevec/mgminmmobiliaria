@@ -1,4 +1,4 @@
-export type PageView = 'home' | 'about' | 'properties' | 'contact' | 'admin' | 'property-detail' | 'privacy';
+export type PageView = 'home' | 'about' | 'properties' | 'constructions' | 'appraisals' | 'contact' | 'admin' | 'property-detail' | 'privacy';
 
 export interface PageConfig {
   id: PageView;
@@ -28,6 +28,24 @@ export const PAGES_CONFIG: Record<PageView, PageConfig> = {
     fullTitle: 'Catálogo de Lotes & Viviendas Disponibles | MGM Inmobiliaria',
     description: 'Explora lotes residenciales, esquineros y comerciales en venta con financiamiento directo.',
     aliases: ['lotes', 'propiedades', 'properties', 'catalogo', 'terrenos', 'viviendas'],
+  },
+  constructions: {
+    id: 'constructions',
+    hash: 'construcciones',
+    path: '/construcciones',
+    label: 'Construcciones',
+    fullTitle: 'Nuestras Construcciones & Obras Civiles | Sociedad Civil MGM Inmobiliaria',
+    description: 'Conoce los proyectos de construcción, casas de diseño y obras ejecutadas por MGM Inmobiliaria en el Austro ecuatoriano.',
+    aliases: ['construcciones', 'construccion', 'nuestras-construcciones', 'obras', 'proyectos-construccion', 'constructions'],
+  },
+  appraisals: {
+    id: 'appraisals',
+    hash: 'avaluos',
+    path: '/avaluos',
+    label: 'Avalúos',
+    fullTitle: 'Avalúos Inmobiliarios & Peritajes Técnicos | Sociedad Civil MGM Inmobiliaria',
+    description: 'Dictamen pericial, valoración comercial y peritaje técnico de inmuebles, lotes y construcciones en Azuay y Ecuador con rigor notarial y validez legal.',
+    aliases: ['avaluos', 'avaluo', 'peritaje', 'peritajes', 'tasacion', 'tasaciones', 'appraisals'],
   },
   about: {
     id: 'about',

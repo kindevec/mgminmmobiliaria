@@ -1,0 +1,216 @@
+export interface ConstructionProject {
+  id: string;
+  name: string;
+  code: string;
+  status: 'Entregada' | 'En Construcción' | 'En Planos' | 'Llave en Mano';
+  location: string;
+  canton: string;
+  constructionArea: number; // m²
+  lotArea: number; // m²
+  levels: number;
+  bedrooms: number;
+  bathrooms: number;
+  parkingSpots: number;
+  description: string;
+  features: string[];
+  structureType: string;
+  mainImage: string;
+  gallery: string[];
+  deliveryYear: string;
+  budgetRef?: string;
+}
+
+export const CONSTRUCTIONS_DATA: ConstructionProject[] = [
+  {
+    id: 'villa-challuabamba',
+    name: 'Villa Campestre Challuabamba',
+    code: 'CONST-CH01',
+    status: 'Entregada',
+    location: 'Sector Challuabamba Alta',
+    canton: 'Cuenca',
+    constructionArea: 245,
+    lotArea: 420,
+    levels: 2,
+    bedrooms: 4,
+    bathrooms: 4,
+    parkingSpots: 3,
+    description: 'Residencia unifamiliar de arquitectura contemporánea que combina hormigón visto, madera tratada y amplias mamparas de vidrio termoacústico con vista al valle.',
+    features: [
+      'Estructura sismorresistente con zapatas aisladas',
+      'Pisos de porcelanato rectificado español 60x120',
+      'Cocina con mesones de cuarzo blanco Calacatta',
+      'Área BBQ techada y jardín perimetral con riego',
+      'Sistema de iluminación domótica dimerizable',
+    ],
+    structureType: 'Hormigón armado y pórticos estructurales',
+    mainImage: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+    gallery: [
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=600&q=80',
+    ],
+    deliveryYear: '2024',
+    budgetRef: 'Proyecto Llave en Mano',
+  },
+  {
+    id: 'residencia-puertas-del-sol',
+    name: 'Residencia Minimalista Puertas del Sol',
+    code: 'CONST-PS02',
+    status: 'Entregada',
+    location: 'Sector Puertas del Sol / Río Tomebamba',
+    canton: 'Cuenca',
+    constructionArea: 195,
+    lotArea: 210,
+    levels: 3,
+    bedrooms: 3,
+    bathrooms: 3.5,
+    parkingSpots: 2,
+    description: 'Vivienda urbana de diseño vanguardista con rooftop panorámico privado, fachada con quiebravistas de aluminio compuesto y máxima optimización lumínica.',
+    features: [
+      'Rooftop privado con pérgola de acero y vista al río',
+      'Suite máster con walk-in closet y tina de hidromasaje',
+      'Perfilería de aluminio europeo con vidrios laminados',
+      'Grifería alemana monomando y sanitarios suspendidos',
+      'Instalaciones soterradas listas para paneles solares',
+    ],
+    structureType: 'Estructura mixta metálica y losas alivianadas',
+    mainImage: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80',
+    gallery: [
+      'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1600573472550-8090b5e0745e?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1600566752355-35792bedcfea?auto=format&fit=crop&w=600&q=80',
+    ],
+    deliveryYear: '2023',
+    budgetRef: 'Construcción por Obra Vendida',
+  },
+  {
+    id: 'quinta-yunguilla',
+    name: 'Casa Vacacional & Quinta Yunguilla',
+    code: 'CONST-YU03',
+    status: 'Entregada',
+    location: 'Valle de Yunguilla / Santa Isabel',
+    canton: 'Santa Isabel',
+    constructionArea: 280,
+    lotArea: 1200,
+    levels: 1,
+    bedrooms: 4,
+    bathrooms: 5,
+    parkingSpots: 4,
+    description: 'Diseño campestre de un solo nivel con galerías exteriores, piscina con borde infinito y materiales térmicos adaptados al clima cálido y soleado de Yunguilla.',
+    features: [
+      'Piscina infinita con recubrimiento de mosaico vítreo',
+      'Galería perimetral techada con vigas de teca vista',
+      'Cisterna de 8 m³ con bomba de presión hidroneumática',
+      'Diseño bioclimático con ventilación cruzada natural',
+      'Zona social exterior con asador rústico y horno de leña',
+    ],
+    structureType: 'Hormigón ciclópeo, muros confinados y cubiertas ventiladas',
+    mainImage: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1200&q=80',
+    gallery: [
+      'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1613977257592-4871e5fcd7c4?auto=format&fit=crop&w=600&q=80',
+    ],
+    deliveryYear: '2024',
+    budgetRef: 'Construcción Integral Personalizada',
+  },
+  {
+    id: 'residencia-ricaurte',
+    name: 'Villas Residenciales Los Álamos',
+    code: 'CONST-RC04',
+    status: 'En Construcción',
+    location: 'Sector Ricaurte / Bellavista',
+    canton: 'Cuenca',
+    constructionArea: 175,
+    lotArea: 220,
+    levels: 2,
+    bedrooms: 3,
+    bathrooms: 3,
+    parkingSpots: 2,
+    description: 'Proyecto residencial en fase de acabados con entrega programada. Espacios integrados en planta baja y jardín privado posterior con cerramiento perimetral de seguridad.',
+    features: [
+      '85% de avance de obra física (fase de enlucidos y carpintería)',
+      'Cocina abierta estilo americano con desayunador isla',
+      'Dormitorio principal con balcón frontal y baño privado',
+      'Tubería de cobre para agua caliente y gas centralizado',
+      'Vías internas adoquinadas con acometidas subterráneas',
+    ],
+    structureType: 'Pórticos de hormigón armado con losa alivianada',
+    mainImage: 'https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=1200&q=80',
+    gallery: [
+      'https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1600573472591-ee6b68d14c68?auto=format&fit=crop&w=600&q=80',
+    ],
+    deliveryYear: '2025',
+    budgetRef: 'En Ejecución / Preventa',
+  },
+  {
+    id: 'villa-paute',
+    name: 'Villa Contemporánea Pirincay',
+    code: 'CONST-PT05',
+    status: 'Entregada',
+    location: 'Sector Pirincay / Vía Paute',
+    canton: 'Paute',
+    constructionArea: 210,
+    lotArea: 350,
+    levels: 2,
+    bedrooms: 3,
+    bathrooms: 3.5,
+    parkingSpots: 2,
+    description: 'Villa moderna con amplios porches y ventanales con vista a la cuenca del río Paute. Combina solidez estructural con confort térmico y acabados de primera línea.',
+    features: [
+      'Porche frontal con pilares revestidos en piedra andesita',
+      'Sala a doble altura con chimenea ecológica de bioetanol',
+      'Muebles modulares de cocina y clósets en melamínico RH',
+      'Sistema de captación pluvial para riego de jardines',
+      'Portón automático corredizo de alta velocidad',
+    ],
+    structureType: 'Estructura tradicional aporticada sismorresistente',
+    mainImage: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80',
+    gallery: [
+      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1600566753104-685f4f24cb4d?auto=format&fit=crop&w=600&q=80',
+    ],
+    deliveryYear: '2023',
+    budgetRef: 'Contrato Llave en Mano',
+  },
+  {
+    id: 'condominio-don-bosco',
+    name: 'Proyecto Residencial Don Bosco',
+    code: 'CONST-DB06',
+    status: 'En Planos',
+    location: 'Sector Don Bosco / Circunvalación',
+    canton: 'Cuenca',
+    constructionArea: 520,
+    lotArea: 400,
+    levels: 4,
+    bedrooms: 6,
+    bathrooms: 7,
+    parkingSpots: 6,
+    description: 'Edificación multifamiliar de 4 departamentos independientes con ascensor, bodegas subterráneas y estacionamientos cubiertos en zona urbana consolidada.',
+    features: [
+      'Aprobación municipal de planos y licencias de obra vigentes',
+      'Ascensor para 8 pasajeros con parada en cada nivel',
+      'Departamentos de 2 y 3 dormitorios con terrazas privadas',
+      'Generador eléctrico de emergencia para áreas comunales',
+      'Financiamiento directo durante el periodo de construcción',
+    ],
+    structureType: 'Estructura de hormigón armado con muros de corte',
+    mainImage: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
+    gallery: [
+      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1574362848149-11496d93a7c7?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=600&q=80',
+    ],
+    deliveryYear: '2026',
+    budgetRef: 'Preventa en Planos',
+  },
+];

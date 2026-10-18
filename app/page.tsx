@@ -16,6 +16,8 @@ const PropertyDetailView = lazy(() => import('@/src/components/views/PropertyDet
 const AboutView = lazy(() => import('@/src/components/views/AboutView').then((m) => ({ default: m.AboutView })));
 const PropertiesView = lazy(() => import('@/src/components/views/PropertiesView').then((m) => ({ default: m.PropertiesView })));
 const ContactView = lazy(() => import('@/src/components/views/ContactView').then((m) => ({ default: m.ContactView })));
+const AppraisalsView = lazy(() => import('@/src/components/views/AppraisalsView').then((m) => ({ default: m.AppraisalsView })));
+const ConstructionsView = lazy(() => import('@/src/components/views/ConstructionsView').then((m) => ({ default: m.ConstructionsView })));
 const AdminView = lazy(() => import('@/src/components/views/AdminView').then((m) => ({ default: m.AdminView })));
 const PrivacyView = lazy(() => import('@/src/components/views/PrivacyView').then((m) => ({ default: m.PrivacyView })));
 
@@ -205,7 +207,7 @@ function HomePageContent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative text-slate-800 antialiased font-sans selection:bg-emerald-600 selection:text-white">
+    <div className={`${currentPage === 'appraisals' ? 'h-screen h-[100dvh] overflow-hidden' : 'min-h-screen'} flex flex-col relative text-slate-800 antialiased font-sans selection:bg-emerald-600 selection:text-white`}>
       {/* ScrollToTop Ergonomic Behavior */}
       <ScrollToTop triggerKey={currentPage} />
 
@@ -221,7 +223,7 @@ function HomePageContent() {
       )}
 
       {/* 2. Main Content Container with Strict Anti-Overflow */}
-      <main className={`flex-1 w-full overflow-x-clip ${currentPage === 'admin' ? 'p-0 pb-0' : 'pb-24 md:pb-12 pt-0'}`}>
+      <main className={`flex-1 w-full ${currentPage === 'appraisals' ? 'h-full overflow-hidden p-0' : currentPage === 'admin' ? 'p-0 pb-0 overflow-x-clip' : 'pb-24 md:pb-12 pt-0 overflow-x-clip'}`}>
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={currentPage}
@@ -229,7 +231,7 @@ function HomePageContent() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="w-full"
+            className={`w-full ${currentPage === 'appraisals' ? 'h-full overflow-hidden' : ''}`}
           >
             <Suspense fallback={<div className="min-h-[60vh] w-full" />}>
               {currentPage === 'home' && (
@@ -260,6 +262,18 @@ function HomePageContent() {
                 />
               )}
 
+              {currentPage === 'constructions' && (
+                <ConstructionsView
+                  onNavigate={handleNavigate}
+                />
+              )}
+
+              {currentPage === 'appraisals' && (
+                <AppraisalsView
+                  onNavigate={handleNavigate}
+                />
+              )}
+
               {currentPage === 'admin' && (
                 <AdminView onNavigate={handleNavigate} />
               )}
@@ -286,7 +300,7 @@ function HomePageContent() {
       </main>
 
       {/* 3. Corporate Footer with Kindev Official Backlink (Solo en vistas públicas) */}
-      {currentPage !== 'admin' && (
+      {currentPage !== 'admin' && currentPage !== 'appraisals' && (
         <Footer
           currentPage={currentPage}
           onNavigate={handleNavigate}
@@ -300,7 +314,7 @@ function HomePageContent() {
       )}
 
       {/* 5. Persistent Smart WhatsApp FAB (Solo en vistas públicas) */}
-      {currentPage !== 'admin' && (
+      {currentPage !== 'admin' && currentPage !== 'appraisals' && (
         <WhatsAppFAB />
       )}
 

@@ -12,19 +12,21 @@ import {
   User,
   SlidersHorizontal,
   Globe,
+  HardHat,
 } from 'lucide-react';
 import { useProperties } from '@/src/context/PropertyContext';
 import { AdminPropertyModal } from './AdminPropertyModal';
 import { AdminPropertiesList } from './AdminPropertiesList';
 import { AdminProfileView } from './AdminProfileView';
 import { AdminBannersView } from './AdminBannersView';
+import { AdminConstructionsView } from './AdminConstructionsView';
 import { AdminGlobalSearchModal } from './AdminGlobalSearchModal';
 import type { LotProperty } from '@/src/data/lots';
 import type { PageView } from '@/src/data/navigation';
 import { supabase } from '@/src/lib/supabase';
 import { LogoMGM } from '../LogoMGM';
 
-export type AdminTab = 'inventory' | 'banners' | 'profile';
+export type AdminTab = 'inventory' | 'constructions' | 'banners' | 'profile';
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -288,6 +290,36 @@ export function AdminDashboard({
               {!isSidebarCollapsed && <span className="truncate">Nueva Propiedad</span>}
             </button>
 
+            {/* 3.1. Nuestras Construcciones */}
+            <button
+              type="button"
+              onClick={() => {
+                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
+                setEditingProperty(null);
+                setIsCreatingProperty(false);
+                setActiveTab('constructions');
+              }}
+              className={`relative w-full flex items-center ${
+                isSidebarCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
+              } rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                !editingProperty && !isCreatingProperty && activeTab === 'constructions'
+                  ? 'bg-white text-emerald-950 shadow-md font-black translate-x-0.5'
+                  : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
+              }`}
+              title="Gestión de Nuestras Construcciones"
+            >
+              <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
+                <HardHat
+                  className={`h-4 w-4 shrink-0 ${
+                    !editingProperty && !isCreatingProperty && activeTab === 'constructions'
+                      ? 'text-emerald-800'
+                      : 'opacity-70'
+                  }`}
+                />
+                {!isSidebarCollapsed && <span className="truncate">Construcciones</span>}
+              </div>
+            </button>
+
             {/* 4. Banners */}
             <button
               type="button"
@@ -451,11 +483,13 @@ export function AdminDashboard({
               <div>
                 <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                   {activeTab === 'inventory' && 'Propiedades en Cartera'}
+                  {activeTab === 'constructions' && 'Nuestras Construcciones'}
                   {activeTab === 'banners' && 'Banners y Portadas Web'}
                   {activeTab === 'profile' && 'Perfil & Configuración'}
                 </h1>
                 <p className="text-xs text-slate-400 mt-0.5 font-medium">
                   {activeTab === 'inventory' && `${properties.length} propiedades registradas en el catálogo`}
+                  {activeTab === 'constructions' && 'Gestión y edición sincronizada de obras civiles y viviendas entregadas/en construcción'}
                   {activeTab === 'banners' && 'Edición de los 3 banners de Inicio y portada única de Lotes, Nosotros y Contacto'}
                   {activeTab === 'profile' && 'Gestión de cuenta de administrador, datos de contacto y ubicación de la sede'}
                 </p>
@@ -494,6 +528,9 @@ export function AdminDashboard({
               />
             )}
 
+            {/* TAB CONTENT: NUESTRAS CONSTRUCCIONES */}
+            {activeTab === 'constructions' && <AdminConstructionsView />}
+
             {/* TAB CONTENT: BANNERS DE CADA VENTANA */}
             {activeTab === 'banners' && <AdminBannersView />}
 
@@ -516,7 +553,7 @@ export function AdminDashboard({
         style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0.75rem))' }}
         aria-label="Navegación móvil del panel de administración"
       >
-        <div className="max-w-md mx-auto grid grid-cols-4 items-center gap-1.5">
+        <div className="max-w-md mx-auto grid grid-cols-5 items-center gap-1">
           {/* 1. Propiedades */}
           <button
             type="button"
@@ -525,27 +562,52 @@ export function AdminDashboard({
               setIsCreatingProperty(false);
               setActiveTab('inventory');
             }}
-            className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all cursor-pointer min-h-[50px] ${
+            className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all cursor-pointer min-h-[50px] ${
               !editingProperty && !isCreatingProperty && activeTab === 'inventory'
                 ? 'text-white bg-white/15 font-black shadow-xs'
                 : 'text-emerald-200/70 hover:text-white hover:bg-white/5 font-semibold'
             }`}
           >
             <Building2
-              className={`h-5 w-5 mb-1 ${
+              className={`h-4 w-4 mb-1 ${
                 !editingProperty && !isCreatingProperty && activeTab === 'inventory'
                   ? 'text-emerald-300'
                   : 'text-emerald-400/80'
               }`}
             />
-            <span className="text-[11px] tracking-tight leading-none">Propiedades</span>
+            <span className="text-[10px] tracking-tight leading-none">Lotes</span>
           </button>
 
-          {/* 2. Nueva Propiedad */}
+          {/* 2. Obras / Construcciones */}
+          <button
+            type="button"
+            onClick={() => {
+              setEditingProperty(null);
+              setIsCreatingProperty(false);
+              setActiveTab('constructions');
+            }}
+            className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all cursor-pointer min-h-[50px] ${
+              !editingProperty && !isCreatingProperty && activeTab === 'constructions'
+                ? 'text-white bg-white/15 font-black shadow-xs'
+                : 'text-emerald-200/70 hover:text-white hover:bg-white/5 font-semibold'
+            }`}
+            title="Nuestras Construcciones"
+          >
+            <HardHat
+              className={`h-4 w-4 mb-1 ${
+                !editingProperty && !isCreatingProperty && activeTab === 'constructions'
+                  ? 'text-emerald-300'
+                  : 'text-emerald-400/80'
+              }`}
+            />
+            <span className="text-[10px] tracking-tight leading-none">Obras</span>
+          </button>
+
+          {/* 3. Nueva Propiedad */}
           <button
             type="button"
             onClick={handleOpenCreate}
-            className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all cursor-pointer min-h-[50px] ${
+            className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all cursor-pointer min-h-[50px] ${
               isCreatingProperty
                 ? 'text-white bg-white/15 font-black shadow-xs'
                 : 'text-emerald-200/70 hover:text-white hover:bg-white/5 font-semibold'
@@ -553,14 +615,14 @@ export function AdminDashboard({
             title="Publicar Nueva Propiedad"
           >
             <Plus
-              className={`h-5 w-5 mb-1 ${
+              className={`h-4 w-4 mb-1 ${
                 isCreatingProperty ? 'text-emerald-300' : 'text-emerald-400/80'
               }`}
             />
-            <span className="text-[11px] tracking-tight leading-none">Nueva</span>
+            <span className="text-[10px] tracking-tight leading-none">Nueva</span>
           </button>
 
-          {/* 3. Banners */}
+          {/* 4. Banners */}
           <button
             type="button"
             onClick={() => {
@@ -568,7 +630,7 @@ export function AdminDashboard({
               setIsCreatingProperty(false);
               setActiveTab('banners');
             }}
-            className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all cursor-pointer min-h-[50px] ${
+            className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all cursor-pointer min-h-[50px] ${
               !editingProperty && !isCreatingProperty && activeTab === 'banners'
                 ? 'text-white bg-white/15 font-black shadow-xs'
                 : 'text-emerald-200/70 hover:text-white hover:bg-white/5 font-semibold'
@@ -576,13 +638,13 @@ export function AdminDashboard({
             title="Editar Banners de Inicio"
           >
             <SlidersHorizontal
-              className={`h-5 w-5 mb-1 ${
+              className={`h-4 w-4 mb-1 ${
                 !editingProperty && !isCreatingProperty && activeTab === 'banners'
                   ? 'text-emerald-300'
                   : 'text-emerald-400/80'
               }`}
             />
-            <span className="text-[11px] tracking-tight leading-none">Banners</span>
+            <span className="text-[10px] tracking-tight leading-none">Banners</span>
           </button>
 
           {/* 4. Perfil */}

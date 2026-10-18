@@ -36,3 +36,6 @@ credenciales.txt
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local batch
+descanso.bat

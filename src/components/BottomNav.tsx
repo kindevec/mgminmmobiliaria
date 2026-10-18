@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
-import { Home, Award, Layers, Trees, MessageSquare } from 'lucide-react';
+import { Home, Award, Layers, Trees, MessageSquare, Calculator, HardHat } from 'lucide-react';
 import { getPageCanonicalHash } from '@/src/data/navigation';
 import type { PageView } from './Header';
 
@@ -81,14 +81,24 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
       icon: Home,
     },
     {
-      id: 'about' as PageView,
-      label: 'Nosotros',
-      icon: Award,
-    },
-    {
       id: 'properties' as PageView,
       label: 'Lotes',
       icon: Layers,
+    },
+    {
+      id: 'constructions' as PageView,
+      label: 'Obras',
+      icon: HardHat,
+    },
+    {
+      id: 'appraisals' as PageView,
+      label: 'Avalúos',
+      icon: Calculator,
+    },
+    {
+      id: 'about' as PageView,
+      label: 'Nosotros',
+      icon: Award,
     },
     {
       id: 'contact' as PageView,
