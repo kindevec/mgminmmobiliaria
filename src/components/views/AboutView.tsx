@@ -11,6 +11,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   FileText,
+  FileDown,
 } from 'lucide-react';
 import type { PageView } from '../Header';
 import { getGeneralWhatsAppUrl } from '@/src/data/lots';
@@ -194,6 +195,38 @@ export function AboutView({ onNavigate }: AboutViewProps) {
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.14] [text-wrap:balance] text-center">
                 Expertos en urbanismo, desarrollo y <span className="text-[#F58220]">certeza jurídica</span>
               </h2>
+
+              {/* Dossier Institucional Oficial */}
+              <div className="w-full">
+                <a
+                  href="/docs/MGM_Inmobiliaria_Dossier_Institucional_Completo.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-orange-50/80 via-white to-emerald-50/80 border border-orange-200/80 hover:border-[#F58220] shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer text-left"
+                >
+                  <div className="flex items-center gap-3.5 w-full sm:w-auto">
+                    <div className="h-11 w-11 rounded-xl bg-[#F58220] text-white flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                      <FileDown className="h-5 w-5 stroke-[2.2]" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#F58220]">Documento Oficial</span>
+                        <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-200">PDF</span>
+                      </div>
+                      <h4 className="text-sm sm:text-base font-bold text-slate-900 leading-snug group-hover:text-[#F58220] transition-colors">
+                        Dossier Institucional MGM Inmobiliaria
+                      </h4>
+                      <p className="text-xs text-slate-500 font-medium">
+                        Respaldo jurídico, garantías notariales y trayectoria empresarial
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#113d22] group-hover:text-[#F58220] transition-colors shrink-0 self-end sm:self-center">
+                    <span>Ver Dossier</span>
+                    <ArrowUpRight className="h-4 w-4 stroke-[2.5]" />
+                  </div>
+                </a>
+              </div>
 
               {/* Descriptive Paragraph - Justified */}
               <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal text-justify">
