@@ -21,6 +21,7 @@ import { WhatsAppIcon } from '../SocialIcons';
 import { TopographicContours } from '../WaveDividers';
 import { ScrollReveal } from '../common/ScrollReveal';
 import { AnimatedInsignia } from '../common/AnimatedInsignia';
+import { CardDeckGallery } from '../common/CardDeckGallery';
 
 interface AboutViewProps {
   onNavigate: (page: PageView) => void;
@@ -93,12 +94,8 @@ export function AboutView({ onNavigate }: AboutViewProps) {
         {/* CONTENIDO EDITORIAL: Directamente sobre la foto, sin cajas envolventes */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="max-w-3xl lg:max-w-4xl flex flex-col items-start text-left select-text cursor-default">
-            <ScrollReveal direction="down" delay={0.05} duration={0.65}>
-              <AnimatedInsignia className="scale-85 sm:scale-95" size={42} />
-            </ScrollReveal>
-
             <ScrollReveal direction="down" delay={0.15} duration={0.7}>
-              <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.12] tracking-tight mt-4 sm:mt-5 drop-shadow-md">
+              <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.12] tracking-tight drop-shadow-md">
                 <span className="block">{aboutBanner.titleLine1}</span>
                 {(aboutBanner.titleHighlight1 || aboutBanner.titleHighlight2) && (
                   <span className="block mt-1">
@@ -294,102 +291,135 @@ export function AboutView({ onNavigate }: AboutViewProps) {
             </p>
           </ScrollReveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
-            {/* Card 1: Soft Fresh Brand Green */}
-            <ScrollReveal direction="left" delay={0.05}>
-              <motion.div
-                whileHover={{ y: -6 }}
-                className="p-6 sm:p-7 rounded-[2rem] bg-[#eaf8ee] border border-[#22A33D]/25 text-[#113d22] flex flex-col justify-between min-h-[250px] sm:min-h-[270px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
-              >
-                <div>
-                  <h3 className="text-lg sm:text-xl font-bold tracking-tight mb-2 text-[#113d22]">
-                    Transparencia Notarial
-                  </h3>
-                  <p className="text-xs sm:text-sm leading-relaxed text-slate-600">
-                    Documentación legal abierta y a disposición de cada cliente antes de firmar cualquier compromiso económico.
-                  </p>
-                </div>
+          {/* VISTA MÓVIL: Galería Tarjeta Naipes (Valores & Pilares MGM) */}
+          <div className="block md:hidden">
+            <CardDeckGallery
+              id="galeria-tarjeta-naipes"
+              items={[
+                {
+                  title: 'Transparencia Notarial',
+                  desc: 'Documentación legal abierta y a disposición de cada cliente antes de firmar cualquier compromiso económico.',
+                  cardStyle: 'bg-[#eaf8ee] border border-[#22A33D]/25 text-[#113d22]',
+                  titleColor: 'text-[#113d22]',
+                  descColor: 'text-slate-600',
+                  icon: FileText,
+                  iconColor: 'text-[#22A33D]/80',
+                },
+                {
+                  title: 'Cumplimiento de Obra',
+                  desc: 'Vías concluidas, alcantarillado instalado y obras de urbanismo palpables y verificables en el terreno.',
+                  cardStyle: 'bg-[#113d22] text-white border border-white/10',
+                  titleColor: 'text-white',
+                  descColor: 'text-slate-300',
+                  icon: Building2,
+                  iconColor: 'text-[#5be196]',
+                },
+                {
+                  title: 'Seguridad Jurídica',
+                  desc: 'Títulos individuales protocolizados ante Notario Público e inscritos legalmente en el Registro de la Propiedad.',
+                  cardStyle: 'bg-gradient-to-br from-[#113d22] via-[#164929] to-[#22A33D] text-white border border-white/15',
+                  titleColor: 'text-white',
+                  descColor: 'text-slate-200',
+                  icon: ShieldCheck,
+                  iconColor: 'text-[#5be196]',
+                },
+                {
+                  title: 'Financiamiento Directo',
+                  desc: 'Crédito directo con la urbanizadora hasta 48 meses en cuotas fijas. Sin trámites bancarios complejos ni historial crediticio excluyente.',
+                  cardStyle: 'bg-[#fff8f0] border border-orange-200/90 text-slate-900',
+                  titleColor: 'text-slate-900',
+                  descColor: 'text-slate-600',
+                  icon: FileCheck2,
+                  iconColor: 'text-[#F58220]',
+                },
+              ]}
+              autoPlayInterval={3000}
+              renderCard={(item) => {
+                const IconComp = item.icon;
+                return (
+                  <div
+                    className={`p-7 rounded-[2.5rem] ${item.cardStyle} flex flex-col justify-between min-h-[300px] relative overflow-hidden shadow-xl`}
+                  >
+                    <div>
+                      <h3 className={`text-xl font-black tracking-tight mb-3 ${item.titleColor}`}>
+                        {item.title}
+                      </h3>
+                      <p className={`text-xs leading-relaxed ${item.descColor}`}>
+                        {item.desc}
+                      </p>
+                    </div>
 
-                <div className="flex items-end justify-between mt-6 pt-2">
-                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#113d22] text-white flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
-                    <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    <div className="flex items-end justify-end mt-6 pt-2">
+                      <IconComp className={`w-14 h-14 stroke-[1.4] ${item.iconColor}`} />
+                    </div>
                   </div>
-                  <FileText className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.4] text-[#22A33D]/80 transition-transform duration-500 group-hover:scale-110" />
-                </div>
-              </motion.div>
-            </ScrollReveal>
+                );
+              }}
+            />
+          </div>
 
-            {/* Card 2: Deep Dark Forest Green (#113d22) */}
-            <ScrollReveal direction="up" delay={0.12}>
-              <motion.div
-                whileHover={{ y: -6 }}
-                className="p-6 sm:p-7 rounded-[2rem] bg-[#113d22] text-white flex flex-col justify-between min-h-[250px] sm:min-h-[270px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
-              >
-                <div>
-                  <h3 className="text-lg sm:text-xl font-bold tracking-tight mb-2 text-white">
-                    Cumplimiento de Obra
-                  </h3>
-                  <p className="text-xs sm:text-sm leading-relaxed text-slate-300">
-                    Vías concluidas, alcantarillado instalado y obras de urbanismo palpables y verificables en el terreno.
-                  </p>
-                </div>
+          {/* VISTA ESCRITORIO: Grid completa 4 columnas original */}
+          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+            {[
+              {
+                title: 'Transparencia Notarial',
+                desc: 'Documentación legal abierta y a disposición de cada cliente antes de firmar cualquier compromiso económico.',
+                cardStyle: 'bg-[#eaf8ee] border border-[#22A33D]/25 text-[#113d22]',
+                titleColor: 'text-[#113d22]',
+                descColor: 'text-slate-600',
+                icon: FileText,
+                iconColor: 'text-[#22A33D]/80',
+              },
+              {
+                title: 'Cumplimiento de Obra',
+                desc: 'Vías concluidas, alcantarillado instalado y obras de urbanismo palpables y verificables en el terreno.',
+                cardStyle: 'bg-[#113d22] text-white border border-white/10',
+                titleColor: 'text-white',
+                descColor: 'text-slate-300',
+                icon: Building2,
+                iconColor: 'text-[#5be196]',
+              },
+              {
+                title: 'Seguridad Jurídica',
+                desc: 'Títulos individuales protocolizados ante Notario Público e inscritos legalmente en el Registro de la Propiedad.',
+                cardStyle: 'bg-gradient-to-br from-[#113d22] via-[#164929] to-[#22A33D] text-white border border-white/15',
+                titleColor: 'text-white',
+                descColor: 'text-slate-200',
+                icon: ShieldCheck,
+                iconColor: 'text-[#5be196]',
+              },
+              {
+                title: 'Financiamiento Directo',
+                desc: 'Crédito directo con la urbanizadora hasta 48 meses en cuotas fijas. Sin trámites bancarios complejos ni historial crediticio excluyente.',
+                cardStyle: 'bg-gradient-to-br from-[#fffaf5] to-[#fff3e6] border border-orange-200/90 text-slate-900',
+                titleColor: 'text-slate-900',
+                descColor: 'text-slate-600',
+                icon: FileCheck2,
+                iconColor: 'text-[#F58220]',
+              },
+            ].map((pilar, idx) => {
+              const IconComp = pilar.icon;
+              return (
+                <ScrollReveal key={idx} direction="up" delay={idx * 0.1}>
+                  <div
+                    className={`p-7 sm:p-9 rounded-[2.5rem] ${pilar.cardStyle} flex flex-col justify-between h-full min-h-[290px] sm:min-h-[310px] relative overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group`}
+                  >
+                    <div>
+                      <h3 className={`text-xl sm:text-2xl font-black tracking-tight mb-3 ${pilar.titleColor}`}>
+                        {pilar.title}
+                      </h3>
+                      <p className={`text-xs sm:text-sm leading-relaxed ${pilar.descColor}`}>
+                        {pilar.desc}
+                      </p>
+                    </div>
 
-                <div className="flex items-end justify-between mt-6 pt-2">
-                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/15 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
-                    <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    <div className="flex items-end justify-end mt-6 pt-2">
+                      <IconComp className={`w-14 h-14 sm:w-16 sm:h-16 stroke-[1.4] ${pilar.iconColor} group-hover:scale-110 transition-transform duration-500`} />
+                    </div>
                   </div>
-                  <Building2 className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.4] text-[#5be196] transition-transform duration-500 group-hover:scale-110" />
-                </div>
-              </motion.div>
-            </ScrollReveal>
-
-            {/* Card 3: Deep Green Gradient with #22A33D */}
-            <ScrollReveal direction="up" delay={0.19}>
-              <motion.div
-                whileHover={{ y: -6 }}
-                className="p-6 sm:p-7 rounded-[2rem] bg-gradient-to-br from-[#113d22] via-[#164929] to-[#22A33D] text-white flex flex-col justify-between min-h-[250px] sm:min-h-[270px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
-              >
-                <div>
-                  <h3 className="text-lg sm:text-xl font-bold tracking-tight mb-2 text-white">
-                    Seguridad Jurídica
-                  </h3>
-                  <p className="text-xs sm:text-sm leading-relaxed text-slate-200">
-                    Títulos individuales protocolizados ante Notario Público e inscritos legalmente en el Registro de la Propiedad.
-                  </p>
-                </div>
-
-                <div className="flex items-end justify-between mt-6 pt-2">
-                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/15 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
-                    <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </div>
-                  <ShieldCheck className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.4] text-[#5be196] transition-transform duration-500 group-hover:scale-110" />
-                </div>
-              </motion.div>
-            </ScrollReveal>
-
-            {/* Card 4: Warm Orange / Direct Financing Accent (#F58220) */}
-            <ScrollReveal direction="right" delay={0.26}>
-              <motion.div
-                whileHover={{ y: -6 }}
-                className="p-6 sm:p-7 rounded-[2rem] bg-gradient-to-br from-[#fffaf5] to-[#fff3e6] border border-orange-200/90 text-slate-900 flex flex-col justify-between min-h-[250px] sm:min-h-[270px] relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl group"
-              >
-                <div>
-                  <h3 className="text-lg sm:text-xl font-bold tracking-tight mb-2 text-slate-900">
-                    Financiamiento Directo
-                  </h3>
-                  <p className="text-xs sm:text-sm leading-relaxed text-slate-600">
-                    Crédito directo con la urbanizadora hasta 48 meses en cuotas fijas. Sin trámites bancarios complejos ni historial crediticio excluyente.
-                  </p>
-                </div>
-
-                <div className="flex items-end justify-between mt-6 pt-2">
-                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#F58220] text-white hover:bg-[#ea580c] flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm">
-                    <ArrowUpRight className="w-5 h-5 stroke-[2.4] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </div>
-                  <FileCheck2 className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.4] text-[#F58220] transition-transform duration-500 group-hover:scale-110" />
-                </div>
-              </motion.div>
-            </ScrollReveal>
+                </ScrollReveal>
+              );
+            })}
           </div>
         </div>
       </section>

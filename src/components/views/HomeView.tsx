@@ -39,6 +39,8 @@ import { useStoredReviews } from '@/src/lib/reviewStorage';
 import { PropertyCard } from '../PropertyCard';
 import { WhatsAppIcon } from '../SocialIcons';
 import { ScrollReveal } from '../common/ScrollReveal';
+import { CardDeckGallery } from '../common/CardDeckGallery';
+import { AnimatedInsignia } from '../common/AnimatedInsignia';
 
 interface HomeViewProps {
   onNavigate: (page: PageView) => void;
@@ -442,9 +444,17 @@ export function HomeView({
 
         {/* CONTENIDO EDITORIAL: Directamente sobre la foto, sin estar encerrado en ningún box */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+          {/* Logotipo Vectorial Animado MGM (Centrado en X y posicionado más arriba) */}
+          <div className="w-full flex justify-center -mt-6 sm:-mt-10 lg:-mt-12 mb-3 sm:mb-5">
+            <ScrollReveal direction="down" delay={0.05} duration={0.65} className="flex justify-center">
+              <AnimatedInsignia className="scale-110 sm:scale-125 lg:scale-135" size={88} />
+            </ScrollReveal>
+          </div>
+
           <div className="max-w-3xl lg:max-w-4xl flex flex-col items-start text-left select-text cursor-default">
+
             {/* Título Principal de Estilo Editorial (máx 2 líneas) */}
-            <ScrollReveal direction="down" delay={0.1} duration={0.7}>
+            <ScrollReveal direction="down" delay={0.15} duration={0.7}>
               <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.12] tracking-tight drop-shadow-md">
                 <span className="block">{activeHeroSlide.titleLine1}</span>
                 {(activeHeroSlide.titleHighlight1 || activeHeroSlide.titleHighlight2) && (
@@ -654,11 +664,11 @@ export function HomeView({
               </ScrollReveal>
             </div>
 
-            {/* Columna Derecha: Las 4 métricas compactas en 1 sola línea (sin boxes ni bordes) */}
+            {/* Columna Derecha: Las 4 métricas en formato 2x2 */}
             <div className="lg:col-span-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5 lg:gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-5">
                 {/* Métrica 1: Propiedades */}
-                <ScrollReveal direction="up" delay={0.05} className="flex items-center gap-2.5">
+                <ScrollReveal direction="up" delay={0.05} className="flex items-center gap-2">
                   <span className="text-xl sm:text-2xl font-black font-mono text-[#5be196] tracking-tight shrink-0">
                     {activeProperties.length}+
                   </span>
@@ -823,43 +833,104 @@ export function HomeView({
             </p>
           </ScrollReveal>
 
-          {/* Grilla Arquitectónica de Expedientes Técnicos (Diseño Vivo con Color & Identidad Real) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
+          {/* VISTA MÓVIL: Galería Tarjeta Naipes (Cambio cada 3s, bordes asomando debajo, botones izq/der) */}
+          <div className="block md:hidden">
+            <CardDeckGallery
+              id="galeria-tarjeta-naipes"
+              items={URBAN_BENEFIT_ITEMS}
+              autoPlayInterval={3000}
+              renderCard={(item) => {
+                const IconComp = item.icon;
+                return (
+                  <div
+                    className={`relative bg-white rounded-3xl p-6 border ${item.palette.border} shadow-xl flex flex-col justify-between overflow-hidden min-h-[330px]`}
+                  >
+                    <div>
+                      {/* Header con Tag e Ícono */}
+                      <div className="flex items-center justify-between gap-3 mb-4">
+                        <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${item.palette.tagColor}`}>
+                          {item.tag}
+                        </span>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${item.palette.statusColor}`}>
+                          {item.status}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-3.5 mb-3.5">
+                        <div className={`p-3 rounded-2xl ${item.palette.iconGradient} shrink-0 shadow-md`}>
+                          <IconComp className="h-5 w-5" strokeWidth={2.2} />
+                        </div>
+                        <h3 className="font-black text-lg text-slate-900 leading-snug">
+                          {item.title}
+                        </h3>
+                      </div>
+
+                      {/* Descripción de Obra */}
+                      <p className="text-xs text-slate-600 leading-relaxed font-normal mb-6">
+                        {item.desc}
+                      </p>
+                    </div>
+
+                    {/* Ficha Técnica de Parámetros Constructivos */}
+                    <div className={`pt-3.5 border-t ${item.palette.specsBg} -mx-6 -mb-6 px-6 py-3.5 rounded-b-3xl`}>
+                      <div className="space-y-2">
+                        {item.specs.map((sp, sIdx) => (
+                          <div key={sIdx} className="flex items-center justify-between text-xs">
+                            <span className="font-medium text-slate-500">{sp.label}:</span>
+                            <span className="font-bold text-slate-800 text-right">{sp.val}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              }}
+            />
+          </div>
+
+          {/* VISTA ESCRITORIO: Grid completa multicuadrícula original */}
+          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
             {URBAN_BENEFIT_ITEMS.map((item, idx) => {
               const IconComp = item.icon;
               return (
-                <ScrollReveal
-                  key={idx}
-                  direction="up"
-                  delay={0.06 * idx}
-                  className={`group relative bg-gradient-to-b ${item.palette.cardGradient} rounded-2xl p-6 sm:p-7 border ${item.palette.border} shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden`}
-                >
-                  <div>
-                    {/* Ícono con contenedor vibrante y Título */}
-                    <div className="flex items-center gap-3.5 mb-3.5">
-                      <div className={`p-3 rounded-2xl ${item.palette.iconGradient} shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300`}>
-                        <IconComp className="h-5 w-5" strokeWidth={2.2} />
+                <ScrollReveal key={idx} direction="up" delay={idx * 0.08}>
+                  <div
+                    className={`group relative bg-white rounded-2xl p-6 sm:p-7 border ${item.palette.border} shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden h-full`}
+                  >
+                    <div>
+                      {/* Header con Tag e Ícono */}
+                      <div className="flex items-center justify-between gap-3 mb-4">
+                        <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${item.palette.tagColor}`}>
+                          {item.tag}
+                        </span>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${item.palette.statusColor}`}>
+                          {item.status}
+                        </span>
                       </div>
-                      <h3 className="font-black text-base sm:text-lg text-slate-900 leading-snug group-hover:text-slate-950 transition-colors">
-                        {item.title}
-                      </h3>
+
+                      <div className="flex items-center gap-3.5 mb-3.5">
+                        <div className={`p-3 rounded-2xl ${item.palette.iconGradient} shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300`}>
+                          <IconComp className="h-5 w-5" strokeWidth={2.2} />
+                        </div>
+                        <h3 className="font-black text-base sm:text-lg text-slate-900 leading-snug group-hover:text-slate-950 transition-colors">
+                          {item.title}
+                        </h3>
+                      </div>
+
+                      <p className="text-xs sm:text-[13px] text-slate-600 leading-relaxed font-normal mb-5">
+                        {item.desc}
+                      </p>
                     </div>
 
-                    {/* Descripción de Obra */}
-                    <p className="text-xs sm:text-[13px] text-slate-600 leading-relaxed font-normal mb-5">
-                      {item.desc}
-                    </p>
-                  </div>
-
-                  {/* Ficha Técnica de Parámetros Constructivos con matiz temático */}
-                  <div className={`pt-3 border-t ${item.palette.specsBg} -mx-6 -mb-6 sm:-mx-7 sm:-mb-7 px-6 sm:px-7 py-3.5 rounded-b-2xl`}>
-                    <div className="space-y-1.5">
-                      {item.specs.map((sp, sIdx) => (
-                        <div key={sIdx} className="flex items-center justify-between text-[11px]">
-                          <span className="font-medium text-slate-500">{sp.label}:</span>
-                          <span className="font-bold text-slate-800 text-right">{sp.val}</span>
-                        </div>
-                      ))}
+                    <div className={`pt-3 border-t ${item.palette.specsBg} -mx-6 -mb-6 sm:-mx-7 sm:-mb-7 px-6 sm:px-7 py-3.5 rounded-b-2xl`}>
+                      <div className="space-y-1.5">
+                        {item.specs.map((sp, sIdx) => (
+                          <div key={sIdx} className="flex items-center justify-between text-[11px]">
+                            <span className="font-medium text-slate-500">{sp.label}:</span>
+                            <span className="font-bold text-slate-800 text-right">{sp.val}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </ScrollReveal>

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useId } from 'react';
+import React, { useState, useId, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   Calculator,
   Home,
@@ -17,6 +18,7 @@ import {
   CheckCircle2,
   AlertCircle,
   RotateCcw,
+  ChevronDown,
 } from 'lucide-react';
 import { useSiteSettings } from '@/src/lib/siteSettings';
 import { WhatsAppIcon } from '../SocialIcons';
@@ -183,74 +185,89 @@ export function AppraisalCalculator() {
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
   };
 
+  // Estado de apertura de dropdowns personalizados
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+  // Cerrar dropdown al hacer click fuera
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('[data-custom-dropdown]')) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener('click', handleOutsideClick);
+    return () => document.removeEventListener('click', handleOutsideClick);
+  }, []);
+
   return (
-    <div id="cotizador-avaluos" className="w-full h-full max-h-full flex flex-col justify-between overflow-hidden">
-      {/* Barra Superior Compacta */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-2 sm:mb-3 shrink-0">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-emerald-100 text-[#113d22] flex items-center justify-center">
-            <Calculator className="w-4 h-4 text-[#F58220]" />
+    <div id="cotizador-avaluos" className="w-full flex-1 flex flex-col justify-start">
+      {/* Barra Superior Minimalista sin cajas */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-200/60 shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl text-[#F58220]">
+            <Calculator className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-base sm:text-xl font-black text-slate-900 tracking-tight leading-none">
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-none">
               Calculadora de Avalúos
             </h1>
-            <p className="text-[11px] text-slate-500 font-medium hidden sm:block mt-0.5">
+            <p className="text-xs text-slate-500 font-medium hidden sm:block mt-1">
               Valuación referencial de mercado y honorarios periciales en el Austro
             </p>
           </div>
         </div>
 
-        {/* Selector de Pestañas Compacto */}
-        <div className="inline-flex p-1 bg-slate-200/90 rounded-xl border border-slate-300/80 shadow-xs">
+        {/* Selector de Pestañas: Botones fantasma sin box, contorno solo en hover/active */}
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setActiveTab('property')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs transition-all cursor-pointer border ${
               activeTab === 'property'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'border-emerald-600 text-emerald-800 bg-emerald-50/50'
+                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-900'
             }`}
           >
-            <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
+            <TrendingUp className="w-4 h-4 text-emerald-600" />
             <span>Valor Comercial</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('fee')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs transition-all cursor-pointer border ${
               activeTab === 'fee'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'border-[#F58220] text-orange-900 bg-orange-50/50'
+                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-900'
             }`}
           >
-            <DollarSign className="w-3.5 h-3.5 text-[#F58220]" />
+            <DollarSign className="w-4 h-4 text-[#F58220]" />
             <span>Honorario Pericial</span>
           </button>
         </div>
       </div>
 
-      {/* Tarjeta Principal Dashboard (Ajustada al viewport) */}
-      <div className="flex-1 min-h-0 bg-white rounded-2xl shadow-xl border border-slate-200/90 overflow-hidden flex flex-col lg:grid lg:grid-cols-12">
+      {/* Cuerpo Principal de la Calculadora: Dividido de izq a der por una sola línea vertical limpia */}
+      <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start relative">
         
-        {/* Panel Izquierdo: Formulario y Parámetros */}
-        <div className="lg:col-span-7 p-3 sm:p-5 overflow-y-auto flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-200">
+        {/* Panel Izquierdo: Formulario con inputs y selectores estéticos con línea vertical divisoria a la derecha */}
+        <div className="lg:col-span-7 space-y-6 lg:pr-10 lg:border-r lg:border-slate-200/80">
           {activeTab === 'property' ? (
-            <div className="space-y-3 sm:space-y-3.5">
-              {/* 1. Categoría */}
+            <div className="space-y-6">
+              {/* 1. Categoría de Inmueble: Botones planos, contorno solo al pasar por encima o activo */}
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-bold text-slate-800">1. Tipo de Inmueble</span>
+                <div className="flex items-center justify-between mb-2.5">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-600">1. Tipo de Inmueble</span>
                   <button
                     type="button"
                     onClick={handleReset}
-                    className="text-[11px] text-slate-400 hover:text-emerald-700 flex items-center gap-1 cursor-pointer"
+                    className="text-xs text-slate-400 hover:text-emerald-700 flex items-center gap-1 cursor-pointer transition-colors"
                   >
-                    <RotateCcw className="w-3 h-3" />
+                    <RotateCcw className="w-3.5 h-3.5" />
                     <span>Restablecer</span>
                   </button>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                   {PROPERTY_CATEGORIES.map((cat) => {
                     const Icon = cat.icon;
                     const isSelected = category === cat.id;
@@ -259,177 +276,269 @@ export function AppraisalCalculator() {
                         key={cat.id}
                         type="button"
                         onClick={() => handleSelectCategory(cat.id)}
-                        className={`p-2 rounded-xl border text-center flex flex-row sm:flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                        className={`p-3 rounded-2xl text-center flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer border ${
                           isSelected
-                            ? 'border-emerald-600 bg-emerald-50/80 text-emerald-950 font-bold shadow-2xs ring-1 ring-emerald-500/20'
-                            : 'border-slate-200 bg-slate-50/60 text-slate-700 hover:bg-slate-100'
+                            ? 'border-emerald-600 text-emerald-950 font-black shadow-xs bg-emerald-50/40'
+                            : 'border-transparent hover:border-slate-300 text-slate-600 hover:text-slate-900'
                         }`}
                       >
-                        <Icon className={`w-4 h-4 ${isSelected ? 'text-[#113d22]' : 'text-slate-500'}`} />
-                        <span className="text-xs leading-none">{cat.label}</span>
+                        <Icon className={`w-5 h-5 ${isSelected ? 'text-[#113d22]' : 'text-slate-400'}`} />
+                        <span className="text-xs font-semibold leading-none">{cat.label}</span>
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* 2. Ubicación */}
-              <div>
-                <label htmlFor={`${inputPrefix}-zone`} className="block text-xs font-bold text-slate-800 mb-1">
+              {/* 2. Ubicación: Selector con solo línea inferior y menú desplegable flotante con fade down */}
+              <div className="relative" data-custom-dropdown>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
                   2. Sector / Cantón
                 </label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
-                  <select
-                    id={`${inputPrefix}-zone`}
-                    value={zoneId}
-                    onChange={(e) => setZoneId(e.target.value)}
-                    className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs sm:text-sm font-medium focus:ring-1 focus:ring-emerald-500 focus:outline-hidden cursor-pointer"
-                  >
-                    {ZONES_DATA.map((z) => (
-                      <option key={z.id} value={z.id}>
-                        {z.label} (~${z.landBase}/m² base)
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setOpenDropdown(openDropdown === 'zone' ? null : 'zone')}
+                  className="w-full flex items-center justify-between py-2.5 border-b-2 border-slate-300 hover:border-emerald-600 focus:border-emerald-600 transition-colors cursor-pointer text-left group"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <MapPin className="w-4 h-4 text-emerald-600" />
+                    <span className="text-sm sm:text-base font-bold text-slate-900">
+                      {selectedZone.label}
+                    </span>
+                    <span className="text-xs text-slate-400 font-medium">
+                      (~${selectedZone.landBase}/m² base)
+                    </span>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${openDropdown === 'zone' ? 'rotate-180 text-emerald-600' : 'group-hover:text-slate-700'}`} />
+                </button>
+
+                {/* Menú flotante redondeado con efecto fade down */}
+                <AnimatePresence>
+                  {openDropdown === 'zone' && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 4, scale: 1 }}
+                      exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                      transition={{ duration: 0.18, ease: 'easeOut' }}
+                      className="absolute left-0 right-0 z-50 bg-white rounded-2xl shadow-2xl border border-slate-200/90 py-2 mt-1 max-h-64 overflow-y-auto"
+                    >
+                      {ZONES_DATA.map((z) => (
+                        <button
+                          key={z.id}
+                          type="button"
+                          onClick={() => {
+                            setZoneId(z.id);
+                            setOpenDropdown(null);
+                          }}
+                          className={`w-full px-4 py-2.5 text-left text-xs sm:text-sm flex items-center justify-between transition-colors ${
+                            zoneId === z.id
+                              ? 'bg-emerald-50 text-emerald-900 font-bold'
+                              : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                          }`}
+                        >
+                          <span>{z.label}</span>
+                          <span className="text-xs text-slate-400 font-medium">~${z.landBase}/m²</span>
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
-              {/* 3. Dimensiones */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {/* 3. Dimensiones: Inputs con solo línea inferior */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {category !== 'departamento' && (
                   <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <label htmlFor={`${inputPrefix}-landArea`} className="text-xs font-bold text-slate-800 flex items-center gap-1">
-                        <LandPlot className="w-3.5 h-3.5 text-emerald-700" />
-                        <span>Área Terreno (m²)</span>
-                      </label>
-                      <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded">
-                        {landArea} m²
-                      </span>
+                    <label htmlFor={`${inputPrefix}-landArea`} className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
+                      Área Terreno (m²)
+                    </label>
+                    <div className="flex items-center gap-2 border-b-2 border-slate-300 focus-within:border-emerald-600 transition-colors py-1">
+                      <LandPlot className="w-4 h-4 text-emerald-700 shrink-0" />
+                      <input
+                        id={`${inputPrefix}-landArea`}
+                        type="number"
+                        min="0"
+                        value={landArea || ''}
+                        onChange={(e) => setLandArea(Number(e.target.value) || 0)}
+                        className="w-full bg-transparent text-slate-900 text-base sm:text-lg font-black focus:outline-hidden"
+                        placeholder="Ej: 300"
+                      />
+                      <span className="text-xs font-bold text-slate-400 shrink-0">m²</span>
                     </div>
-                    <input
-                      id={`${inputPrefix}-landArea`}
-                      type="number"
-                      min="0"
-                      value={landArea || ''}
-                      onChange={(e) => setLandArea(Number(e.target.value) || 0)}
-                      className="w-full px-3 py-1.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs sm:text-sm font-semibold focus:ring-1 focus:ring-emerald-500 focus:outline-hidden"
-                      placeholder="Ej: 300"
-                    />
                   </div>
                 )}
 
                 {category !== 'terreno' && (
                   <div className={category === 'departamento' ? 'sm:col-span-2' : ''}>
-                    <div className="flex justify-between items-center mb-1">
-                      <label htmlFor={`${inputPrefix}-constArea`} className="text-xs font-bold text-slate-800 flex items-center gap-1">
-                        <Building2 className="w-3.5 h-3.5 text-emerald-700" />
-                        <span>Área Construcción (m²)</span>
-                      </label>
-                      <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded">
-                        {constArea} m²
-                      </span>
+                    <label htmlFor={`${inputPrefix}-constArea`} className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
+                      Área Construcción (m²)
+                    </label>
+                    <div className="flex items-center gap-2 border-b-2 border-slate-300 focus-within:border-emerald-600 transition-colors py-1">
+                      <Building2 className="w-4 h-4 text-emerald-700 shrink-0" />
+                      <input
+                        id={`${inputPrefix}-constArea`}
+                        type="number"
+                        min="0"
+                        value={constArea || ''}
+                        onChange={(e) => setConstArea(Number(e.target.value) || 0)}
+                        className="w-full bg-transparent text-slate-900 text-base sm:text-lg font-black focus:outline-hidden"
+                        placeholder="Ej: 160"
+                      />
+                      <span className="text-xs font-bold text-slate-400 shrink-0">m²</span>
                     </div>
-                    <input
-                      id={`${inputPrefix}-constArea`}
-                      type="number"
-                      min="0"
-                      value={constArea || ''}
-                      onChange={(e) => setConstArea(Number(e.target.value) || 0)}
-                      className="w-full px-3 py-1.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs sm:text-sm font-semibold focus:ring-1 focus:ring-emerald-500 focus:outline-hidden"
-                      placeholder="Ej: 160"
-                    />
                   </div>
                 )}
               </div>
 
-              {/* 4. Acabados y Antigüedad */}
+              {/* 4. Acabados y Antigüedad: Selectores flotantes redondeados con fade down */}
               {category !== 'terreno' && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <div>
-                    <label htmlFor={`${inputPrefix}-quality`} className="block text-xs font-bold text-slate-800 mb-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {/* Selector Acabados */}
+                  <div className="relative" data-custom-dropdown>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
                       Nivel de Acabados
                     </label>
-                    <select
-                      id={`${inputPrefix}-quality`}
-                      value={finishQuality}
-                      onChange={(e) => setFinishQuality(e.target.value)}
-                      className="w-full px-3 py-1.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs font-medium focus:ring-1 focus:ring-emerald-500 focus:outline-hidden cursor-pointer"
+                    <button
+                      type="button"
+                      onClick={() => setOpenDropdown(openDropdown === 'finish' ? null : 'finish')}
+                      className="w-full flex items-center justify-between py-2.5 border-b-2 border-slate-300 hover:border-emerald-600 focus:border-emerald-600 transition-colors cursor-pointer text-left group"
                     >
-                      {FINISH_QUALITIES.map((q) => (
-                        <option key={q.id} value={q.id}>
-                          {q.label} (~${q.costM2}/m²)
-                        </option>
-                      ))}
-                    </select>
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-emerald-600" />
+                        <span className="text-sm font-bold text-slate-900">
+                          {selectedFinish.label}
+                        </span>
+                        <span className="text-xs text-slate-400">
+                          (~${selectedFinish.costM2}/m²)
+                        </span>
+                      </div>
+                      <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${openDropdown === 'finish' ? 'rotate-180 text-emerald-600' : 'group-hover:text-slate-700'}`} />
+                    </button>
+
+                    <AnimatePresence>
+                      {openDropdown === 'finish' && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                          animate={{ opacity: 1, y: 4, scale: 1 }}
+                          exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                          transition={{ duration: 0.18, ease: 'easeOut' }}
+                          className="absolute left-0 right-0 z-50 bg-white rounded-2xl shadow-2xl border border-slate-200/90 py-2 mt-1 max-h-64 overflow-y-auto"
+                        >
+                          {FINISH_QUALITIES.map((q) => (
+                            <button
+                              key={q.id}
+                              type="button"
+                              onClick={() => {
+                                setFinishQuality(q.id);
+                                setOpenDropdown(null);
+                              }}
+                              className={`w-full px-4 py-2.5 text-left text-xs sm:text-sm flex items-center justify-between transition-colors ${
+                                finishQuality === q.id
+                                  ? 'bg-emerald-50 text-emerald-900 font-bold'
+                                  : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                              }`}
+                            >
+                              <div>
+                                <span className="block font-bold">{q.label}</span>
+                                <span className="text-[11px] text-slate-400">{q.desc}</span>
+                              </div>
+                              <span className="text-xs font-semibold text-slate-500">~${q.costM2}/m²</span>
+                            </button>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
 
-                  <div>
-                    <label htmlFor={`${inputPrefix}-age`} className="block text-xs font-bold text-slate-800 mb-1">
+                  {/* Selector Antigüedad */}
+                  <div className="relative" data-custom-dropdown>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
                       Antigüedad Edificación
                     </label>
-                    <select
-                      id={`${inputPrefix}-age`}
-                      value={ageId}
-                      onChange={(e) => setAgeId(e.target.value)}
-                      className="w-full px-3 py-1.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs font-medium focus:ring-1 focus:ring-emerald-500 focus:outline-hidden cursor-pointer"
+                    <button
+                      type="button"
+                      onClick={() => setOpenDropdown(openDropdown === 'age' ? null : 'age')}
+                      className="w-full flex items-center justify-between py-2.5 border-b-2 border-slate-300 hover:border-emerald-600 focus:border-emerald-600 transition-colors cursor-pointer text-left group"
                     >
-                      {AGE_OPTIONS.map((a) => (
-                        <option key={a.id} value={a.id}>
-                          {a.label}
-                        </option>
-                      ))}
-                    </select>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-[#F58220]" />
+                        <span className="text-sm font-bold text-slate-900">
+                          {selectedAge.label}
+                        </span>
+                      </div>
+                      <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${openDropdown === 'age' ? 'rotate-180 text-emerald-600' : 'group-hover:text-slate-700'}`} />
+                    </button>
+
+                    <AnimatePresence>
+                      {openDropdown === 'age' && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                          animate={{ opacity: 1, y: 4, scale: 1 }}
+                          exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                          transition={{ duration: 0.18, ease: 'easeOut' }}
+                          className="absolute left-0 sm:left-auto right-0 sm:min-w-[280px] z-50 bg-white rounded-2xl shadow-2xl border border-slate-200/90 py-2 mt-1 max-h-64 overflow-y-auto"
+                        >
+                          {AGE_OPTIONS.map((a) => (
+                            <button
+                              key={a.id}
+                              type="button"
+                              onClick={() => {
+                                setAgeId(a.id);
+                                setOpenDropdown(null);
+                              }}
+                              className={`w-full px-4 py-2.5 text-left text-xs sm:text-sm transition-colors ${
+                                ageId === a.id
+                                  ? 'bg-emerald-50 text-emerald-900 font-bold'
+                                  : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                              }`}
+                            >
+                              {a.label}
+                            </button>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
               )}
 
-              {/* 5. Factores del Terreno */}
+              {/* 5. Factores del Terreno: Botones fantasma sin box */}
               <div>
-                <span className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                <span className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">
                   Equipamiento & Entorno
                 </span>
-                <div className="grid grid-cols-3 gap-2 text-[11px]">
-                  <label className="flex items-center gap-1.5 p-1.5 rounded-lg border border-slate-200 bg-slate-50/70 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={hasFullServices}
-                      onChange={(e) => setHasFullServices(e.target.checked)}
-                      className="rounded text-emerald-600 focus:ring-emerald-500 w-3.5 h-3.5"
-                    />
-                    <span className="font-medium text-slate-700 truncate">Servicios</span>
-                  </label>
-                  <label className="flex items-center gap-1.5 p-1.5 rounded-lg border border-slate-200 bg-slate-50/70 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={hasPavedRoad}
-                      onChange={(e) => setHasPavedRoad(e.target.checked)}
-                      className="rounded text-emerald-600 focus:ring-emerald-500 w-3.5 h-3.5"
-                    />
-                    <span className="font-medium text-slate-700 truncate">Vía asfalto</span>
-                  </label>
-                  <label className="flex items-center gap-1.5 p-1.5 rounded-lg border border-slate-200 bg-slate-50/70 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={isFlatTerrain}
-                      onChange={(e) => setIsFlatTerrain(e.target.checked)}
-                      className="rounded text-emerald-600 focus:ring-emerald-500 w-3.5 h-3.5"
-                    />
-                    <span className="font-medium text-slate-700 truncate">Topografía</span>
-                  </label>
+                <div className="grid grid-cols-3 gap-3 text-xs">
+                  {[
+                    { label: 'Servicios Básicos', checked: hasFullServices, toggle: () => setHasFullServices(!hasFullServices) },
+                    { label: 'Vía Pavimentada', checked: hasPavedRoad, toggle: () => setHasPavedRoad(!hasPavedRoad) },
+                    { label: 'Topografía Plana', checked: isFlatTerrain, toggle: () => setIsFlatTerrain(!isFlatTerrain) },
+                  ].map((item, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={item.toggle}
+                      className={`p-3 rounded-2xl text-center flex items-center justify-center gap-2 transition-all cursor-pointer border ${
+                        item.checked
+                          ? 'border-emerald-600 text-emerald-950 font-bold bg-emerald-50/40'
+                          : 'border-transparent hover:border-slate-300 text-slate-500 hover:text-slate-800'
+                      }`}
+                    >
+                      <CheckCircle2 className={`w-4 h-4 ${item.checked ? 'text-[#15803d]' : 'text-slate-300'}`} />
+                      <span className="truncate">{item.label}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
           ) : (
             /* Modo 2: Cotizador Directo de Honorarios */
-            <div className="space-y-3.5">
+            <div className="space-y-6">
               <div>
-                <label htmlFor={`${inputPrefix}-manualValue`} className="block text-xs font-bold text-slate-800 mb-1">
+                <label htmlFor={`${inputPrefix}-manualValue`} className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
                   Valor Comercial de la Propiedad (USD)
                 </label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-2.5 w-4 h-4 text-slate-400 pointer-events-none" />
+                <div className="flex items-center gap-2 border-b-2 border-slate-300 focus-within:border-emerald-600 transition-colors py-1">
+                  <DollarSign className="w-5 h-5 text-emerald-600 shrink-0" />
                   <input
                     id={`${inputPrefix}-manualValue`}
                     type="number"
@@ -437,17 +546,17 @@ export function AppraisalCalculator() {
                     step="5000"
                     value={manualPropertyValue}
                     onChange={(e) => setManualPropertyValue(Math.max(0, Number(e.target.value) || 0))}
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-base font-bold focus:ring-1 focus:ring-emerald-500 focus:outline-hidden"
+                    className="w-full bg-transparent text-slate-900 text-xl sm:text-2xl font-black focus:outline-hidden"
                     placeholder="Ej: 120000"
                   />
                 </div>
-                <div className="flex gap-1.5 mt-1.5">
+                <div className="flex gap-2 mt-3">
                   {[65000, 110000, 180000, 260000].map((quickVal) => (
                     <button
                       key={quickVal}
                       type="button"
                       onClick={() => setManualPropertyValue(quickVal)}
-                      className="text-[11px] px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium cursor-pointer"
+                      className="text-xs px-3 py-1.5 rounded-xl border border-transparent hover:border-slate-300 text-slate-600 hover:text-slate-900 font-semibold cursor-pointer transition-all"
                     >
                       ${quickVal / 1000}k
                     </button>
@@ -455,151 +564,219 @@ export function AppraisalCalculator() {
                 </div>
               </div>
 
-              <div>
-                <label htmlFor={`${inputPrefix}-purpose`} className="block text-xs font-bold text-slate-800 mb-1">
+              {/* Selector Finalidad con fade down */}
+              <div className="relative" data-custom-dropdown>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
                   Finalidad del Avalúo Pericial
                 </label>
-                <select
-                  id={`${inputPrefix}-purpose`}
-                  value={appraisalPurpose}
-                  onChange={(e) => setAppraisalPurpose(e.target.value)}
-                  className="w-full px-3 py-1.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs sm:text-sm font-medium focus:ring-1 focus:ring-emerald-500 focus:outline-hidden cursor-pointer"
+                <button
+                  type="button"
+                  onClick={() => setOpenDropdown(openDropdown === 'purpose' ? null : 'purpose')}
+                  className="w-full flex items-center justify-between py-2.5 border-b-2 border-slate-300 hover:border-emerald-600 focus:border-emerald-600 transition-colors cursor-pointer text-left group"
                 >
-                  <option value="Crédito Hipotecario (BIESS / Bancos / Cooperativas)">Crédito Hipotecario (BIESS / Bancos / Cooperativas)</option>
-                  <option value="Compraventa Comercial (Fijar precio justo)">Compraventa Comercial (Fijar precio justo)</option>
-                  <option value="Trámite Notarial / Partición de Herencia">Trámite Notarial / Partición de Herencia</option>
-                  <option value="Valoración Tributaria o Catastral">Valoración Tributaria o Catastral</option>
-                  <option value="Peritaje Judicial o Litigio Civil">Peritaje Judicial o Litigio Civil</option>
-                </select>
+                  <span className="text-sm font-bold text-slate-900 truncate">
+                    {appraisalPurpose}
+                  </span>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ${openDropdown === 'purpose' ? 'rotate-180 text-emerald-600' : 'group-hover:text-slate-700'}`} />
+                </button>
+
+                <AnimatePresence>
+                  {openDropdown === 'purpose' && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 4, scale: 1 }}
+                      exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                      transition={{ duration: 0.18, ease: 'easeOut' }}
+                      className="absolute left-0 right-0 z-30 bg-white rounded-2xl shadow-2xl border border-slate-200/90 py-2 mt-1 overflow-hidden"
+                    >
+                      {[
+                        'Crédito Hipotecario (BIESS / Bancos / Cooperativas)',
+                        'Compraventa Comercial (Fijar precio justo)',
+                        'Trámite Notarial / Partición de Herencia',
+                        'Valoración Tributaria o Catastral',
+                        'Peritaje Judicial o Litigio Civil',
+                      ].map((item) => (
+                        <button
+                          key={item}
+                          type="button"
+                          onClick={() => {
+                            setAppraisalPurpose(item);
+                            setOpenDropdown(null);
+                          }}
+                          className={`w-full px-4 py-2.5 text-left text-xs sm:text-sm transition-colors ${
+                            appraisalPurpose === item
+                              ? 'bg-emerald-50 text-emerald-900 font-bold'
+                              : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                          }`}
+                        >
+                          {item}
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
-              <div>
-                <label htmlFor={`${inputPrefix}-feeZone`} className="block text-xs font-bold text-slate-800 mb-1">
+              {/* Selector Zona Inspección con fade down */}
+              <div className="relative" data-custom-dropdown>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
                   Lugar de la Inspección Técnica In-Situ
                 </label>
-                <select
-                  id={`${inputPrefix}-feeZone`}
-                  value={zoneId}
-                  onChange={(e) => setZoneId(e.target.value)}
-                  className="w-full px-3 py-1.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs sm:text-sm font-medium focus:ring-1 focus:ring-emerald-500 focus:outline-hidden cursor-pointer"
+                <button
+                  type="button"
+                  onClick={() => setOpenDropdown(openDropdown === 'feeZone' ? null : 'feeZone')}
+                  className="w-full flex items-center justify-between py-2.5 border-b-2 border-slate-300 hover:border-emerald-600 focus:border-emerald-600 transition-colors cursor-pointer text-left group"
                 >
-                  {ZONES_DATA.map((z) => (
-                    <option key={z.id} value={z.id}>
-                      {z.label} {z.extraTravel > 0 ? `(+ viático $${z.extraTravel})` : '(Área urbana)'}
-                    </option>
-                  ))}
-                </select>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-emerald-600" />
+                    <span className="text-sm font-bold text-slate-900">
+                      {selectedZone.label}
+                    </span>
+                    <span className="text-xs text-slate-400">
+                      {selectedZone.extraTravel > 0 ? `(+ viático $${selectedZone.extraTravel})` : '(Área urbana)'}
+                    </span>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${openDropdown === 'feeZone' ? 'rotate-180 text-emerald-600' : 'group-hover:text-slate-700'}`} />
+                </button>
+
+                <AnimatePresence>
+                  {openDropdown === 'feeZone' && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 4, scale: 1 }}
+                      exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                      transition={{ duration: 0.18, ease: 'easeOut' }}
+                      className="absolute left-0 right-0 z-30 bg-white rounded-2xl shadow-2xl border border-slate-200/90 py-2 mt-1 overflow-hidden"
+                    >
+                      {ZONES_DATA.map((z) => (
+                        <button
+                          key={z.id}
+                          type="button"
+                          onClick={() => {
+                            setZoneId(z.id);
+                            setOpenDropdown(null);
+                          }}
+                          className={`w-full px-4 py-2.5 text-left text-xs sm:text-sm flex items-center justify-between transition-colors ${
+                            zoneId === z.id
+                              ? 'bg-emerald-50 text-emerald-900 font-bold'
+                              : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                          }`}
+                        >
+                          <span>{z.label}</span>
+                          <span className="text-xs text-slate-400">
+                            {z.extraTravel > 0 ? `+$${z.extraTravel}` : 'Urbano'}
+                          </span>
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
-              <div className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3 text-[11px] text-emerald-950 space-y-1">
-                <div className="font-bold flex items-center gap-1 text-emerald-900">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Acreditación Oficial de Peritaje</span>
-                </div>
-                <p className="text-emerald-800 leading-snug">
-                  Informe pericial con firma autorizada para bancos, superintendencias, juzgados y notarías de todo el Ecuador.
-                </p>
+              <div className="pt-2 flex items-center gap-2 text-xs text-emerald-800">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>Informe pericial con firma acreditada para bancos, juzgados y notarías.</span>
               </div>
             </div>
           )}
         </div>
 
-        {/* Panel Derecho: Resultados en Tiempo Real y Acción */}
-        <div className="lg:col-span-5 p-4 sm:p-5 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white flex flex-col justify-between overflow-y-auto">
+        {/* Panel Derecho: Resultados Abiertos sin boxes pesados */}
+        <div className="lg:col-span-5 space-y-6 pt-2 lg:pt-0">
           <div>
-            <div className="flex items-center justify-between border-b border-white/10 pb-2.5 mb-3">
-              <div className="flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-[#5be196]" />
-                <span className="font-bold text-xs tracking-wider text-white uppercase">
-                  Resultado
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-5">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-emerald-600" />
+                <span className="font-black text-xs tracking-wider text-slate-900 uppercase">
+                  Resultado en Tiempo Real
                 </span>
               </div>
-              <span className="text-[10px] font-semibold px-2 py-0.2 rounded-full bg-white/10 text-emerald-300 border border-emerald-500/30">
-                En vivo
+              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full text-emerald-800 bg-emerald-50 border border-emerald-200">
+                Calculado
               </span>
             </div>
 
             {/* Resultado Principal */}
             {activeTab === 'property' && (
-              <div className="space-y-2 mb-3">
-                <span className="text-[11px] text-slate-400 uppercase tracking-wider block">
+              <div className="space-y-3 mb-6">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
                   Valor Comercial Referencial
                 </span>
-                <div className="text-2xl sm:text-3xl font-black text-[#5be196] tracking-tight">
+                <div className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
                   {formatUSD(totalEstimatedValue)}
                 </div>
-                <div className="text-xs text-slate-300 flex items-center gap-1">
-                  <span>Rango:</span>
-                  <strong className="text-white font-semibold">
+                <div className="text-xs text-slate-500 flex items-center gap-1.5">
+                  <span>Rango estimado de mercado:</span>
+                  <strong className="text-slate-800 font-bold">
                     {formatUSD(rangeMin)} — {formatUSD(rangeMax)}
                   </strong>
                 </div>
 
-                {/* Subtotales */}
-                <div className="bg-white/5 rounded-xl p-2.5 border border-white/10 space-y-1 text-xs mt-2">
+                {/* Subtotales en líneas minimalistas */}
+                <div className="pt-4 border-t border-slate-200 space-y-2 text-xs">
                   {effectiveLandArea > 0 && (
-                    <div className="flex justify-between items-center text-slate-300">
-                      <span className="flex items-center gap-1">
-                        <LandPlot className="w-3 h-3 text-emerald-400" />
+                    <div className="flex justify-between items-center text-slate-600">
+                      <span className="flex items-center gap-1.5">
+                        <LandPlot className="w-3.5 h-3.5 text-emerald-600" />
                         Terreno ({effectiveLandArea} m²):
                       </span>
-                      <span className="font-bold text-white">{formatUSD(estimatedLandValue)}</span>
+                      <span className="font-bold text-slate-900">{formatUSD(estimatedLandValue)}</span>
                     </div>
                   )}
                   {effectiveConstArea > 0 && (
-                    <div className="flex justify-between items-center text-slate-300">
-                      <span className="flex items-center gap-1">
-                        <Building2 className="w-3 h-3 text-[#F58220]" />
+                    <div className="flex justify-between items-center text-slate-600">
+                      <span className="flex items-center gap-1.5">
+                        <Building2 className="w-3.5 h-3.5 text-[#F58220]" />
                         Construcción ({effectiveConstArea} m²):
                       </span>
-                      <span className="font-bold text-white">{formatUSD(estimatedConstValue)}</span>
+                      <span className="font-bold text-slate-900">{formatUSD(estimatedConstValue)}</span>
                     </div>
                   )}
                 </div>
               </div>
             )}
 
-            {/* Costo del Peritaje Técnico */}
-            <div className="bg-white/5 rounded-xl p-3 border border-white/10 space-y-2 mb-3">
-              <div className="flex justify-between items-center text-xs">
-                <span className="text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                  <FileText className="w-3 h-3 text-[#F58220]" />
+            {/* Honorario Pericial Oficial en líneas abiertas */}
+            <div className="py-4 border-y border-slate-200 space-y-2 mb-6">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-[#F58220]" />
                   Honorario Pericial Oficial:
                 </span>
-                <span className="font-bold text-[#F58220] text-sm">
+                <span className="font-black text-[#F58220] text-lg sm:text-xl">
                   {formatUSD(appraisalFee.min)} - {formatUSD(appraisalFee.max)}
                 </span>
               </div>
-              <div className="flex justify-between items-center text-xs text-slate-300 border-t border-white/10 pt-1.5">
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-emerald-400" />
-                  Plazo de entrega:
+              <div className="flex justify-between items-center text-xs text-slate-500">
+                <span className="flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-emerald-600" />
+                  Plazo de entrega pericial:
                 </span>
-                <span className="font-semibold text-white">48 a 72 horas</span>
+                <span className="font-semibold text-slate-800">48 a 72 horas</span>
               </div>
             </div>
 
-            <div className="text-[10px] text-slate-400 flex items-start gap-1 mb-3 leading-snug">
-              <AlertCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+            <div className="text-xs text-slate-400 flex items-start gap-1.5 mb-6 leading-relaxed">
+              <AlertCircle className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
               <span>
-                Cálculo estadístico de mercado. El informe pericial con valor legal definitivo se emite tras la visita técnica in-situ.
+                Cálculo estadístico referencial. El informe pericial con fe pública definitiva se emite tras la visita técnica in-situ.
               </span>
             </div>
           </div>
 
-          {/* Botón WhatsApp */}
+          {/* Botón WhatsApp: botón limpio con borde en hover */}
           <div>
             <button
               type="button"
               onClick={handleSendToWhatsApp}
-              className="w-full py-3 px-4 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-slate-950 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+              className="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm flex items-center justify-center gap-2.5 transition-all shadow-md hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
             >
-              <WhatsAppIcon size={18} className="text-slate-950" />
+              <WhatsAppIcon size={20} className="text-white" />
               <span>Agendar Avalúo Oficial con estos Datos</span>
             </button>
-            <p className="text-center text-[10px] text-slate-400 mt-1.5 flex items-center justify-center gap-1">
-              <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-              <span>Conexión directa por WhatsApp con perito acreditado</span>
+            <p className="text-center text-xs text-slate-400 mt-2 flex items-center justify-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Conexión directa por WhatsApp con perito calificado</span>
             </p>
           </div>
         </div>

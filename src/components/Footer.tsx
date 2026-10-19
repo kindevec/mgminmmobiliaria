@@ -107,7 +107,7 @@ export function Footer({
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* Logo y Marca */}
           <div className="flex items-center">
-            <LogoMGM className="h-8 sm:h-9 w-auto" variant="compact" showSubtitle={true} isGhost={true} />
+            <LogoMGM className="h-9 sm:h-11 w-auto" variant="compact" showSubtitle={true} isGhost={true} />
           </div>
 
           {/* Desarrollado por KINDEV */}
@@ -178,7 +178,7 @@ export function Footer({
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <LogoMGM className="h-7 sm:h-9 w-auto" variant="full" showSubtitle={true} isGhost={true} />
+                <LogoMGM className="h-9 sm:h-11 w-auto" variant="full" showSubtitle={true} isGhost={true} />
               </motion.a>
 
               {/* Redes Sociales en Móvil */}
@@ -187,15 +187,15 @@ export function Footer({
               </div>
             </div>
 
-            {/* Misión inmobiliaria */}
-            <p className="text-[11px] sm:text-[12px] text-slate-300 font-normal leading-relaxed max-w-md">
-              {settings.companyName}. Desarrolladores de comunidades urbanizadas planificadas en Ecuador. Solidez jurídica notarial y crédito directo sin intermediarios.
-            </p>
+              {/* Redes Sociales en Escritorio */}
+              <div className="hidden lg:block pt-0.5">
+                <SocialIconsStrip size={24} />
+              </div>
 
-            {/* Redes Sociales en Escritorio */}
-            <div className="hidden lg:block pt-0.5">
-              <SocialIconsStrip size={24} />
-            </div>
+            {/* Misión y Respaldo Institucional (Solo Escritorio) */}
+            <p className="hidden lg:block text-[11px] sm:text-[12px] text-slate-300 font-normal leading-relaxed max-w-md pt-1">
+              Desarrollamos proyectos residenciales planificados con total solvencia técnica, obras civiles concluidas in situ y certeza notarial garantizada en el Registro de la Propiedad.
+            </p>
           </div>
 
           {/* ----------------------------------------------------
@@ -271,30 +271,23 @@ export function Footer({
         {/* ========================================================
             BARRA INFERIOR / SUB-FOOTER
            ======================================================== */}
-        <div className="pt-2 sm:pt-3.5 border-t border-white/10 text-[10px] sm:text-xs text-slate-300 flex flex-col sm:flex-row items-center justify-between gap-1.5 sm:gap-4 font-medium">
-          
-          {/* Izquierda: Copyright y Enlaces Legales */}
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-2.5 gap-y-0.5 text-center sm:text-left">
-            <p>
-              © {currentYear} {settings.companyName}.
-            </p>
-            <div className="flex items-center gap-1.5">
-              <span className="text-slate-500">•</span>
-              <a
-                href="/privacy"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick('privacy');
-                }}
-                className="text-slate-400 hover:text-[#22A33D] transition-colors underline-offset-4 hover:underline cursor-pointer"
-              >
-                Políticas, Términos & Cookies (/privacy)
-              </a>
-            </div>
+        <div className="pt-2 sm:pt-3.5 border-t border-white/10 text-[10px] sm:text-xs text-slate-300 flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-4 font-medium">
+          {/* Copyright y Políticas Legales (Visible en escritorio, limpio en móvil) */}
+          <div className="hidden sm:flex flex-wrap items-center gap-x-2.5 gap-y-1 text-slate-400">
+            <span>&copy; {currentYear} Sociedad Civil MGM Inmobiliaria.</span>
+            <span>&bull;</span>
+            <span>RUC: 1792436274001</span>
+            <span>&bull;</span>
+            <a
+              href="/privacy"
+              className="hover:text-emerald-400 transition-colors underline underline-offset-2"
+            >
+              Políticas y Privacidad
+            </a>
           </div>
 
-          {/* Derecha: Firma Oficial KINDEV */}
-          <div className="flex justify-center">
+          {/* Firma Oficial KINDEV */}
+          <div className="flex justify-center w-full sm:w-auto">
             <a 
               href="https://www.kindevsas.com/" 
               target="_blank" 

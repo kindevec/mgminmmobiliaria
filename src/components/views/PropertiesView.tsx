@@ -300,12 +300,8 @@ export function PropertiesView({
         {/* CONTENIDO EDITORIAL: Directamente sobre la foto, sin cajas envolventes */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="max-w-3xl lg:max-w-4xl flex flex-col items-start text-left select-text cursor-default">
-            <ScrollReveal direction="down" delay={0.05} duration={0.65}>
-              <AnimatedInsignia className="scale-85 sm:scale-95" size={42} />
-            </ScrollReveal>
-
             <ScrollReveal direction="down" delay={0.15} duration={0.7}>
-              <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.12] tracking-tight mt-4 sm:mt-5 drop-shadow-md">
+              <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.12] tracking-tight drop-shadow-md">
                 <span className="block">{lotesBanner.titleLine1}</span>
                 {(lotesBanner.titleHighlight1 || lotesBanner.titleHighlight2) && (
                   <span className="block mt-1">

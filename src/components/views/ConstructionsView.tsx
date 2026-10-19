@@ -92,57 +92,56 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
       {/* ========================================================
           1. BANNER HERO CINEMÁTICO — NUESTRAS CONSTRUCCIONES
           ======================================================== */}
-      <section className="relative w-full bg-slate-950 text-white min-h-[460px] sm:min-h-[520px] flex flex-col justify-center select-none pt-24 sm:pt-28 pb-16">
-        <div className="absolute inset-0 w-full h-full">
+      <section className="relative w-full bg-slate-900 text-white min-h-[480px] sm:min-h-[540px] lg:min-h-[580px] flex flex-col justify-center select-none pt-24 sm:pt-28 pb-16 sm:pb-20 overflow-hidden">
+        {/* Fondo Panorámico: Croquis Arquitectónico Técnico Line Art Original (Luz/Blanco en la derecha) */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden">
           <Image
-            src={CONSTRUCTIONS_HERO_IMAGE.url}
-            alt={CONSTRUCTIONS_HERO_IMAGE.alt}
+            src="/architectural-sketch-villa.webp"
+            alt="Croquis y Boceto Arquitectónico Técnico - MGM Inmobiliaria"
             fill
             priority
             sizes="100vw"
-            className="object-cover transition-transform duration-1000 ease-out hover:scale-105"
+            className="object-cover object-center contrast-115 brightness-100 scale-105 transition-transform duration-10000 ease-out hover:scale-110"
             referrerPolicy="no-referrer"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/80 to-black/40 pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-black/50 pointer-events-none" />
+
+          {/* Shader negro cinematográfico que degrada de izquierda a derecha y se desvanece a transparente antes del 3/5 (~58%) */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/80 via-[32%] to-transparent to-[58%] pointer-events-none" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="max-w-3xl">
-            <ScrollReveal direction="down" delay={0.05}>
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#5be196] text-xs sm:text-sm font-semibold mb-3">
-                <HardHat className="w-4 h-4 text-[#F58220]" />
-                <span>Obras Civiles & Proyectos Arquitectónicos</span>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal direction="down" delay={0.15}>
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight mt-2 drop-shadow-md">
-                <span>Nuestras</span>{' '}
-                <span className="text-[#5be196]">Construcciones</span>
+          <div className="max-w-3xl lg:max-w-4xl text-left">
+            <ScrollReveal direction="down" delay={0.1}>
+              <h1 className="flex flex-col items-start font-black text-white leading-none tracking-tight drop-shadow-md">
+                <span className="text-xl sm:text-2xl md:text-3xl font-black text-white uppercase tracking-widest mb-1.5 sm:mb-2">
+                  Nuestras
+                </span>
+                <span className="text-3xl sm:text-5xl lg:text-6xl text-[#5be196]">
+                  Construcciones
+                </span>
               </h1>
             </ScrollReveal>
 
-            <ScrollReveal direction="up" delay={0.25}>
-              <p className="text-sm sm:text-base lg:text-lg text-slate-200 leading-relaxed font-normal mt-4 drop-shadow-xs max-w-2xl">
+            <ScrollReveal direction="up" delay={0.2}>
+              <p className="text-xs sm:text-sm lg:text-base text-slate-200 leading-relaxed font-normal mt-4 sm:mt-5 drop-shadow-xs max-w-lg text-justify [text-align-last:left]">
                 Diseñamos y ejecutamos viviendas de vanguardia, villas residenciales y proyectos llave en mano con estricto rigor estructural, fiscalización pericial y escrituras notariales en todo el Austro.
               </p>
             </ScrollReveal>
 
-            {/* Métricas destacadas */}
-            <ScrollReveal direction="up" delay={0.35}>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mt-6 sm:mt-8 pt-6 border-t border-white/15">
+            {/* Métricas destacadas en barra técnica */}
+            <ScrollReveal direction="up" delay={0.3}>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6 mt-8 sm:mt-10 pt-6 sm:pt-7 border-t border-white/20 max-w-2xl">
                 <div>
                   <span className="block text-xl sm:text-2xl font-black text-[#5be196]">100%</span>
-                  <span className="text-xs text-slate-300">Sismorresistente Normado</span>
+                  <span className="text-xs text-slate-300 font-medium">Sismorresistente Normado</span>
                 </div>
                 <div>
                   <span className="block text-xl sm:text-2xl font-black text-[#F58220]">Llave en Mano</span>
-                  <span className="text-xs text-slate-300">Desde Planos hasta Entrega</span>
+                  <span className="text-xs text-slate-300 font-medium">Desde Planos hasta Entrega</span>
                 </div>
                 <div className="col-span-2 sm:col-span-1">
                   <span className="block text-xl sm:text-2xl font-black text-white">Fiscalizado</span>
-                  <span className="text-xs text-slate-300">Garantía Pericial MGM</span>
+                  <span className="text-xs text-slate-300 font-medium">Garantía Pericial MGM</span>
                 </div>
               </div>
             </ScrollReveal>

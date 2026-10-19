@@ -143,12 +143,8 @@ export function ContactView({ onOpenLegalModal }: ContactViewProps) {
         {/* CONTENIDO EDITORIAL */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="max-w-3xl lg:max-w-4xl flex flex-col items-start text-left select-text cursor-default">
-            <ScrollReveal direction="down" delay={0.05} duration={0.65}>
-              <AnimatedInsignia className="scale-85 sm:scale-95" size={42} />
-            </ScrollReveal>
-
             <ScrollReveal direction="down" delay={0.15} duration={0.7}>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.1] tracking-tight mt-4 sm:mt-5 drop-shadow-md">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.1] tracking-tight drop-shadow-md">
                 {contactBanner.titleLine1}{' '}
                 <span className="text-[#F58220] inline-block">
                   {contactBanner.titleHighlight1}
@@ -184,7 +180,7 @@ export function ContactView({ onOpenLegalModal }: ContactViewProps) {
       {/* =========================================================================
           SECCIÓN PRINCIPAL DE FORMULARIO Y DATOS DE CONTACTO
           ========================================================================= */}
-      <section className="pt-10 sm:pt-14 pb-6 sm:pb-8">
+      <section className="pt-8 sm:pt-12 pb-1 sm:pb-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-start">
             {/* Columna Izquierda: Formulario Estilo Píldora Moderno */}

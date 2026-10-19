@@ -73,9 +73,9 @@ export function Header({
             className="flex items-center gap-2 sm:gap-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-xl p-0.5 transition-transform hover:scale-[1.02] active:scale-98 cursor-pointer"
             aria-label="Ir a Inicio - Sociedad Civil MGM Inmobiliaria"
           >
-            <div className="h-10 sm:h-11 lg:h-12 w-auto flex items-center">
+            <div className="h-11 sm:h-12 lg:h-14 w-auto flex items-center">
               <LogoMGM
-                className="h-10 sm:h-11 lg:h-12 w-auto"
+                className="h-11 sm:h-12 lg:h-14 w-auto"
                 variant="compact"
                 showSubtitle={true}
                 isGhost={true}
