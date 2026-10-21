@@ -205,7 +205,7 @@ export function AppraisalCalculator() {
       {/* Barra Superior Minimalista sin cajas */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-200/60 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl text-[#F58220]">
+          <div className="py-1 pr-2 text-[#F58220]">
             <Calculator className="w-6 h-6" />
           </div>
           <div>

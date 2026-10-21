@@ -92,7 +92,7 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
       {/* ========================================================
           1. BANNER HERO CINEMÁTICO — NUESTRAS CONSTRUCCIONES
           ======================================================== */}
-      <section className="relative w-full bg-slate-900 text-white min-h-[480px] sm:min-h-[540px] lg:min-h-[580px] flex flex-col justify-center select-none pt-24 sm:pt-28 pb-16 sm:pb-20 overflow-hidden">
+      <section className="relative w-full bg-slate-900 text-white min-h-[440px] sm:min-h-[500px] lg:min-h-[min(70vh,560px)] flex flex-col justify-center select-none pt-20 sm:pt-24 lg:pt-28 pb-12 sm:pb-16 overflow-hidden">
         {/* Fondo Panorámico: Croquis Arquitectónico Técnico Line Art Original (Luz/Blanco en la derecha) */}
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <Image
@@ -116,7 +116,7 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
                 <span className="text-xl sm:text-2xl md:text-3xl font-black text-white uppercase tracking-widest mb-1.5 sm:mb-2">
                   Nuestras
                 </span>
-                <span className="text-3xl sm:text-5xl lg:text-6xl text-[#5be196]">
+                <span className="text-3xl sm:text-5xl lg:text-[clamp(2.5rem,3.8vw,3.75rem)] text-[#5be196]">
                   Construcciones
                 </span>
               </h1>

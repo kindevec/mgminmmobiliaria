@@ -393,7 +393,7 @@ export function HomeView({
           1. HERO INMOBILIARIO PANORÁMICO EDGE-TO-EDGE (FULL BLEED, TEXTO SOBRE IMAGEN)
           ========================================================================= */}
       <section
-        className="group/hero relative w-full bg-slate-950 text-white overflow-hidden min-h-[640px] sm:min-h-[700px] lg:min-h-[760px] flex flex-col justify-center select-none pt-24 sm:pt-28 pb-16 sm:pb-20"
+        className="group/hero relative w-full bg-slate-950 text-white overflow-hidden min-h-[540px] sm:min-h-[620px] lg:min-h-[min(80vh,820px)] flex flex-col justify-center select-none pt-20 sm:pt-24 lg:pt-28 pb-12 sm:pb-16"
         onMouseEnter={() => setHeroHovered(true)}
         onMouseLeave={() => setHeroHovered(false)}
         onTouchStart={handleTouchStart}
@@ -455,7 +455,7 @@ export function HomeView({
 
             {/* Título Principal de Estilo Editorial (máx 2 líneas) */}
             <ScrollReveal direction="down" delay={0.15} duration={0.7}>
-              <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.12] tracking-tight drop-shadow-md">
+              <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-[clamp(2.5rem,3.8vw,3.75rem)] font-black text-white leading-[1.12] tracking-tight drop-shadow-md">
                 <span className="block">{activeHeroSlide.titleLine1}</span>
                 {(activeHeroSlide.titleHighlight1 || activeHeroSlide.titleHighlight2) && (
                   <span className="block mt-1">
@@ -636,7 +636,7 @@ export function HomeView({
       {/* =========================================================================
           5. BANDA DE MÉTRICAS COMPACTA CON CASA EN DESBORDE EDITORIAL
           ========================================================================= */}
-      <section className="relative w-full bg-[#0d2f1a] text-white mt-12 sm:mt-20 lg:mt-24 py-4 sm:py-5 lg:py-6 border-y border-emerald-950/60 overflow-visible z-20">
+      <section className="relative w-full bg-[#0d2f1a] text-white mt-10 sm:mt-16 lg:mt-20 py-4 sm:py-5 lg:py-6 border-y border-emerald-950/60 overflow-visible z-20">
         {/* Trazo topográfico decorativo sutil de fondo */}
         <div className="absolute inset-0 opacity-[0.04] pointer-events-none bg-[radial-gradient(#5be196_1px,transparent_1px)] [background-size:16px_16px] overflow-hidden" />
 
