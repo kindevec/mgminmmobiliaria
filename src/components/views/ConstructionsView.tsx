@@ -24,6 +24,7 @@ import {
   ArrowRight,
   Eye,
   Hammer,
+  FileText,
 } from 'lucide-react';
 import type { PageView } from '@/src/data/navigation';
 import type { ConstructionProject } from '@/src/data/constructions';
@@ -45,6 +46,7 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
   const [lightbox, setLightbox] = useState(false);
   const [lbIdx, setLbIdx] = useState(0);
   const [lbZoom, setLbZoom] = useState(1);
+  const [showDossierModal, setShowDossierModal] = useState(false);
 
   const total = constructions.length;
   const project: ConstructionProject | undefined = constructions[currentIndex] || constructions[0];
@@ -60,15 +62,12 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
     }
   }, [currentIndex, project]);
 
-  // Lista de las siguientes construcciones para la previsualización en el espacio derecho
-  const upcomingProjects = useMemo(() => {
+  // Lista compacta de las otras obras para la cinta inferior auxiliar
+  const otherProjects = useMemo(() => {
     if (total <= 1) return [];
-    const list: { item: ConstructionProject; index: number }[] = [];
-    for (let i = 1; i < total; i++) {
-      const targetIdx = (currentIndex + i) % total;
-      list.push({ item: constructions[targetIdx], index: targetIdx });
-    }
-    return list.slice(0, 2); // Tomamos las próximas 2 para un encaje ergonómico exacto sin scroll
+    return constructions
+      .map((item, index) => ({ item, index }))
+      .filter(({ index }) => index !== currentIndex);
   }, [constructions, currentIndex, total]);
 
   const goPrev = useCallback(() => {
@@ -215,14 +214,14 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          BOTONES DE NAVEGACIÓN A LOS EXTREMOS DE LA PANTALLA
+          BOTONES DE NAVEGACIÓN A LOS COSTADOS DE TODA LA PANTALLA
           ═══════════════════════════════════════════════════════════════════════ */}
       {total > 1 && (
         <>
           <button
             type="button"
             onClick={goPrev}
-            className="absolute left-2 sm:left-4 lg:left-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white text-slate-800 hover:text-emerald-700 shadow-xl shadow-slate-900/10 border border-slate-200/90 hover:border-emerald-500 hover:scale-110 active:scale-95 transition-all flex items-center justify-center cursor-pointer group"
+            className="fixed lg:absolute left-2 sm:left-4 lg:left-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white text-slate-800 hover:text-emerald-700 shadow-xl shadow-slate-900/10 border border-slate-200/90 hover:border-emerald-500 hover:scale-110 active:scale-95 transition-all flex items-center justify-center cursor-pointer group"
             title="Construcción anterior (Flecha Izquierda)"
             aria-label="Construcción anterior"
           >
@@ -232,7 +231,7 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
           <button
             type="button"
             onClick={goNext}
-            className="absolute right-2 sm:right-4 lg:right-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white text-slate-800 hover:text-emerald-700 shadow-xl shadow-slate-900/10 border border-slate-200/90 hover:border-emerald-500 hover:scale-110 active:scale-95 transition-all flex items-center justify-center cursor-pointer group"
+            className="fixed lg:absolute right-2 sm:right-4 lg:right-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white text-slate-800 hover:text-emerald-700 shadow-xl shadow-slate-900/10 border border-slate-200/90 hover:border-emerald-500 hover:scale-110 active:scale-95 transition-all flex items-center justify-center cursor-pointer group"
             title="Siguiente construcción (Flecha Derecha)"
             aria-label="Siguiente construcción"
           >
@@ -242,7 +241,7 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
       )}
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          ESCENARIO CENTRAL: SLIDER CLARO + EXPANDING HERO TRANSITION
+          ESCENARIO CENTRAL: SHOWROOM ARQUITECTÓNICO
           ═══════════════════════════════════════════════════════════════════════ */}
       <div className="relative z-10 flex-1 min-h-0 w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1600px] mx-auto flex flex-col justify-center overflow-hidden px-3 sm:px-6">
         <div className="w-full h-full min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-7 items-stretch overflow-hidden">
@@ -320,6 +319,40 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
                   </button>
                 </div>
 
+                {/* Controles de cambio de foto dentro de la imagen al hacer hover */}
+                {gallery.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const idx = gallery.indexOf(currentDisplayImage);
+                        const prevIdx = idx <= 0 ? gallery.length - 1 : idx - 1;
+                        setActiveImg(gallery[prevIdx]);
+                      }}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-emerald-600 text-white backdrop-blur-md border border-white/20 flex items-center justify-center opacity-0 group-hover/photo:opacity-100 transition-all cursor-pointer hover:scale-110 active:scale-95 shadow-md"
+                      title="Foto anterior de la galería"
+                      aria-label="Foto anterior"
+                    >
+                      <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const idx = gallery.indexOf(currentDisplayImage);
+                        const nextIdx = idx >= gallery.length - 1 ? 0 : idx + 1;
+                        setActiveImg(gallery[nextIdx]);
+                      }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-emerald-600 text-white backdrop-blur-md border border-white/20 flex items-center justify-center opacity-0 group-hover/photo:opacity-100 transition-all cursor-pointer hover:scale-110 active:scale-95 shadow-md"
+                      title="Siguiente foto de la galería"
+                      aria-label="Siguiente foto"
+                    >
+                      <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </button>
+                  </>
+                )}
+
                 {/* Miniaturas flotantes sobremontadas con máscara de degradado (cero caja blanca) */}
                 {gallery.length > 1 && (
                   <div className="absolute bottom-4 left-4 right-4 z-10 flex items-center justify-between gap-3 pointer-events-none">
@@ -366,10 +399,9 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
           </div>
 
           {/* ─────────────────────────────────────────────────────────────────
-              LADO DERECHO: DOSSIER ARQUITECTÓNICO + PREVIEWS DE PRÓXIMAS OBRAS
-              EXPANDIDO AL 100% PARA ELIMINAR CUALQUIER ESPACIO VACÍO
+              LADO DERECHO: DOSSIER ARQUITECTÓNICO & ESPECIFICACIONES DE ÉLITE
               ───────────────────────────────────────────────────────────────── */}
-          <div className="lg:col-span-5 h-full min-h-0 flex flex-col justify-between py-0.5 overflow-hidden">
+          <div className="lg:col-span-5 h-full min-h-0 flex flex-col justify-between py-1 overflow-hidden">
             
             <AnimatePresence mode="wait" custom={slideDir}>
               <motion.div
@@ -378,33 +410,59 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-2 shrink-0"
+                transition={{ duration: 0.28 }}
+                className="flex-1 min-h-0 flex flex-col justify-between space-y-3 overflow-hidden"
               >
-                {/* Sector y Ubicación: Tipografía editorial pura sin contenedor de caja */}
-                <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-emerald-800">
-                  <MapPin className="w-3.5 h-3.5 text-[#F58220] shrink-0" />
-                  <span>{project.location} · {project.canton}</span>
+                {/* 1. Header del Proyecto: Ubicación, Código y Título */}
+                <div className="space-y-1.5 shrink-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-50/80 px-2.5 py-0.5 rounded-full border border-emerald-200/60">
+                      <MapPin className="w-3.5 h-3.5 text-[#F58220] shrink-0" />
+                      <span className="truncate">{project.location} · {project.canton}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {total > 1 && (
+                        <span className="text-[10px] font-mono font-black text-emerald-900 bg-emerald-100/90 border border-emerald-300/80 px-2 py-0.5 rounded-md">
+                          {String(currentIndex + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
+                        </span>
+                      )}
+                      <span className="text-[10px] font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200/60">
+                        {project.code}
+                      </span>
+                    </div>
+                  </div>
+
+                  <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-black text-slate-900 tracking-tight leading-tight">
+                    {project.name}
+                  </h1>
+
+                  {/* Narrativa Arquitectónica con botón para leer memoria completa */}
+                  <div className="space-y-1">
+                    <p className="text-xs text-slate-600 leading-relaxed font-normal line-clamp-3">
+                      {getExtendedDescription(project)}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setShowDossierModal(true)}
+                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                    >
+                      <FileText className="w-3 h-3" />
+                      <span>Ver ficha y memoria arquitectónica completa</span>
+                    </button>
+                  </div>
                 </div>
 
-                {/* Título de la Construcción */}
-                <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-black text-slate-900 tracking-tight leading-tight">
-                  {project.name}
-                </h1>
-
-                {/* Narrativa Arquitectónica Enriquecida */}
-                <p className="text-xs text-slate-600 leading-relaxed font-normal line-clamp-3">
-                  {getExtendedDescription(project)}
-                </p>
-
-                {/* MATRIZ DE CARACTERÍSTICAS TÉCNICAS (Líneas arquitectónicas limpias, cero cajas) */}
-                <div className="pt-0.5">
-                  <div className="grid grid-cols-3 gap-y-1.5 gap-x-3 pb-2 border-b border-slate-200/80">
+                {/* 2. MATRIZ DE ESPECIFICACIONES TÉCNICAS (Micro-tarjetas de alto contraste) */}
+                <div className="space-y-2 shrink-0">
+                  <div className="grid grid-cols-3 gap-2">
                     {SPECS.map(({ icon: Icon, label, value }) => (
-                      <div key={label} className="flex flex-col">
-                        <div className="flex items-center gap-1 mb-0.5">
-                          <Icon className="w-3 h-3 text-emerald-700" />
-                          <span className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider truncate">
+                      <div
+                        key={label}
+                        className="p-2 sm:p-2.5 rounded-xl bg-white/90 border border-slate-200/90 shadow-2xs flex flex-col justify-between hover:border-emerald-300 transition-colors"
+                      >
+                        <div className="flex items-center gap-1 text-slate-400 mb-1">
+                          <Icon className="w-3.5 h-3.5 text-emerald-700" />
+                          <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider truncate">
                             {label}
                           </span>
                         </div>
@@ -415,149 +473,259 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
                     ))}
                   </div>
 
+                  {/* Sistema estructural sismo-resistente */}
                   {project.structureType && (
-                    <div className="mt-1.5 flex items-center justify-between text-[11px] text-slate-600">
-                      <span className="font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 text-[9.5px]">
+                    <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
+                      <span className="font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 text-[9.5px] shrink-0">
                         <Hammer className="w-3 h-3 text-[#F58220]" />
-                        <span>Sistema:</span>
+                        <span>Sistema Constructivo:</span>
                       </span>
-                      <span className="font-semibold text-slate-800 truncate max-w-[75%]">
+                      <span className="font-bold text-slate-800 text-[11.5px] truncate text-right">
                         {project.structureType}
                       </span>
                     </div>
                   )}
                 </div>
-              </motion.div>
-            </AnimatePresence>
 
-            {/* ═════════════════════════════════════════════════════════════════
-                CUADRANTE INFERIOR DERECHO: PRÓXIMAS OBRAS EN EL SLIDER
-                SIN CONTENEDOR ENVOLVENTE (CERO BOX-IN-BOX), MÁSCARAS DE SOBREMONTAJE
-                ═════════════════════════════════════════════════════════════════ */}
-            {upcomingProjects.length > 0 ? (
-              <div className="flex-1 min-h-0 my-2 flex flex-col justify-between">
-                <div className="flex items-center justify-between mb-1.5 shrink-0">
-                  <div className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#F58220] animate-pulse" />
-                    <span className="text-[10.5px] font-black tracking-widest uppercase text-slate-400">
-                      Próximas Obras en el Slider
+                {/* 3. ACABADOS & VENTAJA ARQUITECTÓNICA */}
+                <div className="p-3 rounded-2xl bg-gradient-to-br from-white to-emerald-50/30 border border-slate-200/80 shadow-2xs space-y-2 shrink-0">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-[#F58220]" />
+                      <span>Garantía & Acabados de Primera</span>
+                    </span>
+                    <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/70 border border-emerald-200/50 px-2 py-0.5 rounded-full">
+                      Entrega: {project.deliveryYear || 'Garantizada'}
                     </span>
                   </div>
-                  <span className="text-[10px] text-emerald-700 font-bold flex items-center gap-0.5">
-                    <span>Clic para explorar</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </span>
-                </div>
 
-                {/* Grid directo de tarjetas: flotan directamente en el plano arquitectónico */}
-                <div className={`grid gap-3 flex-1 min-h-0 ${upcomingProjects.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
-                  {upcomingProjects.map(({ item, index }) => (
-                    <motion.div
-                      key={item.id}
-                      whileHover={{ scale: 1.025, y: -3 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleSelectIndex(index)}
-                      className="group relative h-full min-h-[145px] rounded-2xl overflow-hidden shadow-md hover:shadow-2xl hover:shadow-emerald-900/20 transition-all duration-300 cursor-pointer bg-slate-950 flex flex-col justify-between border border-slate-300/40 hover:border-emerald-500/80"
-                      title={`Expandir y ver ${item.name}`}
-                    >
-                      <Image
-                        src={item.mainImage}
-                        alt={item.name}
-                        fill
-                        sizes="(max-width: 1024px) 50vw, 25vw"
-                        className="object-cover opacity-85 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out"
-                        referrerPolicy="no-referrer"
-                      />
-                      {/* Máscara de diseño con degradado de sobremontaje */}
-                      <div
-                        className="absolute inset-0 pointer-events-none"
-                        style={{
-                          background: 'linear-gradient(to top, rgba(2, 6, 23, 0.96) 0%, rgba(2, 6, 23, 0.55) 45%, rgba(2, 6, 23, 0.1) 75%, transparent 100%)',
-                        }}
-                      />
-
-                      {/* Elementos sobremontados directamente sobre la máscara */}
-                      <div className="relative p-2.5 sm:p-3 flex flex-col justify-between h-full z-10 pointer-events-none">
-                        <div className="flex items-center justify-between gap-1">
-                          <span className={`text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full backdrop-blur-md border shadow-xs ${getStatusBadgeStyle(item.status)}`}>
-                            {item.status}
-                          </span>
-                          <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-black/60 text-emerald-300 border border-white/15 backdrop-blur-md">
-                            {item.code}
-                          </span>
-                        </div>
-
-                        <div className="space-y-1">
-                          <h4 className="text-xs sm:text-sm font-black text-white leading-tight line-clamp-1 group-hover:text-emerald-300 transition-colors">
-                            {item.name}
-                          </h4>
-                          <p className="text-[10px] text-slate-300 flex items-center gap-1 truncate">
-                            <MapPin className="w-2.5 h-2.5 text-[#F58220] shrink-0" />
-                            <span>{item.location}</span>
-                          </p>
-                          <div className="pt-1 flex items-center justify-between border-t border-white/15">
-                            <span className="text-[9.5px] font-mono font-bold text-slate-300">
-                              {item.constructionArea} m² · {item.bedrooms} hab
-                            </span>
-                            <span className="text-[9.5px] font-bold text-emerald-400 flex items-center gap-0.5 group-hover:translate-x-1 transition-transform">
-                              <span>Explorar</span>
-                              <ArrowRight className="w-2.5 h-2.5" />
-                            </span>
-                          </div>
-                        </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-0.5">
+                    {(project.features && project.features.length > 0 ? project.features : [
+                      'Estructura sismo-resistente certificada',
+                      'Planificación bioclimática pasiva',
+                      'Instalaciones eléctricas y sanitarias ocultas',
+                      'Fiscalización técnica continua MGM'
+                    ]).slice(0, 4).map((f, i) => (
+                      <div key={i} className="flex items-start gap-1.5 text-xs text-slate-700">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                        <span className="truncate">{f}</span>
                       </div>
-                    </motion.div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ) : (
-              /* Fallback en caso de 1 sola construcción: acabados de primera para llenar el cuadrante */
-              <div className="flex-1 min-h-0 my-2 p-3 rounded-2xl flex flex-col justify-center">
-                <span className="block text-[10.5px] font-black tracking-wider uppercase text-slate-400 mb-2">
-                  Detalles y Acabados de Primera
-                </span>
-                <ul className="space-y-1.5 text-xs text-slate-600">
-                  {project.features?.slice(0, 4).map((f, i) => (
-                    <li key={i} className="flex items-start gap-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
 
-            {/* ─────────────────────────────────────────────────────────────────
-                ZONA DE ACCIÓN: BOTÓN COTIZAR WHATSAPP + CONTADOR NUMÉRICO
-                ───────────────────────────────────────────────────────────────── */}
-            <div className="pt-1.5 border-t border-slate-200/80 mt-auto flex items-center justify-between gap-3 shrink-0">
-              <button
-                type="button"
-                onClick={contactWhatsApp}
-                className="flex-1 py-3 px-6 rounded-2xl bg-gradient-to-r from-[#25D366] to-[#1ebf57] hover:from-[#1ebf57] hover:to-[#17a84c] text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-emerald-500/20 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
-              >
-                <WhatsAppIcon size={18} className="text-slate-950" />
-                <span>Cotizar Proyecto o Visitar Obra</span>
-              </button>
+                {/* 4. CINTA COMPACTA DE OTRAS OBRAS (Llena el espacio inferior con navegación rápida) */}
+                {otherProjects.length > 0 && (
+                  <div className="space-y-1.5 shrink-0 pt-0.5">
+                    <div className="flex items-center justify-between text-[10px] text-slate-400 font-bold uppercase tracking-wider px-0.5">
+                      <span className="flex items-center gap-1.5">
+                        <Building2 className="w-3 h-3 text-emerald-700" />
+                        <span>Otras Obras en Catálogo</span>
+                      </span>
+                      <span className="text-[9.5px] text-emerald-700 font-semibold lowercase">
+                        clic para alternar
+                      </span>
+                    </div>
 
-              {/* Contador numérico de obra tipográfico integrado (sin caja gris) */}
-              {total > 1 && (
-                <div className="flex items-center gap-1.5 px-3 py-2 text-slate-700">
-                  <span className="text-sm font-black text-emerald-800 font-mono">
-                    {String(currentIndex + 1).padStart(2, '0')}
-                  </span>
-                  <span className="text-xs text-slate-300 font-mono">/</span>
-                  <span className="text-xs font-bold text-slate-400 font-mono">
-                    {String(total).padStart(2, '0')}
-                  </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {otherProjects.slice(0, 2).map(({ item, index }) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => handleSelectIndex(index)}
+                          className="group/mini p-1.5 rounded-xl bg-white/95 hover:bg-emerald-50/50 border border-slate-200/90 hover:border-emerald-300/80 shadow-2xs transition-all flex items-center gap-2.5 text-left cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
+                          title={`Ver proyecto ${item.name}`}
+                        >
+                          <div className="relative w-11 h-11 rounded-lg overflow-hidden shrink-0 bg-slate-900 border border-slate-200/60">
+                            <Image
+                              src={item.mainImage}
+                              alt={item.name}
+                              fill
+                              sizes="45px"
+                              className="object-cover group-hover/mini:scale-110 transition-transform duration-500"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+
+                          <div className="min-w-0 flex-1">
+                            <h4 className="text-[11px] font-black text-slate-800 group-hover/mini:text-emerald-800 truncate leading-tight">
+                              {item.name}
+                            </h4>
+                            <p className="text-[9.5px] text-slate-500 truncate flex items-center gap-1">
+                              <span>{item.canton}</span>
+                              <span className="text-slate-300">·</span>
+                              <span className="font-mono text-emerald-700 font-bold">{item.constructionArea} m²</span>
+                            </p>
+                          </div>
+
+                          <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover/mini:text-emerald-700 group-hover/mini:translate-x-0.5 transition-all shrink-0" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 5. ZONA DE ACCIÓN: BOTÓN COTIZAR WHATSAPP + DOSSIER */}
+                <div className="pt-2 border-t border-slate-200/80 mt-auto flex items-center gap-2.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={contactWhatsApp}
+                    className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-[#25D366] to-[#1ebf57] hover:from-[#1ebf57] hover:to-[#17a84c] text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-emerald-500/20 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+                  >
+                    <WhatsAppIcon size={18} className="text-slate-950" />
+                    <span>Cotizar Proyecto o Visitar Obra</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowDossierModal(true)}
+                    className="py-3 px-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center gap-1.5"
+                    title="Ver ficha técnica completa en pantalla"
+                  >
+                    <FileText className="w-4 h-4 text-emerald-400" />
+                    <span className="hidden sm:inline">Dossier</span>
+                  </button>
                 </div>
-              )}
-            </div>
+
+              </motion.div>
+            </AnimatePresence>
 
           </div>
 
         </div>
       </div>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          MODAL DE DOSSIER TÉCNICO ARQUITECTÓNICO COMPLETO
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {showDossierModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
+            onClick={() => setShowDossierModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.94, opacity: 0, y: 15 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.94, opacity: 0, y: 15 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-3xl max-w-2xl w-full max-h-[88vh] overflow-y-auto p-5 sm:p-7 shadow-2xl border border-slate-200 relative flex flex-col justify-between space-y-4"
+            >
+              {/* Header Modal */}
+              <div className="flex items-start justify-between border-b border-slate-100 pb-3.5">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-100/90 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                      Ficha Técnica · {project.code}
+                    </span>
+                    <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${getStatusBadgeStyle(project.status)}`}>
+                      {project.status}
+                    </span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
+                    {project.name}
+                  </h3>
+                  <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
+                    <MapPin className="w-3 h-3 text-[#F58220]" />
+                    <span>{project.location} · {project.canton}</span>
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowDossierModal(false)}
+                  className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer transition-colors"
+                  title="Cerrar ficha (Esc)"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Contenido Técnico */}
+              <div className="space-y-4 text-xs text-slate-700 leading-relaxed">
+                <div>
+                  <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] mb-1.5 flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>Memoria Descriptiva & Peritaje</span>
+                  </h4>
+                  <p className="text-slate-600 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 leading-relaxed">
+                    {getExtendedDescription(project)}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] mb-1.5">
+                    Parámetros Constructivos
+                  </h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {SPECS.map(({ icon: Icon, label, value }) => (
+                      <div key={label} className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70">
+                        <div className="flex items-center gap-1 text-slate-400 mb-0.5">
+                          <Icon className="w-3 h-3 text-emerald-700" />
+                          <span className="text-[10px] font-bold uppercase">{label}</span>
+                        </div>
+                        <span className="text-xs sm:text-sm font-black text-slate-900">{value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {project.structureType && (
+                  <div className="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200/70 text-xs text-emerald-950 flex items-start gap-2">
+                    <Hammer className="w-4 h-4 text-[#F58220] shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="block text-emerald-900 font-bold">Sistema Estructural:</strong>
+                      <span className="text-slate-700">{project.structureType}</span>
+                    </div>
+                  </div>
+                )}
+
+                {project.features && project.features.length > 0 && (
+                  <div>
+                    <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] mb-1.5 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-[#F58220]" />
+                      <span>Especificaciones & Acabados de Primera</span>
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {project.features.map((f, i) => (
+                        <div key={i} className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-200/70 text-slate-800 text-xs">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <span>{f}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Footer Modal con Acción */}
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setShowDossierModal(false)}
+                  className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-colors"
+                >
+                  Cerrar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowDossierModal(false);
+                    contactWhatsApp();
+                  }}
+                  className="flex-1 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#25D366] to-[#1ebf57] hover:from-[#1ebf57] hover:to-[#17a84c] text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer transition-all"
+                >
+                  <WhatsAppIcon size={16} className="text-slate-950" />
+                  <span>Cotizar Proyecto o Agendar Visita</span>
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ═══════════════════════════════════════════════════════════════════════
           MODAL DE ZOOM / PANTALLA COMPLETA EN ALTA DEFINICIÓN
