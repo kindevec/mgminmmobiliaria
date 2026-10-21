@@ -11,7 +11,6 @@ import {
   Bath,
   Car,
   CheckCircle2,
-  Calendar,
   ShieldCheck,
   Hammer,
   ChevronRight,
@@ -99,14 +98,6 @@ export function ConstructionCard({ project }: ConstructionCardProps) {
 
                 <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-black/60 text-white backdrop-blur-md border border-white/20">
                   {project.code}
-                </span>
-              </div>
-
-              {/* Año / Modalidad sobre la imagen */}
-              <div className="absolute bottom-3 left-3 pointer-events-none">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-black/60 text-white text-xs font-medium backdrop-blur-sm">
-                  <Calendar className="w-3.5 h-3.5 text-[#5be196]" />
-                  <span>Entrega: {project.deliveryYear}</span>
                 </span>
               </div>
             </div>

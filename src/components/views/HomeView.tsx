@@ -25,6 +25,9 @@ import {
   Leaf,
   Trophy,
   Compass,
+  Search,
+  MapPin,
+  SlidersHorizontal,
 } from 'lucide-react';
 import type { PageView } from '../Header';
 import {
@@ -117,8 +120,8 @@ const URBAN_BENEFIT_ITEMS = [
       cardGradient: 'from-amber-500/[0.08] via-amber-500/[0.02] to-white',
       border: 'border-amber-200/90 hover:border-amber-400',
       iconGradient: 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-amber-500/25',
-      tagColor: 'text-amber-800 bg-amber-100/90 border-amber-300/80',
-      statusColor: 'text-amber-800 bg-amber-50 border-amber-200',
+      tagColor: 'text-amber-700',
+      statusColor: 'text-amber-600',
       accentDot: 'bg-amber-500',
       specsBg: 'bg-amber-50/50 border-amber-100/80',
     },
@@ -139,8 +142,8 @@ const URBAN_BENEFIT_ITEMS = [
       cardGradient: 'from-sky-500/[0.08] via-sky-500/[0.02] to-white',
       border: 'border-sky-200/90 hover:border-sky-400',
       iconGradient: 'bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-sky-500/25',
-      tagColor: 'text-sky-800 bg-sky-100/90 border-sky-300/80',
-      statusColor: 'text-sky-800 bg-sky-50 border-sky-200',
+      tagColor: 'text-sky-700',
+      statusColor: 'text-sky-600',
       accentDot: 'bg-sky-500',
       specsBg: 'bg-sky-50/50 border-sky-100/80',
     },
@@ -161,8 +164,8 @@ const URBAN_BENEFIT_ITEMS = [
       cardGradient: 'from-emerald-500/[0.09] via-emerald-500/[0.02] to-white',
       border: 'border-emerald-200/90 hover:border-emerald-400',
       iconGradient: 'bg-gradient-to-br from-emerald-500 to-green-700 text-white shadow-emerald-500/25',
-      tagColor: 'text-emerald-800 bg-emerald-100/90 border-emerald-300/80',
-      statusColor: 'text-emerald-800 bg-emerald-50 border-emerald-200',
+      tagColor: 'text-emerald-700',
+      statusColor: 'text-emerald-600',
       accentDot: 'bg-emerald-500',
       specsBg: 'bg-emerald-50/50 border-emerald-100/80',
     },
@@ -183,8 +186,8 @@ const URBAN_BENEFIT_ITEMS = [
       cardGradient: 'from-violet-500/[0.08] via-violet-500/[0.02] to-white',
       border: 'border-violet-200/90 hover:border-violet-400',
       iconGradient: 'bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-violet-500/25',
-      tagColor: 'text-violet-800 bg-violet-100/90 border-violet-300/80',
-      statusColor: 'text-violet-800 bg-violet-50 border-violet-200',
+      tagColor: 'text-violet-700',
+      statusColor: 'text-violet-600',
       accentDot: 'bg-violet-500',
       specsBg: 'bg-violet-50/50 border-violet-100/80',
     },
@@ -205,8 +208,8 @@ const URBAN_BENEFIT_ITEMS = [
       cardGradient: 'from-rose-500/[0.08] via-rose-500/[0.02] to-white',
       border: 'border-rose-200/90 hover:border-rose-400',
       iconGradient: 'bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-rose-500/25',
-      tagColor: 'text-rose-800 bg-rose-100/90 border-rose-300/80',
-      statusColor: 'text-rose-800 bg-rose-50 border-rose-200',
+      tagColor: 'text-rose-700',
+      statusColor: 'text-rose-600',
       accentDot: 'bg-rose-500',
       specsBg: 'bg-rose-50/50 border-rose-100/80',
     },
@@ -227,8 +230,8 @@ const URBAN_BENEFIT_ITEMS = [
       cardGradient: 'from-teal-500/[0.08] via-teal-500/[0.02] to-white',
       border: 'border-teal-200/90 hover:border-teal-400',
       iconGradient: 'bg-gradient-to-br from-teal-500 to-emerald-600 text-white shadow-teal-500/25',
-      tagColor: 'text-teal-800 bg-teal-100/90 border-teal-300/80',
-      statusColor: 'text-teal-800 bg-teal-50 border-teal-200',
+      tagColor: 'text-teal-700',
+      statusColor: 'text-teal-600',
       accentDot: 'bg-teal-500',
       specsBg: 'bg-teal-50/50 border-teal-100/80',
     },
@@ -378,12 +381,23 @@ export function HomeView({
     }, 1200);
   };
 
+  // Pestaña de filtrado dinámico en Propiedades Destacadas
+  const [activeCatalogTab, setActiveCatalogTab] = useState<'all' | 'miravalle' | 'credit'>('all');
+
   // Propiedades destacadas primero (conectado al switch 'Destacar en Inicio' del Admin Panel)
   const displayedProperties = React.useMemo(() => {
     const featuredList = activeProperties.filter((p) => p.featured);
     const others = activeProperties.filter((p) => !p.featured);
-    return [...featuredList, ...others];
-  }, [activeProperties]);
+    let combined = [...featuredList, ...others];
+
+    if (activeCatalogTab === 'miravalle') {
+      combined = combined.filter((p) => p.project?.toLowerCase().includes('miravalle'));
+    } else if (activeCatalogTab === 'credit') {
+      combined = combined.filter((p) => (p.maxMonths || 0) >= 36);
+    }
+
+    return combined;
+  }, [activeProperties, activeCatalogTab]);
 
   const currentTestimonial = testimonials[activeTestimonialIdx] || testimonials[0];
 
@@ -475,55 +489,51 @@ export function HomeView({
           </div>
         </div>
 
-        {/* Controles de diapositivas en esquina inferior (3 banners de inicio) */}
-        <div className="absolute bottom-6 right-4 sm:bottom-8 sm:right-8 lg:right-12 z-20 flex items-center gap-3">
-          {/* Indicadores lineales / dots */}
-          <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md border border-white/15">
-            {homeSlides.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setHeroImgIndex(i);
-                }}
-                aria-label={`Ver diapositiva ${i + 1}`}
-                className="min-w-[24px] min-h-[24px] p-1 flex items-center justify-center cursor-pointer"
-              >
-                <span
-                  className={`h-1.5 rounded-full transition-all block ${
-                    heroImgIndex === i ? 'w-5 bg-[#5be196]' : 'w-1.5 bg-white/40 hover:bg-white'
-                  }`}
-                />
-              </button>
-            ))}
-          </div>
+        {/* Flechas laterales del Hero a la izquierda y derecha */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            prevHeroImage();
+          }}
+          aria-label="Diapositiva anterior"
+          className="absolute left-3 sm:left-6 lg:left-8 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-black/45 hover:bg-black/75 text-white/90 hover:text-white border border-white/20 hover:border-white/50 backdrop-blur-md transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-xl"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
 
-          {/* Flechas compactas */}
-          <div className="flex items-center gap-1.5">
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            nextHeroImage();
+          }}
+          aria-label="Siguiente diapositiva"
+          className="absolute right-3 sm:right-6 lg:right-8 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-black/45 hover:bg-black/75 text-white/90 hover:text-white border border-white/20 hover:border-white/50 backdrop-blur-md transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-xl"
+        >
+          <ChevronRight className="w-6 h-6" />
+        </button>
+
+        {/* Indicadores lineales (dots) centrados discretamente abajo */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15 shadow-lg">
+          {homeSlides.map((_, i) => (
             <button
+              key={i}
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                prevHeroImage();
+                setHeroImgIndex(i);
               }}
-              aria-label="Diapositiva anterior"
-              className="w-10 h-10 rounded-full flex items-center justify-center bg-black/60 hover:bg-black/85 text-white/90 hover:text-white border border-white/25 hover:border-white/60 backdrop-blur-md transition-all active:scale-95 cursor-pointer shadow-md"
+              aria-label={`Ver diapositiva ${i + 1}`}
+              className="min-w-[20px] min-h-[20px] p-1 flex items-center justify-center cursor-pointer"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <span
+                className={`h-1.5 rounded-full transition-all block ${
+                  heroImgIndex === i ? 'w-6 bg-[#5be196]' : 'w-1.5 bg-white/40 hover:bg-white'
+                }`}
+              />
             </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                nextHeroImage();
-              }}
-              aria-label="Siguiente diapositiva"
-              className="w-10 h-10 rounded-full flex items-center justify-center bg-black/60 hover:bg-black/85 text-white/90 hover:text-white border border-white/25 hover:border-white/60 backdrop-blur-md transition-all active:scale-95 cursor-pointer shadow-md"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
+          ))}
         </div>
       </section>
 
@@ -577,8 +587,8 @@ export function HomeView({
           ========================================================================= */}
       <section className="relative w-full bg-[#f8faf8] text-slate-900 py-14 sm:py-20 border-b border-slate-200/70">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
-          {/* Encabezado de la sección */}
-          <div className="pb-4 border-b border-slate-200">
+          {/* Encabezado de la sección con Selector de Categorías */}
+          <div className="pb-4 border-b border-slate-200 flex flex-col md:flex-row md:items-end justify-between gap-4">
             <ScrollReveal direction="left" delay={0.1} className="space-y-1.5 max-w-xl">
               <span className="text-xs font-mono font-bold tracking-widest uppercase text-[#15803d]">
                 Catálogo Seleccionado
@@ -590,6 +600,43 @@ export function HomeView({
                 Disponibilidad verificada con entrega inmediata, metrajes exactos y planes de financiamiento propio hasta 48 meses.
               </p>
             </ScrollReveal>
+
+            {/* Pestañas de Filtro Rápido */}
+            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-200/60 self-start md:self-auto">
+              <button
+                type="button"
+                onClick={() => setActiveCatalogTab('all')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  activeCatalogTab === 'all'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Todos los Destacados
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveCatalogTab('miravalle')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  activeCatalogTab === 'miravalle'
+                    ? 'bg-[#113d22] text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Ciudadela Miravalle
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveCatalogTab('credit')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  activeCatalogTab === 'credit'
+                    ? 'bg-[#F58220] text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Crédito Directo
+              </button>
+            </div>
           </div>
 
           {/* Grilla Responsiva de Tarjetas de Propiedades (Equilibrada en 3 Columnas) */}
@@ -649,7 +696,42 @@ export function HomeView({
                 <div className="relative w-full max-w-[340px] sm:max-w-[440px] md:max-w-[500px] lg:max-w-[560px] -mt-16 sm:-mt-24 md:-mt-32 lg:-mt-36 -mb-4 sm:-mb-6 lg:-mb-8 transition-transform duration-500 hover:scale-[1.04]">
                   {/* Sombra de proyección cinematográfica en la base */}
                   <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[90%] h-10 bg-black/70 blur-xl rounded-full pointer-events-none" />
-                  
+                  {/* Puntos de infraestructura con líneas que señalan a la vivienda y alto contraste dinámico */}
+                  <div className="absolute top-[28%] left-[2%] sm:left-[6%] z-30 flex flex-col items-start pointer-events-none select-none animate-float-subtle">
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/90 dark:bg-black/85 backdrop-blur-sm text-slate-900 dark:text-white border border-slate-300/60 dark:border-white/20 text-[10px] sm:text-xs font-bold tracking-wide shadow-sm">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>Vías Adoquinadas 10-12m</span>
+                    </div>
+                    {/* Línea que señala a la vía y acceso */}
+                    <svg className="w-20 sm:w-24 h-10 overflow-visible mt-0.5 text-slate-700 dark:text-white" viewBox="0 0 96 40" fill="none">
+                      <path d="M 12 0 L 55 0 L 88 32" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 3" />
+                      <circle cx="88" cy="32" r="2.5" fill="currentColor" />
+                    </svg>
+                  </div>
+
+                  <div className="absolute top-[34%] right-[2%] sm:right-[6%] z-30 flex flex-col items-end pointer-events-none select-none animate-float-subtle" style={{ animationDelay: '-2s' }}>
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/90 dark:bg-black/85 backdrop-blur-sm text-slate-900 dark:text-white border border-slate-300/60 dark:border-white/20 text-[10px] sm:text-xs font-bold tracking-wide shadow-sm">
+                      <span>Red Eléctrica &amp; Agua</span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#F58220] animate-pulse" />
+                    </div>
+                    {/* Línea que señala a la cubierta / servicios */}
+                    <svg className="w-20 sm:w-24 h-10 overflow-visible mt-0.5 text-slate-700 dark:text-white" viewBox="0 0 96 40" fill="none">
+                      <path d="M 84 0 L 40 0 L 8 32" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 3" />
+                      <circle cx="8" cy="32" r="2.5" fill="currentColor" />
+                    </svg>
+                  </div>
+
+                  <div className="absolute bottom-[8%] left-[6%] sm:left-[10%] z-30 flex flex-col items-start pointer-events-none select-none animate-float-subtle" style={{ animationDelay: '-1s' }}>
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/90 dark:bg-black/85 backdrop-blur-sm text-slate-900 dark:text-white border border-slate-300/60 dark:border-white/20 text-[10px] sm:text-xs font-bold tracking-wide shadow-sm">
+                      <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
+                      <span>Topografía Plana</span>
+                    </div>
+                    {/* Línea que señala a la rasante / cimentación */}
+                    <svg className="w-16 sm:w-20 h-8 overflow-visible mt-0.5 text-slate-700 dark:text-white" viewBox="0 0 80 32" fill="none">
+                      <path d="M 10 0 L 35 0 L 68 24" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 3" />
+                      <circle cx="68" cy="24" r="2.5" fill="currentColor" />
+                    </svg>
+                  </div>
                   {/* Imagen de la casa con fondo transparente de alto impacto */}
                   <img
                     src="/house-isolated.webp"
@@ -822,9 +904,6 @@ export function HomeView({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-12">
           {/* Encabezado Editorial Técnico */}
           <ScrollReveal direction="down" delay={0.1} className="text-center max-w-3xl mx-auto space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-100/70 border border-emerald-300/60 text-[#15803d] font-mono text-[11px] font-bold tracking-[0.2em] uppercase">
-              <span>Ingeniería Civil &amp; Urbanismo</span>
-            </div>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-tight [text-wrap:balance]">
               Beneficios Tangibles en Cada Urbanización
             </h2>
@@ -846,15 +925,6 @@ export function HomeView({
                     className={`relative bg-white rounded-3xl p-6 border ${item.palette.border} shadow-xl flex flex-col justify-between overflow-hidden min-h-[330px]`}
                   >
                     <div>
-                      {/* Header con Tag e Ícono */}
-                      <div className="flex items-center justify-between gap-3 mb-4">
-                        <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${item.palette.tagColor}`}>
-                          {item.tag}
-                        </span>
-                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${item.palette.statusColor}`}>
-                          {item.status}
-                        </span>
-                      </div>
 
                       <div className="flex items-center gap-3.5 mb-3.5">
                         <div className={`p-3 rounded-2xl ${item.palette.iconGradient} shrink-0 shadow-md`}>
@@ -898,15 +968,6 @@ export function HomeView({
                     className={`group relative bg-white rounded-2xl p-6 sm:p-7 border ${item.palette.border} shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden h-full`}
                   >
                     <div>
-                      {/* Header con Tag e Ícono */}
-                      <div className="flex items-center justify-between gap-3 mb-4">
-                        <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${item.palette.tagColor}`}>
-                          {item.tag}
-                        </span>
-                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${item.palette.statusColor}`}>
-                          {item.status}
-                        </span>
-                      </div>
 
                       <div className="flex items-center gap-3.5 mb-3.5">
                         <div className={`p-3 rounded-2xl ${item.palette.iconGradient} shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300`}>
