@@ -1,308 +1,855 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Image from 'next/image';
+import { motion, AnimatePresence } from 'motion/react';
 import {
-  HardHat,
-  Search,
-  RotateCcw,
-  Sparkles,
+  ChevronLeft,
+  ChevronRight,
+  Maximize2,
+  ZoomIn,
+  ZoomOut,
+  X,
   MapPin,
   Building2,
-  Hammer,
+  LandPlot,
+  Layers,
+  Bed,
+  Bath,
+  Car,
   ShieldCheck,
   CheckCircle2,
-  PhoneCall,
-  Clock,
-  Layers,
+  RotateCcw,
+  Sparkles,
   ArrowRight,
+  Eye,
+  Hammer,
+  FileText,
 } from 'lucide-react';
 import type { PageView } from '@/src/data/navigation';
 import type { ConstructionProject } from '@/src/data/constructions';
 import { useConstructions } from '@/src/lib/constructionStorage';
-import { ConstructionCard } from '../ConstructionCard';
 import { useSiteSettings } from '@/src/lib/siteSettings';
 import { WhatsAppIcon } from '../SocialIcons';
-import { ScrollReveal } from '../common/ScrollReveal';
 
 interface ConstructionsViewProps {
-  onNavigate: (page: PageView) => void;
+  onNavigate?: (page: PageView) => void;
 }
-
-const CONSTRUCTIONS_HERO_IMAGE = {
-  url: 'https://images.unsplash.com/photo-1541888946425-d0fbb18615f8?auto=format&fit=crop&w=1920&q=80',
-  alt: 'Nuestras Construcciones y Obras Civiles - Sociedad Civil MGM Inmobiliaria',
-};
-
-const STATUS_FILTERS = ['Todos', 'Entregada', 'En Construcción', 'En Planos'];
-const CANTON_FILTERS = ['Todos', 'Cuenca', 'Paute', 'Santa Isabel'];
 
 export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
   const { settings } = useSiteSettings();
   const { constructions } = useConstructions();
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('Todos');
-  const [selectedCanton, setSelectedCanton] = useState('Todos');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [slideDir, setSlideDir] = useState(1);
+  const [activeImg, setActiveImg] = useState('');
+  const [lightbox, setLightbox] = useState(false);
+  const [lbIdx, setLbIdx] = useState(0);
+  const [lbZoom, setLbZoom] = useState(1);
+  const [showDossierModal, setShowDossierModal] = useState(false);
 
-  // Filtrado de proyectos sincronizados
-  const filteredProjects = useMemo(() => {
-    return constructions.filter((project) => {
-      // Búsqueda por texto
-      const matchesSearch =
-        searchTerm.trim() === '' ||
-        project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.canton.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.code.toLowerCase().includes(searchTerm.toLowerCase());
+  const total = constructions.length;
+  const project: ConstructionProject | undefined = constructions[currentIndex] || constructions[0];
 
-      // Filtro por estado
-      const matchesStatus =
-        selectedStatus === 'Todos' || project.status === selectedStatus;
+  const gallery = useMemo(() => {
+    if (!project) return [];
+    return Array.from(new Set([project.mainImage, ...(project.gallery || [])].filter(Boolean)));
+  }, [project]);
 
-      // Filtro por cantón
-      const matchesCanton =
-        selectedCanton === 'Todos' || project.canton === selectedCanton;
+  useEffect(() => {
+    if (project) {
+      setActiveImg(project.mainImage || gallery[0] || '');
+    }
+  }, [currentIndex, project]);
 
-      return matchesSearch && matchesStatus && matchesCanton;
-    });
-  }, [searchTerm, selectedStatus, selectedCanton]);
+  // Lista compacta de las otras obras para la cinta inferior auxiliar
+  const otherProjects = useMemo(() => {
+    if (total <= 1) return [];
+    return constructions
+      .map((item, index) => ({ item, index }))
+      .filter(({ index }) => index !== currentIndex);
+  }, [constructions, currentIndex, total]);
 
-  const handleResetFilters = () => {
-    setSearchTerm('');
-    setSelectedStatus('Todos');
-    setSelectedCanton('Todos');
+  const goPrev = useCallback(() => {
+    if (total <= 1) return;
+    setSlideDir(-1);
+    setCurrentIndex((p) => (p === 0 ? total - 1 : p - 1));
+  }, [total]);
+
+  const goNext = useCallback(() => {
+    if (total <= 1) return;
+    setSlideDir(1);
+    setCurrentIndex((p) => (p === total - 1 ? 0 : p + 1));
+  }, [total]);
+
+  const handleSelectIndex = (targetIdx: number) => {
+    if (targetIdx === currentIndex) return;
+    setSlideDir(targetIdx > currentIndex ? 1 : -1);
+    setCurrentIndex(targetIdx);
   };
 
-  const handleConsultGeneral = () => {
-    const cleanPhone = settings.supportPhone.replace(/\D/g, '');
-    const phoneWithCountry = cleanPhone.startsWith('593')
-      ? cleanPhone
-      : cleanPhone.startsWith('0')
-      ? `593${cleanPhone.substring(1)}`
-      : `593${cleanPhone}`;
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (lightbox) {
+        if (e.key === 'Escape') setLightbox(false);
+        if (e.key === 'ArrowLeft') setLbIdx((p) => (p === 0 ? gallery.length - 1 : p - 1));
+        if (e.key === 'ArrowRight') setLbIdx((p) => (p === gallery.length - 1 ? 0 : p + 1));
+        return;
+      }
+      if (e.key === 'ArrowLeft') goPrev();
+      if (e.key === 'ArrowRight') goNext();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [lightbox, goPrev, goNext, gallery.length]);
 
-    const text = `Hola MGM Inmobiliaria, deseo solicitar una asesoría técnica y cotización para construir una vivienda en mi lote en el Austro. ¿Podríamos coordinar una reunión técnica?`;
-    window.open(`https://wa.me/${phoneWithCountry}?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
+  const openLightbox = (idx: number) => {
+    setLbIdx(idx);
+    setLbZoom(1);
+    setLightbox(true);
+  };
+
+  const contactWhatsApp = () => {
+    if (!project) return;
+    const phone = settings.supportPhone.replace(/\D/g, '');
+    const intl = phone.startsWith('593') ? phone : phone.startsWith('0') ? `593${phone.substring(1)}` : `593${phone}`;
+    const msg = [
+      `*CONSULTA DE OBRA CIVIL Y CONSTRUCCIÓN — MGM INMOBILIARIA*`,
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+      `🏗 *Proyecto:* ${project.name} (${project.code})`,
+      `📍 *Ubicación:* ${project.location}, ${project.canton}`,
+      `📐 *Área Construcción:* ${project.constructionArea} m²`,
+      `🏞 *Área Lote:* ${project.lotArea} m²`,
+      `📌 *Estado:* ${project.status}`,
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+      `Hola MGM Inmobiliaria, me interesa conocer más sobre este proyecto arquitectónico o cotizar una edificación personalizada en mi lote. ¿Podríamos coordinar una reunión técnica?`,
+    ].join('\n');
+    window.open(`https://wa.me/${intl}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
+  };
+
+  const getExtendedDescription = (p: ConstructionProject) => {
+    const base = p.description && p.description.length > 25 ? p.description : '';
+    const narrativeSuffix =
+      `Desarrollado bajo rigurosa planificación bioclimática y cálculo estructural sismorresistente. El diseño articula amplias transiciones espaciales con iluminación cenital, carpintería arquitectónica y acabados de primera línea respaldados por fiscalización pericial continua de MGM Inmobiliaria.`;
+    
+    if (!base) return narrativeSuffix;
+    if (base.length > 180) return base;
+    return `${base} ${narrativeSuffix}`;
+  };
+
+  if (!project) return null;
+
+  const currentDisplayImage = activeImg || project.mainImage || gallery[0] || '';
+
+  const SPECS = [
+    { icon: Building2, label: 'Construcción', value: `${project.constructionArea} m²` },
+    { icon: LandPlot, label: 'Terreno', value: `${project.lotArea} m²` },
+    { icon: Layers, label: 'Niveles', value: `${project.levels} ${project.levels === 1 ? 'planta' : 'plantas'}` },
+    { icon: Bed, label: 'Dormitorios', value: `${project.bedrooms} suites` },
+    { icon: Bath, label: 'Baños', value: `${project.bathrooms} baños` },
+    { icon: Car, label: 'Parqueos', value: `${project.parkingSpots} autos` },
+  ];
+
+  const getStatusBadgeStyle = (status: string) => {
+    switch (status) {
+      case 'Entregada':
+        return 'bg-emerald-100 text-emerald-900 border-emerald-300';
+      case 'En Construcción':
+        return 'bg-amber-100 text-amber-900 border-amber-300';
+      case 'En Planos':
+        return 'bg-sky-100 text-sky-900 border-sky-300';
+      case 'Llave en Mano':
+        return 'bg-purple-100 text-purple-900 border-purple-300';
+      default:
+        return 'bg-slate-100 text-slate-800 border-slate-300';
+    }
   };
 
   return (
-    <div className="w-full bg-slate-50 text-slate-900 overflow-hidden">
-      
-      {/* ========================================================
-          1. BANNER HERO CINEMÁTICO — NUESTRAS CONSTRUCCIONES
-          ======================================================== */}
-      <section className="relative w-full bg-slate-900 text-white min-h-[440px] sm:min-h-[500px] lg:min-h-[min(70vh,560px)] flex flex-col justify-center select-none pt-20 sm:pt-24 lg:pt-28 pb-12 sm:pb-16 overflow-hidden">
-        {/* Fondo Panorámico: Croquis Arquitectónico Técnico Line Art Original (Luz/Blanco en la derecha) */}
-        <div className="absolute inset-0 w-full h-full overflow-hidden">
-          <Image
-            src="/architectural-sketch-villa.webp"
-            alt="Croquis y Boceto Arquitectónico Técnico - MGM Inmobiliaria"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center contrast-115 brightness-100 scale-105 transition-transform duration-10000 ease-out hover:scale-110"
-            referrerPolicy="no-referrer"
-          />
+    <div className="relative w-full h-full max-h-screen overflow-hidden bg-gradient-to-b from-slate-50 via-[#f3f7f4] to-white text-slate-900 flex flex-col justify-between pt-16 sm:pt-20 pb-20 md:pb-3 px-3 sm:px-6 lg:px-12 select-none">
 
-          {/* Shader negro cinematográfico que degrada de izquierda a derecha y se desvanece a transparente antes del 3/5 (~58%) */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/80 via-[32%] to-transparent to-[58%] pointer-events-none" />
-        </div>
+      {/* ═══════════════════════════════════════════════════════════════════════
+          FONDO ANIMADO TÉCNICO ARQUITECTÓNICO (BLUEPRINT & CAD GEOMETRY)
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+        <div
+          className="absolute inset-0 opacity-[0.35]"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, rgba(16, 185, 129, 0.08) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(16, 185, 129, 0.08) 1px, transparent 1px),
+              linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px)
+            `,
+            backgroundSize: '80px 80px, 80px 80px, 16px 16px, 16px 16px',
+            maskImage: 'radial-gradient(circle at 50% 50%, black 60%, transparent 100%)',
+            WebkitMaskImage: 'radial-gradient(circle at 50% 50%, black 60%, transparent 100%)',
+          }}
+        />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="max-w-3xl lg:max-w-4xl text-left">
-            <ScrollReveal direction="down" delay={0.1}>
-              <h1 className="flex flex-col items-start font-black text-white leading-none tracking-tight drop-shadow-md">
-                <span className="text-xl sm:text-2xl md:text-3xl font-black text-white uppercase tracking-widest mb-1.5 sm:mb-2">
-                  Nuestras
-                </span>
-                <span className="text-3xl sm:text-5xl lg:text-[clamp(2.5rem,3.8vw,3.75rem)] text-[#5be196]">
-                  Construcciones
-                </span>
-              </h1>
-            </ScrollReveal>
+        <motion.div
+          animate={{ x: [0, 15, 0], opacity: [0.35, 0.55, 0.35] }}
+          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-24 left-16 text-[10px] font-mono text-emerald-800/40 tracking-widest hidden lg:block"
+        >
+          AXIS 01-A ━━━━━━━━━━━━━━ 12.80 m ━━━━━━━━━━━━━━ ⊕ ELEV. +3.20m
+        </motion.div>
 
-            <ScrollReveal direction="up" delay={0.2}>
-              <p className="text-xs sm:text-sm lg:text-base text-slate-200 leading-relaxed font-normal mt-4 sm:mt-5 drop-shadow-xs max-w-lg text-justify [text-align-last:left]">
-                Diseñamos y ejecutamos viviendas de vanguardia, villas residenciales y proyectos llave en mano con estricto rigor estructural, fiscalización pericial y escrituras notariales en todo el Austro.
-              </p>
-            </ScrollReveal>
+        <motion.div
+          animate={{ y: [0, -12, 0], opacity: [0.25, 0.45, 0.25] }}
+          transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute bottom-16 right-24 text-[10px] font-mono text-slate-400/50 tracking-wider hidden lg:block"
+        >
+          ⊕ SECCIÓN ESTRUCTURAL B-B · PERITAJE MGM INMOBILIARIA · ESCALA 1:50
+        </motion.div>
 
-            {/* Métricas destacadas en barra técnica */}
-            <ScrollReveal direction="up" delay={0.3}>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6 mt-8 sm:mt-10 pt-6 sm:pt-7 border-t border-white/20 max-w-2xl">
-                <div>
-                  <span className="block text-xl sm:text-2xl font-black text-[#5be196]">100%</span>
-                  <span className="text-xs text-slate-300 font-medium">Sismorresistente Normado</span>
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 160, repeat: Infinity, ease: 'linear' }}
+          className="absolute -top-32 -right-32 w-96 h-96 rounded-full border border-emerald-500/10 pointer-events-none hidden md:block"
+        >
+          <div className="absolute inset-8 rounded-full border border-dashed border-emerald-600/10" />
+          <div className="absolute inset-20 rounded-full border border-emerald-500/10" />
+        </motion.div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          BOTONES DE NAVEGACIÓN A LOS COSTADOS DE TODA LA PANTALLA
+          ═══════════════════════════════════════════════════════════════════════ */}
+      {total > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={goPrev}
+            className="fixed lg:absolute left-2 sm:left-4 lg:left-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white text-slate-800 hover:text-emerald-700 shadow-xl shadow-slate-900/10 border border-slate-200/90 hover:border-emerald-500 hover:scale-110 active:scale-95 transition-all flex items-center justify-center cursor-pointer group"
+            title="Construcción anterior (Flecha Izquierda)"
+            aria-label="Construcción anterior"
+          >
+            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 transition-transform group-hover:-translate-x-0.5" />
+          </button>
+
+          <button
+            type="button"
+            onClick={goNext}
+            className="fixed lg:absolute right-2 sm:right-4 lg:right-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white text-slate-800 hover:text-emerald-700 shadow-xl shadow-slate-900/10 border border-slate-200/90 hover:border-emerald-500 hover:scale-110 active:scale-95 transition-all flex items-center justify-center cursor-pointer group"
+            title="Siguiente construcción (Flecha Derecha)"
+            aria-label="Siguiente construcción"
+          >
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 transition-transform group-hover:translate-x-0.5" />
+          </button>
+        </>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          ESCENARIO CENTRAL: SHOWROOM ARQUITECTÓNICO
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <div className="relative z-10 flex-1 min-h-0 w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1600px] mx-auto flex flex-col justify-center overflow-hidden px-3 sm:px-6">
+        <div className="w-full h-full min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-7 items-stretch overflow-hidden">
+
+          {/* ─────────────────────────────────────────────────────────────────
+              LADO IZQUIERDO: SPOTLIGHT DE LA OBRA CON EFECTO EXPANSIVO
+              ───────────────────────────────────────────────────────────────── */}
+          <div className="lg:col-span-7 h-full min-h-0 flex flex-col justify-center overflow-hidden">
+            <AnimatePresence mode="wait" custom={slideDir}>
+              <motion.div
+                key={project.id}
+                custom={slideDir}
+                initial={{
+                  scale: 0.85,
+                  opacity: 0,
+                  x: slideDir > 0 ? 60 : -60,
+                  filter: 'blur(8px)',
+                }}
+                animate={{
+                  scale: 1,
+                  opacity: 1,
+                  x: 0,
+                  filter: 'blur(0px)',
+                  transition: {
+                    scale: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
+                    x: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+                    opacity: { duration: 0.35 },
+                    filter: { duration: 0.35 },
+                  },
+                }}
+                exit={{
+                  scale: 1.06,
+                  opacity: 0,
+                  x: slideDir > 0 ? -50 : 50,
+                  filter: 'blur(6px)',
+                  transition: { duration: 0.3, ease: 'easeIn' },
+                }}
+                className="relative w-full h-full min-h-[300px] max-h-[calc(100vh-140px)] rounded-3xl overflow-hidden bg-slate-100 border border-slate-200/90 shadow-[0_20px_45px_rgba(15,23,42,0.12)] group/photo"
+              >
+                {/* Imagen principal en alta resolución */}
+                <Image
+                  src={currentDisplayImage}
+                  alt={project.name}
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 58vw"
+                  className="object-cover transition-transform duration-700 ease-out group-hover/photo:scale-102"
+                  referrerPolicy="no-referrer"
+                />
+
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-slate-950/20 pointer-events-none" />
+
+                {/* Badges superiores: Estado y Código */}
+                <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10 pointer-events-none">
+                  <div className="flex items-center gap-2 pointer-events-auto">
+                    <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border shadow-sm backdrop-blur-md ${getStatusBadgeStyle(project.status)}`}>
+                      {project.status}
+                    </span>
+                    <span className="px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-white/90 text-slate-800 border border-slate-200/80 shadow-sm backdrop-blur-md">
+                      {project.code}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const idx = gallery.indexOf(currentDisplayImage);
+                      openLightbox(idx >= 0 ? idx : 0);
+                    }}
+                    className="pointer-events-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 hover:bg-emerald-600 hover:text-white text-slate-800 text-xs font-bold border border-slate-200 shadow-md backdrop-blur-md transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                    title="Ampliar plano/foto en alta resolución"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5 text-emerald-600 group-hover:text-white" />
+                    <span>Zoom HD</span>
+                  </button>
                 </div>
-                <div>
-                  <span className="block text-xl sm:text-2xl font-black text-[#F58220]">Llave en Mano</span>
-                  <span className="text-xs text-slate-300 font-medium">Desde Planos hasta Entrega</span>
-                </div>
-                <div className="col-span-2 sm:col-span-1">
-                  <span className="block text-xl sm:text-2xl font-black text-white">Fiscalizado</span>
-                  <span className="text-xs text-slate-300 font-medium">Garantía Pericial MGM</span>
-                </div>
-              </div>
-            </ScrollReveal>
+
+                {/* Controles de cambio de foto dentro de la imagen al hacer hover */}
+                {gallery.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const idx = gallery.indexOf(currentDisplayImage);
+                        const prevIdx = idx <= 0 ? gallery.length - 1 : idx - 1;
+                        setActiveImg(gallery[prevIdx]);
+                      }}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-emerald-600 text-white backdrop-blur-md border border-white/20 flex items-center justify-center opacity-0 group-hover/photo:opacity-100 transition-all cursor-pointer hover:scale-110 active:scale-95 shadow-md"
+                      title="Foto anterior de la galería"
+                      aria-label="Foto anterior"
+                    >
+                      <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const idx = gallery.indexOf(currentDisplayImage);
+                        const nextIdx = idx >= gallery.length - 1 ? 0 : idx + 1;
+                        setActiveImg(gallery[nextIdx]);
+                      }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-emerald-600 text-white backdrop-blur-md border border-white/20 flex items-center justify-center opacity-0 group-hover/photo:opacity-100 transition-all cursor-pointer hover:scale-110 active:scale-95 shadow-md"
+                      title="Siguiente foto de la galería"
+                      aria-label="Siguiente foto"
+                    >
+                      <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </button>
+                  </>
+                )}
+
+                {/* Miniaturas flotantes sobremontadas con máscara de degradado (cero caja blanca) */}
+                {gallery.length > 1 && (
+                  <div className="absolute bottom-4 left-4 right-4 z-10 flex items-center justify-between gap-3 pointer-events-none">
+                    <div className="flex items-center gap-2 pointer-events-auto p-1 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 shadow-2xl overflow-x-auto max-w-[85%]">
+                      {gallery.slice(0, 5).map((img, i) => {
+                        const isCurrent = currentDisplayImage === img;
+                        return (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => setActiveImg(img)}
+                            className={`relative w-12 h-9 sm:w-15 sm:h-10 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer shrink-0 ${
+                              isCurrent
+                                ? 'ring-2 ring-emerald-400 scale-105 opacity-100 shadow-md'
+                                : 'opacity-65 hover:opacity-100 hover:scale-102 ring-1 ring-white/20'
+                            }`}
+                            title={`Ver foto de referencia ${i + 1}`}
+                          >
+                            <Image
+                              src={img}
+                              alt=""
+                              fill
+                              sizes="70px"
+                              className="object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          </button>
+                        );
+                      })}
+                      {gallery.length > 5 && (
+                        <span className="text-[10px] text-white/80 font-bold px-2 whitespace-nowrap">
+                          +{gallery.length - 5}
+                        </span>
+                      )}
+                    </div>
+
+                    <span className="text-[11px] text-white/90 font-bold hidden sm:inline-block px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/10">
+                      {gallery.length} fotos de obra
+                    </span>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
           </div>
-        </div>
-      </section>
 
-      {/* ========================================================
-          2. BARRA DE FILTROS & BÚSQUEDA RÁPIDA
-          ======================================================== */}
-      <section className="relative -mt-6 z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-200/90 p-4 sm:p-6">
-          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+          {/* ─────────────────────────────────────────────────────────────────
+              LADO DERECHO: DOSSIER ARQUITECTÓNICO & ESPECIFICACIONES DE ÉLITE
+              ───────────────────────────────────────────────────────────────── */}
+          <div className="lg:col-span-5 h-full min-h-0 flex flex-col justify-between py-1 overflow-hidden">
             
-            {/* Buscador de texto */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-400 pointer-events-none" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Buscar por nombre, sector (ej. Challuabamba, Paute) o código..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
-              />
-            </div>
+            <AnimatePresence mode="wait" custom={slideDir}>
+              <motion.div
+                key={project.id}
+                custom={slideDir}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.28 }}
+                className="flex-1 min-h-0 flex flex-col justify-between space-y-3 overflow-hidden"
+              >
+                {/* 1. Header del Proyecto: Ubicación, Código y Título */}
+                <div className="space-y-1.5 shrink-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-50/80 px-2.5 py-0.5 rounded-full border border-emerald-200/60">
+                      <MapPin className="w-3.5 h-3.5 text-[#F58220] shrink-0" />
+                      <span className="truncate">{project.location} · {project.canton}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {total > 1 && (
+                        <span className="text-[10px] font-mono font-black text-emerald-900 bg-emerald-100/90 border border-emerald-300/80 px-2 py-0.5 rounded-md">
+                          {String(currentIndex + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
+                        </span>
+                      )}
+                      <span className="text-[10px] font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200/60">
+                        {project.code}
+                      </span>
+                    </div>
+                  </div>
 
-            {/* Filtros de Estado y Cantón */}
-            <div className="flex flex-wrap items-center gap-3">
-              {/* Estado */}
-              <div className="flex items-center gap-1.5 text-xs">
-                <span className="font-bold text-slate-700 hidden sm:inline">Estado:</span>
-                <select
-                  value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-emerald-500 cursor-pointer"
-                >
-                  {STATUS_FILTERS.map((st) => (
-                    <option key={st} value={st}>
-                      {st === 'Todos' ? 'Todos los Estados' : st}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-black text-slate-900 tracking-tight leading-tight">
+                    {project.name}
+                  </h1>
 
-              {/* Cantón */}
-              <div className="flex items-center gap-1.5 text-xs">
-                <span className="font-bold text-slate-700 hidden sm:inline">Ubicación:</span>
-                <select
-                  value={selectedCanton}
-                  onChange={(e) => setSelectedCanton(e.target.value)}
-                  className="px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-emerald-500 cursor-pointer"
-                >
-                  {CANTON_FILTERS.map((canton) => (
-                    <option key={canton} value={canton}>
-                      {canton === 'Todos' ? 'Todos los Cantones' : canton}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  {/* Narrativa Arquitectónica con botón para leer memoria completa */}
+                  <div className="space-y-1">
+                    <p className="text-xs text-slate-600 leading-relaxed font-normal line-clamp-3">
+                      {getExtendedDescription(project)}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setShowDossierModal(true)}
+                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                    >
+                      <FileText className="w-3 h-3" />
+                      <span>Ver ficha y memoria arquitectónica completa</span>
+                    </button>
+                  </div>
+                </div>
 
-              {/* Botón de reseteo */}
-              {(searchTerm || selectedStatus !== 'Todos' || selectedCanton !== 'Todos') && (
+                {/* 2. MATRIZ DE ESPECIFICACIONES TÉCNICAS (Micro-tarjetas de alto contraste) */}
+                <div className="space-y-2 shrink-0">
+                  <div className="grid grid-cols-3 gap-2">
+                    {SPECS.map(({ icon: Icon, label, value }) => (
+                      <div
+                        key={label}
+                        className="p-2 sm:p-2.5 rounded-xl bg-white/90 border border-slate-200/90 shadow-2xs flex flex-col justify-between hover:border-emerald-300 transition-colors"
+                      >
+                        <div className="flex items-center gap-1 text-slate-400 mb-1">
+                          <Icon className="w-3.5 h-3.5 text-emerald-700" />
+                          <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider truncate">
+                            {label}
+                          </span>
+                        </div>
+                        <span className="text-xs sm:text-sm font-black text-slate-900 tracking-tight truncate">
+                          {value}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Sistema estructural sismo-resistente */}
+                  {project.structureType && (
+                    <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
+                      <span className="font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 text-[9.5px] shrink-0">
+                        <Hammer className="w-3 h-3 text-[#F58220]" />
+                        <span>Sistema Constructivo:</span>
+                      </span>
+                      <span className="font-bold text-slate-800 text-[11.5px] truncate text-right">
+                        {project.structureType}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. ACABADOS & VENTAJA ARQUITECTÓNICA */}
+                <div className="p-3 rounded-2xl bg-gradient-to-br from-white to-emerald-50/30 border border-slate-200/80 shadow-2xs space-y-2 shrink-0">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-[#F58220]" />
+                      <span>Garantía & Acabados de Primera</span>
+                    </span>
+                    <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/70 border border-emerald-200/50 px-2 py-0.5 rounded-full">
+                      Entrega: {project.deliveryYear || 'Garantizada'}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-0.5">
+                    {(project.features && project.features.length > 0 ? project.features : [
+                      'Estructura sismo-resistente certificada',
+                      'Planificación bioclimática pasiva',
+                      'Instalaciones eléctricas y sanitarias ocultas',
+                      'Fiscalización técnica continua MGM'
+                    ]).slice(0, 4).map((f, i) => (
+                      <div key={i} className="flex items-start gap-1.5 text-xs text-slate-700">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                        <span className="truncate">{f}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 4. CINTA COMPACTA DE OTRAS OBRAS (Llena el espacio inferior con navegación rápida) */}
+                {otherProjects.length > 0 && (
+                  <div className="space-y-1.5 shrink-0 pt-0.5">
+                    <div className="flex items-center justify-between text-[10px] text-slate-400 font-bold uppercase tracking-wider px-0.5">
+                      <span className="flex items-center gap-1.5">
+                        <Building2 className="w-3 h-3 text-emerald-700" />
+                        <span>Otras Obras en Catálogo</span>
+                      </span>
+                      <span className="text-[9.5px] text-emerald-700 font-semibold lowercase">
+                        clic para alternar
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {otherProjects.slice(0, 2).map(({ item, index }) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => handleSelectIndex(index)}
+                          className="group/mini p-1.5 rounded-xl bg-white/95 hover:bg-emerald-50/50 border border-slate-200/90 hover:border-emerald-300/80 shadow-2xs transition-all flex items-center gap-2.5 text-left cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
+                          title={`Ver proyecto ${item.name}`}
+                        >
+                          <div className="relative w-11 h-11 rounded-lg overflow-hidden shrink-0 bg-slate-900 border border-slate-200/60">
+                            <Image
+                              src={item.mainImage}
+                              alt={item.name}
+                              fill
+                              sizes="45px"
+                              className="object-cover group-hover/mini:scale-110 transition-transform duration-500"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+
+                          <div className="min-w-0 flex-1">
+                            <h4 className="text-[11px] font-black text-slate-800 group-hover/mini:text-emerald-800 truncate leading-tight">
+                              {item.name}
+                            </h4>
+                            <p className="text-[9.5px] text-slate-500 truncate flex items-center gap-1">
+                              <span>{item.canton}</span>
+                              <span className="text-slate-300">·</span>
+                              <span className="font-mono text-emerald-700 font-bold">{item.constructionArea} m²</span>
+                            </p>
+                          </div>
+
+                          <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover/mini:text-emerald-700 group-hover/mini:translate-x-0.5 transition-all shrink-0" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 5. ZONA DE ACCIÓN: BOTÓN COTIZAR WHATSAPP + DOSSIER */}
+                <div className="pt-2 border-t border-slate-200/80 mt-auto flex items-center gap-2.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={contactWhatsApp}
+                    className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-[#25D366] to-[#1ebf57] hover:from-[#1ebf57] hover:to-[#17a84c] text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-emerald-500/20 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+                  >
+                    <WhatsAppIcon size={18} className="text-slate-950" />
+                    <span>Cotizar Proyecto o Visitar Obra</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowDossierModal(true)}
+                    className="py-3 px-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center gap-1.5"
+                    title="Ver ficha técnica completa en pantalla"
+                  >
+                    <FileText className="w-4 h-4 text-emerald-400" />
+                    <span className="hidden sm:inline">Dossier</span>
+                  </button>
+                </div>
+
+              </motion.div>
+            </AnimatePresence>
+
+          </div>
+
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          MODAL DE DOSSIER TÉCNICO ARQUITECTÓNICO COMPLETO
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {showDossierModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
+            onClick={() => setShowDossierModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.94, opacity: 0, y: 15 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.94, opacity: 0, y: 15 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-3xl max-w-2xl w-full max-h-[88vh] overflow-y-auto p-5 sm:p-7 shadow-2xl border border-slate-200 relative flex flex-col justify-between space-y-4"
+            >
+              {/* Header Modal */}
+              <div className="flex items-start justify-between border-b border-slate-100 pb-3.5">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-100/90 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                      Ficha Técnica · {project.code}
+                    </span>
+                    <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${getStatusBadgeStyle(project.status)}`}>
+                      {project.status}
+                    </span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
+                    {project.name}
+                  </h3>
+                  <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
+                    <MapPin className="w-3 h-3 text-[#F58220]" />
+                    <span>{project.location} · {project.canton}</span>
+                  </p>
+                </div>
+
                 <button
                   type="button"
-                  onClick={handleResetFilters}
-                  className="px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-emerald-700 bg-slate-100 hover:bg-slate-200 flex items-center gap-1 transition-all cursor-pointer"
-                  title="Restablecer filtros"
+                  onClick={() => setShowDossierModal(false)}
+                  className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer transition-colors"
+                  title="Cerrar ficha (Esc)"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Limpiar</span>
+                  <X className="w-5 h-5" />
                 </button>
-              )}
-            </div>
-          </div>
+              </div>
 
-          {/* Conteo de resultados */}
-          <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-            <span>
-              Mostrando <strong className="text-slate-800 font-bold">{filteredProjects.length}</strong> {filteredProjects.length === 1 ? 'proyecto de construcción' : 'proyectos de construcción'}
-            </span>
-            <span className="text-[#113d22] font-semibold flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5 text-[#F58220]" />
-              <span>Obras ejecutadas y en desarrollo por MGM</span>
-            </span>
-          </div>
-        </div>
-      </section>
+              {/* Contenido Técnico */}
+              <div className="space-y-4 text-xs text-slate-700 leading-relaxed">
+                <div>
+                  <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] mb-1.5 flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>Memoria Descriptiva & Peritaje</span>
+                  </h4>
+                  <p className="text-slate-600 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 leading-relaxed">
+                    {getExtendedDescription(project)}
+                  </p>
+                </div>
 
-      {/* ========================================================
-          3. LISTADO DE CONSTRUCCIONES (CARDS CON FORMATO SOLICITADO)
-          ======================================================== */}
-      <section className="py-12 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {filteredProjects.length > 0 ? (
-          <div className="space-y-10 sm:space-y-14">
-            {filteredProjects.map((project) => (
-              <ConstructionCard key={project.id} project={project} />
-            ))}
-          </div>
-        ) : (
-          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 max-w-xl mx-auto">
-            <Building2 className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-slate-900">
-              No se encontraron proyectos con esos criterios
-            </h3>
-            <p className="text-sm text-slate-500 mt-1">
-              Intenta cambiar los filtros de estado, ubicación o término de búsqueda.
-            </p>
-            <button
-              type="button"
-              onClick={handleResetFilters}
-              className="mt-4 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-all cursor-pointer inline-flex items-center gap-1.5"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Ver todas las construcciones</span>
-            </button>
-          </div>
+                <div>
+                  <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] mb-1.5">
+                    Parámetros Constructivos
+                  </h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {SPECS.map(({ icon: Icon, label, value }) => (
+                      <div key={label} className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70">
+                        <div className="flex items-center gap-1 text-slate-400 mb-0.5">
+                          <Icon className="w-3 h-3 text-emerald-700" />
+                          <span className="text-[10px] font-bold uppercase">{label}</span>
+                        </div>
+                        <span className="text-xs sm:text-sm font-black text-slate-900">{value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {project.structureType && (
+                  <div className="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200/70 text-xs text-emerald-950 flex items-start gap-2">
+                    <Hammer className="w-4 h-4 text-[#F58220] shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="block text-emerald-900 font-bold">Sistema Estructural:</strong>
+                      <span className="text-slate-700">{project.structureType}</span>
+                    </div>
+                  </div>
+                )}
+
+                {project.features && project.features.length > 0 && (
+                  <div>
+                    <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] mb-1.5 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-[#F58220]" />
+                      <span>Especificaciones & Acabados de Primera</span>
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {project.features.map((f, i) => (
+                        <div key={i} className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-200/70 text-slate-800 text-xs">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <span>{f}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Footer Modal con Acción */}
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setShowDossierModal(false)}
+                  className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-colors"
+                >
+                  Cerrar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowDossierModal(false);
+                    contactWhatsApp();
+                  }}
+                  className="flex-1 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#25D366] to-[#1ebf57] hover:from-[#1ebf57] hover:to-[#17a84c] text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer transition-all"
+                >
+                  <WhatsAppIcon size={16} className="text-slate-950" />
+                  <span>Cotizar Proyecto o Agendar Visita</span>
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
-      </section>
+      </AnimatePresence>
 
-      {/* ========================================================
-          4. BANNER CTA — ¿TIENES UN LOTE? CONSTRUYE CON MGM
-          ======================================================== */}
-      <section className="bg-gradient-to-r from-[#113d22] via-[#0d2e1a] to-slate-950 text-white py-14 sm:py-20 border-t border-white/10">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-[#5be196] text-xs font-bold uppercase tracking-wider mb-4">
-            <Hammer className="w-4 h-4 text-[#F58220]" />
-            <span>Servicio de Construcción Llave en Mano</span>
-          </div>
+      {/* ═══════════════════════════════════════════════════════════════════════
+          MODAL DE ZOOM / PANTALLA COMPLETA EN ALTA DEFINICIÓN
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {lightbox && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl flex flex-col justify-between p-4 sm:p-6"
+          >
+            {/* Header de controles */}
+            <div className="flex items-center justify-between text-white shrink-0 z-20">
+              <div className="flex items-center gap-3">
+                <span className="text-xs sm:text-sm font-bold text-white">
+                  {project.name}
+                </span>
+                <span className="text-xs text-slate-400 font-mono">
+                  Foto {lbIdx + 1} de {gallery.length}
+                </span>
+              </div>
 
-          <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-            ¿Tienes un lote o deseas adquirir uno y construir tu casa ideal?
-          </h2>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setLbZoom((z) => Math.min(3, z + 0.5))}
+                  className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer"
+                  title="Acercar (+)"
+                >
+                  <ZoomIn className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLbZoom((z) => Math.max(1, z - 0.5))}
+                  className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer"
+                  title="Alejar (-)"
+                >
+                  <ZoomOut className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLbZoom(1)}
+                  className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer"
+                  title="Restablecer tamaño"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLightbox(false)}
+                  className="p-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold transition-all cursor-pointer"
+                  title="Cerrar visor (Esc)"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
 
-          <p className="text-slate-300 text-sm sm:text-base mt-3 max-w-2xl mx-auto leading-relaxed">
-            Te asesoramos desde el anteproyecto arquitectónico, permisos municipales, cálculo estructural hasta la entrega de llaves con financiamiento directo.
-          </p>
+            {/* Área central con zoom */}
+            <div className="relative flex-1 min-h-0 my-4 flex items-center justify-center overflow-hidden">
+              <button
+                type="button"
+                onClick={() => {
+                  setLbIdx((p) => (p === 0 ? gallery.length - 1 : p - 1));
+                  setLbZoom(1);
+                }}
+                className="absolute left-2 sm:left-4 z-20 p-3 rounded-2xl bg-black/60 hover:bg-emerald-500 hover:text-slate-950 text-white backdrop-blur-md border border-white/20 transition-all cursor-pointer"
+                title="Foto anterior"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
 
-          <div className="flex flex-wrap items-center justify-center gap-3.5 mt-8">
-            <button
-              type="button"
-              onClick={handleConsultGeneral}
-              className="px-6 py-3.5 rounded-2xl bg-[#25D366] hover:bg-[#20ba59] text-slate-950 font-extrabold text-sm sm:text-base flex items-center gap-2.5 transition-all shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 cursor-pointer"
-            >
-              <WhatsAppIcon size={20} className="text-slate-950" />
-              <span>Solicitar Asesoría de Construcción por WhatsApp</span>
-            </button>
+              <div
+                className="relative w-full h-full max-w-5xl max-h-[80vh] flex items-center justify-center transition-transform duration-200"
+                style={{ transform: `scale(${lbZoom})` }}
+              >
+                <Image
+                  src={gallery[lbIdx] || currentDisplayImage}
+                  alt={`${project.name} vista`}
+                  fill
+                  className="object-contain"
+                  sizes="100vw"
+                  priority
+                  referrerPolicy="no-referrer"
+                />
+              </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                onNavigate('properties');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className="px-6 py-3.5 rounded-2xl bg-white/15 hover:bg-white/25 text-white font-bold text-sm sm:text-base border border-white/20 transition-all cursor-pointer flex items-center gap-2"
-            >
-              <span>Ver Lotes Disponibles para Construir</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </section>
+              <button
+                type="button"
+                onClick={() => {
+                  setLbIdx((p) => (p === gallery.length - 1 ? 0 : p + 1));
+                  setLbZoom(1);
+                }}
+                className="absolute right-2 sm:right-4 z-20 p-3 rounded-2xl bg-black/60 hover:bg-emerald-500 hover:text-slate-950 text-white backdrop-blur-md border border-white/20 transition-all cursor-pointer"
+                title="Siguiente foto"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Miniaturas en Lightbox */}
+            <div className="flex items-center justify-center gap-2 overflow-x-auto py-1 shrink-0 z-20">
+              {gallery.map((t, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => {
+                    setLbIdx(i);
+                    setLbZoom(1);
+                  }}
+                  className={`relative w-14 h-10 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
+                    lbIdx === i
+                      ? 'border-emerald-400 scale-105 opacity-100 ring-2 ring-emerald-500/40'
+                      : 'border-white/20 opacity-50 hover:opacity-100'
+                  }`}
+                >
+                  <Image src={t} alt="" fill sizes="56px" className="object-cover" referrerPolicy="no-referrer" />
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
