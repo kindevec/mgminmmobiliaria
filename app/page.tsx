@@ -300,7 +300,7 @@ function HomePageContent() {
       </main>
 
       {/* 3. Corporate Footer with Kindev Official Backlink (Solo en vistas públicas) */}
-      {currentPage !== 'admin' && currentPage !== 'appraisals' && (
+      {currentPage !== 'admin' && currentPage !== 'appraisals' && currentPage !== 'constructions' && (
         <Footer
           currentPage={currentPage}
           onNavigate={handleNavigate}
@@ -314,7 +314,7 @@ function HomePageContent() {
       )}
 
       {/* 5. Persistent Smart WhatsApp FAB (Solo en vistas públicas) */}
-      {currentPage !== 'admin' && currentPage !== 'appraisals' && (
+      {currentPage !== 'admin' && currentPage !== 'appraisals' && currentPage !== 'constructions' && (
         <WhatsAppFAB />
       )}
 

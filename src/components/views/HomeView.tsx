@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -110,136 +110,56 @@ const PURCHASE_PROCESS_STEPS = [
 // 4. Beneficios Urbanos & Infraestructura Real de MGM (Especificaciones de Ingeniería Civil con Color y Vida)
 const URBAN_BENEFIT_ITEMS = [
   {
-    category: 'Vialidad & Acceso Urbano',
-    status: 'CONCLUIDO IN SITU',
     title: 'Vías Adoquinadas 10 a 12m',
-    desc: 'Calzadas vehiculares amplias de alto tránsito con bordillos de hormigón armado, cunetas y aceras peatonales integradas.',
+    desc: 'Calzadas vehiculares de alto tráfico con bordillos de hormigón armado, cunetas y aceras peatonales integradas.',
     icon: Building,
-    tag: 'Infraestructura Vial',
-    palette: {
-      cardGradient: 'from-amber-500/[0.08] via-amber-500/[0.02] to-white',
-      border: 'border-amber-200/90 hover:border-amber-400',
-      iconGradient: 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-amber-500/25',
-      tagColor: 'text-amber-700',
-      statusColor: 'text-amber-600',
-      accentDot: 'bg-amber-500',
-      specsBg: 'bg-amber-50/50 border-amber-100/80',
-    },
-    specs: [
-      { label: 'Sección', val: '10.00m a 12.00m' },
-      { label: 'Capa Rodadura', val: 'Adoquín 400 kg/cm²' },
-      { label: 'Confinamiento', val: 'Bordillos Hormigón' },
-    ],
+    badge: 'OBRA VIAL CUMPLIDA',
+    buttonText: 'Ver Especificaciones & Vías',
+    bgClass: 'bg-[#113d22]', // Verde Corporativo Profundo MGM
+    badgeColor: 'text-[#5be196] bg-black/30 border-[#5be196]/30',
+    buttonBg: 'bg-black/30 hover:bg-black/50 text-white border border-white/20',
+    image: '/benefit-road.png',
+    imageAlt: 'Vías adoquinadas de alto tránsito',
+    imageScale: 'scale-105',
   },
   {
-    category: 'Ingeniería Subterránea',
-    status: '100% SUBTERRÁNEO',
-    title: 'Redes de Servicios Soterradas',
-    desc: 'Distribución técnica subterránea sin cableado aéreo visible: agua presurizada, acometida sanitaria y ductos para fibra óptica.',
+    title: 'Red Eléctrica & Agua Subterránea',
+    desc: 'Distribución técnica soterrada sin cableado aéreo visible: agua potable presurizada y acometidas de energía certificadas.',
     icon: Droplets,
-    tag: 'Agua & Telecomunicaciones',
-    palette: {
-      cardGradient: 'from-sky-500/[0.08] via-sky-500/[0.02] to-white',
-      border: 'border-sky-200/90 hover:border-sky-400',
-      iconGradient: 'bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-sky-500/25',
-      tagColor: 'text-sky-700',
-      statusColor: 'text-sky-600',
-      accentDot: 'bg-sky-500',
-      specsBg: 'bg-sky-50/50 border-sky-100/80',
-    },
-    specs: [
-      { label: 'Red Hídrica', val: 'Presurizada con acometida' },
-      { label: 'Sanitario', val: 'Alcantarillado conectado' },
-      { label: 'Telecom', val: 'Ductería FTTH subterránea' },
-    ],
+    badge: '100% SUBTERRÁNEO',
+    buttonText: 'Consultar Servicios In Situ',
+    bgClass: 'bg-[#F58220]', // Naranja MGM Oficial
+    badgeColor: 'text-amber-950 bg-black/15 border-black/20',
+    buttonBg: 'bg-black/20 hover:bg-black/35 text-white border border-white/25',
+    image: '/benefit-services.png',
+    imageAlt: 'Generador y acometidas eléctricas subterráneas',
+    imageScale: 'scale-95',
   },
   {
-    category: 'Reserva Ecológica & Paisaje',
-    status: 'ÁREA PROTEGIDA',
-    title: '+8.000 m² de Áreas Verdes',
-    desc: 'Espacios recreativos integrados a la trama urbana con caminerías ecológicas, parques familiares y reforestación de especies nativas.',
+    title: '+8.000 m² de Áreas Verdes & Parques',
+    desc: 'Espacios recreativos integrados a la trama urbana con caminerías ecológicas, parques biosaludables y reforestación nativa.',
     icon: Leaf,
-    tag: 'Naturaleza & Pulmón Verde',
-    palette: {
-      cardGradient: 'from-emerald-500/[0.09] via-emerald-500/[0.02] to-white',
-      border: 'border-emerald-200/90 hover:border-emerald-400',
-      iconGradient: 'bg-gradient-to-br from-emerald-500 to-green-700 text-white shadow-emerald-500/25',
-      tagColor: 'text-emerald-700',
-      statusColor: 'text-emerald-600',
-      accentDot: 'bg-emerald-500',
-      specsBg: 'bg-emerald-50/50 border-emerald-100/80',
-    },
-    specs: [
-      { label: 'Superficie', val: '+8.000 m² comunales' },
-      { label: 'Equipamiento', val: 'Senderos & arborización' },
-      { label: 'Entorno', val: 'Microclima residencial' },
-    ],
+    badge: 'PULMÓN VERDE',
+    buttonText: 'Explorar Senderos & Parques',
+    bgClass: 'bg-[#166534]', // Verde Bosque Intenso MGM
+    badgeColor: 'text-emerald-200 bg-black/30 border-emerald-400/30',
+    buttonBg: 'bg-black/30 hover:bg-black/50 text-white border border-white/20',
+    image: '/benefit-park.png',
+    imageAlt: 'Parques y árboles en áreas comunales',
+    imageScale: 'scale-110',
   },
   {
-    category: 'Deporte & Salud Familiar',
-    status: 'ILUMINADO LED',
-    title: 'Complejo Deportivo Multiuso',
-    desc: 'Infraestructura deportiva polivalente con cerramiento técnico perimetral para fútbol, básquetbol y actividades físicas comunitarias.',
-    icon: Trophy,
-    tag: 'Canchas & Vida Sana',
-    palette: {
-      cardGradient: 'from-violet-500/[0.08] via-violet-500/[0.02] to-white',
-      border: 'border-violet-200/90 hover:border-violet-400',
-      iconGradient: 'bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-violet-500/25',
-      tagColor: 'text-violet-700',
-      statusColor: 'text-violet-600',
-      accentDot: 'bg-violet-500',
-      specsBg: 'bg-violet-50/50 border-violet-100/80',
-    },
-    specs: [
-      { label: 'Canchas', val: 'Fútbol y básquetbol' },
-      { label: 'Iluminación', val: 'Reflectores LED nocturnos' },
-      { label: 'Uso', val: 'Exclusivo residentes' },
-    ],
-  },
-  {
-    category: 'Seguridad & Tranquilidad',
-    status: 'OPERATIVO 24/7',
-    title: 'Garita & Pórtico de Acceso',
-    desc: 'Diseño urbanístico concebido con pórtico de control de ingreso, monitoreo perimetral y barreras vehiculares para tranquilidad familiar.',
+    title: 'Topografía Plana & Garita 24/7',
+    desc: 'Lotes nivelados certificados para cimentación inmediata, pórtico monumental con control de acceso y monitoreo permanente.',
     icon: ShieldCheck,
-    tag: 'Protección Residencial',
-    palette: {
-      cardGradient: 'from-rose-500/[0.08] via-rose-500/[0.02] to-white',
-      border: 'border-rose-200/90 hover:border-rose-400',
-      iconGradient: 'bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-rose-500/25',
-      tagColor: 'text-rose-700',
-      statusColor: 'text-rose-600',
-      accentDot: 'bg-rose-500',
-      specsBg: 'bg-rose-50/50 border-rose-100/80',
-    },
-    specs: [
-      { label: 'Acceso', val: 'Garita de control y pluma' },
-      { label: 'Perímetro', val: 'Cierre perimetral definido' },
-      { label: 'Régimen', val: 'Seguridad comunitaria' },
-    ],
-  },
-  {
-    category: 'Topografía & Geotecnia',
-    status: 'APTO EDIFICACIÓN',
-    title: 'Topografía Plana Calificada',
-    desc: 'Lotes con rasantes niveladas y estudio de mecánica de suelos aptos para cimentación inmediata, eliminando sobrecostos de movimiento de tierras.',
-    icon: Compass,
-    tag: 'Suelo Firme Certificado',
-    palette: {
-      cardGradient: 'from-teal-500/[0.08] via-teal-500/[0.02] to-white',
-      border: 'border-teal-200/90 hover:border-teal-400',
-      iconGradient: 'bg-gradient-to-br from-teal-500 to-emerald-600 text-white shadow-teal-500/25',
-      tagColor: 'text-teal-700',
-      statusColor: 'text-teal-600',
-      accentDot: 'bg-teal-500',
-      specsBg: 'bg-teal-50/50 border-teal-100/80',
-    },
-    specs: [
-      { label: 'Pendiente', val: 'Plana (< 2% inclinación)' },
-      { label: 'Cimentación', val: 'Apta para obra directa' },
-      { label: 'Linderación', val: 'Hitos georreferenciados UTM' },
-    ],
+    badge: 'SEGURIDAD & SUELO FIRME',
+    buttonText: 'Cotizar Lote Urbanizado',
+    bgClass: 'bg-[#0d2f1a]', // Verde Esmeralda Nocturno MGM
+    badgeColor: 'text-[#5be196] bg-black/40 border-[#5be196]/30',
+    buttonBg: 'bg-black/30 hover:bg-black/50 text-white border border-white/20',
+    image: '/house-isolated.webp',
+    imageAlt: 'Vivienda modelo y topografía plana calificada',
+    imageScale: 'scale-110',
   },
 ];
 
@@ -251,6 +171,7 @@ export function HomeView({
   useSiteSettings();
   const { properties } = useProperties();
   const { banners } = useSiteBanners();
+
   const homeSlides = banners.inicio;
 
   // Filtrar solo propiedades activas (excluir 'Inactiva' / Borrador)
@@ -815,20 +736,6 @@ export function HomeView({
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent pointer-events-none" />
 
 
-                {/* Badge Flotante Inferior: Garantía de Obras */}
-                <div className="absolute bottom-5 left-5 right-5 z-10 p-4 rounded-2xl bg-white/95 backdrop-blur-md border border-white/40 shadow-xl flex items-center justify-between gap-4">
-                  <div className="space-y-0.5">
-                    <span className="text-[10px] font-mono font-bold uppercase text-[#15803d] tracking-wider block">
-                      Infraestructura Real
-                    </span>
-                    <p className="text-sm font-black text-slate-900 leading-tight">
-                      Vías adoquinadas, alcantarillado y servicios in situ
-                    </p>
-                  </div>
-                  <div className="shrink-0">
-                    <CheckCircle2 className="h-7 w-7 text-[#22A33D]" />
-                  </div>
-                </div>
               </div>
             </ScrollReveal>
 
@@ -898,108 +805,97 @@ export function HomeView({
       </section>
 
       {/* =========================================================================
-          7. BENEFICIOS Y URBANISMO: EXPEDIENTE TÉCNICO EDITORIAL (ESTUDIO ARQUITECTÓNICO)
+          7. BENEFICIOS Y URBANISMO: CARDS CUADRADAS CON COLORES MGM E IMÁGENES SIN FONDO
           ========================================================================= */}
       <section className="relative w-full bg-[#f8faf8] text-slate-900 py-16 sm:py-24 border-b border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-12">
-          {/* Encabezado Editorial Técnico */}
+          
+          {/* Header con píldora superior centrada idéntica al banner de referencia con colores MGM */}
           <ScrollReveal direction="down" delay={0.1} className="text-center max-w-3xl mx-auto space-y-3">
+            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white border border-slate-200/90 shadow-xs mb-1">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#5be196]" />
+                <span className="w-2 h-2 rounded-full bg-[#F58220]" />
+                <span className="w-2 h-2 rounded-full bg-[#113d22]" />
+              </span>
+              <span className="text-[11px] sm:text-xs font-black uppercase tracking-[0.18em] text-slate-800">
+                SERVICIOS &amp; BENEFICIOS URBANOS MGM
+              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-900" />
+            </div>
+
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-tight [text-wrap:balance]">
-              Beneficios Tangibles en Cada Urbanización
+              Infraestructura Urbana Concluida In Situ
             </h2>
             <p className="text-xs sm:text-base text-slate-600 leading-relaxed font-normal max-w-2xl mx-auto">
-              Ciudadelas planificadas con obras civiles concluidas in situ, garantizando plusvalía, seguridad y bienestar familiar integral.
+              Ciudadelas planificadas con obras civiles terminadas, garantizando plusvalía inmediata, seguridad jurídica y calidad constructiva.
             </p>
           </ScrollReveal>
 
-          {/* VISTA MÓVIL: Galería Tarjeta Naipes (Cambio cada 3s, bordes asomando debajo, botones izq/der) */}
-          <div className="block md:hidden">
-            <CardDeckGallery
-              id="galeria-tarjeta-naipes"
-              items={URBAN_BENEFIT_ITEMS}
-              autoPlayInterval={3000}
-              renderCard={(item) => {
-                const IconComp = item.icon;
-                return (
-                  <div
-                    className={`relative bg-white rounded-3xl p-6 border ${item.palette.border} shadow-xl flex flex-col justify-between overflow-hidden min-h-[330px]`}
-                  >
-                    <div>
-
-                      <div className="flex items-center gap-3.5 mb-3.5">
-                        <div className={`p-3 rounded-2xl ${item.palette.iconGradient} shrink-0 shadow-md`}>
-                          <IconComp className="h-5 w-5" strokeWidth={2.2} />
-                        </div>
-                        <h3 className="font-black text-lg text-slate-900 leading-snug">
-                          {item.title}
-                        </h3>
-                      </div>
-
-                      {/* Descripción de Obra */}
-                      <p className="text-xs text-slate-600 leading-relaxed font-normal mb-6">
-                        {item.desc}
-                      </p>
-                    </div>
-
-                    {/* Ficha Técnica de Parámetros Constructivos */}
-                    <div className={`pt-3.5 border-t ${item.palette.specsBg} -mx-6 -mb-6 px-6 py-3.5 rounded-b-3xl`}>
-                      <div className="space-y-2">
-                        {item.specs.map((sp, sIdx) => (
-                          <div key={sIdx} className="flex items-center justify-between text-xs">
-                            <span className="font-medium text-slate-500">{sp.label}:</span>
-                            <span className="font-bold text-slate-800 text-right">{sp.val}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                );
-              }}
-            />
-          </div>
-
-          {/* VISTA ESCRITORIO: Grid completa multicuadrícula original */}
-          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
+          {/* Fila Única Completa: Las 4 Tarjetas Visibles en 1 Sola Línea sin Cortarse */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 xl:gap-5">
             {URBAN_BENEFIT_ITEMS.map((item, idx) => {
               const IconComp = item.icon;
               return (
                 <ScrollReveal key={idx} direction="up" delay={idx * 0.08}>
                   <div
-                    className={`group relative bg-white rounded-2xl p-6 sm:p-7 border ${item.palette.border} shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden h-full`}
+                    className={`group relative ${item.bgClass} text-white rounded-[1.75rem] sm:rounded-3xl p-5 lg:p-4.5 xl:p-5 shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col justify-between overflow-hidden aspect-square h-full`}
                   >
-                    <div>
-
-                      <div className="flex items-center gap-3.5 mb-3.5">
-                        <div className={`p-3 rounded-2xl ${item.palette.iconGradient} shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300`}>
-                          <IconComp className="h-5 w-5" strokeWidth={2.2} />
-                        </div>
-                        <h3 className="font-black text-base sm:text-lg text-slate-900 leading-snug group-hover:text-slate-950 transition-colors">
-                          {item.title}
-                        </h3>
+                    {/* 1. Header Superior Izquierdo: Badge + Título + Descripción */}
+                    <div className="relative z-10 shrink-0 space-y-1.5">
+                      <div>
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border backdrop-blur-md ${item.badgeColor}`}>
+                          <IconComp className="w-3 h-3" />
+                          <span>{item.badge}</span>
+                        </span>
                       </div>
 
-                      <p className="text-xs sm:text-[13px] text-slate-600 leading-relaxed font-normal mb-5">
+                      {/* Título protagonista en tipografía destacada */}
+                      <h3 className="text-base sm:text-lg font-black text-white leading-tight tracking-tight max-w-[92%] line-clamp-2">
+                        {item.title}
+                      </h3>
+
+                      {/* Descripción legible bajo el título */}
+                      <p className="text-[11px] sm:text-xs text-white/90 leading-relaxed font-normal max-w-[75%] line-clamp-2">
                         {item.desc}
                       </p>
                     </div>
 
-                    <div className={`pt-3 border-t ${item.palette.specsBg} -mx-6 -mb-6 sm:-mx-7 sm:-mb-7 px-6 sm:px-7 py-3.5 rounded-b-2xl`}>
-                      <div className="space-y-1.5">
-                        {item.specs.map((sp, sIdx) => (
-                          <div key={sIdx} className="flex items-center justify-between text-[11px]">
-                            <span className="font-medium text-slate-500">{sp.label}:</span>
-                            <span className="font-bold text-slate-800 text-right">{sp.val}</span>
-                          </div>
-                        ))}
-                      </div>
+                    {/* 2. Imagen en la Esquina Inferior Derecha (debajo del texto como en la referencia) */}
+                    <div className="absolute right-0 bottom-0 w-[56%] h-[56%] flex items-end justify-end pointer-events-none overflow-hidden rounded-tl-2xl">
+                      {/* Glow ambiental bajo la imagen */}
+                      <div className="absolute inset-0 bg-white/10 rounded-full blur-xl pointer-events-none transform scale-75" />
+                      
+                      <img
+                        src={item.image}
+                        alt={item.imageAlt}
+                        className={`relative max-h-full max-w-full object-contain object-bottom-right drop-shadow-[0_12px_24px_rgba(0,0,0,0.35)] transition-transform duration-500 group-hover:scale-105 p-1.5 sm:p-2 ${item.imageScale || ''}`}
+                        loading="lazy"
+                      />
                     </div>
+
+                    {/* 3. Botón Flotante Inferior Izquierdo: Estilo píldora frosted glass como en la referencia */}
+                    <div className="relative z-10 mt-auto pt-4 shrink-0 flex items-center justify-start">
+                      <a
+                        href={getGeneralWhatsAppUrl(`Hola, deseo más información técnica sobre: ${item.title}`)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-wide backdrop-blur-md transition-all bg-white/20 hover:bg-white/35 text-white border border-white/25 shadow-sm hover:shadow-md hover:scale-105 active:scale-95 cursor-pointer max-w-[65%]"
+                      >
+                        <span className="truncate">{item.buttonText}</span>
+                        <ArrowRight className="w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-1" />
+                      </a>
+                    </div>
+
+                    {/* Efecto de luz angular sutil de fondo */}
+                    <div className="absolute -right-6 -bottom-6 w-36 h-36 rounded-full bg-white/5 pointer-events-none blur-xl" />
                   </div>
                 </ScrollReveal>
               );
             })}
           </div>
 
-          {/* Botones de Exploración al pie de Beneficios */}
+          {/* Botones de Exploración al pie */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
             <a
               href={getGeneralWhatsAppUrl()}
@@ -1008,7 +904,7 @@ export function HomeView({
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[#113d22] hover:bg-[#1a8230] text-white text-xs sm:text-sm font-bold transition-all shadow-md hover:scale-105 active:scale-95 cursor-pointer"
             >
               <WhatsAppIcon size={16} className="text-white shrink-0" />
-              <span>Cotizar</span>
+              <span>Cotizar Proyectos</span>
             </a>
             <button
               type="button"
@@ -1019,6 +915,7 @@ export function HomeView({
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
+
         </div>
       </section>
 

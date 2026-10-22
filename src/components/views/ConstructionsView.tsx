@@ -166,7 +166,7 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
   };
 
   return (
-    <div className="relative w-full h-full max-h-screen overflow-hidden bg-gradient-to-b from-slate-50 via-[#f3f7f4] to-white text-slate-900 flex flex-col justify-between pt-16 sm:pt-20 pb-20 md:pb-3 px-3 sm:px-6 lg:px-12 select-none">
+    <div className="relative w-full h-full max-h-screen overflow-hidden bg-gradient-to-b from-slate-50 via-[#f3f7f4] to-white text-slate-900 flex flex-col justify-between pt-20 sm:pt-24 lg:pt-28 pb-20 md:pb-3 px-0 select-none">
 
       {/* ═══════════════════════════════════════════════════════════════════════
           FONDO ANIMADO TÉCNICO ARQUITECTÓNICO (BLUEPRINT & CAD GEOMETRY)
@@ -243,7 +243,7 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
       {/* ═══════════════════════════════════════════════════════════════════════
           ESCENARIO CENTRAL: SHOWROOM ARQUITECTÓNICO
           ═══════════════════════════════════════════════════════════════════════ */}
-      <div className="relative z-10 flex-1 min-h-0 w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1600px] mx-auto flex flex-col justify-center overflow-hidden px-3 sm:px-6">
+      <div className="relative z-10 flex-1 min-h-0 w-full max-w-7xl mx-auto flex flex-col justify-center overflow-hidden px-4 sm:px-6 lg:px-8">
         <div className="w-full h-full min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-7 items-stretch overflow-hidden">
 
           {/* ─────────────────────────────────────────────────────────────────
@@ -279,7 +279,7 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
                   filter: 'blur(6px)',
                   transition: { duration: 0.3, ease: 'easeIn' },
                 }}
-                className="relative w-full h-full min-h-[300px] max-h-[calc(100vh-140px)] rounded-3xl overflow-hidden bg-slate-100 border border-slate-200/90 shadow-[0_20px_45px_rgba(15,23,42,0.12)] group/photo"
+                className="relative w-full h-full min-h-[300px] max-h-[calc(100vh-165px)] rounded-3xl overflow-hidden bg-slate-100 border border-slate-200/90 shadow-[0_20px_45px_rgba(15,23,42,0.12)] group/photo"
               >
                 {/* Imagen principal en alta resolución */}
                 <Image
@@ -294,24 +294,15 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
 
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-slate-950/20 pointer-events-none" />
 
-                {/* Badges superiores: Estado y Código */}
-                <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10 pointer-events-none">
-                  <div className="flex items-center gap-2 pointer-events-auto">
-                    <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border shadow-sm backdrop-blur-md ${getStatusBadgeStyle(project.status)}`}>
-                      {project.status}
-                    </span>
-                    <span className="px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-white/90 text-slate-800 border border-slate-200/80 shadow-sm backdrop-blur-md">
-                      {project.code}
-                    </span>
-                  </div>
-
+                {/* Botón Zoom HD */}
+                <div className="absolute top-4 right-4 z-10">
                   <button
                     type="button"
                     onClick={() => {
                       const idx = gallery.indexOf(currentDisplayImage);
                       openLightbox(idx >= 0 ? idx : 0);
                     }}
-                    className="pointer-events-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 hover:bg-emerald-600 hover:text-white text-slate-800 text-xs font-bold border border-slate-200 shadow-md backdrop-blur-md transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 hover:bg-emerald-600 hover:text-white text-slate-800 text-xs font-bold border border-slate-200 shadow-md backdrop-blur-md transition-all hover:scale-105 active:scale-95 cursor-pointer"
                     title="Ampliar plano/foto en alta resolución"
                   >
                     <Maximize2 className="w-3.5 h-3.5 text-emerald-600 group-hover:text-white" />
@@ -413,32 +404,15 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
                 transition={{ duration: 0.28 }}
                 className="flex-1 min-h-0 flex flex-col justify-between space-y-3 overflow-hidden"
               >
-                {/* 1. Header del Proyecto: Ubicación, Código y Título */}
+                {/* 1. Header del Proyecto: Título y Memoria */}
                 <div className="space-y-1.5 shrink-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-50/80 px-2.5 py-0.5 rounded-full border border-emerald-200/60">
-                      <MapPin className="w-3.5 h-3.5 text-[#F58220] shrink-0" />
-                      <span className="truncate">{project.location} · {project.canton}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      {total > 1 && (
-                        <span className="text-[10px] font-mono font-black text-emerald-900 bg-emerald-100/90 border border-emerald-300/80 px-2 py-0.5 rounded-md">
-                          {String(currentIndex + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
-                        </span>
-                      )}
-                      <span className="text-[10px] font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200/60">
-                        {project.code}
-                      </span>
-                    </div>
-                  </div>
-
                   <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-black text-slate-900 tracking-tight leading-tight">
                     {project.name}
                   </h1>
 
                   {/* Narrativa Arquitectónica con botón para leer memoria completa */}
                   <div className="space-y-1">
-                    <p className="text-xs text-slate-600 leading-relaxed font-normal line-clamp-3">
+                    <p className="text-xs text-slate-600 leading-relaxed font-normal line-clamp-2 sm:line-clamp-3">
                       {getExtendedDescription(project)}
                     </p>
                     <button
@@ -452,113 +426,79 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
                   </div>
                 </div>
 
-                {/* 2. MATRIZ DE ESPECIFICACIONES TÉCNICAS (Micro-tarjetas de alto contraste) */}
-                <div className="space-y-2 shrink-0">
-                  <div className="grid grid-cols-3 gap-2">
-                    {SPECS.map(({ icon: Icon, label, value }) => (
-                      <div
-                        key={label}
-                        className="p-2 sm:p-2.5 rounded-xl bg-white/90 border border-slate-200/90 shadow-2xs flex flex-col justify-between hover:border-emerald-300 transition-colors"
-                      >
-                        <div className="flex items-center gap-1 text-slate-400 mb-1">
-                          <Icon className="w-3.5 h-3.5 text-emerald-700" />
-                          <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider truncate">
-                            {label}
-                          </span>
-                        </div>
-                        <span className="text-xs sm:text-sm font-black text-slate-900 tracking-tight truncate">
-                          {value}
+                {/* 2. MATRIZ DE ESPECIFICACIONES TÉCNICAS */}
+                <div className="grid grid-cols-3 gap-2 shrink-0">
+                  {SPECS.map(({ icon: Icon, label, value }) => (
+                    <div
+                      key={label}
+                      className="p-2 sm:p-2.5 rounded-xl bg-white/90 border border-slate-200/90 shadow-2xs flex flex-col justify-between hover:border-emerald-300 transition-colors"
+                    >
+                      <div className="flex items-center gap-1 text-slate-400 mb-1">
+                        <Icon className="w-3.5 h-3.5 text-emerald-700" />
+                        <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider truncate">
+                          {label}
                         </span>
                       </div>
-                    ))}
-                  </div>
-
-                  {/* Sistema estructural sismo-resistente */}
-                  {project.structureType && (
-                    <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
-                      <span className="font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 text-[9.5px] shrink-0">
-                        <Hammer className="w-3 h-3 text-[#F58220]" />
-                        <span>Sistema Constructivo:</span>
-                      </span>
-                      <span className="font-bold text-slate-800 text-[11.5px] truncate text-right">
-                        {project.structureType}
+                      <span className="text-xs sm:text-sm font-black text-slate-900 tracking-tight truncate">
+                        {value}
                       </span>
                     </div>
-                  )}
+                  ))}
                 </div>
 
-                {/* 3. ACABADOS & VENTAJA ARQUITECTÓNICA */}
-                <div className="p-3 rounded-2xl bg-gradient-to-br from-white to-emerald-50/30 border border-slate-200/80 shadow-2xs space-y-2 shrink-0">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-[#F58220]" />
-                      <span>Garantía & Acabados de Primera</span>
-                    </span>
-                    <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/70 border border-emerald-200/50 px-2 py-0.5 rounded-full">
-                      Entrega: {project.deliveryYear || 'Garantizada'}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-0.5">
-                    {(project.features && project.features.length > 0 ? project.features : [
-                      'Estructura sismo-resistente certificada',
-                      'Planificación bioclimática pasiva',
-                      'Instalaciones eléctricas y sanitarias ocultas',
-                      'Fiscalización técnica continua MGM'
-                    ]).slice(0, 4).map((f, i) => (
-                      <div key={i} className="flex items-start gap-1.5 text-xs text-slate-700">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                        <span className="truncate">{f}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 4. CINTA COMPACTA DE OTRAS OBRAS (Llena el espacio inferior con navegación rápida) */}
+                {/* 3. OTRAS OBRAS EN CATÁLOGO: TARJETAS RECTANGULARES EN VERTICAL */}
                 {otherProjects.length > 0 && (
-                  <div className="space-y-1.5 shrink-0 pt-0.5">
-                    <div className="flex items-center justify-between text-[10px] text-slate-400 font-bold uppercase tracking-wider px-0.5">
-                      <span className="flex items-center gap-1.5">
-                        <Building2 className="w-3 h-3 text-emerald-700" />
+                  <div className="flex-1 min-h-0 flex flex-col justify-between space-y-2 pt-1">
+                    <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider px-0.5 shrink-0">
+                      <span className="flex items-center gap-1.5 text-slate-900 font-black text-xs sm:text-sm">
+                        <Building2 className="w-4 h-4 text-emerald-700" />
                         <span>Otras Obras en Catálogo</span>
                       </span>
-                      <span className="text-[9.5px] text-emerald-700 font-semibold lowercase">
-                        clic para alternar
+                      <span className="text-[10px] text-emerald-700 font-bold lowercase flex items-center gap-0.5">
+                        <span>clic para alternar</span>
+                        <ArrowRight className="w-3 h-3" />
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4 flex-1 min-h-0">
                       {otherProjects.slice(0, 2).map(({ item, index }) => (
                         <button
                           key={item.id}
                           type="button"
                           onClick={() => handleSelectIndex(index)}
-                          className="group/mini p-1.5 rounded-xl bg-white/95 hover:bg-emerald-50/50 border border-slate-200/90 hover:border-emerald-300/80 shadow-2xs transition-all flex items-center gap-2.5 text-left cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
+                          className="group/card relative w-full h-full min-h-[175px] sm:min-h-[200px] lg:min-h-[225px] aspect-[3/4] rounded-2xl overflow-hidden border border-slate-200/90 hover:border-emerald-500 shadow-md hover:shadow-xl transition-all flex flex-col justify-between text-left cursor-pointer p-3 sm:p-3.5 bg-slate-950"
                           title={`Ver proyecto ${item.name}`}
                         >
-                          <div className="relative w-11 h-11 rounded-lg overflow-hidden shrink-0 bg-slate-900 border border-slate-200/60">
-                            <Image
-                              src={item.mainImage}
-                              alt={item.name}
-                              fill
-                              sizes="45px"
-                              className="object-cover group-hover/mini:scale-110 transition-transform duration-500"
-                              referrerPolicy="no-referrer"
-                            />
+                          <Image
+                            src={item.mainImage}
+                            alt={item.name}
+                            fill
+                            sizes="(max-width: 1024px) 50vw, 25vw"
+                            className="object-cover group-hover/card:scale-105 transition-transform duration-700 ease-out opacity-85 group-hover:opacity-100"
+                            referrerPolicy="no-referrer"
+                          />
+
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/40 to-black/20 pointer-events-none" />
+
+                          {/* Encabezado de la tarjeta vertical */}
+                          <div className="relative z-10 flex items-center justify-between">
+                            <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/90 text-white shadow-xs backdrop-blur-md">
+                              {item.status}
+                            </span>
+                            <span className="text-[9px] font-mono font-bold text-white/90 bg-black/40 px-1.5 py-0.5 rounded backdrop-blur-md border border-white/10">
+                              {item.constructionArea} m²
+                            </span>
                           </div>
 
-                          <div className="min-w-0 flex-1">
-                            <h4 className="text-[11px] font-black text-slate-800 group-hover/mini:text-emerald-800 truncate leading-tight">
+                          {/* Pie de la tarjeta vertical */}
+                          <div className="relative z-10 space-y-0.5">
+                            <h4 className="text-xs sm:text-sm font-black text-white group-hover/card:text-emerald-300 transition-colors line-clamp-2 leading-snug">
                               {item.name}
                             </h4>
-                            <p className="text-[9.5px] text-slate-500 truncate flex items-center gap-1">
-                              <span>{item.canton}</span>
-                              <span className="text-slate-300">·</span>
-                              <span className="font-mono text-emerald-700 font-bold">{item.constructionArea} m²</span>
+                            <p className="text-[10px] text-slate-300 truncate">
+                              {item.location} · {item.canton}
                             </p>
                           </div>
-
-                          <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover/mini:text-emerald-700 group-hover/mini:translate-x-0.5 transition-all shrink-0" />
                         </button>
                       ))}
                     </div>
