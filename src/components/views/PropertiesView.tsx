@@ -270,7 +270,7 @@ export function PropertiesView({
   const zoom = (lotesBanner.bgZoom ?? 100) / 100;
 
   return (
-    <div className="w-full bg-white text-slate-900">
+    <div className="w-full bg-transparent text-slate-900">
       {/* =========================================================================
           1. BANNER CINEMÁTICO — FULL BLEED EDGE-TO-EDGE (TEXTO SOBRE IMAGEN, SIN BOXES)
           ========================================================================= */}
@@ -324,7 +324,7 @@ export function PropertiesView({
       {/* =========================================================================
           2. SECCIÓN: "FILTRO MODERNO & CATÁLOGO DE PROPIEDADES (Blanco Puro)"
           ========================================================================= */}
-      <section className="relative w-full bg-white text-slate-900 pt-4 sm:pt-10 pb-6 sm:pb-8 overflow-hidden">
+      <section className="relative w-full bg-transparent text-slate-900 pt-4 sm:pt-10 pb-6 sm:pb-8 overflow-hidden">
         <div className="relative z-10 mx-auto max-w-[1440px] px-1 sm:px-4 lg:px-8 space-y-3.5 sm:space-y-6">
           
           {/* BARRA SUPERIOR: SOLO BARRA DE BÚSQUEDA */}

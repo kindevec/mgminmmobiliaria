@@ -128,13 +128,10 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
   };
 
   const getExtendedDescription = (p: ConstructionProject) => {
-    const base = p.description && p.description.length > 25 ? p.description : '';
-    const narrativeSuffix =
-      `Desarrollado bajo rigurosa planificación bioclimática y cálculo estructural sismorresistente. El diseño articula amplias transiciones espaciales con iluminación cenital, carpintería arquitectónica y acabados de primera línea respaldados por fiscalización pericial continua de MGM Inmobiliaria.`;
-    
-    if (!base) return narrativeSuffix;
-    if (base.length > 180) return base;
-    return `${base} ${narrativeSuffix}`;
+    if (p.description && p.description.trim()) {
+      return p.description.trim();
+    }
+    return `Desarrollado bajo rigurosa planificación bioclimática y cálculo estructural sismorresistente. El diseño articula amplias transiciones espaciales con iluminación cenital, carpintería arquitectónica y acabados de primera línea respaldados por fiscalización pericial continua de MGM Inmobiliaria.`;
   };
 
   if (!project) return null;
@@ -166,27 +163,13 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
   };
 
   return (
-    <div className="relative w-full h-full lg:max-h-screen overflow-y-auto lg:overflow-hidden bg-gradient-to-b from-slate-50 via-[#f3f7f4] to-white text-slate-900 flex flex-col justify-between pt-20 sm:pt-24 lg:pt-24 pb-24 lg:pb-3 px-0 select-none">
+    <div className="relative w-full h-full lg:max-h-screen overflow-y-auto lg:overflow-hidden bg-transparent text-slate-900 flex flex-col justify-between pt-28 sm:pt-32 lg:pt-32 pb-24 lg:pb-8 px-0 select-none">
 
       {/* ═══════════════════════════════════════════════════════════════════════
           FONDO ANIMADO TÉCNICO ARQUITECTÓNICO (BLUEPRINT & CAD GEOMETRY)
           ═══════════════════════════════════════════════════════════════════════ */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        <div
-          className="absolute inset-0 opacity-[0.35]"
-          style={{
-            backgroundImage: `
-              linear-gradient(to right, rgba(16, 185, 129, 0.08) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(16, 185, 129, 0.08) 1px, transparent 1px),
-              linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px)
-            `,
-            backgroundSize: '80px 80px, 80px 80px, 16px 16px, 16px 16px',
-            maskImage: 'radial-gradient(circle at 50% 50%, black 60%, transparent 100%)',
-            WebkitMaskImage: 'radial-gradient(circle at 50% 50%, black 60%, transparent 100%)',
-          }}
-        />
-
+        
         <motion.div
           animate={{ x: [0, 15, 0], opacity: [0.35, 0.55, 0.35] }}
           transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
@@ -249,7 +232,7 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
           {/* ─────────────────────────────────────────────────────────────────
               LADO IZQUIERDO: SPOTLIGHT DE LA OBRA CON EFECTO EXPANSIVO
               ───────────────────────────────────────────────────────────────── */}
-          <div className="lg:col-span-7 h-full min-h-0 flex flex-col justify-center overflow-hidden">
+          <div className="lg:col-span-7 h-full min-h-0 flex flex-col justify-stretch overflow-hidden">
             <AnimatePresence mode="wait" custom={slideDir}>
               <motion.div
                 key={project.id}
@@ -279,7 +262,7 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
                   filter: 'blur(6px)',
                   transition: { duration: 0.3, ease: 'easeIn' },
                 }}
-                className="relative w-full h-full min-h-[300px] max-h-[calc(100vh-165px)] rounded-3xl overflow-hidden bg-slate-100 border border-slate-200/90 shadow-[0_20px_45px_rgba(15,23,42,0.12)] group/photo"
+                className="relative w-full h-full min-h-[320px] rounded-3xl overflow-hidden bg-slate-100 border border-slate-200/90 shadow-[0_20px_45px_rgba(15,23,42,0.12)] group/photo"
               >
                 {/* Imagen principal en alta resolución */}
                 <Image
@@ -388,7 +371,7 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
           {/* ─────────────────────────────────────────────────────────────────
               LADO DERECHO: DOSSIER ARQUITECTÓNICO & ESPECIFICACIONES DE ÉLITE
               ───────────────────────────────────────────────────────────────── */}
-          <div className="lg:col-span-5 h-full min-h-0 flex flex-col justify-between py-1 overflow-hidden">
+          <div className="lg:col-span-5 h-full min-h-0 flex flex-col justify-between overflow-hidden">
             
             <AnimatePresence mode="wait" custom={slideDir}>
               <motion.div
@@ -398,17 +381,17 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.28 }}
-                className="flex-1 min-h-0 flex flex-col justify-between space-y-3 overflow-hidden"
+                className="h-full min-h-0 flex flex-col justify-between overflow-hidden"
               >
                 {/* 1. Header del Proyecto: Título y Memoria */}
                 <div className="space-y-1.5 shrink-0">
-                  <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-black text-slate-900 tracking-tight leading-tight">
+                  <h1 className="text-2xl sm:text-3xl lg:text-[34px] xl:text-[38px] font-black text-slate-900 tracking-tight leading-[1.1]">
                     {project.name}
                   </h1>
 
                   {/* Narrativa Arquitectónica con botón para leer memoria completa */}
                   <div className="space-y-1">
-                    <p className="text-xs text-slate-600 leading-relaxed font-normal line-clamp-2 sm:line-clamp-3">
+                    <p className="text-xs text-slate-600 leading-relaxed font-normal line-clamp-5 whitespace-pre-line break-words">
                       {getExtendedDescription(project)}
                     </p>
                     <button
@@ -442,9 +425,9 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
                   ))}
                 </div>
 
-                {/* 3. OTRAS OBRAS EN CATÁLOGO: TARJETAS RECTANGULARES EN VERTICAL */}
+                {/* 3. OTRAS OBRAS EN CATÁLOGO: TARJETAS COMPACTAS */}
                 {otherProjects.length > 0 && (
-                  <div className="flex-1 min-h-0 flex flex-col justify-between space-y-2 pt-1">
+                  <div className="mt-auto shrink-0 space-y-2 pt-3 pb-1">
                     <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider px-0.5 shrink-0">
                       <span className="flex items-center gap-1.5 text-slate-900 font-black text-xs sm:text-sm">
                         <Building2 className="w-4 h-4 text-emerald-700" />
@@ -456,13 +439,13 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 sm:gap-4 flex-1 min-h-0">
+                    <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
                       {otherProjects.slice(0, 2).map(({ item, index }) => (
                         <button
                           key={item.id}
                           type="button"
                           onClick={() => handleSelectIndex(index)}
-                          className="group/card relative w-full h-full min-h-[175px] sm:min-h-[200px] lg:min-h-[225px] aspect-[3/4] rounded-2xl overflow-hidden border border-slate-200/90 hover:border-emerald-500 shadow-md hover:shadow-xl transition-all flex flex-col justify-between text-left cursor-pointer p-3 sm:p-3.5 bg-slate-950"
+                          className="group/card relative w-full aspect-square rounded-2xl overflow-hidden border border-slate-200/90 hover:border-emerald-500 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between text-left cursor-pointer p-2.5 sm:p-3 bg-slate-950"
                           title={`Ver proyecto ${item.name}`}
                         >
                           <Image
@@ -478,20 +461,20 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
 
                           {/* Encabezado de la tarjeta vertical */}
                           <div className="relative z-10 flex items-center justify-between">
-                            <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/90 text-white shadow-xs backdrop-blur-md">
+                            <span className="text-[8.5px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-emerald-600/90 text-white shadow-xs backdrop-blur-md">
                               {item.status}
                             </span>
-                            <span className="text-[9px] font-mono font-bold text-white/90 bg-black/40 px-1.5 py-0.5 rounded backdrop-blur-md border border-white/10">
+                            <span className="text-[8.5px] font-mono font-bold text-white/90 bg-black/40 px-1.5 py-0.5 rounded backdrop-blur-md border border-white/10">
                               {item.constructionArea} m²
                             </span>
                           </div>
 
                           {/* Pie de la tarjeta vertical */}
                           <div className="relative z-10 space-y-0.5">
-                            <h4 className="text-xs sm:text-sm font-black text-white group-hover/card:text-emerald-300 transition-colors line-clamp-2 leading-snug">
+                            <h4 className="text-xs font-black text-white group-hover/card:text-emerald-300 transition-colors line-clamp-1 leading-snug">
                               {item.name}
                             </h4>
-                            <p className="text-[10px] text-slate-300 truncate">
+                            <p className="text-[9.5px] text-slate-300 truncate">
                               {item.location} · {item.canton}
                             </p>
                           </div>
@@ -501,25 +484,15 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
                   </div>
                 )}
 
-                {/* 5. ZONA DE ACCIÓN: BOTÓN COTIZAR WHATSAPP + DOSSIER */}
-                <div className="pt-2 border-t border-slate-200/80 mt-auto flex items-center gap-2.5 shrink-0">
+                {/* 5. ZONA DE ACCIÓN: BOTÓN COTIZAR WHATSAPP */}
+                <div className="pt-2 border-t border-slate-200/80 flex items-center shrink-0">
                   <button
                     type="button"
                     onClick={contactWhatsApp}
-                    className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-[#25D366] to-[#1ebf57] hover:from-[#1ebf57] hover:to-[#17a84c] text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-emerald-500/20 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+                    className="w-full py-3 px-5 rounded-2xl bg-gradient-to-r from-[#25D366] to-[#1ebf57] hover:from-[#1ebf57] hover:to-[#17a84c] text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-emerald-500/20 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
                   >
                     <WhatsAppIcon size={18} className="text-slate-950" />
-                    <span>Cotizar Proyecto o Visitar Obra</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setShowDossierModal(true)}
-                    className="py-3 px-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center gap-1.5"
-                    title="Ver ficha técnica completa en pantalla"
-                  >
-                    <FileText className="w-4 h-4 text-emerald-400" />
-                    <span className="hidden sm:inline">Dossier</span>
+                    <span>Cotizar Proyecto</span>
                   </button>
                 </div>
 
@@ -587,9 +560,11 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
                     <FileText className="w-3.5 h-3.5 text-emerald-700" />
                     <span>Memoria Descriptiva & Peritaje</span>
                   </h4>
-                  <p className="text-slate-600 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 leading-relaxed">
-                    {getExtendedDescription(project)}
-                  </p>
+                  <div className="bg-slate-50 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 max-h-60 sm:max-h-72 overflow-y-auto overscroll-contain">
+                    <p className="text-slate-600 leading-relaxed whitespace-pre-line break-words text-xs sm:text-sm">
+                      {getExtendedDescription(project)}
+                    </p>
+                  </div>
                 </div>
 
                 <div>
@@ -608,33 +583,6 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
                     ))}
                   </div>
                 </div>
-
-                {project.structureType && (
-                  <div className="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200/70 text-xs text-emerald-950 flex items-start gap-2">
-                    <Hammer className="w-4 h-4 text-[#F58220] shrink-0 mt-0.5" />
-                    <div>
-                      <strong className="block text-emerald-900 font-bold">Sistema Estructural:</strong>
-                      <span className="text-slate-700">{project.structureType}</span>
-                    </div>
-                  </div>
-                )}
-
-                {project.features && project.features.length > 0 && (
-                  <div>
-                    <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] mb-1.5 flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-[#F58220]" />
-                      <span>Especificaciones & Acabados de Primera</span>
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {project.features.map((f, i) => (
-                        <div key={i} className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-200/70 text-slate-800 text-xs">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                          <span>{f}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Footer Modal con Acción */}
@@ -655,7 +603,7 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
                   className="flex-1 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#25D366] to-[#1ebf57] hover:from-[#1ebf57] hover:to-[#17a84c] text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer transition-all"
                 >
                   <WhatsAppIcon size={16} className="text-slate-950" />
-                  <span>Cotizar Proyecto o Agendar Visita</span>
+                  <span>Cotizar Proyecto</span>
                 </button>
               </div>
             </motion.div>

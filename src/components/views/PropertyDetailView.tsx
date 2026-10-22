@@ -250,7 +250,7 @@ export function PropertyDetailView({
   }, [recommendedLots]);
 
   return (
-    <div className="w-full min-h-screen bg-white text-slate-900 pb-6 sm:pb-8 pt-24 sm:pt-28">
+    <div className="w-full min-h-screen bg-transparent text-slate-900 pb-6 sm:pb-8 pt-24 sm:pt-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* =========================================================================

@@ -113,7 +113,7 @@ export function ContactView({ onOpenLegalModal }: ContactViewProps) {
   const telHref = `tel:${formatPhoneForTel(settings.supportPhone)}`;
 
   return (
-    <div className="min-h-screen bg-[#FBFBFA] font-sans pb-16">
+    <div className="min-h-screen bg-transparent font-sans pb-16">
       {/* =========================================================================
           HERO BANNER DE CONTACTO — FULL BLEED EDGE-TO-EDGE
           ========================================================================= */}

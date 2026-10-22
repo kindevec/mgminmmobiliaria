@@ -212,7 +212,7 @@ function HomePageContent() {
       <ScrollToTop triggerKey={currentPage} />
 
       {/* Dynamic Ambient Interactive Background */}
-      <InteractiveBackground />
+      <InteractiveBackground currentPage={currentPage} />
 
       {/* 1. Header (Solo en vistas públicas) */}
       {currentPage !== 'admin' && (

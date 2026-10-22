@@ -18,7 +18,6 @@ import { getGeneralWhatsAppUrl } from '@/src/data/lots';
 import { useSiteBanners } from '@/src/lib/bannerStorage';
 import { useSiteSettings } from '@/src/lib/siteSettings';
 import { WhatsAppIcon } from '../SocialIcons';
-import { TopographicContours } from '../WaveDividers';
 import { ScrollReveal } from '../common/ScrollReveal';
 import { AnimatedInsignia } from '../common/AnimatedInsignia';
 import { CardDeckGallery } from '../common/CardDeckGallery';
@@ -64,7 +63,7 @@ export function AboutView({ onNavigate }: AboutViewProps) {
   const zoom = (aboutBanner.bgZoom ?? 100) / 100;
 
   return (
-    <div className="w-full overflow-hidden bg-white text-slate-900">
+    <div className="w-full overflow-hidden bg-transparent text-slate-900">
       {/* =========================================================================
           1. BANNER CINEMÁTICO — FULL BLEED EDGE-TO-EDGE (TEXTO SOBRE IMAGEN, SIN BOXES)
           ========================================================================= */}
@@ -120,12 +119,9 @@ export function AboutView({ onNavigate }: AboutViewProps) {
       {/* =========================================================================
           2. SECCIÓN: COMPROMISO ÉTICO & NOTARIAL (Diseño de Estudio con Máscaras)
           ========================================================================= */}
-      <section className="relative w-full bg-white text-slate-900 pt-12 sm:pt-16 pb-8 sm:pb-10 overflow-hidden border-b border-slate-100">
+      <section className="relative w-full bg-transparent text-slate-900 pt-12 sm:pt-16 pb-8 sm:pb-10 overflow-hidden border-b border-slate-100">
         {/* Ambient Topographic & Architectural Mask over section canvas */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute inset-0 opacity-40 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]">
-            <TopographicContours className="text-emerald-900/15" />
-          </div>
           <Image
             src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1920&q=80"
             alt="Planimetría y Arquitectura"
@@ -280,7 +276,7 @@ export function AboutView({ onNavigate }: AboutViewProps) {
       {/* =========================================================================
           3. PILARES FUNDACIONALES (Luminoso & Arquitectónico)
           ========================================================================= */}
-      <section className="relative w-full bg-[#FBFBFA] text-slate-900 pt-8 sm:pt-10 pb-16 sm:pb-24 overflow-hidden border-y border-slate-100">
+      <section className="relative w-full bg-transparent text-slate-900 pt-8 sm:pt-10 pb-16 sm:pb-24 overflow-hidden border-y border-slate-100">
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal direction="down" delay={0.1} className="text-center max-w-3xl mx-auto space-y-3 mb-8 sm:mb-10">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight [text-wrap:balance]">
@@ -599,7 +595,7 @@ export function AboutView({ onNavigate }: AboutViewProps) {
       {/* =========================================================================
           5. PANORAMIC BOTTOM CTA (Luminoso)
           ========================================================================= */}
-      <section className="relative w-full bg-[#FBFBFA] text-slate-900 pt-10 sm:pt-14 pb-6 sm:pb-8 overflow-hidden">
+      <section className="relative w-full bg-transparent text-slate-900 pt-10 sm:pt-14 pb-6 sm:pb-8 overflow-hidden">
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal direction="zoom" delay={0.15}>
             <div className="rounded-3xl bg-slate-900 border border-slate-800 p-8 sm:p-12 text-white flex flex-col sm:flex-row items-center justify-between gap-8 shadow-xl relative overflow-hidden">

@@ -201,9 +201,9 @@ export function AppraisalCalculator() {
   }, []);
 
   return (
-    <div id="cotizador-avaluos" className="w-full flex-1 flex flex-col justify-start">
+    <div id="cotizador-avaluos" className="w-full h-full flex-1 flex flex-col justify-between">
       {/* Barra Superior Minimalista sin cajas */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-200/60 shrink-0">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 sm:pb-3.5 border-b border-slate-200/60 shrink-0">
         <div className="flex items-center gap-3">
           <div className="py-1 pr-2 text-[#F58220]">
             <Calculator className="w-6 h-6" />
@@ -248,12 +248,12 @@ export function AppraisalCalculator() {
       </div>
 
       {/* Cuerpo Principal de la Calculadora: Dividido de izq a der por una sola línea vertical limpia */}
-      <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start relative">
+      <div className="w-full flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center py-2 sm:py-3 relative">
         
         {/* Panel Izquierdo: Formulario con inputs y selectores estéticos con línea vertical divisoria a la derecha */}
-        <div className="lg:col-span-7 space-y-6 lg:pr-10 lg:border-r lg:border-slate-200/80">
+        <div className="lg:col-span-7 space-y-4 lg:space-y-5 lg:pr-10 lg:border-r lg:border-slate-200/80">
           {activeTab === 'property' ? (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-4.5">
               {/* 1. Categoría de Inmueble: Botones planos, contorno solo al pasar por encima o activo */}
               <div>
                 <div className="flex items-center justify-between mb-2.5">
@@ -276,14 +276,14 @@ export function AppraisalCalculator() {
                         key={cat.id}
                         type="button"
                         onClick={() => handleSelectCategory(cat.id)}
-                        className={`p-3 rounded-2xl text-center flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer border ${
+                        className={`p-3 sm:p-3.5 rounded-2xl text-center flex flex-col items-center justify-center gap-2 transition-all cursor-pointer border ${
                           isSelected
                             ? 'border-emerald-600 text-emerald-950 font-black shadow-xs bg-emerald-50/40'
                             : 'border-transparent hover:border-slate-300 text-slate-600 hover:text-slate-900'
                         }`}
                       >
-                        <Icon className={`w-5 h-5 ${isSelected ? 'text-[#113d22]' : 'text-slate-400'}`} />
-                        <span className="text-xs font-semibold leading-none">{cat.label}</span>
+                        <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${isSelected ? 'text-[#113d22]' : 'text-slate-400'}`} />
+                        <span className="text-xs sm:text-sm font-bold leading-none">{cat.label}</span>
                       </button>
                     );
                   })}
@@ -298,7 +298,7 @@ export function AppraisalCalculator() {
                 <button
                   type="button"
                   onClick={() => setOpenDropdown(openDropdown === 'zone' ? null : 'zone')}
-                  className="w-full flex items-center justify-between py-2.5 border-b-2 border-slate-300 hover:border-emerald-600 focus:border-emerald-600 transition-colors cursor-pointer text-left group"
+                  className="w-full flex items-center justify-between py-2.5 sm:py-3 border-b-2 border-slate-300 hover:border-emerald-600 focus:border-emerald-600 transition-colors cursor-pointer text-left group"
                 >
                   <div className="flex items-center gap-2.5">
                     <MapPin className="w-4 h-4 text-emerald-600" />
@@ -346,7 +346,7 @@ export function AppraisalCalculator() {
               </div>
 
               {/* 3. Dimensiones: Inputs con solo línea inferior */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {category !== 'departamento' && (
                   <div>
                     <label htmlFor={`${inputPrefix}-landArea`} className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
@@ -392,7 +392,7 @@ export function AppraisalCalculator() {
 
               {/* 4. Acabados y Antigüedad: Selectores flotantes redondeados con fade down */}
               {category !== 'terreno' && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Selector Acabados */}
                   <div className="relative" data-custom-dropdown>
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
@@ -401,7 +401,7 @@ export function AppraisalCalculator() {
                     <button
                       type="button"
                       onClick={() => setOpenDropdown(openDropdown === 'finish' ? null : 'finish')}
-                      className="w-full flex items-center justify-between py-2.5 border-b-2 border-slate-300 hover:border-emerald-600 focus:border-emerald-600 transition-colors cursor-pointer text-left group"
+                      className="w-full flex items-center justify-between py-2.5 sm:py-3 border-b-2 border-slate-300 hover:border-emerald-600 focus:border-emerald-600 transition-colors cursor-pointer text-left group"
                     >
                       <div className="flex items-center gap-2">
                         <Sparkles className="w-4 h-4 text-emerald-600" />
@@ -458,7 +458,7 @@ export function AppraisalCalculator() {
                     <button
                       type="button"
                       onClick={() => setOpenDropdown(openDropdown === 'age' ? null : 'age')}
-                      className="w-full flex items-center justify-between py-2.5 border-b-2 border-slate-300 hover:border-emerald-600 focus:border-emerald-600 transition-colors cursor-pointer text-left group"
+                      className="w-full flex items-center justify-between py-2.5 sm:py-3 border-b-2 border-slate-300 hover:border-emerald-600 focus:border-emerald-600 transition-colors cursor-pointer text-left group"
                     >
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4 text-[#F58220]" />
@@ -517,7 +517,7 @@ export function AppraisalCalculator() {
                       key={idx}
                       type="button"
                       onClick={item.toggle}
-                      className={`p-3 rounded-2xl text-center flex items-center justify-center gap-2 transition-all cursor-pointer border ${
+                      className={`p-3 sm:p-3.5 rounded-2xl text-center flex items-center justify-center gap-2 transition-all cursor-pointer border ${
                         item.checked
                           ? 'border-emerald-600 text-emerald-950 font-bold bg-emerald-50/40'
                           : 'border-transparent hover:border-slate-300 text-slate-500 hover:text-slate-800'
@@ -572,7 +572,7 @@ export function AppraisalCalculator() {
                 <button
                   type="button"
                   onClick={() => setOpenDropdown(openDropdown === 'purpose' ? null : 'purpose')}
-                  className="w-full flex items-center justify-between py-2.5 border-b-2 border-slate-300 hover:border-emerald-600 focus:border-emerald-600 transition-colors cursor-pointer text-left group"
+                  className="w-full flex items-center justify-between py-2.5 sm:py-3 border-b-2 border-slate-300 hover:border-emerald-600 focus:border-emerald-600 transition-colors cursor-pointer text-left group"
                 >
                   <span className="text-sm font-bold text-slate-900 truncate">
                     {appraisalPurpose}
@@ -625,7 +625,7 @@ export function AppraisalCalculator() {
                 <button
                   type="button"
                   onClick={() => setOpenDropdown(openDropdown === 'feeZone' ? null : 'feeZone')}
-                  className="w-full flex items-center justify-between py-2.5 border-b-2 border-slate-300 hover:border-emerald-600 focus:border-emerald-600 transition-colors cursor-pointer text-left group"
+                  className="w-full flex items-center justify-between py-2.5 sm:py-3 border-b-2 border-slate-300 hover:border-emerald-600 focus:border-emerald-600 transition-colors cursor-pointer text-left group"
                 >
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-emerald-600" />
@@ -682,9 +682,9 @@ export function AppraisalCalculator() {
         </div>
 
         {/* Panel Derecho: Resultados Abiertos sin boxes pesados */}
-        <div className="lg:col-span-5 space-y-6 pt-2 lg:pt-0">
+        <div className="lg:col-span-5 space-y-4 lg:space-y-5 pt-1 lg:pt-0">
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-5">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-200 mb-3">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-emerald-600" />
                 <span className="font-black text-xs tracking-wider text-slate-900 uppercase">
@@ -698,11 +698,11 @@ export function AppraisalCalculator() {
 
             {/* Resultado Principal */}
             {activeTab === 'property' && (
-              <div className="space-y-3 mb-6">
+              <div className="space-y-2 mb-3">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
                   Valor Comercial Referencial
                 </span>
-                <div className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
+                <div className="text-4xl sm:text-5xl lg:text-[48px] font-black text-slate-900 tracking-tight leading-none">
                   {formatUSD(totalEstimatedValue)}
                 </div>
                 <div className="text-xs text-slate-500 flex items-center gap-1.5">
@@ -713,7 +713,7 @@ export function AppraisalCalculator() {
                 </div>
 
                 {/* Subtotales en líneas minimalistas */}
-                <div className="pt-4 border-t border-slate-200 space-y-2 text-xs">
+                <div className="pt-2 border-t border-slate-200 space-y-1.5 text-xs">
                   {effectiveLandArea > 0 && (
                     <div className="flex justify-between items-center text-slate-600">
                       <span className="flex items-center gap-1.5">
@@ -737,7 +737,7 @@ export function AppraisalCalculator() {
             )}
 
             {/* Honorario Pericial Oficial en líneas abiertas */}
-            <div className="py-4 border-y border-slate-200 space-y-2 mb-6">
+            <div className="py-2.5 border-y border-slate-200 space-y-1 mb-2.5">
               <div className="flex justify-between items-center">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
                   <FileText className="w-3.5 h-3.5 text-[#F58220]" />
@@ -756,7 +756,7 @@ export function AppraisalCalculator() {
               </div>
             </div>
 
-            <div className="text-xs text-slate-400 flex items-start gap-1.5 mb-6 leading-relaxed">
+            <div className="text-[11px] text-slate-400 flex items-start gap-1 mb-2.5 leading-snug">
               <AlertCircle className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
               <span>
                 Cálculo estadístico referencial. El informe pericial con fe pública definitiva se emite tras la visita técnica in-situ.
@@ -769,7 +769,7 @@ export function AppraisalCalculator() {
             <button
               type="button"
               onClick={handleSendToWhatsApp}
-              className="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm flex items-center justify-center gap-2.5 transition-all shadow-md hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+              className="w-full py-3.5 sm:py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2.5 transition-all shadow-md hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
             >
               <WhatsAppIcon size={20} className="text-white" />
               <span>Agendar Avalúo Oficial con estos Datos</span>
@@ -781,6 +781,49 @@ export function AppraisalCalculator() {
           </div>
         </div>
 
+      </div>
+
+      {/* 3. Franja Inferior de Respaldo Técnico y Acreditaciones Periciales */}
+      <div className="pt-3 border-t border-slate-200/80 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-xs shrink-0 mt-auto">
+        <div className="flex items-center gap-3 p-2.5 sm:p-3 rounded-2xl bg-white/70 border border-slate-200/60 shadow-2xs">
+          <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center shrink-0">
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+          </div>
+          <div>
+            <span className="block font-bold text-slate-900 text-xs leading-tight">Peritaje Acreditado</span>
+            <span className="text-[11px] text-slate-500">Bancos, BIESS y Notarías</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 p-2.5 sm:p-3 rounded-2xl bg-white/70 border border-slate-200/60 shadow-2xs">
+          <div className="w-8 h-8 rounded-xl bg-orange-50 text-[#F58220] flex items-center justify-center shrink-0">
+            <TrendingUp className="w-4 h-4 text-[#F58220]" />
+          </div>
+          <div>
+            <span className="block font-bold text-slate-900 text-xs leading-tight">Norma Técnica</span>
+            <span className="text-[11px] text-slate-500">Valuación IVS & Nacional</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 p-2.5 sm:p-3 rounded-2xl bg-white/70 border border-slate-200/60 shadow-2xs">
+          <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center shrink-0">
+            <Clock className="w-4 h-4 text-emerald-600" />
+          </div>
+          <div>
+            <span className="block font-bold text-slate-900 text-xs leading-tight">Entrega Rápida</span>
+            <span className="text-[11px] text-slate-500">48 a 72 horas hábiles</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 p-2.5 sm:p-3 rounded-2xl bg-white/70 border border-slate-200/60 shadow-2xs">
+          <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
+            <MapPin className="w-4 h-4 text-blue-600" />
+          </div>
+          <div>
+            <span className="block font-bold text-slate-900 text-xs leading-tight">Cobertura Austro</span>
+            <span className="text-[11px] text-slate-500">Azuay, Cañar y El Oro</span>
+          </div>
+        </div>
       </div>
     </div>
   );

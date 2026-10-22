@@ -85,8 +85,8 @@ export function AdminConstructionsView() {
     bathrooms: 3,
     parkingSpots: 2,
     description: '',
-    features: ['Estructura sismorresistente', 'Acabados de primera', 'Pisos de porcelanato'],
-    structureType: 'Pórticos de hormigón armado sismorresistente',
+    features: [],
+    structureType: '',
     mainImage: '',
     gallery: [],
     deliveryYear: `${new Date().getFullYear()}`,
@@ -348,7 +348,7 @@ export function AdminConstructionsView() {
                   {project.name}
                 </h3>
 
-                <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                <p className="text-xs text-slate-500 mt-1 line-clamp-3 whitespace-pre-line break-words leading-relaxed">
                   {project.description}
                 </p>
 
@@ -591,33 +591,18 @@ export function AdminConstructionsView() {
                   </div>
                 </div>
 
-                {/* 4. Estructura y Año */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-800 mb-1">
-                      Sistema Estructural
-                    </label>
-                    <input
-                      type="text"
-                      value={editingProject.structureType}
-                      onChange={(e) => setEditingProject({ ...editingProject, structureType: e.target.value })}
-                      placeholder="Ej: Pórticos de hormigón sismorresistente"
-                      className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 font-medium"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-800 mb-1">
-                      Año de Entrega
-                    </label>
-                    <input
-                      type="text"
-                      value={editingProject.deliveryYear}
-                      onChange={(e) => setEditingProject({ ...editingProject, deliveryYear: e.target.value })}
-                      placeholder="Ej: 2024"
-                      className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 font-medium"
-                    />
-                  </div>
+                {/* 4. Año de Entrega */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                    Año de Entrega
+                  </label>
+                  <input
+                    type="text"
+                    value={editingProject.deliveryYear}
+                    onChange={(e) => setEditingProject({ ...editingProject, deliveryYear: e.target.value })}
+                    placeholder="Ej: 2024"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 font-medium"
+                  />
                 </div>
 
                 {/* ========================================================
@@ -776,34 +761,20 @@ export function AdminConstructionsView() {
 
                 {/* 6. Descripción */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
-                    Descripción Arquitectónica
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-slate-800">
+                      Descripción Arquitectónica (Memoria Descriptiva)
+                    </label>
+                    <span className="text-[11px] text-slate-500 font-medium">
+                      Los saltos de línea se respetan automáticamente
+                    </span>
+                  </div>
                   <textarea
-                    rows={2}
+                    rows={5}
                     value={editingProject.description}
                     onChange={(e) => setEditingProject({ ...editingProject, description: e.target.value })}
-                    placeholder="Detalles sobre el diseño, iluminación, estilo y funcionalidad..."
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs sm:text-sm font-medium"
-                  />
-                </div>
-
-                {/* 7. Acabados y Características */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
-                    Características & Acabados de Primera (1 por línea)
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={editingProject.features.join('\n')}
-                    onChange={(e) =>
-                      setEditingProject({
-                        ...editingProject,
-                        features: e.target.value.split('\n').map((f) => f.trim()).filter(Boolean),
-                      })
-                    }
-                    placeholder="Pisos de porcelanato rectificado&#10;Mesones de cuarzo en cocina&#10;Grifería de alta gama"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs sm:text-sm font-medium"
+                    placeholder="Detalles sobre el diseño, iluminación, estilo y funcionalidad (usa saltos de línea para separar párrafos)..."
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs sm:text-sm font-medium leading-relaxed"
                   />
                 </div>
               </div>

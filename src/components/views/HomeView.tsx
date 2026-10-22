@@ -352,20 +352,7 @@ export function HomeView({
   const currentTestimonial = testimonials[activeTestimonialIdx] || testimonials[0];
 
   return (
-    <div className="relative w-full overflow-hidden bg-[#faf8f5] text-slate-900 selection:bg-emerald-600 selection:text-white">
-      {/* =========================================================================
-          TEXTURA TOPOGRÁFICA OLIVO CLARO CONTINUA (CAPA MAESTRA SIN CORTES NI COSTURAS)
-          ========================================================================= */}
-      <div
-        className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none"
-        style={{
-          backgroundImage: "url('/topographic-olive-pattern.webp')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        }}
-        aria-hidden="true"
-      />
+    <div className="relative w-full overflow-hidden bg-transparent text-slate-900 selection:bg-emerald-600 selection:text-white">
       {/* =========================================================================
           1. HERO INMOBILIARIO PANORÁMICO EDGE-TO-EDGE (FULL BLEED, TEXTO SOBRE IMAGEN)
           ========================================================================= */}

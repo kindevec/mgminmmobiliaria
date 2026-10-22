@@ -25,7 +25,7 @@ export function PrivacyView({ onNavigate, defaultSection = 'privacy' }: PrivacyV
   const [activeTab, setActiveTab] = useState<'privacy' | 'terms' | 'cookies'>(defaultSection);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 pb-20 pt-8 sm:pt-12">
+    <div className="min-h-screen bg-transparent text-slate-800 pb-20 pt-8 sm:pt-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {/* Navigation Breadcrumb / Back button */}
         <div className="mb-6 flex items-center justify-between">

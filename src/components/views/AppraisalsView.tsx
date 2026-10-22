@@ -10,8 +10,8 @@ interface AppraisalsViewProps {
 
 export function AppraisalsView({ onNavigate }: AppraisalsViewProps) {
   return (
-    <div className="w-full min-h-[calc(100dvh-4rem)] bg-gradient-to-b from-slate-50 via-white to-slate-50 text-slate-900 pt-24 sm:pt-28 lg:pt-32 pb-16 md:pb-6 flex flex-col justify-start">
-      <div className="w-full max-w-7xl mx-auto flex-1 px-4 sm:px-6 lg:px-8 flex flex-col justify-start">
+    <div className="w-full h-full max-h-screen overflow-hidden bg-transparent text-slate-900 pt-24 sm:pt-26 lg:pt-28 pb-4 sm:pb-5 flex flex-col justify-between select-none">
+      <div className="w-full max-w-7xl mx-auto flex-1 px-4 sm:px-6 lg:px-8 flex flex-col justify-between">
         <AppraisalCalculator />
       </div>
     </div>

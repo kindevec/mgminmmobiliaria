@@ -171,7 +171,7 @@ export function ConstructionCard({ project }: ConstructionCardProps) {
                 {project.name}
               </h3>
 
-              <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed whitespace-pre-line line-clamp-5 break-words">
                 {project.description}
               </p>
             </div>
@@ -251,31 +251,6 @@ export function ConstructionCard({ project }: ConstructionCardProps) {
                 </div>
               </div>
 
-              {/* Sistema Estructural */}
-              <div className="mt-2 p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200/80 text-xs text-emerald-950 flex items-center justify-between">
-                <span className="font-semibold flex items-center gap-1.5">
-                  <Hammer className="w-3.5 h-3.5 text-emerald-700" />
-                  <span>Estructura:</span>
-                </span>
-                <span className="font-medium text-emerald-900 text-right text-[11.5px]">
-                  {project.structureType}
-                </span>
-              </div>
-            </div>
-
-            {/* Características y Acabados de Primera */}
-            <div className="mb-6">
-              <span className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                Detalles y Acabados
-              </span>
-              <ul className="space-y-1.5 text-xs text-slate-600">
-                {project.features.map((feat, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#22A33D] shrink-0 mt-0.5" />
-                    <span>{feat}</span>
-                  </li>
-                ))}
-              </ul>
             </div>
           </div>
 
