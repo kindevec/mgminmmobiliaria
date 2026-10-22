@@ -166,7 +166,7 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
   };
 
   return (
-    <div className="relative w-full h-full max-h-screen overflow-hidden bg-gradient-to-b from-slate-50 via-[#f3f7f4] to-white text-slate-900 flex flex-col justify-between pt-20 sm:pt-24 lg:pt-28 pb-20 md:pb-3 px-0 select-none">
+    <div className="relative w-full h-full lg:max-h-screen overflow-y-auto lg:overflow-hidden bg-gradient-to-b from-slate-50 via-[#f3f7f4] to-white text-slate-900 flex flex-col justify-between pt-20 sm:pt-24 lg:pt-24 pb-24 lg:pb-3 px-0 select-none">
 
       {/* ═══════════════════════════════════════════════════════════════════════
           FONDO ANIMADO TÉCNICO ARQUITECTÓNICO (BLUEPRINT & CAD GEOMETRY)
@@ -243,8 +243,8 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
       {/* ═══════════════════════════════════════════════════════════════════════
           ESCENARIO CENTRAL: SHOWROOM ARQUITECTÓNICO
           ═══════════════════════════════════════════════════════════════════════ */}
-      <div className="relative z-10 flex-1 min-h-0 w-full max-w-7xl mx-auto flex flex-col justify-center overflow-hidden px-4 sm:px-6 lg:px-8">
-        <div className="w-full h-full min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-7 items-stretch overflow-hidden">
+      <div className="relative z-10 flex-1 min-h-0 w-full max-w-7xl mx-auto flex flex-col justify-center lg:overflow-hidden px-4 sm:px-6 lg:px-8">
+        <div className="w-full h-full min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-7 items-stretch lg:overflow-hidden">
 
           {/* ─────────────────────────────────────────────────────────────────
               LADO IZQUIERDO: SPOTLIGHT DE LA OBRA CON EFECTO EXPANSIVO
@@ -379,10 +379,6 @@ export function ConstructionsView({ onNavigate }: ConstructionsViewProps) {
                         </span>
                       )}
                     </div>
-
-                    <span className="text-[11px] text-white/90 font-bold hidden sm:inline-block px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/10">
-                      {gallery.length} fotos de obra
-                    </span>
                   </div>
                 )}
               </motion.div>

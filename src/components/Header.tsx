@@ -43,7 +43,8 @@ export function Header({
     currentPage === 'property-detail' ||
     currentPage === 'admin' ||
     currentPage === 'privacy' ||
-    currentPage === 'appraisals';
+    currentPage === 'appraisals' ||
+    currentPage === 'constructions';
 
   const navLinks: { id: PageView; label: string; hash: string }[] = [
     { id: 'home', label: 'Inicio', hash: getPageCanonicalHash('home') },

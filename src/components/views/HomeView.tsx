@@ -107,6 +107,47 @@ const PURCHASE_PROCESS_STEPS = [
   },
 ];
 
+// 4.1 Ingeniería Civil & Urbanismo (Renders 3D Isométricos en Alta Definición con Animación Flotante)
+const CIVIL_ENGINEERING_ITEMS = [
+  {
+    title: 'Vías',
+    titleSecond: 'Adoquinadas',
+    subtitle: 'Calzadas vehiculares amplias de alto tránsito (10m a 12m) con adoquín de alta resistencia',
+    image: '/benefit-civil-road.png',
+    imageAlt: 'Render 3D isométrico de vías adoquinadas con poste y acera',
+    animationDelay: '0s',
+    specLabel: 'Resistencia:',
+    specValue: '400 kg/cm²',
+    whatsappMsg: 'Hola, deseo especificaciones técnicas de las vías adoquinadas en sus urbanizaciones.',
+  },
+  {
+    title: 'Redes Soterradas',
+    subtitle: 'Distribución técnica subterránea sin cableado aéreo visible: agua, alcantarillado y fibra óptica',
+    image: '/benefit-civil-services.png',
+    imageAlt: 'Render 3D isométrico de redes soterradas con zanja técnica y tuberías',
+    animationDelay: '-1.5s',
+    whatsappMsg: 'Hola, deseo información técnica sobre las redes subterráneas de agua, alcantarillado y fibra óptica.',
+  },
+  {
+    isHighlightNumber: true,
+    number: '+8.000m²',
+    title: 'Áreas Verdes',
+    subtitle: 'Espacios recreativos integrados con caminerías ecológicas y parques familiares',
+    image: '/benefit-civil-park.png',
+    imageAlt: 'Render 3D isométrico de áreas verdes con caminería y arbolado nativo',
+    animationDelay: '-3s',
+    whatsappMsg: 'Hola, deseo conocer más sobre las áreas verdes y caminerías ecológicas.',
+  },
+  {
+    title: 'Topografía Plana',
+    subtitle: 'Lotes con rasantes niveladas aptos para cimentación inmediata, sin sobrecostos',
+    image: '/benefit-civil-topography.png',
+    imageAlt: 'Render 3D isométrico de topografía plana con curvas de nivel y nivelación técnica',
+    animationDelay: '-4.5s',
+    whatsappMsg: 'Hola, deseo información sobre lotes con topografía plana para cimentación inmediata.',
+  },
+];
+
 // 4. Beneficios Urbanos & Infraestructura Real de MGM (Especificaciones de Ingeniería Civil con Color y Vida)
 const URBAN_BENEFIT_ITEMS = [
   {
@@ -229,16 +270,15 @@ export function HomeView({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isReviewModalOpen]);
 
-  // Rotación suave del Hero cada 6 segundos (respetando prefers-reduced-motion)
+  // Rotación suave del Hero cada 3 segundos
   useEffect(() => {
-    if (heroHovered) return;
     const mediaQuery = typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
     if (mediaQuery?.matches) return;
     const interval = setInterval(() => {
       setHeroImgIndex((prev) => (prev + 1 >= homeSlides.length ? 0 : prev + 1));
-    }, 6000);
+    }, 3000);
     return () => clearInterval(interval);
-  }, [heroHovered, homeSlides.length]);
+  }, [homeSlides.length]);
 
   const nextHeroImage = () => {
     setHeroImgIndex((prev) => (prev + 1 >= homeSlides.length ? 0 : prev + 1));
@@ -302,28 +342,30 @@ export function HomeView({
     }, 1200);
   };
 
-  // Pestaña de filtrado dinámico en Propiedades Destacadas
-  const [activeCatalogTab, setActiveCatalogTab] = useState<'all' | 'miravalle' | 'credit'>('all');
-
   // Propiedades destacadas primero (conectado al switch 'Destacar en Inicio' del Admin Panel)
   const displayedProperties = React.useMemo(() => {
     const featuredList = activeProperties.filter((p) => p.featured);
     const others = activeProperties.filter((p) => !p.featured);
-    let combined = [...featuredList, ...others];
-
-    if (activeCatalogTab === 'miravalle') {
-      combined = combined.filter((p) => p.project?.toLowerCase().includes('miravalle'));
-    } else if (activeCatalogTab === 'credit') {
-      combined = combined.filter((p) => (p.maxMonths || 0) >= 36);
-    }
-
-    return combined;
-  }, [activeProperties, activeCatalogTab]);
+    return [...featuredList, ...others];
+  }, [activeProperties]);
 
   const currentTestimonial = testimonials[activeTestimonialIdx] || testimonials[0];
 
   return (
-    <div className="w-full overflow-hidden bg-white text-slate-900 selection:bg-emerald-600 selection:text-white">
+    <div className="relative w-full overflow-hidden bg-[#faf8f5] text-slate-900 selection:bg-emerald-600 selection:text-white">
+      {/* =========================================================================
+          TEXTURA TOPOGRÁFICA OLIVO CLARO CONTINUA (CAPA MAESTRA SIN CORTES NI COSTURAS)
+          ========================================================================= */}
+      <div
+        className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none"
+        style={{
+          backgroundImage: "url('/topographic-olive-pattern.webp')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+        aria-hidden="true"
+      />
       {/* =========================================================================
           1. HERO INMOBILIARIO PANORÁMICO EDGE-TO-EDGE (FULL BLEED, TEXTO SOBRE IMAGEN)
           ========================================================================= */}
@@ -435,27 +477,7 @@ export function HomeView({
           <ChevronRight className="w-6 h-6" />
         </button>
 
-        {/* Indicadores lineales (dots) centrados discretamente abajo */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15 shadow-lg">
-          {homeSlides.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setHeroImgIndex(i);
-              }}
-              aria-label={`Ver diapositiva ${i + 1}`}
-              className="min-w-[20px] min-h-[20px] p-1 flex items-center justify-center cursor-pointer"
-            >
-              <span
-                className={`h-1.5 rounded-full transition-all block ${
-                  heroImgIndex === i ? 'w-6 bg-[#5be196]' : 'w-1.5 bg-white/40 hover:bg-white'
-                }`}
-              />
-            </button>
-          ))}
-        </div>
+
       </section>
 
       {/* =========================================================================
@@ -506,7 +528,7 @@ export function HomeView({
       {/* =========================================================================
           4. PROPIEDADES DESTACADAS (FEATURED PROPERTIES)
           ========================================================================= */}
-      <section className="relative w-full bg-[#f8faf8] text-slate-900 py-14 sm:py-20 border-b border-slate-200/70">
+      <section className="relative w-full bg-transparent text-slate-900 py-14 sm:py-20 border-b border-stone-200/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
           {/* Encabezado de la sección con Selector de Categorías */}
           <div className="pb-4 border-b border-slate-200 flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -522,42 +544,6 @@ export function HomeView({
               </p>
             </ScrollReveal>
 
-            {/* Pestañas de Filtro Rápido */}
-            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-200/60 self-start md:self-auto">
-              <button
-                type="button"
-                onClick={() => setActiveCatalogTab('all')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  activeCatalogTab === 'all'
-                    ? 'bg-white text-slate-900 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Todos los Destacados
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveCatalogTab('miravalle')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  activeCatalogTab === 'miravalle'
-                    ? 'bg-[#113d22] text-white shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Ciudadela Miravalle
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveCatalogTab('credit')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  activeCatalogTab === 'credit'
-                    ? 'bg-[#F58220] text-white shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Crédito Directo
-              </button>
-            </div>
           </div>
 
           {/* Grilla Responsiva de Tarjetas de Propiedades (Equilibrada en 3 Columnas) */}
@@ -717,204 +703,267 @@ export function HomeView({
       </section>
 
       {/* =========================================================================
-          6. SECCIÓN EDITORIAL EN DOS COLUMNAS (URBANISMO CON RESPALDO TANGIBLE)
+          5.1 INGENIERÍA CIVIL & URBANISMO (ESTILO EDITORIAL MINIMALISTA CON ISOMÉTRICOS 3D)
           ========================================================================= */}
-      <section className="relative w-full bg-white text-slate-900 py-16 sm:py-24 border-b border-slate-100 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-            {/* Columna Izquierda: Fotografía Editorial de Alto Nivel con Badges Integrados */}
-            <ScrollReveal direction="left" delay={0.1} className="lg:col-span-6 relative">
-              <div className="relative w-full h-[360px] sm:h-[440px] lg:h-[480px] rounded-3xl overflow-hidden shadow-2xl border border-slate-200/80 bg-slate-950">
-                <Image
-                  src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=75&fm=webp"
-                  alt="Urbanización Planificada y Obras Civiles Concluidas - MGM Inmobiliaria"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover object-center transform transition-transform duration-700 ease-out hover:scale-105"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent pointer-events-none" />
+      <section className="relative w-full bg-transparent text-slate-900 py-16 sm:py-24 border-b border-stone-200/60 overflow-hidden">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
+          
+          {/* Header con Título Editorial en Serif Idéntico a la Referencia */}
+          <ScrollReveal direction="down" delay={0.1}>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-normal text-slate-900 tracking-tight">
+              Ingeniería Civil &amp; Urbanismo
+            </h2>
+          </ScrollReveal>
 
-
-              </div>
-            </ScrollReveal>
-
-            {/* Columna Derecha: Contenido Editorial y Pilares de Compra */}
-            <ScrollReveal direction="right" delay={0.2} className="lg:col-span-6 space-y-6">
-              <div className="space-y-2">
-                <span className="text-xs font-mono font-bold tracking-widest uppercase text-[#15803d]">
-                  Sobre Sociedad Civil MGM Inmobiliaria
-                </span>
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-tight [text-wrap:balance]">
-                  Elevando el Estándar del Urbanismo en el Ecuador
-                </h2>
-                <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
-                  En MGM Inmobiliaria no comercializamos promesas sobre planos sin sustento. Cada proyecto nace de una planificación seria con obras civiles tangibles, servicios básicos garantizados in situ y certeza jurídica notarial desde el primer momento.
-                </p>
-              </div>
-
-              {/* Proceso de Compra Transparente en 4 Pasos */}
-              <div className="space-y-2 pt-1">
-                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-600 block">
-                  Proceso de Adquisición Transparente
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  {PURCHASE_PROCESS_STEPS.map((stepItem) => {
-                    const StepIcon = stepItem.icon;
-                    return (
-                      <div
-                        key={stepItem.step}
-                        className="p-3.5 rounded-2xl bg-[#f8faf8] border border-slate-200/80 space-y-1.5 hover:border-emerald-300 hover:bg-emerald-50/20 transition-all"
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-2">
-                            <div className="p-1.5 rounded-lg bg-emerald-100/70 text-[#113d22]">
-                              <StepIcon className="h-3.5 w-3.5" />
-                            </div>
-                            <h3 className="font-bold text-xs sm:text-sm text-slate-900">
-                              {stepItem.title}
-                            </h3>
-                          </div>
-                          <span className="text-[10px] font-mono font-black text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/50">
-                            {stepItem.step}
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-slate-600 leading-relaxed font-normal">
-                          {stepItem.desc}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Botón de Acción Editorial */}
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={() => onNavigate('about')}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-950 hover:bg-[#22A33D] text-white font-bold text-xs sm:text-sm transition-all shadow-md hover:scale-105 active:scale-95 cursor-pointer"
+          {/* Grilla 2x2 de Tarjetas Limpias con Ilustración 3D Isométrica */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
+            {CIVIL_ENGINEERING_ITEMS.map((card, idx) => (
+              <ScrollReveal key={idx} direction="up" delay={idx * 0.08}>
+                <a
+                  href={getGeneralWhatsAppUrl(card.whatsappMsg)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative bg-[#fcfbf9] hover:bg-white rounded-[2rem] sm:rounded-[2.25rem] p-7 sm:p-8 lg:p-9 border border-stone-200/60 shadow-[0_4px_24px_rgba(0,0,0,0.02)] hover:shadow-xl hover:border-stone-300 transition-all duration-300 flex flex-col justify-between min-h-[220px] sm:min-h-[240px] cursor-pointer overflow-hidden h-full"
                 >
-                  <span>Conocer Nuestra Trayectoria</span>
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
-            </ScrollReveal>
+                  {/* Fila Superior: Contenido Textual a la izquierda | Ilustración Isométrica 3D a la derecha */}
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-2 max-w-[58%] sm:max-w-[62%]">
+                      {card.isHighlightNumber ? (
+                        <div>
+                          <div className="text-3xl sm:text-4xl font-serif text-slate-900 tracking-tight leading-none mb-1">
+                            {card.number}
+                          </div>
+                          <h3 className="text-xl sm:text-2xl font-bold text-slate-900 leading-tight">
+                            {card.title}
+                          </h3>
+                        </div>
+                      ) : card.titleSecond ? (
+                        <h3 className="text-xl sm:text-2xl font-bold text-slate-900 leading-tight">
+                          {card.title}
+                          <br />
+                          {card.titleSecond}
+                        </h3>
+                      ) : (
+                        <h3 className="text-xl sm:text-2xl font-bold text-slate-900 leading-tight">
+                          {card.title}
+                        </h3>
+                      )}
+                      
+                      <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal pt-0.5">
+                        {card.subtitle}
+                      </p>
+                    </div>
+
+                    {/* Render Isométrico 3D de Alta Definición con Flotación Suave */}
+                    <div className="shrink-0 w-32 sm:w-44 lg:w-52 h-28 sm:h-36 lg:h-44 flex items-center justify-end -mt-2 -mr-2">
+                      <div
+                        className="w-full h-full flex items-center justify-center animate-float-subtle will-change-transform drop-shadow-[0_12px_24px_rgba(0,0,0,0.08)] group-hover:scale-105 group-hover:-translate-y-1 transition-all duration-500"
+                        style={{ animationDelay: card.animationDelay }}
+                      >
+                        <img
+                          src={card.image}
+                          alt={card.imageAlt}
+                          className="w-full h-full object-contain select-none pointer-events-none"
+                          loading="lazy"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Fila Inferior: Especificación Técnica (si existe) + Botón Circular '>' en la Esquina */}
+                  <div className="pt-6 mt-auto flex items-end justify-between gap-3">
+                    {card.specLabel && card.specValue ? (
+                      <div className="text-xs sm:text-sm text-slate-600 font-normal">
+                        {card.specLabel}{' '}
+                        <span className="font-bold text-slate-900">{card.specValue}</span>
+                      </div>
+                    ) : (
+                      <div className="grow" />
+                    )}
+
+                    {/* Botón Circular '>' en tono cálido sutil */}
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#ece8de]/80 group-hover:bg-[#113d22] text-slate-700 group-hover:text-white flex items-center justify-center transition-all duration-300 shadow-2xs shrink-0 group-hover:scale-110 ml-auto">
+                      <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                    </div>
+                  </div>
+
+                </a>
+              </ScrollReveal>
+            ))}
           </div>
+
         </div>
       </section>
 
       {/* =========================================================================
-          7. BENEFICIOS Y URBANISMO: CARDS CUADRADAS CON COLORES MGM E IMÁGENES SIN FONDO
+          6. SECCIÓN COMBINADA: SERVICIOS URBANOS & RESPALDO EDITORIAL (ESTILO REFERENCIA)
           ========================================================================= */}
-      <section className="relative w-full bg-[#f8faf8] text-slate-900 py-16 sm:py-24 border-b border-slate-200/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-12">
+      <section className="relative w-full bg-transparent text-slate-900 py-16 sm:py-24 border-b border-stone-200/60 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
           
-          {/* Header con píldora superior centrada idéntica al banner de referencia con colores MGM */}
-          <ScrollReveal direction="down" delay={0.1} className="text-center max-w-3xl mx-auto space-y-3">
-            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white border border-slate-200/90 shadow-xs mb-1">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-[#5be196]" />
-                <span className="w-2 h-2 rounded-full bg-[#F58220]" />
-                <span className="w-2 h-2 rounded-full bg-[#113d22]" />
+          {/* Header Superior Izquierdo al estilo de la referencia */}
+          <ScrollReveal direction="down" delay={0.1} className="max-w-3xl space-y-2">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-base font-black text-[#d97706] tracking-tight">+ —</span>
+              <span className="text-[11px] sm:text-xs font-mono font-bold uppercase tracking-[0.2em] text-[#d97706]">
+                NUESTROS SERVICIOS URBANOS
               </span>
-              <span className="text-[11px] sm:text-xs font-black uppercase tracking-[0.18em] text-slate-800">
-                SERVICIOS &amp; BENEFICIOS URBANOS MGM
-              </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-900" />
             </div>
 
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-tight [text-wrap:balance]">
-              Infraestructura Urbana Concluida In Situ
+              Infraestructura Urbana Concluida <br className="hidden sm:inline" />
+              <span className="text-[#d97706]">y Certeza Inmobiliaria In Situ</span>
             </h2>
-            <p className="text-xs sm:text-base text-slate-600 leading-relaxed font-normal max-w-2xl mx-auto">
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal max-w-2xl pt-1">
               Ciudadelas planificadas con obras civiles terminadas, garantizando plusvalía inmediata, seguridad jurídica y calidad constructiva.
             </p>
           </ScrollReveal>
 
-          {/* Fila Única Completa: Las 4 Tarjetas Visibles en 1 Sola Línea sin Cortarse */}
+          {/* Fila de 4 Tarjetas Cuadradas/Rectangulares Superiores (Los cuadrados encima del rectángulo) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 xl:gap-5">
             {URBAN_BENEFIT_ITEMS.map((item, idx) => {
               const IconComp = item.icon;
               return (
                 <ScrollReveal key={idx} direction="up" delay={idx * 0.08}>
-                  <div
-                    className={`group relative ${item.bgClass} text-white rounded-[1.75rem] sm:rounded-3xl p-5 lg:p-4.5 xl:p-5 shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col justify-between overflow-hidden aspect-square h-full`}
+                  <a
+                    href={getGeneralWhatsAppUrl('Hola, deseo más información técnica sobre: ' + item.title)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative bg-white/80 hover:bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-7 border border-slate-200/90 hover:border-[#d97706]/40 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col items-center text-center justify-between min-h-[220px] sm:min-h-[240px] cursor-pointer h-full"
                   >
-                    {/* 1. Header Superior Izquierdo: Badge + Título + Descripción */}
-                    <div className="relative z-10 shrink-0 space-y-1.5">
-                      <div>
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border backdrop-blur-md ${item.badgeColor}`}>
-                          <IconComp className="w-3 h-3" />
-                          <span>{item.badge}</span>
-                        </span>
-                      </div>
+                    {/* Icono Centrado Superior con tono dorado/ámbar de la referencia */}
+                    <div className="p-3 rounded-2xl bg-amber-50/70 group-hover:bg-amber-100/80 text-[#d97706] transition-transform duration-300 group-hover:scale-110 shrink-0 border border-amber-200/40">
+                      <IconComp className="w-7 h-7 sm:w-8 sm:h-8 stroke-[1.75]" />
+                    </div>
 
-                      {/* Título protagonista en tipografía destacada */}
-                      <h3 className="text-base sm:text-lg font-black text-white leading-tight tracking-tight max-w-[92%] line-clamp-2">
+                    {/* Título en tipografía negrita destacada */}
+                    <div className="my-auto py-2">
+                      <h3 className="text-sm sm:text-base font-black text-slate-900 leading-snug group-hover:text-[#113d22] transition-colors">
                         {item.title}
                       </h3>
-
-                      {/* Descripción legible bajo el título */}
-                      <p className="text-[11px] sm:text-xs text-white/90 leading-relaxed font-normal max-w-[75%] line-clamp-2">
+                      {/* Descripción breve centrada */}
+                      <p className="text-xs text-slate-500 leading-relaxed font-normal mt-2 line-clamp-3">
                         {item.desc}
                       </p>
                     </div>
 
-                    {/* 2. Imagen en la Esquina Inferior Derecha (debajo del texto como en la referencia) */}
-                    <div className="absolute right-0 bottom-0 w-[56%] h-[56%] flex items-end justify-end pointer-events-none overflow-hidden rounded-tl-2xl">
-                      {/* Glow ambiental bajo la imagen */}
-                      <div className="absolute inset-0 bg-white/10 rounded-full blur-xl pointer-events-none transform scale-75" />
-                      
-                      <img
-                        src={item.image}
-                        alt={item.imageAlt}
-                        className={`relative max-h-full max-w-full object-contain object-bottom-right drop-shadow-[0_12px_24px_rgba(0,0,0,0.35)] transition-transform duration-500 group-hover:scale-105 p-1.5 sm:p-2 ${item.imageScale || ''}`}
-                        loading="lazy"
-                      />
+                    {/* Indicador de acción sutil al pie */}
+                    <div className="pt-2 text-[11px] font-bold text-[#d97706] group-hover:text-[#b45309] inline-flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <span>Consultar detalles</span>
+                      <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-1" />
                     </div>
-
-                    {/* 3. Botón Flotante Inferior Izquierdo: Estilo píldora frosted glass como en la referencia */}
-                    <div className="relative z-10 mt-auto pt-4 shrink-0 flex items-center justify-start">
-                      <a
-                        href={getGeneralWhatsAppUrl(`Hola, deseo más información técnica sobre: ${item.title}`)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-wide backdrop-blur-md transition-all bg-white/20 hover:bg-white/35 text-white border border-white/25 shadow-sm hover:shadow-md hover:scale-105 active:scale-95 cursor-pointer max-w-[65%]"
-                      >
-                        <span className="truncate">{item.buttonText}</span>
-                        <ArrowRight className="w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-1" />
-                      </a>
-                    </div>
-
-                    {/* Efecto de luz angular sutil de fondo */}
-                    <div className="absolute -right-6 -bottom-6 w-36 h-36 rounded-full bg-white/5 pointer-events-none blur-xl" />
-                  </div>
+                  </a>
                 </ScrollReveal>
               );
             })}
           </div>
 
-          {/* Botones de Exploración al pie */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
-            <a
-              href={getGeneralWhatsAppUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[#113d22] hover:bg-[#1a8230] text-white text-xs sm:text-sm font-bold transition-all shadow-md hover:scale-105 active:scale-95 cursor-pointer"
-            >
-              <WhatsAppIcon size={16} className="text-white shrink-0" />
-              <span>Cotizar Proyectos</span>
-            </a>
-            <button
-              type="button"
-              onClick={() => handleCatalogExplore()}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-white hover:bg-slate-100 text-slate-900 border border-slate-300 text-xs sm:text-sm font-bold transition-all shadow-xs hover:scale-105 active:scale-95 cursor-pointer"
-            >
-              <span>Explorar Catálogo de Lotes</span>
-              <ArrowRight className="h-4 w-4" />
-            </button>
-          </div>
+          {/* Gran Rectángulo Inferior: Sobre MGM + 4 Pasos + Fotografía con Curva Dorada */}
+          <ScrollReveal direction="up" delay={0.2}>
+            <div className="rounded-3xl sm:rounded-[2.5rem] border border-slate-300/70 bg-[#e4eaf0] overflow-hidden shadow-sm hover:shadow-md transition-all">
+              <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+                
+                {/* Columna Izquierda: Contenido Editorial, Pilares y Botones */}
+                <div className="lg:col-span-7 p-6 sm:p-8 lg:p-12 space-y-6 flex flex-col justify-between">
+                  
+                  {/* Encabezado Editorial */}
+                  <div className="space-y-2">
+                    <span className="text-xs font-mono font-bold tracking-widest uppercase text-[#15803d] flex items-center gap-1.5">
+                      <span className="w-2 h-0.5 bg-[#d97706] rounded-full" />
+                      Sobre Sociedad Civil MGM Inmobiliaria
+                    </span>
+                    <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-tight [text-wrap:balance]">
+                      Elevando el Estándar del Urbanismo en el Ecuador
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal pt-1">
+                      En MGM Inmobiliaria no comercializamos promesas sobre planos sin sustento. Cada proyecto nace de una planificación seria con obras civiles tangibles, servicios básicos garantizados in situ y certeza jurídica notarial desde el primer momento.
+                    </p>
+                  </div>
+
+                  {/* 4 Pasos del Proceso de Adquisición Transparente */}
+                  <div className="space-y-2.5 pt-1">
+                    <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500 block">
+                      Proceso de Adquisición Transparente
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {PURCHASE_PROCESS_STEPS.map((stepItem) => {
+                        const StepIcon = stepItem.icon;
+                        return (
+                          <div
+                            key={stepItem.step}
+                            className="p-3.5 rounded-2xl bg-white/90 border border-slate-200/90 space-y-1.5 hover:border-emerald-300 hover:bg-white transition-all shadow-2xs"
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2">
+                                <div className="p-1.5 rounded-lg bg-emerald-100/70 text-[#113d22]">
+                                  <StepIcon className="h-3.5 w-3.5" />
+                                </div>
+                                <h4 className="font-bold text-xs sm:text-sm text-slate-900">
+                                  {stepItem.title}
+                                </h4>
+                              </div>
+                              <span className="text-[10px] font-mono font-black text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/50">
+                                {stepItem.step}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-600 leading-relaxed font-normal">
+                              {stepItem.desc}
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Botones de Acción al pie del contenedor */}
+                  <div className="pt-3 flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => onNavigate('about')}
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-950 hover:bg-[#22A33D] text-white font-bold text-xs sm:text-sm transition-all shadow-md hover:scale-105 active:scale-95 cursor-pointer"
+                    >
+                      <span>Conocer Nuestra Trayectoria</span>
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
+                    <a
+                      href={getGeneralWhatsAppUrl('Hola, deseo asesoría sobre los proyectos de MGM Inmobiliaria')}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-bold text-xs sm:text-sm transition-all shadow-xs hover:scale-105 active:scale-95 cursor-pointer"
+                    >
+                      <WhatsAppIcon size={16} className="text-[#25D366]" />
+                      <span>Contactar un Asesor</span>
+                    </a>
+                  </div>
+
+                </div>
+
+                {/* Columna Derecha: Fotografía Editorial con Curva Dorada de Separación (Estilo Referencia) */}
+                <div className="lg:col-span-5 relative min-h-[340px] sm:min-h-[420px] lg:min-h-full overflow-hidden bg-slate-950">
+                  <Image
+                    src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80"
+                    alt="Urbanización Planificada y Obras Civiles Concluidas - MGM Inmobiliaria"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 42vw"
+                    className="object-cover object-center transform transition-transform duration-700 ease-out hover:scale-105"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent lg:hidden pointer-events-none" />
+
+                  {/* Separador Curvo Dorado Estilo Referencia (Visible en Desktop) */}
+                  <svg
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="none"
+                    className="absolute -left-[1px] top-0 h-full w-14 lg:w-20 pointer-events-none hidden lg:block z-10"
+                  >
+                    <path d="M 0,0 L 40,0 Q -15,50 40,100 L 0,100 Z" className="fill-[#e4eaf0]" />
+                    <path d="M 40,0 Q -15,50 40,100" fill="none" stroke="#d97706" strokeWidth="6" />
+                  </svg>
+                </div>
+
+              </div>
+            </div>
+          </ScrollReveal>
 
         </div>
       </section>

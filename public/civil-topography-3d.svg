@@ -1,0 +1,198 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 360" width="420" height="360" fill="none">
+  <defs>
+    <!-- Filtros de Sombra Suave -->
+    <filter id="topo-ambient-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#0f172a" flood-opacity="0.14" />
+    </filter>
+
+    <!-- Gradientes de Terreno Verde Oliva & Rasante Plana -->
+    <linearGradient id="topo-surface-plane" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#bef264" />
+      <stop offset="35%" stop-color="#a3e635" />
+      <stop offset="70%" stop-color="#84cc16" />
+      <stop offset="100%" stop-color="#4d7c0f" />
+    </linearGradient>
+
+    <!-- Gradientes de Estratos Horizontales Perfectamente Nivelados -->
+    <linearGradient id="topo-soil-left-1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3f6212" />
+      <stop offset="100%" stop-color="#78350f" />
+    </linearGradient>
+    <linearGradient id="topo-soil-left-2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#a16207" />
+      <stop offset="100%" stop-color="#854d0e" />
+    </linearGradient>
+    <linearGradient id="topo-soil-left-3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#451a03" />
+      <stop offset="100%" stop-color="#291202" />
+    </linearGradient>
+
+    <linearGradient id="topo-soil-right-1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a" />
+      <stop offset="0%" stop-color="#365314" />
+      <stop offset="100%" stop-color="#451a03" />
+    </linearGradient>
+    <linearGradient id="topo-soil-right-2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#78350f" />
+      <stop offset="100%" stop-color="#291202" />
+    </linearGradient>
+
+    <!-- Gradiente Mira Topográfica (Topographic Surveyor Rod) -->
+    <linearGradient id="topo-rod-silver" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="50%" stop-color="#e2e8f0" />
+      <stop offset="100%" stop-color="#94a3b8" />
+    </linearGradient>
+  </defs>
+
+  <!-- Sombra Suave Proyectada en el Piso -->
+  <ellipse cx="210" cy="305" rx="160" ry="42" fill="#0f172a" opacity="0.16" />
+
+  <!-- ================= BLOQUE ISOMÉTRICO (ESTRATOS GEOTÉCNICOS NIVELES) ================= -->
+  <!-- CARA LATERAL IZQUIERDA (Demuestra Estratificación 100% Horizontal y Nivelada) -->
+  <g>
+    <!-- Capa 1: Capa Vegetal Superior y Rasante Nivelada -->
+    <path d="M 50 170 L 210 262 L 210 276 L 50 184 Z" fill="url(#topo-soil-left-1)" />
+    <!-- Capa 2: Estrato de Limos y Arenas Compactadas de Alta Capacidad Portante -->
+    <path d="M 50 184 L 210 276 L 210 294 L 50 202 Z" fill="url(#topo-soil-left-2)" />
+    <!-- Capa 3: Roca Madre Firme / Basamento Nivelado -->
+    <path d="M 50 202 L 210 294 L 210 310 L 50 218 Z" fill="url(#topo-soil-left-3)" />
+
+    <!-- Líneas Geométricas de Estrato Nivelado Izquierdo -->
+    <path d="M 50 184 L 210 276" stroke="#4d7c0f" stroke-width="1.2" stroke-opacity="0.6" />
+    <path d="M 50 202 L 210 294" stroke="#eab308" stroke-width="1" stroke-opacity="0.5" />
+    <!-- Textura Granulométrica -->
+    <circle cx="85" cy="195" r="2" fill="#ca8a04" opacity="0.4" />
+    <circle cx="130" cy="225" r="1.5" fill="#fef08a" opacity="0.4" />
+    <circle cx="170" cy="285" r="2.2" fill="#78350f" opacity="0.5" />
+  </g>
+
+  <!-- CARA LATERAL DERECHA (Corte Geotécnico Firme) -->
+  <g>
+    <!-- Capa 1 -->
+    <path d="M 210 262 L 370 170 L 370 184 L 210 276 Z" fill="url(#topo-soil-right-1)" />
+    <!-- Capa 2 -->
+    <path d="M 210 276 L 370 184 L 370 202 L 210 294 Z" fill="url(#topo-soil-right-2)" />
+    <!-- Capa 3 -->
+    <path d="M 210 294 L 370 202 L 370 218 L 210 310 Z" fill="#1c0b02" />
+
+    <!-- Líneas Geométricas de Estrato Nivelado Derecho -->
+    <path d="M 210 276 L 370 184" stroke="#291202" stroke-width="1.2" stroke-opacity="0.6" />
+    <path d="M 210 294 L 370 202" stroke="#451a03" stroke-width="1" stroke-opacity="0.6" />
+    <circle cx="260" cy="280" r="2.2" fill="#78350f" opacity="0.5" />
+    <circle cx="310" cy="245" r="1.8" fill="#a16207" opacity="0.4" />
+  </g>
+
+  <!-- ================= PLANTA SUPERIOR: TERRENO REGULAR CON CURVAS DE NIVEL ================= -->
+  <g filter="url(#topo-ambient-shadow)">
+    <!-- Base del Terreno con Pendiente Suave y Controlada -->
+    <path d="M 50 170 L 210 78 L 370 170 L 210 262 Z" fill="url(#topo-surface-plane)" />
+
+    <!-- Retícula de Coordenadas Topográficas Isométricas (Micro-grid) -->
+    <g stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.25" stroke-dasharray="3 4">
+      <line x1="90" y1="147" x2="250" y2="55" />
+      <line x1="130" y1="124" x2="290" y2="32" />
+      <line x1="170" y1="101" x2="330" y2="9" />
+      <line x1="130" y1="216" x2="290" y2="124" />
+      <line x1="170" y1="239" x2="330" y2="147" />
+    </g>
+
+    <!-- Curvas de Nivel Topográficas Vectoriales (Topographic Contour Isolines) -->
+    <!-- Curva de Nivel 1: Rasante Inferior (+0.00m) -->
+    <g>
+      <path d="M 80 187 Q 150 205 210 235 T 340 187" fill="none" stroke="#fef08a" stroke-width="1.6" stroke-linecap="round" />
+      <!-- Cota técnica -->
+      <rect x="188" y="218" width="42" height="11" rx="3" fill="#1e293b" opacity="0.85" />
+      <text x="209" y="226" font-family="monospace" font-size="7.5" font-weight="bold" fill="#facc15" text-anchor="middle">+0.00m</text>
+    </g>
+
+    <!-- Curva de Nivel 2: Cota Intermedia (+0.25m) -->
+    <g>
+      <path d="M 95 160 Q 170 170 215 190 T 325 158" fill="none" stroke="#fef08a" stroke-width="1.8" stroke-linecap="round" />
+      <rect x="194" y="176" width="42" height="11" rx="3" fill="#1e293b" opacity="0.85" />
+      <text x="215" y="184" font-family="monospace" font-size="7.5" font-weight="bold" fill="#facc15" text-anchor="middle">+0.25m</text>
+    </g>
+
+    <!-- Curva de Nivel 3: Cota Superior (+0.50m) -->
+    <g>
+      <path d="M 125 130 Q 185 135 215 150 T 295 130" fill="none" stroke="#fef08a" stroke-width="1.6" stroke-linecap="round" />
+      <rect x="194" y="137" width="42" height="11" rx="3" fill="#1e293b" opacity="0.85" />
+      <text x="215" y="145" font-family="monospace" font-size="7.5" font-weight="bold" fill="#facc15" text-anchor="middle">+0.50m</text>
+    </g>
+
+    <!-- Curva de Nivel 4: Cota Meseta (+0.75m) -->
+    <path d="M 160 102 Q 200 108 215 116 T 265 104" fill="none" stroke="#fef9c3" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="2 3" />
+
+    <!-- Estacas de Replanteo Topográfico en las Esquinas del Terreno -->
+    <!-- Estaca 1 (Izquierda) -->
+    <g>
+      <line x1="90" y1="165" x2="90" y2="152" stroke="#dc2626" stroke-width="2" stroke-linecap="round" />
+      <!-- Cinta testigo amarilla flameando -->
+      <polygon points="90,154 100,152 90,158" fill="#facc15" />
+    </g>
+    <!-- Estaca 2 (Derecha) -->
+    <g>
+      <line x1="330" y1="165" x2="330" y2="152" stroke="#dc2626" stroke-width="2" stroke-linecap="round" />
+      <polygon points="330,154 340,152 330,158" fill="#facc15" />
+    </g>
+  </g>
+
+  <!-- ================= EQUIPAMIENTO DE TOPOGRAFÍA Y PRECISIÓN ================= -->
+  <!-- Estación Total / Trípode de Precisión con Prisma Geodésico -->
+  <g>
+    <!-- Sombra del trípode en la rasante -->
+    <ellipse cx="275" cy="148" rx="20" ry="8" fill="#0f172a" opacity="0.3" />
+
+    <!-- Patas del Trípode Geodésico -->
+    <!-- Pata Trasera -->
+    <line x1="275" y1="108" x2="262" y2="146" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round" />
+    <!-- Pata Izquierda -->
+    <line x1="275" y1="108" x2="272" y2="150" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" />
+    <!-- Pata Derecha -->
+    <line x1="275" y1="108" x2="288" y2="145" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" />
+    <!-- Zapatas de anclaje metálicas -->
+    <polygon points="261,146 263,146 262,149" fill="#0f172a" />
+    <polygon points="271,150 273,150 272,153" fill="#0f172a" />
+    <polygon points="287,145 289,145 288,148" fill="#0f172a" />
+
+    <!-- Cabezal / Plataforma Nivelante del Trípode -->
+    <polygon points="271,108 279,108 277,105 273,105" fill="#334155" />
+
+    <!-- Cuerpo de la Estación Total Digital (Cuerpo Amarillo / Naranja Topográfico) -->
+    <rect x="272" y="93" width="7" height="12" rx="1.5" fill="#f59e0b" stroke="#d97706" stroke-width="0.8" />
+    <!-- Pantalla LCD Digital y Teclado de Campo -->
+    <rect x="273.5" y="98" width="4" height="4" fill="#0f172a" />
+    <rect x="274" y="99" width="3" height="2" fill="#22c55e" opacity="0.8" />
+
+    <!-- Telescopio Óptico / Mira Láser Transversal -->
+    <line x1="268" y1="91" x2="283" y2="91" stroke="#334155" stroke-width="3" stroke-linecap="round" />
+    <circle cx="268" cy="91" r="2" fill="#0284c7" />
+
+    <!-- Haz Láser Verde de Nivelación Rasante (Láser de Medición Proyectado) -->
+    <line x1="268" y1="91" x2="160" y2="128" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="4 3" stroke-opacity="0.8" />
+    <!-- Punto de Impacto Láser -->
+    <circle cx="160" cy="128" r="2" fill="#86efac" />
+    <circle cx="160" cy="128" r="4" fill="#4ade80" opacity="0.4" />
+  </g>
+
+  <!-- Mira Topográfica Vertical con Marcas Métricas (Surveyor's Staff) en Cota +0.25m -->
+  <g>
+    <!-- Sombra de la mira -->
+    <ellipse cx="160" cy="132" rx="6" ry="2.5" fill="#0f172a" opacity="0.3" />
+
+    <!-- Varilla Graduada de Aluminio -->
+    <rect x="158.5" y="80" width="3" height="52" fill="url(#topo-rod-silver)" stroke="#64748b" stroke-width="0.5" />
+
+    <!-- Franjas de Medición Métricas E (Alternancia Rojo y Blanco de Precisión) -->
+    <rect x="158.5" y="80" width="3" height="8" fill="#ef4444" />
+    <rect x="158.5" y="88" width="3" height="8" fill="#ffffff" />
+    <rect x="158.5" y="96" width="3" height="8" fill="#ef4444" />
+    <rect x="158.5" y="104" width="3" height="8" fill="#ffffff" />
+    <rect x="158.5" y="112" width="3" height="8" fill="#ef4444" />
+    <rect x="158.5" y="120" width="3" height="8" fill="#ffffff" />
+
+    <!-- Prisma Circular Superior con Carcasa Reflectante -->
+    <circle cx="160" cy="77" r="4" fill="#f59e0b" stroke="#b45309" stroke-width="0.8" />
+    <circle cx="160" cy="77" r="2.5" fill="#38bdf8" />
+  </g>
+</svg>

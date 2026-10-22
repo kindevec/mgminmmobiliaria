@@ -207,7 +207,7 @@ function HomePageContent() {
   };
 
   return (
-    <div className={`${currentPage === 'appraisals' ? 'h-screen h-[100dvh] overflow-hidden' : 'min-h-screen'} flex flex-col relative text-slate-800 antialiased font-sans selection:bg-emerald-600 selection:text-white`}>
+    <div className={`${(currentPage === 'appraisals' || currentPage === 'constructions') ? 'h-screen h-[100dvh] overflow-hidden' : 'min-h-screen'} flex flex-col relative text-slate-800 antialiased font-sans selection:bg-emerald-600 selection:text-white`}>
       {/* ScrollToTop Ergonomic Behavior */}
       <ScrollToTop triggerKey={currentPage} />
 
@@ -223,7 +223,7 @@ function HomePageContent() {
       )}
 
       {/* 2. Main Content Container with Strict Anti-Overflow */}
-      <main className={`flex-1 w-full ${currentPage === 'appraisals' ? 'h-full overflow-hidden p-0' : currentPage === 'admin' ? 'p-0 pb-0 overflow-x-clip' : 'pb-24 md:pb-12 pt-0 overflow-x-clip'}`}>
+      <main className={`flex-1 w-full ${(currentPage === 'appraisals' || currentPage === 'constructions') ? 'h-full overflow-hidden p-0' : currentPage === 'admin' ? 'p-0 pb-0 overflow-x-clip' : 'pb-24 md:pb-12 pt-0 overflow-x-clip'}`}>
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={currentPage}
@@ -231,7 +231,7 @@ function HomePageContent() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className={`w-full ${currentPage === 'appraisals' ? 'h-full overflow-hidden' : ''}`}
+            className={`w-full ${(currentPage === 'appraisals' || currentPage === 'constructions') ? 'h-full overflow-hidden' : ''}`}
           >
             <Suspense fallback={<div className="min-h-[60vh] w-full" />}>
               {currentPage === 'home' && (
